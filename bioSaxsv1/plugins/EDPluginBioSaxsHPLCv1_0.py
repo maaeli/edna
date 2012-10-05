@@ -1,6 +1,6 @@
 # coding: utf8
 #
-#    Project: <projectName>
+#    Project:BioSaxs
 #             http://www.edna-site.org
 #
 #    File: "$Id$"
@@ -30,175 +30,34 @@ __copyright__ = "2012 ESRF"
 __date__ = "20120920"
 __status__ = "development"
 
-import os, h5py, fabio, numpy
+import os
 from EDPluginControl import EDPluginControl
 from EDThreading import Semaphore
-from EDVerbose import EDVerbose
+
 from EDFactoryPlugin import edFactoryPlugin
 edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
 edFactoryPlugin.loadModule("XSDataEdnaSaxs")
 from XSDataBioSaxsv1_0 import XSDataInputBioSaxsHPLCv1_0, XSDataResultBioSaxsHPLCv1_0, \
                             XSDataInputBioSaxsProcessOneFilev1_0
 from XSDataEdnaSaxs import XSDataInputDatcmp, XSDataInputDataver, XSDataInputDatop, XSDataInputSaxsAnalysis
-from XSDataCommon import XSDataFile, XSDataStatus, XSDataString, XSDataInteger, XSDataStatus
+from XSDataCommon import XSDataFile, XSDataString, XSDataStatus
 
-class HPLCframe(object):
-    def __init__(self, runID, frameId=None):
-        self.runID = runID
-        self.frameId = frameId
-        self.curve = None
-        self.subtracted = None
-        self.processing = True
-        self.time = None
-        self.gnom = None
-        self.Dmax = None
-        self.total = None
-        self.volume = None
-        self.Rg = None
-        self.Rg_Stdev = None
-        self.I0 = None
-        self.I0_Stdev = None
-        self.quality = None
+from EDUtilsBioSaxs import HPLCframe, HPLCrun
 
-
-class HPLCrun(object):
-    def __init__(self, runId, first_curve=None):
-        self.id = runId
-        self.buffer = None
-        self.first_curve = first_curve
-        self.frames = {} #key: id, value: HPLCframe instance
-        self.curves = []
-        self.for_buffer = []
-        self.hdf5_filename = None
-        self.hdf5 = None
-        self.start_time = None
-        self.chunk_size = 100
-        self.lock = Semaphore()
-        if first_curve:
-            self.files.append(first_curve)
-
-    def reset(self):
-        self.frames = []
-        self.curves = []
-        self.for_buffer = []
-
-    def dump_json(self):
-        import json
-        dico = {}
-        for i in self.frames:
-            dico[i] = self.frames[i].__dict__()
-        json.dump(dico, open(self.hdf5_filename, "w"), indent=1)
-    def init_hdf5(self, filename):
-        if self.hdf5_filename is None:
-            with self.lock:
-                if self.hdf5_filename is None:
-                    self.hdf5_filename = filename
-        if self.hdf5 is None:
-            with self.lock:
-                if self.hdf5 is None:
-                    if os.path.exists(self.hdf5_filename):
-                        os.unlink(self.hdf5_filename)
-                    self.hdf5 = h5py.File(self.hdf5_filename)
-        else:
-            try:# the HDF5 file exist but could be closed
-                fn = self.hdf5.filename
-            except IOError: #if closed: reopen it without erasing it
-                with self.lock:
-                    self.hdf5 = h5py.File(self.hdf5_filename)
-
-    def close_hdf5(self):
-        with self.lock:
-            if self.hdf5:
-                try:
-                    self.hdf5.flush()
-                except IOError:
-                    EDVerbose.WARNING("HDF5 file already closed")
-                    pass
-
-    def calc_size(self, id):
-        return (1 + (id // self.chunk_size)) * self.chunk_size
-
-    def set_scal(self, frameId, data, key="time"):
-        if not self.hdf5:
-            EDVerbose.WARNING("HDF5 is not initialized")
-            if self.hdf5_filename :
-                self.init_hdf5(self.hdf5_filename)
-        with self.lock:
-            if key not in self.hdf5:
-                ds = self.hdf5.create_dataset(key, (self.calc_size(frameId),), "float32", chunks=(self.chunk_size,))
-            else:
-                ds = self.hdf5[key]
-            if ds.shape[0] <= frameId:
-                ds.resize((self.calc_size(frameId),))
-            ds[frameId] = data
-
-    def set_time(self, frameId, rawfilename):
-        if not os.path.isfile(rawfilename):
-            EDVerbose.WARNING("Raw file not on disk: %s" % rawfilename)
-            return
-        header = fabio.open(rawfilename).header
-        if "time_of_day" in header:
-            try:
-                tt = float(header["time_of_day"])
-            except:
-                EDVerbose.WARNING("time_of_day not a float in %s" % rawfilename)
-                return
-            if self.start_time is None:
-                with self.lock:
-                    if self.start_time is None:
-                        self.start_time = tt
-            self.set_scal(frameId, tt - self.start_time, key="time")
-
-
-    def set_2D(self, frameId, datfilename, kind="scattering"):
-        if not self.hdf5:
-            EDVerbose.WARNING("HDF5 is not initialized")
-            if self.hdf5_filename :
-                self.init_hdf5(self.hdf5_filename)
-        if not os.path.isfile(datfilename):
-            EDVerbose.WARNING("Ascii file not on disk: %s" % datfilename)
-            return
-        data = numpy.loadtxt(datfilename)
-        size = data.shape[0]
-        q = data[:, 0]
-        I = data[:, 1]
-        s = data[:, 2]
-        with self.lock:
-            key = kind + "_q"
-            if key not in self.hdf5:
-                self.hdf5[key] = q.astype("float32")
-
-            key = kind + "_I"
-            if key not in self.hdf5:
-                ds = self.hdf5.create_dataset(key, (self.calc_size(frameId), size), "float32", chunks=(self.chunk_size, size))
-            else:
-                ds = self.hdf5[key]
-            if ds.shape[0] <= frameId:
-                ds.resize((self.calc_size(frameId), size))
-            ds[frameId, :] = I
-
-            key = kind + "_Stdev"
-            if key not in self.hdf5:
-                ds = self.hdf5.create_dataset(key, (self.calc_size(frameId), size), "float32", chunks=(self.chunk_size, size))
-            else:
-                ds = self.hdf5[key]
-            if ds.shape[0] <= frameId:
-                ds.resize((self.calc_size(frameId), size))
-            ds[frameId, :] = s
 
 
 
 class EDPluginBioSaxsHPLCv1_0(EDPluginControl):
     """
     plugin for processing Saxs data coming from HPLC
-    
+
     runs subsequently:
-    *ProcessOneFile, 
-    *subtraction of buffer 
+    *ProcessOneFile,
+    *subtraction of buffer
     *SaxsAnalysis
-    
+
     todo:
-    only store references: Wait for flush to construct HDF5 file and (possibly) web pages with PNG graphs  
+    only store references: Wait for flush to construct HDF5 file and (possibly) web pages with PNG graphs
     """
 
     strControlledPluginProcessOneFile = "EDPluginBioSaxsProcessOneFilev1_2"
@@ -288,9 +147,9 @@ class EDPluginBioSaxsHPLCv1_0(EDPluginControl):
             else:
                 hplc = os.path.splitext(path)[0] + ".h5"
 
-#        if not self.hplc_run.hdf5_filename:
-#            with self._sem:
-#                self.hplc_run.init_hdf5(hplc)
+        if not self.hplc_run.hdf5_filename:
+            with self._sem:
+                self.hplc_run.init_hdf5(hplc)
 #        self.xsDataResult.hplcFile = XSDataFile(XSDataString(hplc))
 
     def process(self, _edObject=None):
@@ -359,7 +218,7 @@ class EDPluginBioSaxsHPLCv1_0(EDPluginControl):
         if self.curve:
             self.xsDataResult.integratedCurve = XSDataFile(XSDataString(self.curve))
         if self.subtracted:
-             self.xsDataResult.subtractedCurve = XSDataFile(XSDataString(self.subtracted))
+            self.xsDataResult.subtractedCurve = XSDataFile(XSDataString(self.subtracted))
 
     def finallyProcess(self, _edObject=None):
         EDPluginControl.finallyProcess(self)
@@ -412,9 +271,8 @@ class EDPluginBioSaxsHPLCv1_0(EDPluginControl):
             startTime = None
         with self._sem:
             if not self.hplc_run.first_curve:
-                 self.hplc_run.first_curve = self.curve
-                 self.hplc_run.start_time = startTime
-#                 self.hplc_run.for_buffer.append(self.curve)
+                self.hplc_run.first_curve = self.curve
+                self.hplc_run.start_time = startTime
         self.frame.curve = self.curve
         self.frame.time = startTime
 
@@ -441,7 +299,7 @@ class EDPluginBioSaxsHPLCv1_0(EDPluginControl):
                     self.xsDataResult.subtractedCurve = output.outputCurve
                     self.frame.subtracted = self.subtracted
                 else:
-                    strErr = "Edna plugin datop did not produce subtracted file %s" % subtracted
+                    strErr = "Edna plugin datop did not produce subtracted file %s" % self.subtracted
                     self.ERROR(strErr)
                     self.lstExecutiveSummary.append(strErr)
                     self.setFailure()
@@ -496,8 +354,9 @@ class EDPluginBioSaxsHPLCv1_0(EDPluginControl):
         strErr = "Edna plugin SaxsAnalysis failed."
         if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.status and  _edPlugin.dataOutput.status.executiveSummary:
             self.lstExecutiveSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
+            self.lstExecutiveSummary.append(strErr)
         else:
-            self.lstExecutiveSummary.append("Edna plugin SaxsAnalysis failed.")
+            self.lstExecutiveSummary.append(strErr)
         self.setFailure()
 
     def doSuccessDatCmp(self, _edPlugin=None):
@@ -516,20 +375,13 @@ class EDPluginBioSaxsHPLCv1_0(EDPluginControl):
         if self.hplc_run.buffer is None:
             if fidelity > 0:
                 self.isBuffer = True
-                #with self._sem:
-                self.hplc_run.for_buffer.append(self.curve)
+                if fidelity > 0.1:
+                    self.hplc_run.for_buffer.append(self.curve)
             else :
                 self.average_buffers()
         elif fidelity > 0:
             self.isBuffer = True
 
-#complex type XSDataResultDatcmp extends XSDataResult {
-#    "Higher chi-values indicate dis-similarities in the input.\n
-#     Fidelity gives the likelihood of the two data sets being identical.
-#    "
-#    chi: XSDataDouble 
-#    fidelity: XSDataDouble
-#}
     def doFailureDatCmp(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsHPLCv1_0.doFailureDatCmp")
         self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_0.doFailureDatCmp")
@@ -544,14 +396,14 @@ class EDPluginBioSaxsHPLCv1_0(EDPluginControl):
         self.DEBUG("EDPluginBioSaxsHPLCv1_0.doSuccessDatAver")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_0.doSuccessDatAver")
         if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.outputCurve:
-            buffer = _edPlugin.dataOutput.outputCurve.path.value
-            if os.path.exists(buffer):
+            bufferCurve = _edPlugin.dataOutput.outputCurve.path.value
+            if os.path.exists(bufferCurve):
                 with self._sem:
-                    self.hplc_run.buffer = buffer
+                    self.hplc_run.buffer = bufferCurve
             else:
                 strErr = "DatAver claimed buffer is in %s but no such file !!!" % buffer
-                self.ERROR(strError)
-                self.lstExecutiveSummary.append(strError)
+                self.ERROR(strErr)
+                self.lstExecutiveSummary.append(strErr)
                 self.setFailure()
 
     def doFailureDatAver(self, _edPlugin=None):
