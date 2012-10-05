@@ -193,16 +193,24 @@ class Reprocess(EDLogging):
         """
         while not (self.jobQueue.empty() and \
                 (self.__semaphoreNbThreads._Semaphore__value == self.iNbCpu) and \
-                (EDUtilsParallel.getNbRunning() == self.iNbCpu) and \
+                (EDUtilsParallel.getNbRunning() == 0) and \
                 (self.processingSem._Semaphore__value == 1) and\
                 (len(EDStatus.getRunning()) == 0)):
             time.sleep(1)
 
+
 if __name__ == "__main__":
+    res = {}
+    def sortn(a, b):
+        if res[a][1] < res[b][1]:
+            return 1
+        else:
+            return -1
+
     from optparse import OptionParser
     parser = OptionParser(usage="%prog reprocess on SAXS-HPLC experiment", version="%prog 1.0")
 #    parser.add_option("-o", "--output", dest="h5path",
-#                      help="write result to HDF5 file with given path: path/to/file.h5:Aligned")
+#                      help="put loh information to ")
 #    parser.add_option("-c", "--crop", dest="crop",
 #                      help="Shall we crop the dataset to valid area", default=True)
 #    parser.add_option("-k", "--check", dest="recheck",
@@ -215,6 +223,9 @@ if __name__ == "__main__":
     parser.add_option("-p", "--plugin", action="store", type="string",
                       dest="plugin", default="EDPluginBioSaxsHPLCv1_0",
                       help="use an alternative plugin")
+    parser.add_option("-y", "--yappi", action="store_true",
+                      dest="yappi", default=False,
+                      help="use an multi-threaded profiler named 'YAPPI'")
     (options, args) = parser.parse_args()
     print("")
     print("Options:")
@@ -228,14 +239,45 @@ if __name__ == "__main__":
         print("Input XML files: " + ", ".join([f for f in list(args) if f.endswith(".xml")]))
     print(" ")
     reprocess = Reprocess(options.plugin, options.ncpu)
+    if options.yappi:
+        try:
+            import yappi
+        except ImportError:
+            print("Sorry, I was not able to import Yappi")
+            yappi = None
+    else:
+        yappi = None
     if options.verbose:
         reprocess.setVerboseDebugOn()
-    for i in args:
-        if i.endswith(".xml"):
-            reprocess.startJob(i)
+    fullargs = [os.path.abspath(i) for i in args if os.path.exists(i) and i.endswith(".xml")]
+    working_dir = "Reprocess-HPLC-%s" % time.strftime("%Y%m%d-%H%M%S")
+    os.makedirs(working_dir)
+    os.chdir(working_dir)
+    if yappi: yappi.start()
+    for i in fullargs:
+        reprocess.startJob(i)
     print("All %i jobs queued after %.3fs" % (len(args), time.time() - reprocess.startTime))
     reprocess.join()
+    if yappi: yappi.stop()
     print("All %i jobs processed after %.3fs" % (len(args), time.time() - reprocess.startTime))
     print reprocess.statistics()
-
+    if yappi:
+        stat = yappi.get_stats(sort_type=yappi.SORTTYPE_TTOT)
+        res = {}
+        for i in stat.func_stats:
+            if i[0] in res:
+                res[i[0]][0] += i[1]
+                res[i[0]][1] += i[2]
+            else:
+                res[i[0]] = [i[1], i[2]]
+        keys = res.keys()
+        keys.sort(sortn)
+        with open("yappi.out", "w") as f:
+            f.write("ncall\t\ttotal\t\tpercall\t\tfunction%s" % (os.linesep))
+            for i in keys:
+                f.write("%8s\t%16s\t%16s\t%s%s" % (res[i][0], res[i][1], res[i][1] / res[i][0], i, os.linesep))
+        print("Profiling information written in yappi.out")
+    edJob = EDJob("EDPluginBioSaxsFlushHPLCv1_0")
+    edJob.setDataInput(open(fullargs[-1], "r").read())
+    edJob.execute()
 
