@@ -174,7 +174,7 @@ class EDJob(EDLogging):
         elif self.__pathXSDOutput is not None:
             return open(self.__pathXSDOutput).read()
         else:
-            self.WARNING("Getting DataOutput for uninstanciated plugin %s." % self.__strPluginName)
+            self.WARNING("Getting DataOutput for uninstanciated plugin or plugin has been garbage collected or output data were not saved. JobID was %s ." % self.__jobId)
     dataOutput = property(getDataOutput)
 
     def execute(self):
