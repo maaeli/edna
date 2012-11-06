@@ -1,35 +1,24 @@
 #!/usr/bin/env python
-# -*- coding: utf8 -*-
-#
-#    Project: BioSaxs
-#             http://www.edna-site.org
-#
-#    File: "$Id$"
-#
-#    Copyright (C) European Synchrotron Radiation Facility, Grenoble, France
-#
-#    Principal author:       Jérôme Kieffer (Jerome.Kieffer@ESRF.eu)
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
+# coding: utf8
+
 from __future__ import with_statement
 
-__author__ = "Jérôme Kieffer"
-__contact__ = "Jerome.Kieffer@ESRF.eu"
+__authors__ = [ "Jérôme Kieffer"]
+__contact__ = "jerome.kieffer@esrf.eu"
 __license__ = "GPLv3+"
 __copyright__ = "European Synchrotron Radiation Facility, Grenoble, France"
-__date__ = "20121105"
+__date__ = "20121106"
+__status__ = "beta"
+__doc__ = """Usage: 
+
+$ ${EDNA_HOME} / bioSaxsv1 / bin / smart_merge.py  [-range = 1 - 10] [-rdabs = 1e-6] [-rdrel = 1e-6] * .dat
+
+options:
+* -plugin: name of the plugin to use
+* -range: the range of frames to merge (by default all)
+* -rdabs: lower limit for similarity (radiation damage estimation) with first image in the serie
+* -rdrel: lower limit for similarity (radiation damage estimation) with previous image in the serie
+"""
 
 import os, sys, time, threading, gc, types
 if sys.version > (3, 0):
@@ -38,25 +27,27 @@ else:
     from Queue import Queue
 
 # Append the EDNA kernel source directory to the python path
-if "EDNA_HOME" not in os.environ:
-    pyStrProgramPath = os.path.abspath(__file__)
-    pyLPath = pyStrProgramPath.split(os.sep)
-    if len(pyLPath) > 3:
-        pyStrEdnaHomePath = os.sep.join(pyLPath[:-3])
+
+if not os.environ.has_key("EDNA_HOME"):
+    strProgramPath = os.path.abspath(sys.argv[0])
+    lPath = strProgramPath.split(os.sep)
+    if len(lPath) > 3:
+        strEdnaHomePath = os.sep.join(lPath[:-3])
     else:
-        print ("Problem in the EDNA_HOME path ..." + pyStrEdnaHomePath)
+        raise RuntimeError("Problem in the EDNA_HOME path ... %s" % strEdnaHomePath)
         sys.exit()
-    os.environ["EDNA_HOME"] = pyStrEdnaHomePath
+    os.environ["EDNA_HOME"] = strEdnaHomePath
 
 sys.path.append(os.path.join(os.environ["EDNA_HOME"], "kernel", "src"))
+from EDFactoryPlugin import edFactoryPlugin
+edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
+from XSDataCommon import XSDataDouble, XSDataFile, XSDataString
+from XSDataBioSaxsv1_0 import XSDataInputBioSaxsSmartMergev1_0
 from EDLogging import EDLogging
-from EDFactoryPlugin  import edFactoryPlugin
 from EDJob import EDJob
 from EDThreading import Semaphore
 from EDUtilsParallel import EDUtilsParallel
 from EDStatus import EDStatus
-edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
-import XSDataBioSaxsv1_0
 
 class Reprocess(EDLogging):
     def __init__(self, strPluginName, iNbCpu=None):
@@ -112,6 +103,7 @@ class Reprocess(EDLogging):
                 edJob.connectSUCCESS(self.successJobExecution)
                 edJob.connectFAILURE(self.failureJobExecution)
                 edJob.execute()
+                edJob.synchronize()
 
     def successJobExecution(self, jobId):
         self.DEBUG("In %s.successJobExecution(%s)" % (self.__class__.__name__, jobId))
@@ -202,36 +194,107 @@ class Reprocess(EDLogging):
             time.sleep(1)
 
 
-if __name__ == "__main__":
-    res = {}
-    def sortn(a, b):
-        if res[a][1] < res[b][1]:
-            return 1
-        else:
-            return -1
 
+
+def getInteger(astr):
+    try:
+        j = int(astr)
+    except ValueError, error:
+        print("%s: %s is not an integer" % (error, i))
+    else:
+        return j
+
+def getRange(astr):
+    """
+    transforms a chain like "1,5-6" in [1,5,6]
+    """
+    filerange = []
+    for i in astr.split(","):
+        if "-" in i:
+            lstLim = i.split("-")
+            minv = getInteger(lstLim[0])
+            maxv = getInteger(lstLim[1])
+            if minv and maxv:
+                filerange += range(minv, maxv + 1)
+        else:
+            j = getInteger(i)
+            if j is not None:
+                filerange.append(j)
+    filerange.sort()
+    return filerange
+
+def getCommon(str1, str2):
+    """
+    return the common part of two strings
+    """
+    out = ""
+    for i, j in zip(str1, str2):
+        if i == j:
+            out += i
+        else:
+            return out
+    return out
+
+def split_name(name):
+    """
+    return a dict with:
+    dirname
+    prefix
+    run
+    frame
+    extention
+    or None if the file does not match the pattern: dir/prefix_run_frame.dat
+    """
+    try:
+        dirname, basename = os.path.split(name)
+        root, ext = os.path.splitext(basename)
+        prefix, run, frame = root.split("_", 2)
+        run = int(run)
+        frame = int(frame)
+    except Exception:
+        print("Filename %s does not match format dir/prefix_run_frame.dat" % name)
+        return
+    return {"dirname":dirname,
+          "basename":basename,
+          "prefix":prefix,
+          "run":run,
+          "frame":frame,
+          "ext":ext}
+
+if __name__ == "__main__":
+    filerange = None
+    rdabs = None
+    rdrel = None
+    outFile = None
+    subFile = None
+    #xml = None
+    listXml = []
+    filenames = []
+    if len(sys.argv) == 1:
+            print(__doc__)
+            sys.exit(1)
     from optparse import OptionParser
-    parser = OptionParser(usage="%prog reprocess on SAXS non-HPLC experiment", version="%prog 1.0")
-#    parser.add_option("-o", "--output", dest="h5path",
-#                      help="put loh information to ")
-#    parser.add_option("-c", "--crop", dest="crop",
-#                      help="Shall we crop the dataset to valid area", default=True)
-#    parser.add_option("-k", "--check", dest="recheck",
-#                      help="Shall we recheck the consistency of the various frames ... very time consuming !!! (not implemented", default=False)
-    parser.add_option("-n", "--ncpu", dest="ncpu", action="store", type="int",
-                      help="limit the number of CPU used", default=None)
+    parser = OptionParser(usage="%prog reprocess on SAXS-smart merge", version="%prog 1.0")
     parser.add_option("-d", "--debug",
                       action="store_true", dest="verbose", default=False,
                       help="switch to debug mode")
-    parser.add_option("-p", "--plugin", action="store", type="string",
-                      dest = "plugin", default = "EDPluginBioSaxsProcessOneFilev1_2",
-                      help="use an alternative plugin")
     parser.add_option("-y", "--yappi", action="store_true",
                       dest="yappi", default=False,
                       help="use an multi-threaded profiler named 'YAPPI'")
-    parser.add_option("-f", "--force", action="store", type="string",
-                      dest="force", default="",
-                      help="force XSData from input to be overwritten with values from that file")
+    parser.add_option("-n", "--ncpu", dest="ncpu", action="store", type="int",
+                      help="limit the number of CPU used", default=None)
+
+    parser.add_option("-p", "--plugin", action="store", type="string",
+                      dest = "plugin", default = "EDPluginBioSaxsSmartMergev1_4",
+                      help = "use an alternative plugin, by default EDPluginBioSaxsSmartMergev1_4")
+    parser.add_option("-r", "--range", action="store", type="str",
+                      dest="filerange", default=None,
+                      help="the range of frames to merge (by default all)")
+    parser.add_option("-a", "--rdabs", dest="rdabs", action="store", type="float",
+                      help="lower limit for similarity (radiation damage estimation) with first image in the serie", default=None)
+    parser.add_option("-e", "--rdrel", dest="rdrel", action="store", type="float",
+                      help="lower limit for similarity (radiation damage estimation) with previous image in the serie", default=None)
+
     (options, args) = parser.parse_args()
     print("")
     print("Options:")
@@ -239,61 +302,67 @@ if __name__ == "__main__":
     for k, v in options.__dict__.items():
         print("    %s: %s" % (k, v))
     print("")
-    if len(args) > 5:
-        print("Input XML files: " + ", ".join([f for f in list(args) if f.endswith(".xml")][:5]) + "...")
-    else:
-        print("Input XML files: " + ", ".join([f for f in list(args) if f.endswith(".xml")]))
-    print(" ")
     reprocess = Reprocess(options.plugin, options.ncpu)
     if options.yappi:
         try:
             import yappi
+
         except ImportError:
             print("Sorry, I was not able to import Yappi")
             yappi = None
+        else:
+            yappi.start()
     else:
         yappi = None
     if options.verbose:
         reprocess.setVerboseDebugOn()
-    if options.force:
-        force_xsd = XSDataBioSaxsv1_0.XSDataInputBioSaxsProcessOneFilev1_0.parseFile(options.force)
+    if options.filerange:
+        filerange = getRange(options.filerange)
     else:
-        force_xsd = None
-    fullargs = [os.path.abspath(i) for i in args if os.path.exists(i) and i.endswith(".xml")]
-    working_dir = "Reprocess-normal-%s" % time.strftime("%Y%m%d-%H%M%S")
+        filerange = None
+    if options.rdabs:
+        rdabs = XSDataDouble(options.rdabs)
+    if options.rdrel:
+        rdrel = XSDataDouble(options.rdrel)
+
+    runs = {}
+    for onefile in args:
+        if os.path.exists(onefile):
+            d = split_name(os.path.abspath(onefile))
+            if d:
+                k = (d["dirname"], d["prefix"], d["run"])
+                if k in runs:
+                    runs[k].append(d)
+                else:
+                    runs[k] = [d]
+    keys = runs.keys()
+    keys.sort()
+    working_dir = "smart_merge-%s" % time.strftime("%Y%m%d-%H%M%S")
     base_dir = os.getcwd()
     os.makedirs(working_dir)
     os.chdir(working_dir)
-    if yappi: yappi.start()
-    for i in fullargs:
-        xml = XSDataBioSaxsv1_0.XSDataInputBioSaxsProcessOneFilev1_0.parseFile(i)
-        filename = os.path.basename(xml.rawImage.path.value)
-        if os.path.exists(os.path.join(base_dir, filename)):
-            basename = os.path.splitext(filename)[0]
-            xml.rawImage.path.value = os.path.join(base_dir, filename)
-            xml.logFile.path.value = os.path.join(base_dir, "..", "misc", basename + ".log")
-            xml.normalizedImage.path.value = os.path.join(base_dir, "..", "2d", basename + ".edf")
-            xml.integratedImage.path.value = os.path.join(base_dir, "..", "misc", basename + ".ang")
-            xml.integratedCurve.path.value = os.path.join(base_dir, "..", "1d", basename + ".dat")
-        if force_xsd:
-            if force_xsd.experimentSetup:
-                if  force_xsd.experimentSetup.detector:
-                    xml.experimentSetup.detector = force_xsd.experimentSetup.detector
-                if  force_xsd.experimentSetup.detectorDistance:
-                    xml.experimentSetup.detectorDistance = force_xsd.experimentSetup.detectorDistance
-                if  force_xsd.experimentSetup.pixelSize_1:
-                    xml.experimentSetup.pixelSize_1 = force_xsd.experimentSetup.pixelSize_1
-                if  force_xsd.experimentSetup.pixelSize_2:
-                    xml.experimentSetup.pixelSize_2 = force_xsd.experimentSetup.pixelSize_2
-                if  force_xsd.experimentSetup.beamCenter_1:
-                    xml.experimentSetup.beamCenter_1 = force_xsd.experimentSetup.beamCenter_1
-                if  force_xsd.experimentSetup.beamCenter_2:
-                    xml.experimentSetup.beamCenter_2 = force_xsd.experimentSetup.beamCenter_2
-                if  force_xsd.experimentSetup.wavelength:
-                    xml.experimentSetup.wavelength = force_xsd.experimentSetup.wavelength
-                if  force_xsd.experimentSetup.normalizationFactor:
-                    xml.experimentSetup.normalizationFactor = force_xsd.experimentSetup.normalizationFactor
-        reprocess.startJob(xml)
+    for run in keys:
+        dico = runs[run][0]
+        common_base = os.sep.join((dico["dirname"], "_".join(dico["basename"].split("_")[:-1]))) + "_"
+        outFile = common_base + "ave.dat"
+        subdir = os.path.join(os.path.dirname(dico["dirname"]), "ednaSub")
+        if not subdir:
+            os.makedirs(subdir)
+        subFile = os.path.join(subdir, os.path.basename(common_base) + "sub.dat")
+        xsd = XSDataInputBioSaxsSmartMergev1_0(mergedCurve=XSDataFile(XSDataString(outFile)),
+                                         subtractedCurve = XSDataFile(XSDataString(subFile)),
+                                         absoluteFidelity=rdabs,
+                                         relativeFidelity=rdrel)
+        if filerange:
+            xsd.inputCurves = [XSDataFile(XSDataString(os.sep.join((dico["dirname"], dico["basename"]))))
+                                for dico in runs[run]
+                                if dico["frame"] in filerange ]
+        else:
+            xsd.inputCurves = [XSDataFile(XSDataString(os.sep.join((dico["dirname"], dico["basename"]))))
+                                          for dico in runs[run]
+                                          ]
+        reprocess.startJob(xsd)
+
     print("All %i jobs queued after %.3fs" % (len(args), time.time() - reprocess.startTime))
     reprocess.join()
     if yappi: yappi.stop()
@@ -315,4 +384,3 @@ if __name__ == "__main__":
             for i in keys:
                 f.write("%8s\t%16s\t%16s\t%s%s" % (res[i][0], res[i][1], res[i][1] / res[i][0], i, os.linesep))
         print("Profiling information written in yappi.out")
-
