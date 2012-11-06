@@ -90,9 +90,9 @@ class EDPluginExecDatGnomv1_0(EDPluginExecProcessScript):
                             ("Guinier", "rgGuinier", XSDataLength),
                             ("Gnom", "rgGnom", XSDataLength),
                             ("Total", "total", XSDataDouble)):
-            idx = out.index(key)
+            idx = out.find(key)
             if idx == -1:
-                self.error("No key %s in file %s" % (key, logfile))
+                self.error("EDPluginExecDatGnomv1_0.postProcess No key %s in file %s" % (key, logfile))
                 self.setFailure()
             res = out[idx + 2]
             gnom.__setattr__(val, typ(float(res)))
