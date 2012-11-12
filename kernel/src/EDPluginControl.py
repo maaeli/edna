@@ -127,6 +127,9 @@ class EDPluginControl(EDPlugin):
             for edPlugin in listPluginOrig:
                 if edPlugin.isStarted() and (not edPlugin.isEnded()):
                     edPlugin.synchronize()
+                elif not edPlugin.isStarted():
+                    time.sleep(0.01) #release GIL to let plugin start 
+                    continue
             time.sleep(0.01)
             with self.locked():
                 bSynchronized = (self.__listOfLoadedPlugins == listPluginOrig)
