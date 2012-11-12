@@ -120,7 +120,7 @@ class EDPluginBioSaxsNormalizev1_1(EDPluginControl):
         self.strRawImage = self.xsdInput.rawImage.path.value
         self.strNormalizedImage = self.xsdInput.normalizedImage.path.value
         outDir = os.path.dirname(self.strNormalizedImage)
-        if not os.path.exists(outDir):
+        if outDir and not os.path.exists(outDir):
             os.mkdir(outDir)
         self.strRawImageSize = self.xsdInput.getRawImageSize().value
         self.dictOutputHeader["DiodeCurr"] = self.experimentSetup.beamStopDiode.value

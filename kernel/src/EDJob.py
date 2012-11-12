@@ -107,6 +107,8 @@ class EDJob(EDLogging):
         self.__name = None
         self.__runtime = None
         self.__edPlugin = EDJob.__edFactoryPlugin.loadPlugin(self.__strPluginName)
+        if self.__edPlugin is None:
+            raise RuntimeError("Unable to create plugin %s" % self.__strPluginName)
         self.__jobId = "%s-%08i" % (self.__strPluginName, self.__edPlugin.getId())
         with self.__class__.__semaphore:
             self.__class__.__dictJobs[self.__jobId] = self
