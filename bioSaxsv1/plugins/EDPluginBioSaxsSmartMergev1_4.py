@@ -31,7 +31,7 @@ __copyright__ = "2011, ESRF Grenoble"
 __date__ = "20120918"
 __status__ = "Production"
 
-import os, shutil
+import os, shutil, time
 from math import log
 from EDPluginControl import EDPluginControl
 from EDFactoryPluginStatic import EDFactoryPluginStatic
