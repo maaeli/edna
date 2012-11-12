@@ -200,6 +200,11 @@ class EDPluginBioSaxsSmartMergev1_4(EDPluginControl):
                             edPluginExecRelativeFidelity.execute()
             self.synchronizePlugins()
 
+            with self.locked():
+                pass #this is just a way to get the focus
+            time.sleep(0.01) #this is just a way to give the focus
+            self.synchronizePlugins()
+
             for idx, oneFile in enumerate(self.lstInput):
                 if idx == 0:
                     self.lstMerged.append(oneFile)
