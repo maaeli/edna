@@ -109,6 +109,11 @@ complex type XSDataBioSaxsSample extends XSData {
 	concentration : XSDataDouble optional
 	comments : XSDataString optional
 	code : XSDataString optional
+	login: XSDataString
+	passwd: XSDataString
+	experimentID: XSDataInteger
+	dataCollectionID: XSDataInteger
+	measumentID: XSDataInteger
 }
 
 
@@ -342,7 +347,15 @@ complex type XSDataResultBioSaxsSingleSamplev1_0 extends XSDataResult{
 	directory2D : XSDataFile
 }
 
+complex type XSDataInputBioSaxsISPyBv1_0 extends XSDataInput  {
+	"plugin populating BioSaxs ISPyB"
+	
+	
+}
 
+complex type XSDataResultBioSaxsISPyBv1_0 extends XSDataResult {
+	
+}
 
 
 /**************************************
