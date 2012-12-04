@@ -34,15 +34,15 @@ from EDTestCasePluginExecute             import EDTestCasePluginExecute
 from EDFactoryPluginStatic               import EDFactoryPluginStatic
 from EDUtilsParallel                     import EDUtilsParallel
 from XSDataBioSaxsv1_0 import XSDataResultBioSaxsAzimutIntv1_0
-
+from EDUtilsFile import EDUtilsFile
+from EDUtilsPath import  EDUtilsPath
 
 EDFactoryPluginStatic.loadModule("EDInstallNumpyv1_3")
 EDFactoryPluginStatic.loadModule("EDInstallSpecClient")
 EDFactoryPluginStatic.loadModule("EDInstallEdfFile")
 EDFactoryPluginStatic.loadModule("EDInstallPILv1_1_7")
 EDFactoryPluginStatic.loadModule("EDInstallFabio_v0_0_7")
-
-
+import pyFAI
 import fabio
 
 
@@ -84,6 +84,8 @@ class EDTestCasePluginExecuteBioSaxsAzimutIntv1_3(EDTestCasePluginExecute):
 #        if os.path.isfile(self.correctedImage):
 #            EDVerbose.DEBUG(" Output Corrected Image file exists %s, I will remove it" % self.correctedImage)
 #            os.remove(self.correctedImage)
+        if not pyFAI.version.startswith("0.7"):
+            EDVerbose.ERROR('pyFAI is not the right version, tested only with 0.7.2, here running version %s' % pyFAI.version)
 
     def testExecute(self):
         """
@@ -106,9 +108,10 @@ class EDTestCasePluginExecuteBioSaxsAzimutIntv1_3(EDTestCasePluginExecute):
 # Compare spectrum ascii Files
 ################################################################################
 
-        outputData = open(xsDataResultObtained.getIntegratedCurve().getPath().value, "rb").read()
-        referenceData = open(os.path.join(self.getTestsDataImagesHome(), "bioSaxsIntegratedv1_3.dat"), "rb").read()
-
+        outputData = open(xsDataResultObtained.getIntegratedCurve().getPath().value, "rb").read().split(os.linesep)
+        referenceData = EDUtilsFile.readFileAndParseVariables(os.path.join(self.getTestsDataImagesHome(), "bioSaxsIntegratedv1_3.dat"), EDUtilsPath.getDictOfPaths()).split(os.linesep)
+        outputData = os.linesep.join([i for i in outputData if not i.startswith("# History")])
+        referenceData = os.linesep.join([i for i in referenceData if not i.startswith("# History")])
         EDAssert.strAlmostEqual(referenceData, outputData, _strComment="3column ascii spectra files are the same", _fRelError=0.1, _fAbsError=0.1, _strExcluded="bioSaxs")
 
 

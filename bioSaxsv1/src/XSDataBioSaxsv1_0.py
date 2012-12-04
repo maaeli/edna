@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Thu Sep 27 11:01::24 2012 by EDGenerateDS.
+# Generated Tue Nov 27 10:50::06 2012 by EDGenerateDS.
 #
 
 import os, sys
@@ -640,7 +640,7 @@ class XSDataBioSaxsExperimentSetup(XSData):
 
 
 class XSDataBioSaxsSample(XSData):
-    def __init__(self, code=None, comments=None, concentration=None):
+    def __init__(self, measumentID=None, dataCollectionID=None, experimentID=None, passwd=None, login=None, code=None, comments=None, concentration=None):
         XSData.__init__(self,)
         if concentration is None:
             self._concentration = None
@@ -662,6 +662,41 @@ class XSDataBioSaxsSample(XSData):
             self._code = code
         else:
             strMessage = "ERROR! XSDataBioSaxsSample constructor argument 'code' is not XSDataString but %s" % self._code.__class__.__name__
+            raise BaseException(strMessage)
+        if login is None:
+            self._login = None
+        elif login.__class__.__name__ == "XSDataString":
+            self._login = login
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample constructor argument 'login' is not XSDataString but %s" % self._login.__class__.__name__
+            raise BaseException(strMessage)
+        if passwd is None:
+            self._passwd = None
+        elif passwd.__class__.__name__ == "XSDataString":
+            self._passwd = passwd
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample constructor argument 'passwd' is not XSDataString but %s" % self._passwd.__class__.__name__
+            raise BaseException(strMessage)
+        if experimentID is None:
+            self._experimentID = None
+        elif experimentID.__class__.__name__ == "XSDataInteger":
+            self._experimentID = experimentID
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample constructor argument 'experimentID' is not XSDataInteger but %s" % self._experimentID.__class__.__name__
+            raise BaseException(strMessage)
+        if dataCollectionID is None:
+            self._dataCollectionID = None
+        elif dataCollectionID.__class__.__name__ == "XSDataInteger":
+            self._dataCollectionID = dataCollectionID
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample constructor argument 'dataCollectionID' is not XSDataInteger but %s" % self._dataCollectionID.__class__.__name__
+            raise BaseException(strMessage)
+        if measumentID is None:
+            self._measumentID = None
+        elif measumentID.__class__.__name__ == "XSDataInteger":
+            self._measumentID = measumentID
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample constructor argument 'measumentID' is not XSDataInteger but %s" % self._measumentID.__class__.__name__
             raise BaseException(strMessage)
     # Methods and properties for the 'concentration' attribute
     def getConcentration(self): return self._concentration
@@ -699,6 +734,66 @@ class XSDataBioSaxsSample(XSData):
             raise BaseException(strMessage)
     def delCode(self): self._code = None
     code = property(getCode, setCode, delCode, "Property for code")
+    # Methods and properties for the 'login' attribute
+    def getLogin(self): return self._login
+    def setLogin(self, login):
+        if login is None:
+            self._login = None
+        elif login.__class__.__name__ == "XSDataString":
+            self._login = login
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample.setLogin argument is not XSDataString but %s" % login.__class__.__name__
+            raise BaseException(strMessage)
+    def delLogin(self): self._login = None
+    login = property(getLogin, setLogin, delLogin, "Property for login")
+    # Methods and properties for the 'passwd' attribute
+    def getPasswd(self): return self._passwd
+    def setPasswd(self, passwd):
+        if passwd is None:
+            self._passwd = None
+        elif passwd.__class__.__name__ == "XSDataString":
+            self._passwd = passwd
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample.setPasswd argument is not XSDataString but %s" % passwd.__class__.__name__
+            raise BaseException(strMessage)
+    def delPasswd(self): self._passwd = None
+    passwd = property(getPasswd, setPasswd, delPasswd, "Property for passwd")
+    # Methods and properties for the 'experimentID' attribute
+    def getExperimentID(self): return self._experimentID
+    def setExperimentID(self, experimentID):
+        if experimentID is None:
+            self._experimentID = None
+        elif experimentID.__class__.__name__ == "XSDataInteger":
+            self._experimentID = experimentID
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample.setExperimentID argument is not XSDataInteger but %s" % experimentID.__class__.__name__
+            raise BaseException(strMessage)
+    def delExperimentID(self): self._experimentID = None
+    experimentID = property(getExperimentID, setExperimentID, delExperimentID, "Property for experimentID")
+    # Methods and properties for the 'dataCollectionID' attribute
+    def getDataCollectionID(self): return self._dataCollectionID
+    def setDataCollectionID(self, dataCollectionID):
+        if dataCollectionID is None:
+            self._dataCollectionID = None
+        elif dataCollectionID.__class__.__name__ == "XSDataInteger":
+            self._dataCollectionID = dataCollectionID
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample.setDataCollectionID argument is not XSDataInteger but %s" % dataCollectionID.__class__.__name__
+            raise BaseException(strMessage)
+    def delDataCollectionID(self): self._dataCollectionID = None
+    dataCollectionID = property(getDataCollectionID, setDataCollectionID, delDataCollectionID, "Property for dataCollectionID")
+    # Methods and properties for the 'measumentID' attribute
+    def getMeasumentID(self): return self._measumentID
+    def setMeasumentID(self, measumentID):
+        if measumentID is None:
+            self._measumentID = None
+        elif measumentID.__class__.__name__ == "XSDataInteger":
+            self._measumentID = measumentID
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample.setMeasumentID argument is not XSDataInteger but %s" % measumentID.__class__.__name__
+            raise BaseException(strMessage)
+    def delMeasumentID(self): self._measumentID = None
+    measumentID = property(getMeasumentID, setMeasumentID, delMeasumentID, "Property for measumentID")
     def export(self, outfile, level, name_='XSDataBioSaxsSample'):
         showIndent(outfile, level)
         outfile.write(unicode('<%s>\n' % name_))
@@ -713,6 +808,26 @@ class XSDataBioSaxsSample(XSData):
             self.comments.export(outfile, level, name_='comments')
         if self._code is not None:
             self.code.export(outfile, level, name_='code')
+        if self._login is not None:
+            self.login.export(outfile, level, name_='login')
+        else:
+            warnEmptyAttribute("login", "XSDataString")
+        if self._passwd is not None:
+            self.passwd.export(outfile, level, name_='passwd')
+        else:
+            warnEmptyAttribute("passwd", "XSDataString")
+        if self._experimentID is not None:
+            self.experimentID.export(outfile, level, name_='experimentID')
+        else:
+            warnEmptyAttribute("experimentID", "XSDataInteger")
+        if self._dataCollectionID is not None:
+            self.dataCollectionID.export(outfile, level, name_='dataCollectionID')
+        else:
+            warnEmptyAttribute("dataCollectionID", "XSDataInteger")
+        if self._measumentID is not None:
+            self.measumentID.export(outfile, level, name_='measumentID')
+        else:
+            warnEmptyAttribute("measumentID", "XSDataInteger")
     def build(self, node_):
         for child_ in node_.childNodes:
             nodeName_ = child_.nodeName.split(':')[-1]
@@ -733,6 +848,31 @@ class XSDataBioSaxsSample(XSData):
             obj_ = XSDataString()
             obj_.build(child_)
             self.setCode(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'login':
+            obj_ = XSDataString()
+            obj_.build(child_)
+            self.setLogin(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'passwd':
+            obj_ = XSDataString()
+            obj_.build(child_)
+            self.setPasswd(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'experimentID':
+            obj_ = XSDataInteger()
+            obj_.build(child_)
+            self.setExperimentID(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'dataCollectionID':
+            obj_ = XSDataInteger()
+            obj_.build(child_)
+            self.setDataCollectionID(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'measumentID':
+            obj_ = XSDataInteger()
+            obj_.build(child_)
+            self.setMeasumentID(obj_)
         XSData.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
     def marshal(self):
@@ -1306,6 +1446,69 @@ class XSDataInputBioSaxsAzimutIntv1_0(XSDataInput):
         return rootObj
     parseFile = staticmethod(parseFile)
 # end class XSDataInputBioSaxsAzimutIntv1_0
+
+
+class XSDataInputBioSaxsISPyBv1_0(XSDataInput):
+    """plugin populating BioSaxs ISPyB"""
+    def __init__(self, configuration=None):
+        XSDataInput.__init__(self, configuration)
+    def export(self, outfile, level, name_='XSDataInputBioSaxsISPyBv1_0'):
+        showIndent(outfile, level)
+        outfile.write(unicode('<%s>\n' % name_))
+        self.exportChildren(outfile, level + 1, name_)
+        showIndent(outfile, level)
+        outfile.write(unicode('</%s>\n' % name_))
+    def exportChildren(self, outfile, level, name_='XSDataInputBioSaxsISPyBv1_0'):
+        XSDataInput.exportChildren(self, outfile, level, name_)
+    def build(self, node_):
+        for child_ in node_.childNodes:
+            nodeName_ = child_.nodeName.split(':')[-1]
+            self.buildChildren(child_, nodeName_)
+    def buildChildren(self, child_, nodeName_):
+        pass
+        XSDataInput.buildChildren(self, child_, nodeName_)
+    #Method for marshalling an object
+    def marshal(self):
+        oStreamString = StringIO()
+        oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
+        self.export(oStreamString, 0, name_="XSDataInputBioSaxsISPyBv1_0")
+        oStringXML = oStreamString.getvalue()
+        oStreamString.close()
+        return oStringXML
+    #Only to export the entire XML tree to a file stream on disk
+    def exportToFile(self, _outfileName):
+        outfile = open(_outfileName, "w")
+        outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
+        self.export(outfile, 0, name_='XSDataInputBioSaxsISPyBv1_0')
+        outfile.close()
+    #Deprecated method, replaced by exportToFile
+    def outputFile(self, _outfileName):
+        print("WARNING: Method outputFile in class XSDataInputBioSaxsISPyBv1_0 is deprecated, please use instead exportToFile!")
+        self.exportToFile(_outfileName)
+    #Method for making a copy in a new instance
+    def copy(self):
+        return XSDataInputBioSaxsISPyBv1_0.parseString(self.marshal())
+    #Static method for parsing a string
+    def parseString(_inString):
+        doc = minidom.parseString(_inString)
+        rootNode = doc.documentElement
+        rootObj = XSDataInputBioSaxsISPyBv1_0()
+        rootObj.build(rootNode)
+        # Check that all minOccurs are obeyed by marshalling the created object
+        oStreamString = StringIO()
+        rootObj.export(oStreamString, 0, name_="XSDataInputBioSaxsISPyBv1_0")
+        oStreamString.close()
+        return rootObj
+    parseString = staticmethod(parseString)
+    #Static method for parsing a file
+    def parseFile(_inFilePath):
+        doc = minidom.parse(_inFilePath)
+        rootNode = doc.documentElement
+        rootObj = XSDataInputBioSaxsISPyBv1_0()
+        rootObj.build(rootNode)
+        return rootObj
+    parseFile = staticmethod(parseFile)
+# end class XSDataInputBioSaxsISPyBv1_0
 
 
 class XSDataInputBioSaxsNormalizev1_0(XSDataInput):
@@ -3546,6 +3749,68 @@ class XSDataResultBioSaxsAzimutIntv1_0(XSDataResult):
         return rootObj
     parseFile = staticmethod(parseFile)
 # end class XSDataResultBioSaxsAzimutIntv1_0
+
+
+class XSDataResultBioSaxsISPyBv1_0(XSDataResult):
+    def __init__(self, status=None):
+        XSDataResult.__init__(self, status)
+    def export(self, outfile, level, name_='XSDataResultBioSaxsISPyBv1_0'):
+        showIndent(outfile, level)
+        outfile.write(unicode('<%s>\n' % name_))
+        self.exportChildren(outfile, level + 1, name_)
+        showIndent(outfile, level)
+        outfile.write(unicode('</%s>\n' % name_))
+    def exportChildren(self, outfile, level, name_='XSDataResultBioSaxsISPyBv1_0'):
+        XSDataResult.exportChildren(self, outfile, level, name_)
+    def build(self, node_):
+        for child_ in node_.childNodes:
+            nodeName_ = child_.nodeName.split(':')[-1]
+            self.buildChildren(child_, nodeName_)
+    def buildChildren(self, child_, nodeName_):
+        pass
+        XSDataResult.buildChildren(self, child_, nodeName_)
+    #Method for marshalling an object
+    def marshal(self):
+        oStreamString = StringIO()
+        oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
+        self.export(oStreamString, 0, name_="XSDataResultBioSaxsISPyBv1_0")
+        oStringXML = oStreamString.getvalue()
+        oStreamString.close()
+        return oStringXML
+    #Only to export the entire XML tree to a file stream on disk
+    def exportToFile(self, _outfileName):
+        outfile = open(_outfileName, "w")
+        outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
+        self.export(outfile, 0, name_='XSDataResultBioSaxsISPyBv1_0')
+        outfile.close()
+    #Deprecated method, replaced by exportToFile
+    def outputFile(self, _outfileName):
+        print("WARNING: Method outputFile in class XSDataResultBioSaxsISPyBv1_0 is deprecated, please use instead exportToFile!")
+        self.exportToFile(_outfileName)
+    #Method for making a copy in a new instance
+    def copy(self):
+        return XSDataResultBioSaxsISPyBv1_0.parseString(self.marshal())
+    #Static method for parsing a string
+    def parseString(_inString):
+        doc = minidom.parseString(_inString)
+        rootNode = doc.documentElement
+        rootObj = XSDataResultBioSaxsISPyBv1_0()
+        rootObj.build(rootNode)
+        # Check that all minOccurs are obeyed by marshalling the created object
+        oStreamString = StringIO()
+        rootObj.export(oStreamString, 0, name_="XSDataResultBioSaxsISPyBv1_0")
+        oStreamString.close()
+        return rootObj
+    parseString = staticmethod(parseString)
+    #Static method for parsing a file
+    def parseFile(_inFilePath):
+        doc = minidom.parse(_inFilePath)
+        rootNode = doc.documentElement
+        rootObj = XSDataResultBioSaxsISPyBv1_0()
+        rootObj.build(rootNode)
+        return rootObj
+    parseFile = staticmethod(parseFile)
+# end class XSDataResultBioSaxsISPyBv1_0
 
 
 class XSDataResultBioSaxsNormalizev1_0(XSDataResult):

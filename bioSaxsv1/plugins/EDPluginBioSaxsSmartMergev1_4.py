@@ -31,7 +31,7 @@ __copyright__ = "2011, ESRF Grenoble"
 __date__ = "20120918"
 __status__ = "Production"
 
-import os, shutil
+import os, shutil, time
 from math import log
 from EDPluginControl import EDPluginControl
 from EDFactoryPluginStatic import EDFactoryPluginStatic
@@ -206,8 +206,11 @@ class EDPluginBioSaxsSmartMergev1_4(EDPluginControl):
                 elif (self.absoluteFidelity is not None) and (self.relativeFidelity is not None):
                     if (idx - 1, idx) not in self.dictSimilarities:
                         self.ERROR("dict missing %i,%i: \n" % (idx - 1, idx) + "\n".join([ "%s: %s" % (key, self.dictSimilarities[key]) for key in self.dictSimilarities]))
+                        self.resynchronize()
+
                     if (0, idx) not in self.dictSimilarities:
                         self.ERROR("dict missing %i,%i: \n" % (0, idx) + "\n".join([ "%s: %s" % (key, self.dictSimilarities[key]) for key in self.dictSimilarities]))
+                        self.resynchronize()
 
                     if (self.dictSimilarities[(0, idx)] >= self.absoluteFidelity) and (self.dictSimilarities[(idx - 1, idx)] >= self.relativeFidelity):
                         self.lstMerged.append(oneFile)
@@ -216,6 +219,7 @@ class EDPluginBioSaxsSmartMergev1_4(EDPluginControl):
                 elif (self.absoluteFidelity is not None) :
                     if (0, idx) not in self.dictSimilarities:
                         self.ERROR("dict missing %i,%i: \n" % (0, idx) + "\n".join([ "%s: %s" % (key, self.dictSimilarities[key]) for key in self.dictSimilarities]))
+                        self.resynchronize()
 
                     if (self.dictSimilarities[(0, idx)] >= self.absoluteFidelity):
                         self.lstMerged.append(oneFile)
@@ -224,6 +228,7 @@ class EDPluginBioSaxsSmartMergev1_4(EDPluginControl):
                 elif (self.relativeFidelity is not None) :
                     if (idx - 1, idx) not in self.dictSimilarities:
                         self.ERROR("dict missing %i,%i: \n" % (idx - 1, idx) + "\n".join([ "%s: %s" % (key, self.dictSimilarities[key]) for key in self.dictSimilarities]))
+                        self.resynchronize()
 
                     if (self.dictSimilarities[(idx - 1, idx)] >= self.relativeFidelity):
                         self.lstMerged.append(oneFile)
@@ -298,6 +303,14 @@ class EDPluginBioSaxsSmartMergev1_4(EDPluginControl):
         executiveSummary = os.linesep.join(self.lstSummary)
         self.xsDataResult.status = XSDataStatus(executiveSummary=XSDataString(executiveSummary))
         self.dataOutput = self.xsDataResult
+
+    def resynchronize(self):
+        """
+        Sometimes plugins are not started or not yet finished... 
+        """
+        time.sleep(1) #this is just a way to give the focus to other threads
+        self.synchronizePlugins()
+        self.ERROR("I slept a second, waiting for sub-plugins to finish")
 
 
     def rewriteHeader(self, infile=None, output=None, hdr="#", linesep=os.linesep):

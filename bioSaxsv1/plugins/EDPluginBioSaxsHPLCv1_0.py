@@ -401,7 +401,7 @@ class EDPluginBioSaxsHPLCv1_0(EDPluginControl):
                 with self._sem:
                     self.hplc_run.buffer = bufferCurve
             else:
-                strErr = "DatAver claimed buffer is in %s but no such file !!!" % buffer
+                strErr = "DatAver claimed buffer is in %s but no such file !!!" % bufferCurve
                 self.ERROR(strErr)
                 self.lstExecutiveSummary.append(strErr)
                 self.setFailure()
