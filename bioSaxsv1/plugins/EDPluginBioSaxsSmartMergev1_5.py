@@ -287,7 +287,7 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
         else:
             self.__class__.lastSample = self.dataInput.mergedCurve
 
-        if self.dataInput.sample.login and self.dataInput.sample.password and self.dataInput.sample.measurementID:
+        if self.dataInput.sample.login and self.dataInput.sample.passwd and self.dataInput.sample.measurementID:
             self.lstSummary.append("Registering to ISPyB")
             self.__edPluginSaxsISPyB = self.loadPlugins(self.__strControlledPluginSaxsISPyB)
             if len(self.lstInput) > 1:
