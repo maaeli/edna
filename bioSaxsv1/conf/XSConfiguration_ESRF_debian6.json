@@ -9,5 +9,8 @@
     "EDPluginBioSaxsNormalizev1_0": {}, 
     "EDPluginBioSaxsNormalizev1_1": {
         "DummyPixelValue": -1
-    }
+    },
+	"EDPluginBioSaxsISPyBv1_0":{
+         "url":"http://pcantolinos:8080/ispyb-ejb3/ispybWS/ToolsForBiosaxsWebService?wsdl"
+	}
 }

@@ -42,8 +42,7 @@ EDFactoryPluginStatic.loadModule("EDInstallSpecClient")
 EDFactoryPluginStatic.loadModule("EDInstallEdfFile")
 EDFactoryPluginStatic.loadModule("EDInstallPILv1_1_7")
 EDFactoryPluginStatic.loadModule("EDInstallFabio_v0_0_7")
-
-
+import pyFAI
 import fabio
 
 
@@ -85,6 +84,8 @@ class EDTestCasePluginExecuteBioSaxsAzimutIntv1_3(EDTestCasePluginExecute):
 #        if os.path.isfile(self.correctedImage):
 #            EDVerbose.DEBUG(" Output Corrected Image file exists %s, I will remove it" % self.correctedImage)
 #            os.remove(self.correctedImage)
+        if not pyFAI.version.startswith("0.7"):
+            EDVerbose.ERROR('pyFAI is not the right version, tested only with 0.7.2, here running version %s' % pyFAI.version)
 
     def testExecute(self):
         """

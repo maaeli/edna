@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Thu Sep 27 11:01::24 2012 by EDGenerateDS.
+# Generated Wed Dec 5 10:48::47 2012 by EDGenerateDS.
 #
 
 import os, sys
@@ -138,7 +138,7 @@ class MixedContainer(object):
 
 class XSDataBioSaxsExperimentSetup(XSData):
     def __init__(self, timeOfFrame=None, frameMax=None, frameNumber=None, exposureTime=None, exposureTemperature=None, storageTemperature=None, normalizationFactor=None, maskFile=None, machineCurrent=None, wavelength=None, beamStopDiode=None, beamCenter_2=None, beamCenter_1=None, pixelSize_2=None, pixelSize_1=None, detectorDistance=None, detector=None):
-        XSData.__init__(self,)
+        XSData.__init__(self, )
         if detector is None:
             self._detector = None
         elif detector.__class__.__name__ == "XSDataString":
@@ -596,52 +596,52 @@ class XSDataBioSaxsExperimentSetup(XSData):
             self.setTimeOfFrame(obj_)
         XSData.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataBioSaxsExperimentSetup")
+        self.export( oStreamString, 0, name_="XSDataBioSaxsExperimentSetup" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataBioSaxsExperimentSetup')
+        self.export( outfile, 0, name_='XSDataBioSaxsExperimentSetup' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataBioSaxsExperimentSetup is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataBioSaxsExperimentSetup.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataBioSaxsExperimentSetup()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataBioSaxsExperimentSetup")
+        rootObj.export( oStreamString, 0, name_="XSDataBioSaxsExperimentSetup" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataBioSaxsExperimentSetup()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataBioSaxsExperimentSetup
 
 
 class XSDataBioSaxsSample(XSData):
-    def __init__(self, code=None, comments=None, concentration=None):
-        XSData.__init__(self,)
+    def __init__(self, measurementID=None, passwd=None, login=None, code=None, comments=None, concentration=None):
+        XSData.__init__(self, )
         if concentration is None:
             self._concentration = None
         elif concentration.__class__.__name__ == "XSDataDouble":
@@ -662,6 +662,27 @@ class XSDataBioSaxsSample(XSData):
             self._code = code
         else:
             strMessage = "ERROR! XSDataBioSaxsSample constructor argument 'code' is not XSDataString but %s" % self._code.__class__.__name__
+            raise BaseException(strMessage)
+        if login is None:
+            self._login = None
+        elif login.__class__.__name__ == "XSDataString":
+            self._login = login
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample constructor argument 'login' is not XSDataString but %s" % self._login.__class__.__name__
+            raise BaseException(strMessage)
+        if passwd is None:
+            self._passwd = None
+        elif passwd.__class__.__name__ == "XSDataString":
+            self._passwd = passwd
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample constructor argument 'passwd' is not XSDataString but %s" % self._passwd.__class__.__name__
+            raise BaseException(strMessage)
+        if measurementID is None:
+            self._measurementID = None
+        elif measurementID.__class__.__name__ == "XSDataInteger":
+            self._measurementID = measurementID
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample constructor argument 'measurementID' is not XSDataInteger but %s" % self._measurementID.__class__.__name__
             raise BaseException(strMessage)
     # Methods and properties for the 'concentration' attribute
     def getConcentration(self): return self._concentration
@@ -699,6 +720,42 @@ class XSDataBioSaxsSample(XSData):
             raise BaseException(strMessage)
     def delCode(self): self._code = None
     code = property(getCode, setCode, delCode, "Property for code")
+    # Methods and properties for the 'login' attribute
+    def getLogin(self): return self._login
+    def setLogin(self, login):
+        if login is None:
+            self._login = None
+        elif login.__class__.__name__ == "XSDataString":
+            self._login = login
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample.setLogin argument is not XSDataString but %s" % login.__class__.__name__
+            raise BaseException(strMessage)
+    def delLogin(self): self._login = None
+    login = property(getLogin, setLogin, delLogin, "Property for login")
+    # Methods and properties for the 'passwd' attribute
+    def getPasswd(self): return self._passwd
+    def setPasswd(self, passwd):
+        if passwd is None:
+            self._passwd = None
+        elif passwd.__class__.__name__ == "XSDataString":
+            self._passwd = passwd
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample.setPasswd argument is not XSDataString but %s" % passwd.__class__.__name__
+            raise BaseException(strMessage)
+    def delPasswd(self): self._passwd = None
+    passwd = property(getPasswd, setPasswd, delPasswd, "Property for passwd")
+    # Methods and properties for the 'measurementID' attribute
+    def getMeasurementID(self): return self._measurementID
+    def setMeasurementID(self, measurementID):
+        if measurementID is None:
+            self._measurementID = None
+        elif measurementID.__class__.__name__ == "XSDataInteger":
+            self._measurementID = measurementID
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample.setMeasurementID argument is not XSDataInteger but %s" % measurementID.__class__.__name__
+            raise BaseException(strMessage)
+    def delMeasurementID(self): self._measurementID = None
+    measurementID = property(getMeasurementID, setMeasurementID, delMeasurementID, "Property for measurementID")
     def export(self, outfile, level, name_='XSDataBioSaxsSample'):
         showIndent(outfile, level)
         outfile.write(unicode('<%s>\n' % name_))
@@ -713,6 +770,18 @@ class XSDataBioSaxsSample(XSData):
             self.comments.export(outfile, level, name_='comments')
         if self._code is not None:
             self.code.export(outfile, level, name_='code')
+        if self._login is not None:
+            self.login.export(outfile, level, name_='login')
+        else:
+            warnEmptyAttribute("login", "XSDataString")
+        if self._passwd is not None:
+            self.passwd.export(outfile, level, name_='passwd')
+        else:
+            warnEmptyAttribute("passwd", "XSDataString")
+        if self._measurementID is not None:
+            self.measurementID.export(outfile, level, name_='measurementID')
+        else:
+            warnEmptyAttribute("measurementID", "XSDataInteger")
     def build(self, node_):
         for child_ in node_.childNodes:
             nodeName_ = child_.nodeName.split(':')[-1]
@@ -733,54 +802,69 @@ class XSDataBioSaxsSample(XSData):
             obj_ = XSDataString()
             obj_.build(child_)
             self.setCode(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'login':
+            obj_ = XSDataString()
+            obj_.build(child_)
+            self.setLogin(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'passwd':
+            obj_ = XSDataString()
+            obj_.build(child_)
+            self.setPasswd(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'measurementID':
+            obj_ = XSDataInteger()
+            obj_.build(child_)
+            self.setMeasurementID(obj_)
         XSData.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataBioSaxsSample")
+        self.export( oStreamString, 0, name_="XSDataBioSaxsSample" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataBioSaxsSample')
+        self.export( outfile, 0, name_='XSDataBioSaxsSample' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataBioSaxsSample is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataBioSaxsSample.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataBioSaxsSample()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataBioSaxsSample")
+        rootObj.export( oStreamString, 0, name_="XSDataBioSaxsSample" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataBioSaxsSample()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataBioSaxsSample
 
 
 class XSDataFileSeries(XSData):
     def __init__(self, files=None):
-        XSData.__init__(self,)
+        XSData.__init__(self, )
         if files is None:
             self._files = []
         elif files.__class__.__name__ == "list":
@@ -803,7 +887,7 @@ class XSDataFileSeries(XSData):
     def addFiles(self, value):
         if value is None:
             strMessage = "ERROR! XSDataFileSeries.addFiles argument is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         elif value.__class__.__name__ == "XSDataFile":
             self._files.append(value)
         else:
@@ -812,10 +896,10 @@ class XSDataFileSeries(XSData):
     def insertFiles(self, index, value):
         if index is None:
             strMessage = "ERROR! XSDataFileSeries.insertFiles argument 'index' is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         if value is None:
             strMessage = "ERROR! XSDataFileSeries.insertFiles argument 'value' is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         elif value.__class__.__name__ == "XSDataFile":
             self._files[index] = value
         else:
@@ -845,46 +929,46 @@ class XSDataFileSeries(XSData):
             self.files.append(obj_)
         XSData.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataFileSeries")
+        self.export( oStreamString, 0, name_="XSDataFileSeries" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataFileSeries')
+        self.export( outfile, 0, name_='XSDataFileSeries' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataFileSeries is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataFileSeries.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataFileSeries()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataFileSeries")
+        rootObj.export( oStreamString, 0, name_="XSDataFileSeries" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataFileSeries()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataFileSeries
 
 
@@ -1014,46 +1098,46 @@ class XSDataInputBioSaxsAsciiExportv1_0(XSDataInput):
             self.setExperimentSetup(obj_)
         XSDataInput.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataInputBioSaxsAsciiExportv1_0")
+        self.export( oStreamString, 0, name_="XSDataInputBioSaxsAsciiExportv1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataInputBioSaxsAsciiExportv1_0')
+        self.export( outfile, 0, name_='XSDataInputBioSaxsAsciiExportv1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataInputBioSaxsAsciiExportv1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataInputBioSaxsAsciiExportv1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsAsciiExportv1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataInputBioSaxsAsciiExportv1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsAsciiExportv1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsAsciiExportv1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataInputBioSaxsAsciiExportv1_0
 
 
@@ -1265,47 +1349,267 @@ class XSDataInputBioSaxsAzimutIntv1_0(XSDataInput):
             self.setExperimentSetup(obj_)
         XSDataInput.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataInputBioSaxsAzimutIntv1_0")
+        self.export( oStreamString, 0, name_="XSDataInputBioSaxsAzimutIntv1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataInputBioSaxsAzimutIntv1_0')
+        self.export( outfile, 0, name_='XSDataInputBioSaxsAzimutIntv1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataInputBioSaxsAzimutIntv1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataInputBioSaxsAzimutIntv1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsAzimutIntv1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataInputBioSaxsAzimutIntv1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsAzimutIntv1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsAzimutIntv1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataInputBioSaxsAzimutIntv1_0
+
+
+class XSDataInputBioSaxsISPyBv1_0(XSDataInput):
+    """Input class for populating ISPyB"""
+    def __init__(self, configuration=None, frameMerged=None, frameAverage=None, volume=None, gnom=None, autoRg=None, sample=None):
+        XSDataInput.__init__(self, configuration)
+        if sample is None:
+            self._sample = None
+        elif sample.__class__.__name__ == "XSDataBioSaxsSample":
+            self._sample = sample
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0 constructor argument 'sample' is not XSDataBioSaxsSample but %s" % self._sample.__class__.__name__
+            raise BaseException(strMessage)
+        if autoRg is None:
+            self._autoRg = None
+        elif autoRg.__class__.__name__ == "XSDataAutoRg":
+            self._autoRg = autoRg
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0 constructor argument 'autoRg' is not XSDataAutoRg but %s" % self._autoRg.__class__.__name__
+            raise BaseException(strMessage)
+        if gnom is None:
+            self._gnom = None
+        elif gnom.__class__.__name__ == "XSDataGnom":
+            self._gnom = gnom
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0 constructor argument 'gnom' is not XSDataGnom but %s" % self._gnom.__class__.__name__
+            raise BaseException(strMessage)
+        if volume is None:
+            self._volume = None
+        elif volume.__class__.__name__ == "XSDataDoubleWithUnit":
+            self._volume = volume
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0 constructor argument 'volume' is not XSDataDoubleWithUnit but %s" % self._volume.__class__.__name__
+            raise BaseException(strMessage)
+        if frameAverage is None:
+            self._frameAverage = None
+        elif frameAverage.__class__.__name__ == "XSDataInteger":
+            self._frameAverage = frameAverage
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0 constructor argument 'frameAverage' is not XSDataInteger but %s" % self._frameAverage.__class__.__name__
+            raise BaseException(strMessage)
+        if frameMerged is None:
+            self._frameMerged = None
+        elif frameMerged.__class__.__name__ == "XSDataInteger":
+            self._frameMerged = frameMerged
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0 constructor argument 'frameMerged' is not XSDataInteger but %s" % self._frameMerged.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'sample' attribute
+    def getSample(self): return self._sample
+    def setSample(self, sample):
+        if sample is None:
+            self._sample = None
+        elif sample.__class__.__name__ == "XSDataBioSaxsSample":
+            self._sample = sample
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.setSample argument is not XSDataBioSaxsSample but %s" % sample.__class__.__name__
+            raise BaseException(strMessage)
+    def delSample(self): self._sample = None
+    sample = property(getSample, setSample, delSample, "Property for sample")
+    # Methods and properties for the 'autoRg' attribute
+    def getAutoRg(self): return self._autoRg
+    def setAutoRg(self, autoRg):
+        if autoRg is None:
+            self._autoRg = None
+        elif autoRg.__class__.__name__ == "XSDataAutoRg":
+            self._autoRg = autoRg
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.setAutoRg argument is not XSDataAutoRg but %s" % autoRg.__class__.__name__
+            raise BaseException(strMessage)
+    def delAutoRg(self): self._autoRg = None
+    autoRg = property(getAutoRg, setAutoRg, delAutoRg, "Property for autoRg")
+    # Methods and properties for the 'gnom' attribute
+    def getGnom(self): return self._gnom
+    def setGnom(self, gnom):
+        if gnom is None:
+            self._gnom = None
+        elif gnom.__class__.__name__ == "XSDataGnom":
+            self._gnom = gnom
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.setGnom argument is not XSDataGnom but %s" % gnom.__class__.__name__
+            raise BaseException(strMessage)
+    def delGnom(self): self._gnom = None
+    gnom = property(getGnom, setGnom, delGnom, "Property for gnom")
+    # Methods and properties for the 'volume' attribute
+    def getVolume(self): return self._volume
+    def setVolume(self, volume):
+        if volume is None:
+            self._volume = None
+        elif volume.__class__.__name__ == "XSDataDoubleWithUnit":
+            self._volume = volume
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.setVolume argument is not XSDataDoubleWithUnit but %s" % volume.__class__.__name__
+            raise BaseException(strMessage)
+    def delVolume(self): self._volume = None
+    volume = property(getVolume, setVolume, delVolume, "Property for volume")
+    # Methods and properties for the 'frameAverage' attribute
+    def getFrameAverage(self): return self._frameAverage
+    def setFrameAverage(self, frameAverage):
+        if frameAverage is None:
+            self._frameAverage = None
+        elif frameAverage.__class__.__name__ == "XSDataInteger":
+            self._frameAverage = frameAverage
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.setFrameAverage argument is not XSDataInteger but %s" % frameAverage.__class__.__name__
+            raise BaseException(strMessage)
+    def delFrameAverage(self): self._frameAverage = None
+    frameAverage = property(getFrameAverage, setFrameAverage, delFrameAverage, "Property for frameAverage")
+    # Methods and properties for the 'frameMerged' attribute
+    def getFrameMerged(self): return self._frameMerged
+    def setFrameMerged(self, frameMerged):
+        if frameMerged is None:
+            self._frameMerged = None
+        elif frameMerged.__class__.__name__ == "XSDataInteger":
+            self._frameMerged = frameMerged
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.setFrameMerged argument is not XSDataInteger but %s" % frameMerged.__class__.__name__
+            raise BaseException(strMessage)
+    def delFrameMerged(self): self._frameMerged = None
+    frameMerged = property(getFrameMerged, setFrameMerged, delFrameMerged, "Property for frameMerged")
+    def export(self, outfile, level, name_='XSDataInputBioSaxsISPyBv1_0'):
+        showIndent(outfile, level)
+        outfile.write(unicode('<%s>\n' % name_))
+        self.exportChildren(outfile, level + 1, name_)
+        showIndent(outfile, level)
+        outfile.write(unicode('</%s>\n' % name_))
+    def exportChildren(self, outfile, level, name_='XSDataInputBioSaxsISPyBv1_0'):
+        XSDataInput.exportChildren(self, outfile, level, name_)
+        if self._sample is not None:
+            self.sample.export(outfile, level, name_='sample')
+        else:
+            warnEmptyAttribute("sample", "XSDataBioSaxsSample")
+        if self._autoRg is not None:
+            self.autoRg.export(outfile, level, name_='autoRg')
+        if self._gnom is not None:
+            self.gnom.export(outfile, level, name_='gnom')
+        if self._volume is not None:
+            self.volume.export(outfile, level, name_='volume')
+        if self._frameAverage is not None:
+            self.frameAverage.export(outfile, level, name_='frameAverage')
+        if self._frameMerged is not None:
+            self.frameMerged.export(outfile, level, name_='frameMerged')
+    def build(self, node_):
+        for child_ in node_.childNodes:
+            nodeName_ = child_.nodeName.split(':')[-1]
+            self.buildChildren(child_, nodeName_)
+    def buildChildren(self, child_, nodeName_):
+        if child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'sample':
+            obj_ = XSDataBioSaxsSample()
+            obj_.build(child_)
+            self.setSample(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'autoRg':
+            obj_ = XSDataAutoRg()
+            obj_.build(child_)
+            self.setAutoRg(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'gnom':
+            obj_ = XSDataGnom()
+            obj_.build(child_)
+            self.setGnom(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'volume':
+            obj_ = XSDataDoubleWithUnit()
+            obj_.build(child_)
+            self.setVolume(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'frameAverage':
+            obj_ = XSDataInteger()
+            obj_.build(child_)
+            self.setFrameAverage(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'frameMerged':
+            obj_ = XSDataInteger()
+            obj_.build(child_)
+            self.setFrameMerged(obj_)
+        XSDataInput.buildChildren(self, child_, nodeName_)
+    #Method for marshalling an object
+    def marshal( self ):
+        oStreamString = StringIO()
+        oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
+        self.export( oStreamString, 0, name_="XSDataInputBioSaxsISPyBv1_0" )
+        oStringXML = oStreamString.getvalue()
+        oStreamString.close()
+        return oStringXML
+    #Only to export the entire XML tree to a file stream on disk
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
+        outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
+        self.export( outfile, 0, name_='XSDataInputBioSaxsISPyBv1_0' )
+        outfile.close()
+    #Deprecated method, replaced by exportToFile
+    def outputFile( self, _outfileName ):
+        print("WARNING: Method outputFile in class XSDataInputBioSaxsISPyBv1_0 is deprecated, please use instead exportToFile!")
+        self.exportToFile(_outfileName)
+    #Method for making a copy in a new instance
+    def copy( self ):
+        return XSDataInputBioSaxsISPyBv1_0.parseString(self.marshal())
+    #Static method for parsing a string
+    def parseString( _inString ):
+        doc = minidom.parseString(_inString)
+        rootNode = doc.documentElement
+        rootObj = XSDataInputBioSaxsISPyBv1_0()
+        rootObj.build(rootNode)
+        # Check that all minOccurs are obeyed by marshalling the created object
+        oStreamString = StringIO()
+        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsISPyBv1_0" )
+        oStreamString.close()
+        return rootObj
+    parseString = staticmethod( parseString )
+    #Static method for parsing a file
+    def parseFile( _inFilePath ):
+        doc = minidom.parse(_inFilePath)
+        rootNode = doc.documentElement
+        rootObj = XSDataInputBioSaxsISPyBv1_0()
+        rootObj.build(rootNode)
+        return rootObj
+    parseFile = staticmethod( parseFile )
+# end class XSDataInputBioSaxsISPyBv1_0
 
 
 class XSDataInputBioSaxsNormalizev1_0(XSDataInput):
@@ -1492,46 +1796,46 @@ class XSDataInputBioSaxsNormalizev1_0(XSDataInput):
             self.setExperimentSetup(obj_)
         XSDataInput.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataInputBioSaxsNormalizev1_0")
+        self.export( oStreamString, 0, name_="XSDataInputBioSaxsNormalizev1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataInputBioSaxsNormalizev1_0')
+        self.export( outfile, 0, name_='XSDataInputBioSaxsNormalizev1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataInputBioSaxsNormalizev1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataInputBioSaxsNormalizev1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsNormalizev1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataInputBioSaxsNormalizev1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsNormalizev1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsNormalizev1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataInputBioSaxsNormalizev1_0
 
 
@@ -1820,46 +2124,46 @@ class XSDataInputBioSaxsProcessOneFilev1_0(XSDataInput):
             self.setFrameId(obj_)
         XSDataInput.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataInputBioSaxsProcessOneFilev1_0")
+        self.export( oStreamString, 0, name_="XSDataInputBioSaxsProcessOneFilev1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataInputBioSaxsProcessOneFilev1_0')
+        self.export( outfile, 0, name_='XSDataInputBioSaxsProcessOneFilev1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataInputBioSaxsProcessOneFilev1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataInputBioSaxsProcessOneFilev1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsProcessOneFilev1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataInputBioSaxsProcessOneFilev1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsProcessOneFilev1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsProcessOneFilev1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataInputBioSaxsProcessOneFilev1_0
 
 
@@ -2154,46 +2458,46 @@ class XSDataInputBioSaxsReduceFileSeriev1_0(XSDataInput):
             self.setRawImageSize(obj_)
         XSDataInput.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataInputBioSaxsReduceFileSeriev1_0")
+        self.export( oStreamString, 0, name_="XSDataInputBioSaxsReduceFileSeriev1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataInputBioSaxsReduceFileSeriev1_0')
+        self.export( outfile, 0, name_='XSDataInputBioSaxsReduceFileSeriev1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataInputBioSaxsReduceFileSeriev1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataInputBioSaxsReduceFileSeriev1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsReduceFileSeriev1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataInputBioSaxsReduceFileSeriev1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsReduceFileSeriev1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsReduceFileSeriev1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataInputBioSaxsReduceFileSeriev1_0
 
 
@@ -2294,46 +2598,46 @@ class XSDataInputBioSaxsSample(XSDataInput):
             self.setCode(obj_)
         XSDataInput.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataInputBioSaxsSample")
+        self.export( oStreamString, 0, name_="XSDataInputBioSaxsSample" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataInputBioSaxsSample')
+        self.export( outfile, 0, name_='XSDataInputBioSaxsSample' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataInputBioSaxsSample is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataInputBioSaxsSample.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsSample()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataInputBioSaxsSample")
+        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsSample" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsSample()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataInputBioSaxsSample
 
 
@@ -2411,7 +2715,7 @@ class XSDataInputBioSaxsSmartMergev1_0(XSDataInput):
     def addInputCurves(self, value):
         if value is None:
             strMessage = "ERROR! XSDataInputBioSaxsSmartMergev1_0.addInputCurves argument is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         elif value.__class__.__name__ == "XSDataFile":
             self._inputCurves.append(value)
         else:
@@ -2420,10 +2724,10 @@ class XSDataInputBioSaxsSmartMergev1_0(XSDataInput):
     def insertInputCurves(self, index, value):
         if index is None:
             strMessage = "ERROR! XSDataInputBioSaxsSmartMergev1_0.insertInputCurves argument 'index' is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         if value is None:
             strMessage = "ERROR! XSDataInputBioSaxsSmartMergev1_0.insertInputCurves argument 'value' is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         elif value.__class__.__name__ == "XSDataFile":
             self._inputCurves[index] = value
         else:
@@ -2516,7 +2820,7 @@ class XSDataInputBioSaxsSmartMergev1_0(XSDataInput):
     def addBufferCurves(self, value):
         if value is None:
             strMessage = "ERROR! XSDataInputBioSaxsSmartMergev1_0.addBufferCurves argument is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         elif value.__class__.__name__ == "XSDataFile":
             self._bufferCurves.append(value)
         else:
@@ -2525,10 +2829,10 @@ class XSDataInputBioSaxsSmartMergev1_0(XSDataInput):
     def insertBufferCurves(self, index, value):
         if index is None:
             strMessage = "ERROR! XSDataInputBioSaxsSmartMergev1_0.insertBufferCurves argument 'index' is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         if value is None:
             strMessage = "ERROR! XSDataInputBioSaxsSmartMergev1_0.insertBufferCurves argument 'value' is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         elif value.__class__.__name__ == "XSDataFile":
             self._bufferCurves[index] = value
         else:
@@ -2609,46 +2913,46 @@ class XSDataInputBioSaxsSmartMergev1_0(XSDataInput):
             self.bufferCurves.append(obj_)
         XSDataInput.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataInputBioSaxsSmartMergev1_0")
+        self.export( oStreamString, 0, name_="XSDataInputBioSaxsSmartMergev1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataInputBioSaxsSmartMergev1_0')
+        self.export( outfile, 0, name_='XSDataInputBioSaxsSmartMergev1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataInputBioSaxsSmartMergev1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataInputBioSaxsSmartMergev1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsSmartMergev1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataInputBioSaxsSmartMergev1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsSmartMergev1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsSmartMergev1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataInputBioSaxsSmartMergev1_0
 
 
@@ -2718,7 +3022,7 @@ class XSDataInputBioSaxsSubtractv1_0(XSDataInput):
     def addBufferCurves(self, value):
         if value is None:
             strMessage = "ERROR! XSDataInputBioSaxsSubtractv1_0.addBufferCurves argument is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         elif value.__class__.__name__ == "XSDataFile":
             self._bufferCurves.append(value)
         else:
@@ -2727,10 +3031,10 @@ class XSDataInputBioSaxsSubtractv1_0(XSDataInput):
     def insertBufferCurves(self, index, value):
         if index is None:
             strMessage = "ERROR! XSDataInputBioSaxsSubtractv1_0.insertBufferCurves argument 'index' is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         if value is None:
             strMessage = "ERROR! XSDataInputBioSaxsSubtractv1_0.insertBufferCurves argument 'value' is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         elif value.__class__.__name__ == "XSDataFile":
             self._bufferCurves[index] = value
         else:
@@ -2824,46 +3128,46 @@ class XSDataInputBioSaxsSubtractv1_0(XSDataInput):
             self.setGnomFile(obj_)
         XSDataInput.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataInputBioSaxsSubtractv1_0")
+        self.export( oStreamString, 0, name_="XSDataInputBioSaxsSubtractv1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataInputBioSaxsSubtractv1_0')
+        self.export( outfile, 0, name_='XSDataInputBioSaxsSubtractv1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataInputBioSaxsSubtractv1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataInputBioSaxsSubtractv1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsSubtractv1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataInputBioSaxsSubtractv1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsSubtractv1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsSubtractv1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataInputBioSaxsSubtractv1_0
 
 
@@ -3018,46 +3322,46 @@ class XSDataInputBioSaxsToSASv1_0(XSDataInput):
             self.setDestinationDirectory(obj_)
         XSDataInput.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataInputBioSaxsToSASv1_0")
+        self.export( oStreamString, 0, name_="XSDataInputBioSaxsToSASv1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataInputBioSaxsToSASv1_0')
+        self.export( outfile, 0, name_='XSDataInputBioSaxsToSASv1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataInputBioSaxsToSASv1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataInputBioSaxsToSASv1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsToSASv1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataInputBioSaxsToSASv1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsToSASv1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsToSASv1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataInputBioSaxsToSASv1_0
 
 
@@ -3135,46 +3439,46 @@ class XSDataResultBioSaxsAsciiExportv1_0(XSDataResult):
             self.setProcessLog(obj_)
         XSDataResult.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataResultBioSaxsAsciiExportv1_0")
+        self.export( oStreamString, 0, name_="XSDataResultBioSaxsAsciiExportv1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataResultBioSaxsAsciiExportv1_0')
+        self.export( outfile, 0, name_='XSDataResultBioSaxsAsciiExportv1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataResultBioSaxsAsciiExportv1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataResultBioSaxsAsciiExportv1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsAsciiExportv1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataResultBioSaxsAsciiExportv1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataResultBioSaxsAsciiExportv1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsAsciiExportv1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataResultBioSaxsAsciiExportv1_0
 
 
@@ -3308,46 +3612,46 @@ class XSDataResultBioSaxsAveragev1_0(XSDataResult):
             self.setLogFile(obj_)
         XSDataResult.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataResultBioSaxsAveragev1_0")
+        self.export( oStreamString, 0, name_="XSDataResultBioSaxsAveragev1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataResultBioSaxsAveragev1_0')
+        self.export( outfile, 0, name_='XSDataResultBioSaxsAveragev1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataResultBioSaxsAveragev1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataResultBioSaxsAveragev1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsAveragev1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataResultBioSaxsAveragev1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataResultBioSaxsAveragev1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsAveragev1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataResultBioSaxsAveragev1_0
 
 
@@ -3505,47 +3809,109 @@ class XSDataResultBioSaxsAzimutIntv1_0(XSDataResult):
             self.setExperimentSetup(obj_)
         XSDataResult.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataResultBioSaxsAzimutIntv1_0")
+        self.export( oStreamString, 0, name_="XSDataResultBioSaxsAzimutIntv1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataResultBioSaxsAzimutIntv1_0')
+        self.export( outfile, 0, name_='XSDataResultBioSaxsAzimutIntv1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataResultBioSaxsAzimutIntv1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataResultBioSaxsAzimutIntv1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsAzimutIntv1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataResultBioSaxsAzimutIntv1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataResultBioSaxsAzimutIntv1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsAzimutIntv1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataResultBioSaxsAzimutIntv1_0
+
+
+class XSDataResultBioSaxsISPyBv1_0(XSDataResult):
+    def __init__(self, status=None):
+        XSDataResult.__init__(self, status)
+    def export(self, outfile, level, name_='XSDataResultBioSaxsISPyBv1_0'):
+        showIndent(outfile, level)
+        outfile.write(unicode('<%s>\n' % name_))
+        self.exportChildren(outfile, level + 1, name_)
+        showIndent(outfile, level)
+        outfile.write(unicode('</%s>\n' % name_))
+    def exportChildren(self, outfile, level, name_='XSDataResultBioSaxsISPyBv1_0'):
+        XSDataResult.exportChildren(self, outfile, level, name_)
+    def build(self, node_):
+        for child_ in node_.childNodes:
+            nodeName_ = child_.nodeName.split(':')[-1]
+            self.buildChildren(child_, nodeName_)
+    def buildChildren(self, child_, nodeName_):
+        pass
+        XSDataResult.buildChildren(self, child_, nodeName_)
+    #Method for marshalling an object
+    def marshal( self ):
+        oStreamString = StringIO()
+        oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
+        self.export( oStreamString, 0, name_="XSDataResultBioSaxsISPyBv1_0" )
+        oStringXML = oStreamString.getvalue()
+        oStreamString.close()
+        return oStringXML
+    #Only to export the entire XML tree to a file stream on disk
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
+        outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
+        self.export( outfile, 0, name_='XSDataResultBioSaxsISPyBv1_0' )
+        outfile.close()
+    #Deprecated method, replaced by exportToFile
+    def outputFile( self, _outfileName ):
+        print("WARNING: Method outputFile in class XSDataResultBioSaxsISPyBv1_0 is deprecated, please use instead exportToFile!")
+        self.exportToFile(_outfileName)
+    #Method for making a copy in a new instance
+    def copy( self ):
+        return XSDataResultBioSaxsISPyBv1_0.parseString(self.marshal())
+    #Static method for parsing a string
+    def parseString( _inString ):
+        doc = minidom.parseString(_inString)
+        rootNode = doc.documentElement
+        rootObj = XSDataResultBioSaxsISPyBv1_0()
+        rootObj.build(rootNode)
+        # Check that all minOccurs are obeyed by marshalling the created object
+        oStreamString = StringIO()
+        rootObj.export( oStreamString, 0, name_="XSDataResultBioSaxsISPyBv1_0" )
+        oStreamString.close()
+        return rootObj
+    parseString = staticmethod( parseString )
+    #Static method for parsing a file
+    def parseFile( _inFilePath ):
+        doc = minidom.parse(_inFilePath)
+        rootNode = doc.documentElement
+        rootObj = XSDataResultBioSaxsISPyBv1_0()
+        rootObj.build(rootNode)
+        return rootObj
+    parseFile = staticmethod( parseFile )
+# end class XSDataResultBioSaxsISPyBv1_0
 
 
 class XSDataResultBioSaxsNormalizev1_0(XSDataResult):
@@ -3650,46 +4016,46 @@ class XSDataResultBioSaxsNormalizev1_0(XSDataResult):
             self.setProcessLog(obj_)
         XSDataResult.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataResultBioSaxsNormalizev1_0")
+        self.export( oStreamString, 0, name_="XSDataResultBioSaxsNormalizev1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataResultBioSaxsNormalizev1_0')
+        self.export( outfile, 0, name_='XSDataResultBioSaxsNormalizev1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataResultBioSaxsNormalizev1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataResultBioSaxsNormalizev1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsNormalizev1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataResultBioSaxsNormalizev1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataResultBioSaxsNormalizev1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsNormalizev1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataResultBioSaxsNormalizev1_0
 
 
@@ -3845,46 +4211,46 @@ class XSDataResultBioSaxsProcessOneFilev1_0(XSDataResult):
             self.setExperimentSetup(obj_)
         XSDataResult.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataResultBioSaxsProcessOneFilev1_0")
+        self.export( oStreamString, 0, name_="XSDataResultBioSaxsProcessOneFilev1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataResultBioSaxsProcessOneFilev1_0')
+        self.export( outfile, 0, name_='XSDataResultBioSaxsProcessOneFilev1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataResultBioSaxsProcessOneFilev1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataResultBioSaxsProcessOneFilev1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsProcessOneFilev1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataResultBioSaxsProcessOneFilev1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataResultBioSaxsProcessOneFilev1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsProcessOneFilev1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataResultBioSaxsProcessOneFilev1_0
 
 
@@ -4018,46 +4384,46 @@ class XSDataResultBioSaxsReduceFileSeriev1_0(XSDataResult):
             self.setDirectoryMisc(obj_)
         XSDataResult.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataResultBioSaxsReduceFileSeriev1_0")
+        self.export( oStreamString, 0, name_="XSDataResultBioSaxsReduceFileSeriev1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataResultBioSaxsReduceFileSeriev1_0')
+        self.export( outfile, 0, name_='XSDataResultBioSaxsReduceFileSeriev1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataResultBioSaxsReduceFileSeriev1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataResultBioSaxsReduceFileSeriev1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsReduceFileSeriev1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataResultBioSaxsReduceFileSeriev1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataResultBioSaxsReduceFileSeriev1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsReduceFileSeriev1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataResultBioSaxsReduceFileSeriev1_0
 
 
@@ -4158,46 +4524,46 @@ class XSDataResultBioSaxsSample(XSDataResult):
             self.setCode(obj_)
         XSDataResult.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataResultBioSaxsSample")
+        self.export( oStreamString, 0, name_="XSDataResultBioSaxsSample" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataResultBioSaxsSample')
+        self.export( outfile, 0, name_='XSDataResultBioSaxsSample' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataResultBioSaxsSample is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataResultBioSaxsSample.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsSample()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataResultBioSaxsSample")
+        rootObj.export( oStreamString, 0, name_="XSDataResultBioSaxsSample" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsSample()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataResultBioSaxsSample
 
 
@@ -4304,46 +4670,46 @@ class XSDataResultBioSaxsSingleSamplev1_0(XSDataResult):
             self.setDirectory2D(obj_)
         XSDataResult.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataResultBioSaxsSingleSamplev1_0")
+        self.export( oStreamString, 0, name_="XSDataResultBioSaxsSingleSamplev1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataResultBioSaxsSingleSamplev1_0')
+        self.export( outfile, 0, name_='XSDataResultBioSaxsSingleSamplev1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataResultBioSaxsSingleSamplev1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataResultBioSaxsSingleSamplev1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsSingleSamplev1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataResultBioSaxsSingleSamplev1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataResultBioSaxsSingleSamplev1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsSingleSamplev1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataResultBioSaxsSingleSamplev1_0
 
 
@@ -4497,46 +4863,46 @@ class XSDataResultBioSaxsSmartMergev1_0(XSDataResult):
             self.setSubtractedCurve(obj_)
         XSDataResult.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataResultBioSaxsSmartMergev1_0")
+        self.export( oStreamString, 0, name_="XSDataResultBioSaxsSmartMergev1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataResultBioSaxsSmartMergev1_0')
+        self.export( outfile, 0, name_='XSDataResultBioSaxsSmartMergev1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataResultBioSaxsSmartMergev1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataResultBioSaxsSmartMergev1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsSmartMergev1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataResultBioSaxsSmartMergev1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataResultBioSaxsSmartMergev1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsSmartMergev1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataResultBioSaxsSmartMergev1_0
 
 
@@ -4664,46 +5030,46 @@ class XSDataResultBioSaxsSubtractv1_0(XSDataResult):
             self.setVolume(obj_)
         XSDataResult.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataResultBioSaxsSubtractv1_0")
+        self.export( oStreamString, 0, name_="XSDataResultBioSaxsSubtractv1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataResultBioSaxsSubtractv1_0')
+        self.export( outfile, 0, name_='XSDataResultBioSaxsSubtractv1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataResultBioSaxsSubtractv1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataResultBioSaxsSubtractv1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsSubtractv1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataResultBioSaxsSubtractv1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataResultBioSaxsSubtractv1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsSubtractv1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataResultBioSaxsSubtractv1_0
 
 
@@ -4753,46 +5119,46 @@ class XSDataResultBioSaxsToSASv1_0(XSDataResult):
             self.setHtmlPage(obj_)
         XSDataResult.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataResultBioSaxsToSASv1_0")
+        self.export( oStreamString, 0, name_="XSDataResultBioSaxsToSASv1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataResultBioSaxsToSASv1_0')
+        self.export( outfile, 0, name_='XSDataResultBioSaxsToSASv1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataResultBioSaxsToSASv1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataResultBioSaxsToSASv1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsToSASv1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataResultBioSaxsToSASv1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataResultBioSaxsToSASv1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsToSASv1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataResultBioSaxsToSASv1_0
 
 
@@ -4919,46 +5285,46 @@ class XSDataInputBioSaxsHPLCv1_0(XSDataInputBioSaxsProcessOneFilev1_0):
             self.setHplcFile(obj_)
         XSDataInputBioSaxsProcessOneFilev1_0.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataInputBioSaxsHPLCv1_0")
+        self.export( oStreamString, 0, name_="XSDataInputBioSaxsHPLCv1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataInputBioSaxsHPLCv1_0')
+        self.export( outfile, 0, name_='XSDataInputBioSaxsHPLCv1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataInputBioSaxsHPLCv1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataInputBioSaxsHPLCv1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsHPLCv1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataInputBioSaxsHPLCv1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsHPLCv1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsHPLCv1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataInputBioSaxsHPLCv1_0
 
 
@@ -5423,46 +5789,46 @@ class XSDataInputBioSaxsSampleExperiment(XSDataInputBioSaxsSample):
             self.setTimeOfFrame(obj_)
         XSDataInputBioSaxsSample.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataInputBioSaxsSampleExperiment")
+        self.export( oStreamString, 0, name_="XSDataInputBioSaxsSampleExperiment" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataInputBioSaxsSampleExperiment')
+        self.export( outfile, 0, name_='XSDataInputBioSaxsSampleExperiment' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataInputBioSaxsSampleExperiment is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataInputBioSaxsSampleExperiment.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsSampleExperiment()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataInputBioSaxsSampleExperiment")
+        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsSampleExperiment" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsSampleExperiment()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataInputBioSaxsSampleExperiment
 
 
@@ -5613,7 +5979,7 @@ class XSDataResultBioSaxsHPLCv1_0(XSDataResultBioSaxsProcessOneFilev1_0):
     def addMergedCurves(self, value):
         if value is None:
             strMessage = "ERROR! XSDataResultBioSaxsHPLCv1_0.addMergedCurves argument is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         elif value.__class__.__name__ == "XSDataFile":
             self._mergedCurves.append(value)
         else:
@@ -5622,10 +5988,10 @@ class XSDataResultBioSaxsHPLCv1_0(XSDataResultBioSaxsProcessOneFilev1_0):
     def insertMergedCurves(self, index, value):
         if index is None:
             strMessage = "ERROR! XSDataResultBioSaxsHPLCv1_0.insertMergedCurves argument 'index' is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         if value is None:
             strMessage = "ERROR! XSDataResultBioSaxsHPLCv1_0.insertMergedCurves argument 'value' is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         elif value.__class__.__name__ == "XSDataFile":
             self._mergedCurves[index] = value
         else:
@@ -5714,46 +6080,46 @@ class XSDataResultBioSaxsHPLCv1_0(XSDataResultBioSaxsProcessOneFilev1_0):
             self.setHplcImage(obj_)
         XSDataResultBioSaxsProcessOneFilev1_0.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataResultBioSaxsHPLCv1_0")
+        self.export( oStreamString, 0, name_="XSDataResultBioSaxsHPLCv1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataResultBioSaxsHPLCv1_0')
+        self.export( outfile, 0, name_='XSDataResultBioSaxsHPLCv1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataResultBioSaxsHPLCv1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataResultBioSaxsHPLCv1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsHPLCv1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataResultBioSaxsHPLCv1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataResultBioSaxsHPLCv1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsHPLCv1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataResultBioSaxsHPLCv1_0
 
 
@@ -6218,46 +6584,46 @@ class XSDataResultBioSaxsSampleExperiment(XSDataResultBioSaxsSample):
             self.setTimeOfFrame(obj_)
         XSDataResultBioSaxsSample.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataResultBioSaxsSampleExperiment")
+        self.export( oStreamString, 0, name_="XSDataResultBioSaxsSampleExperiment" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataResultBioSaxsSampleExperiment')
+        self.export( outfile, 0, name_='XSDataResultBioSaxsSampleExperiment' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataResultBioSaxsSampleExperiment is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataResultBioSaxsSampleExperiment.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsSampleExperiment()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataResultBioSaxsSampleExperiment")
+        rootObj.export( oStreamString, 0, name_="XSDataResultBioSaxsSampleExperiment" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsSampleExperiment()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataResultBioSaxsSampleExperiment
 
 
@@ -6314,7 +6680,7 @@ class XSDataInputBioSaxsAveragev1_0(XSDataInputBioSaxsSampleExperiment):
     def addIntegratedImage(self, value):
         if value is None:
             strMessage = "ERROR! XSDataInputBioSaxsAveragev1_0.addIntegratedImage argument is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         elif value.__class__.__name__ == "XSDataImage":
             self._integratedImage.append(value)
         else:
@@ -6323,10 +6689,10 @@ class XSDataInputBioSaxsAveragev1_0(XSDataInputBioSaxsSampleExperiment):
     def insertIntegratedImage(self, index, value):
         if index is None:
             strMessage = "ERROR! XSDataInputBioSaxsAveragev1_0.insertIntegratedImage argument 'index' is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         if value is None:
             strMessage = "ERROR! XSDataInputBioSaxsAveragev1_0.insertIntegratedImage argument 'value' is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         elif value.__class__.__name__ == "XSDataImage":
             self._integratedImage[index] = value
         else:
@@ -6440,46 +6806,46 @@ class XSDataInputBioSaxsAveragev1_0(XSDataInputBioSaxsSampleExperiment):
             self.setLogFile(obj_)
         XSDataInputBioSaxsSampleExperiment.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataInputBioSaxsAveragev1_0")
+        self.export( oStreamString, 0, name_="XSDataInputBioSaxsAveragev1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataInputBioSaxsAveragev1_0')
+        self.export( outfile, 0, name_='XSDataInputBioSaxsAveragev1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataInputBioSaxsAveragev1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataInputBioSaxsAveragev1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsAveragev1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataInputBioSaxsAveragev1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsAveragev1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsAveragev1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataInputBioSaxsAveragev1_0
 
 
@@ -6555,46 +6921,46 @@ class XSDataInputBioSaxsMetadatav1_0(XSDataInputBioSaxsSampleExperiment):
             self.setOutputImage(obj_)
         XSDataInputBioSaxsSampleExperiment.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataInputBioSaxsMetadatav1_0")
+        self.export( oStreamString, 0, name_="XSDataInputBioSaxsMetadatav1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataInputBioSaxsMetadatav1_0')
+        self.export( outfile, 0, name_='XSDataInputBioSaxsMetadatav1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataInputBioSaxsMetadatav1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataInputBioSaxsMetadatav1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsMetadatav1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataInputBioSaxsMetadatav1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsMetadatav1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsMetadatav1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataInputBioSaxsMetadatav1_0
 
 
@@ -6695,7 +7061,7 @@ class XSDataInputBioSaxsSingleSamplev1_0(XSDataInputBioSaxsSampleExperiment):
     def addBufferSeries(self, value):
         if value is None:
             strMessage = "ERROR! XSDataInputBioSaxsSingleSamplev1_0.addBufferSeries argument is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         elif value.__class__.__name__ == "XSDataFileSeries":
             self._bufferSeries.append(value)
         else:
@@ -6704,10 +7070,10 @@ class XSDataInputBioSaxsSingleSamplev1_0(XSDataInputBioSaxsSampleExperiment):
     def insertBufferSeries(self, index, value):
         if index is None:
             strMessage = "ERROR! XSDataInputBioSaxsSingleSamplev1_0.insertBufferSeries argument 'index' is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         if value is None:
             strMessage = "ERROR! XSDataInputBioSaxsSingleSamplev1_0.insertBufferSeries argument 'value' is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         elif value.__class__.__name__ == "XSDataFileSeries":
             self._bufferSeries[index] = value
         else:
@@ -6728,7 +7094,7 @@ class XSDataInputBioSaxsSingleSamplev1_0(XSDataInputBioSaxsSampleExperiment):
     def addSampleSeries(self, value):
         if value is None:
             strMessage = "ERROR! XSDataInputBioSaxsSingleSamplev1_0.addSampleSeries argument is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         elif value.__class__.__name__ == "XSDataFileSeries":
             self._sampleSeries.append(value)
         else:
@@ -6737,10 +7103,10 @@ class XSDataInputBioSaxsSingleSamplev1_0(XSDataInputBioSaxsSampleExperiment):
     def insertSampleSeries(self, index, value):
         if index is None:
             strMessage = "ERROR! XSDataInputBioSaxsSingleSamplev1_0.insertSampleSeries argument 'index' is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         if value is None:
             strMessage = "ERROR! XSDataInputBioSaxsSingleSamplev1_0.insertSampleSeries argument 'value' is None"
-            raise BaseException(strMessage)
+            raise BaseException(strMessage)            
         elif value.__class__.__name__ == "XSDataFileSeries":
             self._sampleSeries[index] = value
         else:
@@ -6825,46 +7191,46 @@ class XSDataInputBioSaxsSingleSamplev1_0(XSDataInputBioSaxsSampleExperiment):
             self.setForceReprocess(obj_)
         XSDataInputBioSaxsSampleExperiment.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataInputBioSaxsSingleSamplev1_0")
+        self.export( oStreamString, 0, name_="XSDataInputBioSaxsSingleSamplev1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataInputBioSaxsSingleSamplev1_0')
+        self.export( outfile, 0, name_='XSDataInputBioSaxsSingleSamplev1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataInputBioSaxsSingleSamplev1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataInputBioSaxsSingleSamplev1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsSingleSamplev1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataInputBioSaxsSingleSamplev1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsSingleSamplev1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataInputBioSaxsSingleSamplev1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataInputBioSaxsSingleSamplev1_0
 
 
@@ -6964,46 +7330,46 @@ class XSDataResultBioSaxsMetadatav1_0(XSDataResultBioSaxsSampleExperiment):
             self.setOutputImage(obj_)
         XSDataResultBioSaxsSampleExperiment.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
-    def marshal(self):
+    def marshal( self ):
         oStreamString = StringIO()
         oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export(oStreamString, 0, name_="XSDataResultBioSaxsMetadatav1_0")
+        self.export( oStreamString, 0, name_="XSDataResultBioSaxsMetadatav1_0" )
         oStringXML = oStreamString.getvalue()
         oStreamString.close()
         return oStringXML
     #Only to export the entire XML tree to a file stream on disk
-    def exportToFile(self, _outfileName):
-        outfile = open(_outfileName, "w")
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
         outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export(outfile, 0, name_='XSDataResultBioSaxsMetadatav1_0')
+        self.export( outfile, 0, name_='XSDataResultBioSaxsMetadatav1_0' )
         outfile.close()
     #Deprecated method, replaced by exportToFile
-    def outputFile(self, _outfileName):
+    def outputFile( self, _outfileName ):
         print("WARNING: Method outputFile in class XSDataResultBioSaxsMetadatav1_0 is deprecated, please use instead exportToFile!")
         self.exportToFile(_outfileName)
     #Method for making a copy in a new instance
-    def copy(self):
+    def copy( self ):
         return XSDataResultBioSaxsMetadatav1_0.parseString(self.marshal())
     #Static method for parsing a string
-    def parseString(_inString):
+    def parseString( _inString ):
         doc = minidom.parseString(_inString)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsMetadatav1_0()
         rootObj.build(rootNode)
         # Check that all minOccurs are obeyed by marshalling the created object
         oStreamString = StringIO()
-        rootObj.export(oStreamString, 0, name_="XSDataResultBioSaxsMetadatav1_0")
+        rootObj.export( oStreamString, 0, name_="XSDataResultBioSaxsMetadatav1_0" )
         oStreamString.close()
         return rootObj
-    parseString = staticmethod(parseString)
+    parseString = staticmethod( parseString )
     #Static method for parsing a file
-    def parseFile(_inFilePath):
+    def parseFile( _inFilePath ):
         doc = minidom.parse(_inFilePath)
         rootNode = doc.documentElement
         rootObj = XSDataResultBioSaxsMetadatav1_0()
         rootObj.build(rootNode)
         return rootObj
-    parseFile = staticmethod(parseFile)
+    parseFile = staticmethod( parseFile )
 # end class XSDataResultBioSaxsMetadatav1_0
 
 
