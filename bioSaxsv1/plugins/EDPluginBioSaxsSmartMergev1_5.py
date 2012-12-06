@@ -289,7 +289,7 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
 
         if self.dataInput.sample.login and self.dataInput.sample.passwd and self.dataInput.sample.measurementID:
             self.lstSummary.append("Registering to ISPyB")
-            self.__edPluginSaxsISPyB = self.loadPlugins(self.__strControlledPluginSaxsISPyB)
+            self.__edPluginSaxsISPyB = self.loadPlugin(self.__strControlledPluginSaxsISPyB)
             if len(self.lstInput) > 1:
                 frameAverage = XSDataInteger(len(self.lstInput))
                 frameMerged = XSDataInteger(len(self.lstMerged))

@@ -61,6 +61,22 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
         self.volume = None
         self.framesAverage = None
         self.framesMerged = None
+        self.filename = None
+        self.rg = None  
+        self.rgStdev = None
+        self.i0 = None
+        self.i0Stdev =None 
+        self.firstPointUsed= None
+        self.lastPointUsed= None
+        self.quality= None
+        self.isagregated= None
+        self.code=None  
+        self.concentration=None  
+        self.gnomFile=None 
+        self.rgGuinier=None  
+        self.rgGnom=None  
+        self.dmax=None  
+        self.total=None  
 
 
     def checkParameters(self):
@@ -114,10 +130,47 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
         #Params to be sent and I dont know them
         if self.dataInput.volume:
             self.volume = self.dataInput.volume.value
-
-        self.framesAverage = self.dataInput.frameAverage.value
-        self.framesMerged = self.dataInput.frameMerged.value
-
+        if self.dataInput.frameAverage:
+            self.framesAverage = self.dataInput.frameAverage.value
+        if self.dataInput.frameMerged:
+            self.framesMerged = self.dataInput.frameMerged.value
+	if self.dataAutoRg:
+           autoRg = self.dataAutoRg 
+           if autoRg.filename and autoRg.filename.path:
+		self.filename = autoRg.filename.path.value
+           if autoRg.rg:
+                self.rg = autoRg.rg.value
+           if autoRg.rgStdev:
+                self.rgStdev = autoRg.rgStdev.value
+           if autoRg.i0:
+                self.i0 = autoRg.i0.value
+           if autoRg.i0Stdev:
+                self.i0Stdev = autoRg.i0Stdev.value
+           if autoRg.firstPointUsed:
+                self.firstPointUsed= autoRg.firstPointUsed.value
+           if autoRg.lastPointUsed:
+                self.lastPointUsed= autoRg.lastPointUsed.value
+           if autoRg.quality:
+                self.quality= autoRg.quality.value
+           if autoRg.isagregated:
+                self.isagregated= autoRg.isagregated.value
+        if self.dataBioSaxsSample:
+            if self.dataBioSaxsSample.code:
+                self.code=self.dataBioSaxsSample.code.value
+            if self.dataBioSaxsSample.concentration:
+                self.concentration=self.dataBioSaxsSample.concentration.value
+        if self.dataGnom:
+            if self.dataGnom.gnomFile:
+               self.gnomFile=self.dataGnom.gnomFile.path.value
+            if self.dataGnom.rgGuinier:
+               self.rgGuinier=self.dataGnom.rgGuinier.value
+            if self.dataGnom.rgGnom:
+               self.rgGnom=self.dataGnom.rgGnom.value
+            if self.dataGnom.dmax:
+               self.dmax = self.dataGnom.dmax.value
+            if self.dataGnom.total:     
+               self.total = self.dataGnom.total.value
+  
 
     def process(self, _edObject=None):
         EDPluginControl.process(self)
@@ -125,22 +178,22 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
         try:
             self.client.service.storeDataAnalysisResultByMeasurementId(
                                     self.dataBioSaxsSample.measurementID.value,
-                                    self.dataAutoRg.filename.path.value,
-                                    self.dataAutoRg.rg.value,
-                                    self.dataAutoRg.rgStdev.value,
-                                    self.dataAutoRg.i0.value,
-                                    self.dataAutoRg.i0Stdev.value,
-                                    self.dataAutoRg.firstPointUsed.value,
-                                    self.dataAutoRg.lastPointUsed.value,
-                                    self.dataAutoRg.quality.value,
-                                    self.dataAutoRg.isagregated.value,
-                                    self.dataBioSaxsSample.code.value,
-                                    self.dataBioSaxsSample.concentration.value,
-                                    self.dataGnom.gnomFile.path.value,
-                                    self.dataGnom.rgGuinier.value,
-                                    self.dataGnom.rgGnom.value,
-                                    self.dataGnom.dmax.value,
-                                    self.dataGnom.total.value,
+                                    self.filename,
+                                    self.rg,
+                                    self.rgStdev,
+                                    self.i0,
+                                    self.i0Stdev,
+                                    self.firstPointUsed,
+                                    self.lastPointUsed,
+                                    self.quality,
+                                    self.isagregated,
+                                    self.code,
+                                    self.concentration,
+                                    self.gnomFile,
+                                    self.rgGuinier,
+                                    self.rgGnom,
+                                    self.dmax,
+                                    self.total,
                                     self.volume,
                                     self.framesAverage,
                                     self.framesMerged,
