@@ -39,7 +39,8 @@ EDFactoryPluginStatic.loadModule("XSDataEdnaSaxs")
 EDFactoryPluginStatic.loadModule("XSDataBioSaxsv1_0")
 EDFactoryPluginStatic.loadModule("XSDataWaitFilev1_0")
 from XSDataCommon       import XSDataString, XSDataStatus, XSDataFile, XSDataTime, XSDataInteger
-from XSDataBioSaxsv1_0  import XSDataInputBioSaxsSmartMergev1_0, XSDataResultBioSaxsSmartMergev1_0
+from XSDataBioSaxsv1_0  import XSDataInputBioSaxsSmartMergev1_0, XSDataResultBioSaxsSmartMergev1_0, \
+                            XSDataInputBioSaxsISPyBv1_0
 from XSDataEdnaSaxs     import XSDataInputDatcmp, XSDataInputDataver, XSDataInputAutoSub, XSDataInputDatop, XSDataInputSaxsAnalysis
 from XSDataWaitFilev1_0 import XSDataInputWaitMultiFile
 
@@ -256,36 +257,56 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
                 self.__edPluginExecDataver.connectFAILURE(self.doFailureExecDataver)
                 self.__edPluginExecDataver.executeSynchronous()
 
-            if (self.fConcentration == 0) and (self.strSubFile is not None):
-                if (self.__class__.lastBuffer is not None) and (self.__class__.lastSample is not None):
-                    self.__edPluginExecAutoSub = self.loadPlugin(self.__strControlledPluginAutoSub)
-                    base = "_".join(os.path.basename(self.__class__.lastSample.path.value).split("_")[:-1])
-                    suff = os.path.basename(self.strSubFile).split("_")[-1]
-                    sub = os.path.join(os.path.dirname(self.strSubFile), base + "_" + suff)
-                    xsdSubtractedCurve = XSDataFile(XSDataString(sub))
-                    self.__edPluginExecAutoSub.dataInput = XSDataInputAutoSub(sampleCurve=self.__class__.lastSample,
-                                             buffers=[self.__class__.lastBuffer, self.dataInput.mergedCurve],
-                                             subtractedCurve=xsdSubtractedCurve)
-                    self.__edPluginExecAutoSub.connectSUCCESS(self.doSuccessExecAutoSub)
-                    self.__edPluginExecAutoSub.connectFAILURE(self.doFailureExecAutoSub)
-                    self.__edPluginExecAutoSub.executeSynchronous()
+        if (self.fConcentration == 0) and (self.strSubFile is not None):
+            if (self.__class__.lastBuffer is not None) and (self.__class__.lastSample is not None):
+                self.__edPluginExecAutoSub = self.loadPlugin(self.__strControlledPluginAutoSub)
+                base = "_".join(os.path.basename(self.__class__.lastSample.path.value).split("_")[:-1])
+                suff = os.path.basename(self.strSubFile).split("_")[-1]
+                sub = os.path.join(os.path.dirname(self.strSubFile), base + "_" + suff)
+                xsdSubtractedCurve = XSDataFile(XSDataString(sub))
+                self.__edPluginExecAutoSub.dataInput = XSDataInputAutoSub(sampleCurve=self.__class__.lastSample,
+                                         buffers=[self.__class__.lastBuffer, self.dataInput.mergedCurve],
+                                         subtractedCurve=xsdSubtractedCurve)
+                self.__edPluginExecAutoSub.connectSUCCESS(self.doSuccessExecAutoSub)
+                self.__edPluginExecAutoSub.connectFAILURE(self.doFailureExecAutoSub)
+                self.__edPluginExecAutoSub.executeSynchronous()
 
-                    if self.isFailure():
-                        return
+                if self.isFailure():
+                    return
 
-                    self.__edPluginSaxsAnalysis = self.loadPlugin(self.__strControlledPluginSaxsAnalysis)
-                    self.__edPluginSaxsAnalysis.dataInput = XSDataInputSaxsAnalysis(scatterCurve=xsdSubtractedCurve,
-                                                                                    autoRg=self.autoRg)
-                    self.__edPluginSaxsAnalysis.connectSUCCESS(self.doSuccessSaxsAnalysis)
-                    self.__edPluginSaxsAnalysis.connectFAILURE(self.doFailureSaxsAnalysis)
-                    self.__edPluginSaxsAnalysis.executeSynchronous()
+                self.__edPluginSaxsAnalysis = self.loadPlugin(self.__strControlledPluginSaxsAnalysis)
+                self.__edPluginSaxsAnalysis.dataInput = XSDataInputSaxsAnalysis(scatterCurve=xsdSubtractedCurve,
+                                                                                autoRg=self.autoRg)
+                self.__edPluginSaxsAnalysis.connectSUCCESS(self.doSuccessSaxsAnalysis)
+                self.__edPluginSaxsAnalysis.connectFAILURE(self.doFailureSaxsAnalysis)
+                self.__edPluginSaxsAnalysis.executeSynchronous()
 
 
-                self.__class__.lastBuffer = self.dataInput.mergedCurve
-                self.__class__.lastSample = None
+            self.__class__.lastBuffer = self.dataInput.mergedCurve
+            self.__class__.lastSample = None
+        else:
+            self.__class__.lastSample = self.dataInput.mergedCurve
+
+        if self.dataInput.sample.login and self.dataInput.sample.password and self.dataInput.sample.measurementID:
+            self.lstSummary.append("Registering to ISPyB")
+            self.__edPluginSaxsISPyB = self.loadPlugins(self.__strControlledPluginSaxsISPyB)
+            if len(self.lstInput) > 1:
+                frameAverage = XSDataInteger(len(self.lstInput))
+                frameMerged = XSDataInteger(len(self.lstMerged))
             else:
-                self.__class__.lastSample = self.dataInput.mergedCurve
+                frameMerged = frameAverage = XSDataInteger(1)
 
+            xsdin = XSDataInputBioSaxsISPyBv1_0(sample=self.dataInput.sample,
+                                                     autoRg=self.autoRg,
+                                                     gnom=self.gnom,
+                                                     volume=self.volume,
+                                                     frameAverage=frameAverage,
+                                                     frameMerged=frameMerged
+                                               )
+            self.__edPluginSaxsISPyB.dataInput = xsdin
+            self.__edPluginSaxsISPyB.connectSUCCESS(self.doSuccessISPyB)
+            self.__edPluginSaxsISPyB.connectFAILURE(self.doFailureISPyB)
+            self.__edPluginSaxsISPyB.execute()
 
     def postProcess(self, _edObject=None):
         EDPluginControl.postProcess(self)
@@ -498,3 +519,11 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
         self.ERROR(strErr)
         self.lstSummary.append(strErr)
         self.setFailure()
+
+    def doSuccessISPyB(self, _edPlugin=None):
+        self.DEBUG("EDPluginBioSaxsSmartMergev1_5.doSuccessISPyB")
+        self.lstSummary.append("Registered in ISPyB")
+
+    def doFailureISPyB(self, _edPlugin=None):
+        self.DEBUG("EDPluginBioSaxsSmartMergev1_5.doFailureISPyB")
+        self.lstSummary.append("Failed to registered in ISPyB")
