@@ -111,9 +111,7 @@ complex type XSDataBioSaxsSample extends XSData {
 	code : XSDataString optional
 	login: XSDataString
 	passwd: XSDataString
-	experimentID: XSDataInteger
-	dataCollectionID: XSDataInteger
-	measumentID: XSDataInteger
+	measurementID: XSDataInteger
 }
 
 
@@ -348,8 +346,13 @@ complex type XSDataResultBioSaxsSingleSamplev1_0 extends XSDataResult{
 }
 
 complex type XSDataInputBioSaxsISPyBv1_0 extends XSDataInput  {
-	"plugin populating BioSaxs ISPyB"
-	
+	"Input class for populating ISPyB"
+	sample 		: XSDataBioSaxsSample
+	autoRg		: XSDataAutoRg optional
+	gnom		: XSDataGnom optional 
+	volume		: XSDataDoubleWithUnit optional
+	frameAverage: XSDataInteger optional
+	frameMerged : XSDataInteger optional
 	
 }
 
