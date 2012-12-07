@@ -30,7 +30,8 @@ __license__ = "GPLv3+"
 __copyright__ = "2011, ESRF, Grenoble"
 __date__ = "20120112"
 __doc__ = "This is a python module to measure image offsets using pyfftw3 or fftpack"
-import os, threading, time, gc
+import os, time, gc
+
 try:
     import fftw3
 except ImportError:
@@ -46,7 +47,11 @@ except ImportError:
 
 import numpy
 from math import ceil, floor
-sem = threading.Semaphore()
+try:
+    from EDThreading import Semaphore
+except:
+    from threading import Semaphore
+sem = Semaphore()
 masks = {}
 def shift(input, shift):
     """
@@ -136,8 +141,8 @@ class CudaCorrelate(object):
     ctx = None
 #    pycuda.autoinit.context.pop()
 #    ctx.pop()
-    sem = threading.Semaphore()
-    initsem = threading.Semaphore()
+    sem = Semaphore()
+    initsem = Semaphore()
 
     def __init__(self, shape):
         self.shape = tuple(shape)
