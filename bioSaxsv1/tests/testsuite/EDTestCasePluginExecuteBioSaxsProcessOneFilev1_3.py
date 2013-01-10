@@ -55,12 +55,12 @@ class EDTestCasePluginExecuteBioSaxsProcessOneFilev1_3(EDTestCasePluginExecute):
         self.setDataInputFile(os.path.join(self.getPluginTestsDataHome(), \
                                            "XSDataInputBioSaxsProcessOneFile_reference.xml"))
         self.setReferenceDataOutputFile(os.path.join(self.getPluginTestsDataHome(), \
-                                                     "XSDataResultBioSaxsProcessOneFile_reference_v1_2.xml"))
+                                                     "XSDataResultBioSaxsProcessOneFile_reference_v1_3.xml"))
 
     def preProcess(self):
         """
         PreProcess of the execution test: download a set of images  from http://www.edna-site.org
-        and remove any existing output file 
+        and remove any existing output file
         """
         EDTestCasePluginExecute.preProcess(self)
         self.loadTestImage(["bioSaxsRaw.edf", "bioSaxsMask.edf",
@@ -69,12 +69,12 @@ class EDTestCasePluginExecuteBioSaxsProcessOneFilev1_3(EDTestCasePluginExecute):
         strExpectedOutput = self.readAndParseFile (self.getReferenceDataOutputFile())
         EDVerbose.DEBUG("strExpectedOutput:" + strExpectedOutput)
         xsDataResultReference = XSDataResultBioSaxsProcessOneFilev1_0.parseString(strExpectedOutput)
-        self.refNormImg = xsDataResultReference.normalizedImage.path.value
+#        self.refNormImg = xsDataResultReference.normalizedImage.path.value
         self.refIntCrv = xsDataResultReference.integratedCurve.path.value
-        if not os.path.isdir(os.path.dirname(self.refNormImg)):
-            os.makedirs(os.path.dirname(self.refNormImg))
-        if os.path.isfile(self.refNormImg):
-            os.remove(self.refNormImg)
+#        if not os.path.isdir(os.path.dirname(self.refNormImg)):
+#            os.makedirs(os.path.dirname(self.refNormImg))
+#        if os.path.isfile(self.refNormImg):
+#            os.remove(self.refNormImg)
         if os.path.isfile(self.refIntCrv):
             os.remove(self.refIntCrv)
         EDUtilsParallel.initializeNbThread()

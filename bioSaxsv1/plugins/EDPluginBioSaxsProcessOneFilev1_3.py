@@ -1,5 +1,5 @@
 # coding: utf8
-# 
+#
 #    Project: BioSaxs
 #             http://www.edna-site.org
 #
@@ -30,20 +30,19 @@ __copyright__ = "ESRF"
 __date__ = "20130110"
 __status__ = "development"
 
-import os, sys, threading
+import os, time
 from EDVerbose              import EDVerbose
 from EDPluginControl        import EDPluginControl
-from EDUtilsPlatform        import EDUtilsPlatform
 from EDFactoryPlugin        import edFactoryPlugin
 from EDThreading            import Semaphore
+from EDUtilsUnit            import EDUtilsUnit
 edFactoryPlugin.loadModule("XSDataEdnaSaxs")
 edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
 edFactoryPlugin.loadModule("XSDataWaitFilev1_0")
 from XSDataWaitFilev1_0     import XSDataInputWaitFile
-from XSDataBioSaxsv1_0      import XSDataInputBioSaxsProcessOneFilev1_0, XSDataResultBioSaxsProcessOneFilev1_0, \
-                            XSDataInputBioSaxsNormalizev1_0, XSDataInputBioSaxsAzimutIntv1_0
-from XSDataCommon           import XSDataStatus, XSDataString, XSDataFile, XSDataImage, XSDataInteger, XSDataTime
-
+from XSDataBioSaxsv1_0      import XSDataInputBioSaxsProcessOneFilev1_0, XSDataResultBioSaxsProcessOneFilev1_0
+from XSDataCommon           import XSDataStatus, XSDataString, XSDataFile, XSDataInteger, XSDataTime
+import fabio
 import numpy
 import pyFAI
 
@@ -55,17 +54,18 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
     """
     Control plugin that does the same as previously without sub-plugin call ...
     except WaitFile which is still called.
-    
+
     Nota normalization is done AFTER integration not before as previously
-    
+
     TODO: configuration for device selection
     """
-#    __strControlledPluginNormalize = "EDPluginBioSaxsNormalizev1_1"
-#    __strControlledPluginIntegrate = "EDPluginBioSaxsAzimutIntv1_3"
     cpWaitFile = "EDPluginWaitFile"
     integrator = pyFAI.AzimuthalIntegrator()
     CONF_DUMMY_PIXEL_VALUE = "DummyPixelValue"
     CONF_DUMMY_PIXEL_DELTA = "DummyPixelDelta"
+    CONF_OPENCL_DEVICE_TYPE = "DeviceType"
+    CONF_OPENCL_PLATFORM_ID = "PlatformId"
+    CONF_OPENCL_DEVICE_ID = "DeviceId"
     __configured = False
     dummy = -2
     delta_dummy = 1.1
@@ -81,10 +81,8 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
         """
         EDPluginControl.__init__(self)
         self.setXSDataInputClass(XSDataInputBioSaxsProcessOneFilev1_0)
-#        self.__edPluginNormalize = None
-#        self.__edPluginIntegrate = None
         self.__edPluginWaitFile = None
-
+        self.rawImage = None
         self.rawImageSize = XSDataInteger(1024)
         self.normalizedImage = None
         self.integratedCurve = None
@@ -151,14 +149,14 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
             try:
                 os.mkdir(curveDir)
             except OSError:
-                #could occure in race condition ...  
+                # could occure in race condition ...
                 pass
 
         self.sample = self.dataInput.sample
         self.experimentSetup = self.dataInput.experimentSetup
         self.integrator_config = {'dist': self.experimentSetup.detectorDistance.value,
-                                  'pixel1': self.experimentSetup.pixelSize_2.value, # flip X,Y
-                                  'pixel2': self.experimentSetup.pixelSize_1.value, # flip X,Y
+                                  'pixel1': self.experimentSetup.pixelSize_2.value,  # flip X,Y
+                                  'pixel2': self.experimentSetup.pixelSize_1.value,  # flip X,Y
                                   'poni1': self.experimentSetup.beamCenter_2.value * self.experimentSetup.pixelSize_2.value,
                                   'poni2': self.experimentSetup.beamCenter_1.value * self.experimentSetup.pixelSize_1.value,
                                   'rot1': 0.0,
@@ -168,7 +166,7 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
         i0 = self.experimentSetup.beamStopDiode.value
         if i0 == 0:
             warn = "beamStopDiode is Null --> If we are testing, this is OK, else investigate !!!"
-            self.lstProcessLog.append(warn)
+            self.lstExecutiveSummary.append(warn)
             self.warning(warn)
             self.scale = self.experimentSetup.normalizationFactor.value
         else:
@@ -209,22 +207,20 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
 
     def integrate(self):
         img = fabio.open(self.rawImage)
+        if "Date" in img.header:
+            self.experimentSetup.timeOfFrame = XSDataTime(time.mktime(time.strptime(img.header["Date"], "%a %b %d %H:%M:%S %Y")))
+
         with self.__class__.semaphore:
             if (self.integrator.getPyFAI() != self.integrator_config) or \
                (self.integrator.wavelength != self.experimentSetup.wavelength.value) or\
                (self.integrator.maskfile != self.experimentSetup.maskFile.path.value):
                 self.screen("Resetting PyFAI integrator")
                 self.integrator.setPyFAI(**self.integrator_config)
-                self.integrator.wavelength = self.experimentSetup.wavelength.value
+                self.integrator.wavelength = EDUtilsUnit.getSIValue(self.experimentSetup.wavelength)
                 self.integrator.detector.mask = self.calc_mask()
 
-#            with EDUtilsParallel.getSemaphoreNbThreads():
-
-
-            #todo: go to integrate1d
             q, I, std = self.integrator.integrate1d(data=img.data, nbPt=max(img.dim1, img.dim2),
                                        correctSolidAngle=True,
-#                                       variance=variance.data,
                                        dummy=self.dummy, delta_dummy=self.delta_dummy,
                                        filename=None,
                                        error_model="poisson",
@@ -236,7 +232,7 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
 
     def normalize(self, data):
         """
-        Perform the normalization of some data 
+        Perform the normalization of some data
         @return: normalized data
         """
         maskedData = numpy.ma.masked_array(data, abs(data - self.dummy) < self.delta_dummy)
@@ -257,7 +253,7 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
         if detector_mask.shape == mask.shape:
             mask = numpy.logical_or(mask, detector_mask)
         else:
-            #crop the user defined mask
+            # crop the user defined mask
             mask = numpy.logical_or(mask[:shape0, :shape1], detector_mask)
         return mask
 
@@ -386,301 +382,8 @@ s-vector Intensity Error
     def doFailureWaitFile(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsProcessOneFilev1_3.doFailureWaitFile")
         self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsProcessOneFilev1_3.doFailureWaitFile")
-        self.lstProcessLog.append("Timeout in waiting for file '%s'" % (self.rawImage))
+        self.lstExecutiveSummary.append("Timeout in waiting for file '%s'" % (self.rawImage))
         self.setFailure()
-
-
-################################################################################
-# EDPluginBioSaxsNormalizev1_1
-################################################################################
-class EDPluginBioSaxsNormalizev1_1(EDPluginControl):
-    """
-    Wait for the file to appear then apply mask ;  
-    do the normalization of the raw data by ring current and BeamStopDiode 
-    and finally append all metadata to the file EDF.
-    
-    All "processing" are done with Numpy, Input/Output is handled by Fabio
-    """
-    __maskfiles = {} #key=filename, value=numpy.ndarray
-    __semaphore = threading.Semaphore()
-    CONF_DUMMY_PIXEL_VALUE = "DummyPixelValue"
-
-    def __init__(self):
-        """
-        """
-        EDPluginControl.__init__(self)
-        self.setXSDataInputClass(XSDataInputBioSaxsNormalizev1_0)
-        self.__strPluginNameWaitFile = "EDPluginWaitFile"
-        self.__edPluginExecWaitFile = None
-
-        self.dummy = None
-        self.strLogFile = None
-        self.strRawImage = None
-        self.strRawImageSize = None
-        self.strNormalizedImage = None
-        self.lstProcessLog = [] #comments to be returned
-
-        self.xsdInput = None
-        self.sample = None
-        self.experimentSetup = None
-        self.xsdResult = XSDataResultBioSaxsNormalizev1_0()
-        self.dictOutputHeader = {}
-
-    def checkParameters(self):
-        """
-        Checks the mandatory parameters.
-        """
-        self.DEBUG("EDPluginBioSaxsNormalizev1_1.checkParameters")
-        self.xsdInput = self.dataInput
-        self.checkMandatoryParameters(self.xsdInput, "Data Input is None")
-        self.checkMandatoryParameters(self.xsdInput.rawImage, "Raw File is None")
-        self.checkMandatoryParameters(self.xsdInput.normalizedImage, "No normalized output image provided")
-        self.checkMandatoryParameters(self.xsdInput.sample, "No sample provided")
-        self.checkMandatoryParameters(self.xsdInput.experimentSetup, "No experiment setup provided")
-
-
-    def preProcess(self, _edObject=None):
-        EDPluginControl.preProcess(self)
-        self.DEBUG("EDPluginBioSaxsNormalizev1_1.preProcess")
-        self.sample = self.xsdInput.sample
-        self.experimentSetup = self.xsdInput.experimentSetup
-#        self.strLogFile = self.xsdInput.getLogFile().path.value
-        self.strRawImage = self.xsdInput.rawImage.path.value
-        self.strNormalizedImage = self.xsdInput.normalizedImage.path.value
-        outDir = os.path.dirname(self.strNormalizedImage)
-        if outDir and not os.path.exists(outDir):
-            os.mkdir(outDir)
-        self.strRawImageSize = self.xsdInput.getRawImageSize().value
-        self.dictOutputHeader["DiodeCurr"] = self.experimentSetup.beamStopDiode.value
-        self.dictOutputHeader["Normalization"] = self.experimentSetup.normalizationFactor.value
-        self.dictOutputHeader["MachCurr"] = self.experimentSetup.machineCurrent.value
-        self.dictOutputHeader["Mask"] = str(self.experimentSetup.maskFile.path.value)
-        self.dictOutputHeader["SampleDistance"] = self.experimentSetup.detectorDistance.value
-        self.dictOutputHeader["WaveLength"] = self.experimentSetup.wavelength.value
-        self.dictOutputHeader["PSize_1"] = self.experimentSetup.pixelSize_1.value
-        self.dictOutputHeader["PSize_2"] = self.experimentSetup.pixelSize_2.value
-        self.dictOutputHeader["Center_1"] = self.experimentSetup.beamCenter_1.value
-        self.dictOutputHeader["Center_2"] = self.experimentSetup.beamCenter_2.value
-        if self.experimentSetup.storageTemperature is not None:
-            self.dictOutputHeader["storageTemperature"] = self.experimentSetup.storageTemperature.value
-        if self.experimentSetup.exposureTemperature is not None:
-            self.dictOutputHeader["exposureTemperature"] = self.experimentSetup.exposureTemperature.value
-        if self.experimentSetup.exposureTime is not None:
-            self.dictOutputHeader["exposureTime"] = self.experimentSetup.exposureTime.value
-        if self.experimentSetup.frameNumber is not None:
-            self.dictOutputHeader["frameNumber"] = self.experimentSetup.frameNumber.value
-        if self.experimentSetup.frameMax is not None:
-            self.dictOutputHeader["frameMax"] = self.experimentSetup.frameMax.value
-
-        if self.sample.comments is not None:
-            self.dictOutputHeader["Comments"] = str(self.sample.comments.value)
-            self.dictOutputHeader["title"] = str(self.sample.comments.value)
-
-        if self.sample.concentration is not None:
-            self.dictOutputHeader["Concentration"] = str(self.sample.concentration.value)
-        if self.sample.code is not None:
-            self.dictOutputHeader["Code"] = str(self.sample.code.value)
-
-        # Load the execution plugin
-        self.__edPluginExecWaitFile = self.loadPlugin(self.__strPluginNameWaitFile)
-
-
-    def process(self, _edObject=None):
-        EDPluginControl.process(self)
-        self.DEBUG("EDPluginBioSaxsNormalizev1_1.process")
-        xsdiWaitFile = XSDataInputWaitFile(expectedFile=XSDataFile(self.xsdInput.rawImage.path),
-                                           expectedSize=self.xsdInput.rawImageSize,
-                                           timeOut=XSDataTime(value=30))
-        self.__edPluginExecWaitFile.setDataInput(xsdiWaitFile)
-        self.__edPluginExecWaitFile.connectSUCCESS(self.doSuccessExecWaitFile)
-        self.__edPluginExecWaitFile.connectFAILURE(self.doFailureExecWaitFile)
-        self.__edPluginExecWaitFile.executeSynchronous()
-        if self.isFailure():
-            return
-#        Small Numpy processing:
-        fabIn = fabio.open(self.strRawImage)
-        if "time_of_day" in fabIn.header:
-            self.dictOutputHeader["time_of_day"] = fabIn.header["time_of_day"]
-        if "Mask" in self.dictOutputHeader:
-            mask = self.getMask(self.dictOutputHeader["Mask"])
-            npaMaskedData = numpy.ma.masked_array(fabIn.data.astype("float32"),
-                                                  ((fabIn.data < 0) + (mask[:fabIn.dim2, :fabIn.dim1 ] < 0)))
-        else:
-            npaMaskedData = numpy.ma.masked_array(fabIn.data.astype("float32"), (fabIn.data < 0))
-        if self.dictOutputHeader["DiodeCurr"] == 0:
-            warn = "DiodeCurr is Null --> I Guess we are testing and take it as one"
-            self.lstProcessLog.append(warn)
-            self.warning(warn)
-            scale = self.dictOutputHeader["Normalization"]
-        else:
-            scale = self.dictOutputHeader["Normalization"] / self.dictOutputHeader["DiodeCurr"]
-        self.dictOutputHeader["Dummy"] = str(self.dummy)
-        self.dictOutputHeader["DDummy"] = "0.1"
-        self.dictOutputHeader["EDF_DataBlockID"] = "1.Image.Psd"
-        header_keys = self.dictOutputHeader.keys()
-        header_keys.sort()
-        fabioOut = fabio.edfimage.edfimage(header=self.dictOutputHeader, header_keys=header_keys,
-                             data=numpy.ma.filled(npaMaskedData * scale, float(self.dummy)))
-        fabioOut.appendFrame(header={"Dummy": str(self.dummy), "DDummy":"0.1", "EDF_DataBlockID":"1.Image.Error"},
-                              data=(numpy.ma.filled(npaMaskedData * (scale ** 2), float(self.dummy))))
-        fabioOut.write(self.strNormalizedImage)
-        self.lstProcessLog.append("Normalized image by factor %.3f " % (scale))
-
-
-    def postProcess(self, _edObject=None):
-        EDPluginControl.postProcess(self)
-        self.DEBUG("EDPluginBioSaxsNormalizev1_1.postProcess")
-
-        if os.path.isfile(self.strNormalizedImage):
-            xsNormFile = XSDataImage()
-            xsNormFile.setPath(XSDataString(self.strNormalizedImage))
-            self.xsdResult.setNormalizedImage(xsNormFile)
-        self.xsdResult.status = XSDataStatus(executiveSummary=XSDataString(os.linesep.join(self.lstProcessLog)))
-        # Create some output data
-        self.setDataOutput(self.xsdResult)
-
-
-    def doSuccessExecWaitFile(self, _edPlugin=None):
-        self.DEBUG("EDPluginBioSaxsNormalizev1_1.doSuccessExecWaitFile")
-        self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsNormalizev1_1.doSuccessExecWaitFile")
-        xsdOut = _edPlugin.getDataOutput()
-        if (xsdOut.timedOut is not None) and (xsdOut.timedOut.value):
-            strErr = "Timeout (%s s) in waiting for file %s" % (_edPlugin.getTimeOut(), self.strRawImage)
-            self.ERROR(strErr)
-            self.lstProcessLog.append(strErr)
-            self.setFailure()
-        else:
-            self.log("EDPluginBioSaxsNormalizev1_1.WaitFile took %.3fs" % self.getRunTime())
-            self.lstProcessLog.append("Normalizing EDF frame '%s' -> '%s'" % (self.strRawImage, self.strNormalizedImage))
-
-
-    def doFailureExecWaitFile(self, _edPlugin=None):
-        self.DEBUG("EDPluginBioSaxsNormalizev1_1.doFailureExecWaitFile")
-        self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsNormalizev1_1.doFailureExecWaitFile")
-        self.lstProcessLog.append("Timeout in waiting for file '%s'.\n" % (self.strRawImage))
-        self.setFailure()
-
-
-    def configure(self):
-        """
-        Configures the plugin from the configuration file with the following parameters:
-         - DummyPixelValue: the value to be assigned to dummy pixels.
-        """
-        EDPluginControl.configure(self)
-        self.DEBUG("EDPluginBioSaxsNormalizev1_1.configure")
-        xsPluginItem = self.getConfiguration()
-        if (xsPluginItem == None):
-            self.warning("EDPluginBioSaxsNormalizev1_1.configure: No plugin item defined.")
-            xsPluginItem = XSPluginItem()
-        self.dummy = EDConfiguration.getStringParamValue(xsPluginItem, self.CONF_DUMMY_PIXEL_VALUE)
-        if self.dummy is None:
-            strMessage = 'EDPluginBioSaxsNormalizev1_1.configure: %s Configuration parameter missing: \
-%s, defaulting to "-1"' % (self.getBaseName(), self.CONF_DUMMY_PIXEL_VALUE)
-            self.WARNING(strMessage)
-            self.addErrorWarningMessagesToExecutiveSummary(strMessage)
-            self.dummy = -1
-#
-#    @classmethod
-#    def getMask(cls, _strFilename):
-#        """
-#        Retrieve the data from a file, featuring caching.
-#        
-#        @param _strFilename: name of the file
-#        @return: numpy ndarray
-#        
-#        /!\ This is a class method (for the cache part)
-#        """
-#        if _strFilename not in cls.__maskfiles:
-#            cls.__semaphore.acquire()
-#            maskFile = fabio.open(_strFilename)
-#            cls.__maskfiles[_strFilename] = maskFile.data
-#            cls.__semaphore.release()
-#        return cls.__maskfiles[_strFilename]
-
-
-################################################################################
-# EDPluginBioSaxsAzimutIntv1_3
-################################################################################
-
-import os
-from EDUtilsArray           import EDUtilsArray
-from EDPluginControl        import EDPluginControl
-from EDFactoryPluginStatic  import EDFactoryPluginStatic
-from EDUtilsPlatform        import EDUtilsPlatform
-from EDUtilsPath            import EDUtilsPath
-from XSDataCommon           import XSDataString, XSDataStatus, XSDataTime, XSDataFile, XSDataAngle, \
-                                    XSDataDouble, XSDataInteger
-from XSDataBioSaxsv1_0      import XSDataInputBioSaxsAzimutIntv1_0, XSDataResultBioSaxsAzimutIntv1_0, \
-                                XSDataInputBioSaxsMetadatav1_0
-EDFactoryPluginStatic.loadModule("XSDataWaitFilev1_0")
-EDFactoryPluginStatic.loadModule("XSDataPyFAIv1_0")
-from XSDataWaitFilev1_0     import XSDataInputWaitFile
-from XSDataPyFAIv1_0        import XSDataInputPyFAI, XSDataDetector, XSDataGeometryFit2D
-from EDUtilsParallel        import EDUtilsParallel
-architecture = EDUtilsPlatform.architecture
-fabioPath = os.path.join(EDUtilsPath.EDNA_HOME, "libraries", "FabIO-0.0.7", architecture)
-imagingPath = os.path.join(EDUtilsPath.EDNA_HOME, "libraries", "20091115-PIL-1.1.7", architecture)
-numpyPath = os.path.join(EDUtilsPath.EDNA_HOME, "libraries", "20090405-Numpy-1.3", architecture)
-
-numpy = EDFactoryPluginStatic.preImport("numpy", numpyPath)
-Image = EDFactoryPluginStatic.preImport("Image", imagingPath)
-fabio = EDFactoryPluginStatic.preImport("fabio", fabioPath)
-import pyFAI
-
-class EDPluginBioSaxsAzimutIntv1_3(EDPluginControl):
-    """
-    Control for Bio Saxs azimuthal integration; suppose the mask is already applied by BioSaxsNormalizev1.1 :
-    * wait for normalized file to arrive  (EDPluginWaitFile)
-    * retrieve and update metadata (EDPluginBioSaxsMetadatav1_0)
-    * integrate (directly vi pyFAI)
-    * export as 3-column ascii-file is done here to allow more precise header
-    Changelog since v1.2: use PyFAI instead of saxs_angle from Peter Boesecke
-    """
-    cpWaitFile = "EDPluginWaitFile"
-    cpGetMetadata = "EDPluginBioSaxsMetadatav1_1"
-    integrator = pyFAI.AzimuthalIntegrator()
-    def __init__(self):
-        """
-        """
-        EDPluginControl.__init__(self)
-        self.setXSDataInputClass(XSDataInputBioSaxsAzimutIntv1_0)
-        self.__edPluginWaitFile = None
-        self.__edPluginMetadata = None
-        self.xsdMetadata = None
-        self.sample = None
-        self.experimentSetup = None
-        self.normalizedImage = None
-        self.integratedCurve = None
-        self.normalizationFactor = None
-
-        self.lstProcessLog = []
-        self.npaOut = None
-        self.xsdResult = XSDataResultBioSaxsAzimutIntv1_0()
-
-    def checkParameters(self):
-        """
-        Checks the mandatory parameters.
-        """
-        self.DEBUG("EDPluginBioSaxsAzimutIntv1_3.checkParameters")
-        self.checkMandatoryParameters(self.dataInput, "Data Input is None")
-        self.checkMandatoryParameters(self.dataInput.normalizedImage, "Missing normalizedImage")
-        self.checkMandatoryParameters(self.dataInput.normalizedImageSize, "Missing normalizedImageSize")
-        self.checkMandatoryParameters(self.dataInput.integratedCurve, "Missing integratedCurve")
-        self.checkMandatoryParameters(self.dataInput.sample, "Missing a sample description")
-        self.checkMandatoryParameters(self.dataInput.experimentSetup, "Missing an experiment setup")
-
-
-    def preProcess(self, _edObject=None):
-        EDPluginControl.preProcess(self)
-        self.DEBUG("EDPluginBioSaxsAzimutIntv1_3.preProcess")
-        # Load the execution plugins
-        self.sample = self.dataInput.sample
-        self.experimentSetup = self.dataInput.experimentSetup
-        self.__edPluginWaitFile = self.loadPlugin(self.cpWaitFile)
-        self.__edPluginMetadata = self.loadPlugin(self.cpGetMetadata)
-        self.normalizedImage = self.dataInput.normalizedImage.path.value
-        self.integratedCurve = self.dataInput.integratedCurve.path.value
-
 
 
 
