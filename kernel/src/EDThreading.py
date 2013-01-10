@@ -36,35 +36,36 @@ __contact__ = "jerome.kieffer@esrf.fr"
 __license__ = "LGPLv3+"
 __copyright__ = "European Synchrotron Radiation Facility, Grenoble, France"
 __date__ = "20120401"
-import uuid, sys, os, traceback
+import sys, os, traceback
 import threading
 _Semaphore = threading._Semaphore
+
+
 
 if os.environ.get("EDNA_LOCK", False):
     class Semaphore(_Semaphore):
         """
         threading.Semaphore like class with helper for fighting dead-locks
         """
+        write_lock = _Semaphore()
+        blocked = []
         def __init__(self, *arg, **kwarg):
             _Semaphore.__init__(self, *arg, **kwarg)
-            self.blocked = []
+
 
         def acquire(self, *arg, **kwarg):
             if self._Semaphore__value == 0:
-                uid = uuid.uuid4()
-                self.blocked.append(uid)
-                sys.stderr.write("Blocking sem %s" %
-                                 os.linesep.join([str(uid)] + \
-                                        traceback.format_stack()[:-1] + [""]))
+                with self.write_lock:
+                    self.blocked.append(id(self))
+                    sys.stderr.write(os.linesep.join(["Blocking sem %s" % id(self)] + \
+                                            traceback.format_stack()[:-1] + [""]))
             return _Semaphore.acquire(self, *arg, **kwarg)
 
         def release(self, *arg, **kwarg):
-            if self.blocked:
-                try:
-                    uid = self.blocked.pop()
-                except Exception:
-                    pass
-                else:
+            with self.write_lock:
+                uid = id(self)
+                if uid in self.blocked:
+                    self.blocked.remove(uid)
                     sys.stderr.write("Released sem %s %s" % (uid, os.linesep))
             _Semaphore.release(self, *arg, **kwarg)
 

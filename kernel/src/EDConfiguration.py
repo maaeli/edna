@@ -123,7 +123,12 @@ class EDConfiguration(EDLogging):
                                         plugin_conf[paramItem.name] = bestType(paramItem.value)
                                 dictConfig[plugin_name] = plugin_conf
                 else: #JSON mode
-                    dictConfig = json.loads(strConfiguration)
+                    try:
+                        dictConfig = json.loads(strConfiguration)
+                    except ValueError, error:
+                        strError = "in file %s Json was %s" % (strFileName, error)
+                        self.error(strError)
+                        raise ValueError(strError)
                 # Make sure we are thread safe when manipulating the cache
                 with self.locked():
                     self._dictConfigurationFiles[strFileName] = dictConfig
