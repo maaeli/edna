@@ -30,7 +30,7 @@
 """
 This static class is used for comparing two objects.
 """
-
+from __future__ import with_statement
 
 __authors__ = [ "Marie-Francoise Incardona", "Olof Svensson", "Jérôme Kieffer" ]
 __contact__ = "svensson@esrf.fr"
@@ -323,4 +323,63 @@ class EDAssert:
             raise AssertionError, ERROR_ASSERT_MESSAGE
         else:
             EDVerbose.ASSERT("OK " + _strComment)
+
+    @staticmethod
+    def curveSimilar(_npaValue, _npaRef, _strComment="curves are similar", _fRfactor=0.1):
+        """
+        Tests if two curves are similar. 
+        Two arrays (vectors, matrices, tensors, ...) if the have :  
+        * Sigma(abs(Value - Ref)/max(abs(Value),abs(Ref)) < _fRfactor1 if _fRfactor is defined 
+        
+        
+        @param _npaRef: 2-tuple of vectors or lists
+        @param _npaValue: 2-tuple of vectors or lists
+        @param _strComment: a comment to make your assertion more understandable to the user
+        @type _strComment: python string or unicode string. 
+        @type _fAbsMaxDelta: Float
+        @type _fRelMaxDelta: Float
+        @type _fRfactor1: Float
+        """
+        import numpy
+        bAlmostEqual = True
+        try:
+            ref_X, ref_Y = _npaRef[:2]
+            obt_X, obt_Y = _npaValue[:2]
+        except Exception:
+            bAlmostEqual = False
+            ERROR_ASSERT_MESSAGE = "Objects passed have not the right "
+
+        EDAssert.equal(len(ref_X), len(ref_Y), "Reference vector have the same length")
+        EDAssert.equal(len(obt_X), len(obt_Y), "Obtained vector have the same length")
+
+        if bAlmostEqual and _fRfactor is not None:
+            big_X = (list(ref_X) + list(obt_X))
+            big_X.sort()
+            big_X = numpy.unique(big_X)
+            big_ref = numpy.interp(big_X, ref_X, ref_Y)
+            big_obt = numpy.interp(big_X, obt_X, obt_Y)
+            big_mean = (big_ref + big_obt) / 2.0
+            big_delta = (big_ref - big_obt)
+            non_null = abs(big_mean) > numpy.finfo(numpy.float32).tiny
+            R = numpy.sqrt(((big_delta[non_null]) ** 2 / ((big_mean[non_null]) ** 2)).sum()) / non_null.size * 100
+            EDVerbose.DEBUG("Obtained R value: %.4f" % R)
+            if R > _fRfactor:
+                ERROR_ASSERT_MESSAGE = "R factor: %s larger than allowed: %s" % (R, _fRfactor)
+                bAlmostEqual = False
+
+        if not bAlmostEqual:
+            strExpectedFileName = tempfile.mktemp(suffix="_expected.txt", dir=os.getcwd())
+            strUniqueIndentifier = strExpectedFileName.split("_expected.txt")[0]
+            with open(strExpectedFileName , "w") as f:
+                f. writelines(os.linesep.join(["%s %s" % (x, y) for x, y in zip(ref_X, ref_Y)]))
+
+            strObtainedFileName = strUniqueIndentifier + "_obtained.txt"
+            with open(strObtainedFileName , "w") as f:
+                f. writelines(os.linesep.join(["%s %s" % (x, y) for x, y in zip(obt_X, obt_Y)]))
+            EQUAL_ERROR_ASSERT_MESSAGE = "FAILURE: %s, %s \nIdentifier %s" % (_strComment, ERROR_ASSERT_MESSAGE, strUniqueIndentifier)
+            EDVerbose.ASSERT(EQUAL_ERROR_ASSERT_MESSAGE)
+            raise AssertionError, EQUAL_ERROR_ASSERT_MESSAGE
+        else:
+            EDVerbose.ASSERT("OK " + _strComment)
+
 
