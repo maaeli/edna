@@ -42,7 +42,6 @@ EDFactoryPluginStatic.loadModule("EDInstallPILv1_1_7")
 EDFactoryPluginStatic.loadModule("EDInstallFabio_v0_0_7")
 
 import numpy
-from fabio.openimage import openimage
 
 
 class EDTestCasePluginExecuteBioSaxsProcessOneFilev1_3(EDTestCasePluginExecute):
@@ -97,12 +96,19 @@ class EDTestCasePluginExecuteBioSaxsProcessOneFilev1_3(EDTestCasePluginExecute):
 
 
 ################################################################################
-# Compare Ascii files
+# Compare Ascii HEADER files
 ################################################################################
-        asciiObt = os.linesep.join([i.strip() for i in  open(xsDataResultObtained.integratedCurve.path.value) if "Raster" not in i])
-        asciiRef = os.linesep.join([i.strip() for i in  open(os.path.join(self.getTestsDataImagesHome(), "bioSaxsProcessIntegrated1_2.dat")) if "Raster" not in i])
+        asciiObt = os.linesep.join([i.strip() for i in  open(xsDataResultObtained.integratedCurve.path.value) if i.startswith("#") and "Raster" not in i])
+        asciiRef = os.linesep.join([i.strip() for i in  open(os.path.join(self.getTestsDataImagesHome(), "bioSaxsProcessIntegrated1_2.dat")) if i.startswith("#") and "Raster" not in i])
 
-        EDAssert.strAlmostEqual(asciiRef, asciiObt, _strComment="3 column ascii files are the same", _fRelError=0.1, _strExcluded=os.environ["USER"])
+        EDAssert.strAlmostEqual(asciiObt, asciiRef, _strComment="ascii header files are the same", _fRelError=0.1, _strExcluded=os.environ["USER"])
+
+        dataObt = numpy.loadtxt(xsDataResultObtained.integratedCurve.path.value)
+        dataRef = numpy.loadtxt(os.path.join(self.getTestsDataImagesHome(), "bioSaxsProcessIntegrated1_2.dat"))
+        EDAssert.curveSimilar((dataObt[:, 0], dataObt[:, 1]), (dataRef[:, 0], dataRef[:, 1]), "data are the same")
+        EDAssert.curveSimilar((dataObt[:, 0], dataObt[:, 2]), (dataRef[:, 0], dataRef[:, 2]), "errors are the same")
+
+
         EDVerbose.screen("Execution time for %s: %.3fs" % (plugin.getClassName(), plugin.getRunTime()))
     def process(self):
         """

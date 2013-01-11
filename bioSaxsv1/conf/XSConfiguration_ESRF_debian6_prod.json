@@ -1,5 +1,5 @@
 {
-    "__extend__": [], 
+    "__extend__": ["XSConfiguration_ESRF_debian6.json"], 
 
     "EDPluginBioSaxsSmartMergev1_4": {}, 
     "EDPluginBioSaxsProcessOneFilev1_2": {}, 

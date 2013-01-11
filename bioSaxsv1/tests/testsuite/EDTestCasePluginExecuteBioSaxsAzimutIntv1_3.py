@@ -44,6 +44,7 @@ EDFactoryPluginStatic.loadModule("EDInstallPILv1_1_7")
 EDFactoryPluginStatic.loadModule("EDInstallFabio_v0_0_7")
 import pyFAI
 import fabio
+import numpy
 
 
 class EDTestCasePluginExecuteBioSaxsAzimutIntv1_3(EDTestCasePluginExecute):
@@ -105,14 +106,31 @@ class EDTestCasePluginExecuteBioSaxsAzimutIntv1_3(EDTestCasePluginExecute):
         EDAssert.strAlmostEqual(xsDataResultReference.marshal(), xsDataResultObtained.marshal(), "XSDataResult output are the same", _strExcluded="bioSaxs")
 
 ################################################################################
-# Compare spectrum ascii Files
+# Compare Ascii HEADER files
 ################################################################################
+        asciiObt = os.linesep.join([i.strip() for i in  open(xsDataResultObtained.integratedCurve.path.value) if i.startswith("#") and "Raster" not in i])
+        asciiRef = os.linesep.join([i.strip() for i in  open(os.path.join(self.getTestsDataImagesHome(), "bioSaxsProcessIntegrated1_2.dat")) if i.startswith("#") and "Raster" not in i])
 
-        outputData = open(xsDataResultObtained.getIntegratedCurve().getPath().value, "rb").read().split(os.linesep)
-        referenceData = EDUtilsFile.readFileAndParseVariables(os.path.join(self.getTestsDataImagesHome(), "bioSaxsIntegratedv1_3.dat"), EDUtilsPath.getDictOfPaths()).split(os.linesep)
-        outputData = os.linesep.join([i for i in outputData if not i.startswith("# History")])
-        referenceData = os.linesep.join([i for i in referenceData if not i.startswith("# History")])
-        EDAssert.strAlmostEqual(referenceData, outputData, _strComment="3column ascii spectra files are the same", _fRelError=0.1, _fAbsError=0.1, _strExcluded="bioSaxs")
+        EDAssert.strAlmostEqual(asciiObt, asciiRef, _strComment="ascii header files are the same", _fRelError=0.1, _strExcluded=os.environ["USER"])
+
+        dataObt = numpy.loadtxt(xsDataResultObtained.integratedCurve.path.value)
+        dataRef = numpy.loadtxt(os.path.join(self.getTestsDataImagesHome(), "bioSaxsProcessIntegrated1_2.dat"))
+        EDAssert.curveSimilar((dataObt[:, 0], dataObt[:, 1]), (dataRef[:, 0], dataRef[:, 1]), "data are the same", 0.6)
+        EDAssert.curveSimilar((dataObt[:, 0], dataObt[:, 2]), (dataRef[:, 0], dataRef[:, 2]), "errors are the same", 0.6)
+
+
+        EDVerbose.screen("Execution time for %s: %.3fs" % (plugin.getClassName(), plugin.getRunTime()))
+#
+#
+#################################################################################
+## Compare spectrum ascii Files
+#################################################################################
+#
+#        outputData = open(xsDataResultObtained.getIntegratedCurve().getPath().value, "rb").read().split(os.linesep)
+#        referenceData = EDUtilsFile.readFileAndParseVariables(os.path.join(self.getTestsDataImagesHome(), "bioSaxsIntegratedv1_3.dat"), EDUtilsPath.getDictOfPaths()).split(os.linesep)
+#        outputData = os.linesep.join([i for i in outputData if not i.startswith("# History")])
+#        referenceData = os.linesep.join([i for i in referenceData if not i.startswith("# History")])
+#        EDAssert.strAlmostEqual(referenceData, outputData, _strComment="3column ascii spectra files are the same", _fRelError=0.1, _fAbsError=0.1, _strExcluded="bioSaxs")
 
 
     def process(self):

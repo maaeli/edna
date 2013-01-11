@@ -57,15 +57,12 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
 
     Nota normalization is done AFTER integration not before as previously
 
-    TODO: configuration for device selection
     """
     cpWaitFile = "EDPluginWaitFile"
     integrator = pyFAI.AzimuthalIntegrator()
     CONF_DUMMY_PIXEL_VALUE = "DummyPixelValue"
     CONF_DUMMY_PIXEL_DELTA = "DummyPixelDelta"
-    CONF_OPENCL_DEVICE_TYPE = "DeviceType"
-    CONF_OPENCL_PLATFORM_ID = "PlatformId"
-    CONF_OPENCL_DEVICE_ID = "DeviceId"
+    CONF_OPENCL_DEVICE = "DeviceType"
     __configured = False
     dummy = -2
     delta_dummy = 1.1
@@ -110,6 +107,7 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
         Configures the plugin from the configuration file with the following parameters:
          - DummyPixelValue: the value be assigned to dummy pixels.
          - DummyPixelDelta: the value be assigned to delta dummy.
+         - DeviceType: "lut_ocl_1,3" will select device #3 on first platform #1 
         """
         EDPluginControl.configure(self)
         if not self.__configured:
@@ -123,7 +121,7 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
                         self.WARNING(strMessage)
                         self.addErrorWarningMessagesToExecutiveSummary(strMessage)
                     else:
-                        self.__class__.dummy = dummy
+                        self.__class__.dummy = float(dummy)
                     ddummy = self.config.get(self.CONF_DUMMY_PIXEL_DELTA)
                     if ddummy is None:
                         strMessage = 'EDPluginBioSaxsProcessOneFilev1_3.configure: %s Configuration parameter missing: \
@@ -131,7 +129,15 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
                         self.WARNING(strMessage)
                         self.addErrorWarningMessagesToExecutiveSummary(strMessage)
                     else:
-                        self.__class__.delta_dummy = ddummy
+                        self.__class__.delta_dummy = float(ddummy)
+                    method = self.config.get(self.CONF_OPENCL_DEVICE)
+                    if method is None:
+                        strMessage = 'EDPluginBioSaxsProcessOneFilev1_3.configure: %s Configuration parameter missing: \
+            %s, defaulting to "%s"' % (self.getBaseName(), self.CONF_OPENCL_DEVICE, self.METHOD)
+                        self.WARNING(strMessage)
+                        self.addErrorWarningMessagesToExecutiveSummary(strMessage)
+                    else:
+                        self.__class__.METHOD = method
                     self.__class__.__configured = True
 
 
@@ -149,14 +155,14 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
             try:
                 os.mkdir(curveDir)
             except OSError:
-                # could occure in race condition ...
+                # could occur in race condition ...
                 pass
 
         self.sample = self.dataInput.sample
         self.experimentSetup = self.dataInput.experimentSetup
         self.integrator_config = {'dist': self.experimentSetup.detectorDistance.value,
-                                  'pixel1': self.experimentSetup.pixelSize_2.value,  # flip X,Y
-                                  'pixel2': self.experimentSetup.pixelSize_1.value,  # flip X,Y
+                                  'pixel1': self.experimentSetup.pixelSize_2.value, # flip X,Y
+                                  'pixel2': self.experimentSetup.pixelSize_1.value, # flip X,Y
                                   'poni1': self.experimentSetup.beamCenter_2.value * self.experimentSetup.pixelSize_2.value,
                                   'poni2': self.experimentSetup.beamCenter_1.value * self.experimentSetup.pixelSize_1.value,
                                   'rot1': 0.0,
