@@ -201,7 +201,7 @@ class EDPluginBioSaxsAzimutIntv1_3(EDPluginControl):
 
             self.detector = self.experimentSetup.detector.value.lower()
             if self.detector == "pilatus":
-                self.detector += "1m"
+                self.detector = "Pilatus1M"
             self.integrator_config = {'dist': self.experimentSetup.detectorDistance.value,
                                   'pixel1': self.experimentSetup.pixelSize_2.value, # flip X,Y
                                   'pixel2': self.experimentSetup.pixelSize_1.value, # flip X,Y
@@ -211,7 +211,7 @@ class EDPluginBioSaxsAzimutIntv1_3(EDPluginControl):
                                   'rot2': 0.0,
                                   'rot3': 0.0,
                                   'splineFile': None,
-                                  "detector": self.detector.capitalize()
+                                  'detector': self.detector
                                   }
 
     def doFailureGetMetadata(self, _edPlugin=None):
