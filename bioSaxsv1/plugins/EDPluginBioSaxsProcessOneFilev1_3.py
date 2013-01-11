@@ -161,9 +161,11 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
 
         self.sample = self.dataInput.sample
         self.experimentSetup = self.dataInput.experimentSetup
-        self.detector = self.experimentSetup.detector.value.lower()
-        if self.detector == "pilatus":
-            self.detector += "1m"
+        self.detector = self.experimentSetup.detector.value
+        if self.detector.lower() == "pilatus":
+            self.detector = "Pilatus1M"
+        else:
+            self.detector = self.detector.capitalize()
         self.integrator_config = {'dist': self.experimentSetup.detectorDistance.value,
                                   'pixel1': self.experimentSetup.pixelSize_2.value, # flip X,Y
                                   'pixel2': self.experimentSetup.pixelSize_1.value, # flip X,Y
@@ -173,7 +175,7 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
                                   'rot2': 0.0,
                                   'rot3': 0.0,
                                   'splineFile': None,
-                                  "detector": self.detector.capitalize()
+                                  'detector': self.detector
                                   }
         i0 = self.experimentSetup.beamStopDiode.value
         if i0 == 0:
