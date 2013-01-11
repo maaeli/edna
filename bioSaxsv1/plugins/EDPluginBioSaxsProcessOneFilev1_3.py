@@ -90,7 +90,7 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
         self.experimentSetup = None
         self.integrator_config = {}
         self.scale = None
-
+        self.detector = None
 
     def checkParameters(self):
         """
@@ -161,6 +161,9 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
 
         self.sample = self.dataInput.sample
         self.experimentSetup = self.dataInput.experimentSetup
+        self.detector = self.experimentSetup.detector.value.lower()
+        if self.detector == "pilatus":
+            self.detector += "1m"
         self.integrator_config = {'dist': self.experimentSetup.detectorDistance.value,
                                   'pixel1': self.experimentSetup.pixelSize_2.value, # flip X,Y
                                   'pixel2': self.experimentSetup.pixelSize_1.value, # flip X,Y
@@ -169,7 +172,9 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
                                   'rot1': 0.0,
                                   'rot2': 0.0,
                                   'rot3': 0.0,
-                                  'splineFile': None}
+                                  'splineFile': None,
+                                  "detector": self.detector.capitalize()
+                                  }
         i0 = self.experimentSetup.beamStopDiode.value
         if i0 == 0:
             warn = "beamStopDiode is Null --> If we are testing, this is OK, else investigate !!!"
@@ -217,11 +222,11 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
         if "Date" in img.header:
             self.experimentSetup.timeOfFrame = XSDataTime(time.mktime(time.strptime(img.header["Date"], "%a %b %d %H:%M:%S %Y")))
         wavelength = EDUtilsUnit.getSIValue(self.experimentSetup.wavelength)
-	current_config = self.integrator.getPyFAI()
+        current_config = self.integrator.getPyFAI()
         short_config = {}
         for key in self.integrator_config:
-            short_config[key]=current_config[key]
-        
+            short_config[key] = current_config[key]
+
         with self.__class__.semaphore:
             if (short_config != self.integrator_config) or \
                (self.integrator.wavelength != wavelength) or\
@@ -257,10 +262,8 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
         """
 
         mask = fabio.open(self.experimentSetup.maskFile.path.value).data
-        detector_name = self.experimentSetup.detector.value.lower()
-        if detector_name == "pilatus":
-            detector_name += "1m"
-        detector_mask = pyFAI.detectors.detector_factory(detector_name).calc_mask()
+
+        detector_mask = pyFAI.detectors.detector_factory(self.detector).calc_mask()
         shape0, shape1 = detector_mask.shape
         if detector_mask.shape == mask.shape:
             mask = numpy.logical_or(mask, detector_mask)
