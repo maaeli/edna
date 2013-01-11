@@ -16,7 +16,7 @@
 		<beamStopDiode><value>2.03737e-05</value></beamStopDiode>
 		<machineCurrent><value>85.5755</value></machineCurrent>
 		<maskFile><path><value>${EDNA_TESTIMAGES}/bioSaxsMask.edf</value></path></maskFile>
-		<wavelength><value>9.31e-11</value><unit>m</unit></wavelength>
+		<wavelength><value>9.31e-11</value><unit><value>m</value></unit></wavelength>
 		<normalizationFactor><value>1.0</value></normalizationFactor>
 	</experimentSetup>
 	<sample>

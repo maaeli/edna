@@ -12,5 +12,10 @@
     },
 	"EDPluginBioSaxsISPyBv1_0":{
          "url":"http://pcantolinos:8080/ispyb-ejb3/ispybWS/ToolsForBiosaxsWebService?wsdl"
+	},
+	"EDPluginBioSaxsProcessOneFilev1_3":{
+		"DummyPixelValue": -2.0,
+    	"DummyPixelDelta": 1.1,
+    	"DeviceType": "lut_ocl_gpu"	
 	}
 }
