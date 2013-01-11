@@ -60,6 +60,7 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
     """
     cpWaitFile = "EDPluginWaitFile"
     integrator = pyFAI.AzimuthalIntegrator()
+    integrator.wavelength = 1e-10
     CONF_DUMMY_PIXEL_VALUE = "DummyPixelValue"
     CONF_DUMMY_PIXEL_DELTA = "DummyPixelDelta"
     CONF_OPENCL_DEVICE = "DeviceType"
@@ -67,7 +68,7 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
     dummy = -2
     delta_dummy = 1.1
     semaphore = Semaphore()
-
+    maskfile = None
     if pyFAI.opencl.ocl is None:
         METHOD = "lut"
     else:
@@ -215,14 +216,19 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
         img = fabio.open(self.rawImage)
         if "Date" in img.header:
             self.experimentSetup.timeOfFrame = XSDataTime(time.mktime(time.strptime(img.header["Date"], "%a %b %d %H:%M:%S %Y")))
-
+        wavelength = EDUtilsUnit.getSIValue(self.experimentSetup.wavelength)
+	current_config = self.integrator.getPyFAI()
+        short_config = {}
+        for key in self.integrator_config:
+            short_config[key]=current_config[key]
+        
         with self.__class__.semaphore:
-            if (self.integrator.getPyFAI() != self.integrator_config) or \
-               (self.integrator.wavelength != self.experimentSetup.wavelength.value) or\
-               (self.integrator.maskfile != self.experimentSetup.maskFile.path.value):
+            if (short_config != self.integrator_config) or \
+               (self.integrator.wavelength != wavelength) or\
+               (self.maskfile != self.experimentSetup.maskFile.path.value):
                 self.screen("Resetting PyFAI integrator")
                 self.integrator.setPyFAI(**self.integrator_config)
-                self.integrator.wavelength = EDUtilsUnit.getSIValue(self.experimentSetup.wavelength)
+                self.integrator.wavelength = wavelength
                 self.integrator.detector.mask = self.calc_mask()
 
             q, I, std = self.integrator.integrate1d(data=img.data, nbPt=max(img.dim1, img.dim2),
@@ -251,7 +257,7 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
         """
 
         mask = fabio.open(self.experimentSetup.maskFile.path.value).data
-        detector_name = self.experimentSetup.detector.value
+        detector_name = self.experimentSetup.detector.value.lower()
         if detector_name == "pilatus":
             detector_name += "1m"
         detector_mask = pyFAI.detectors.detector_factory(detector_name).calc_mask()
@@ -261,6 +267,7 @@ class EDPluginBioSaxsProcessOneFilev1_3(EDPluginControl):
         else:
             # crop the user defined mask
             mask = numpy.logical_or(mask[:shape0, :shape1], detector_mask)
+        self.__class__.maskfile = self.experimentSetup.maskFile.path.value
         return mask
 
     def write3ColumnAscii(self, npaQ, npaI, npaStd=None, outputCurve="output.dat", hdr="#", linesep=os.linesep):
