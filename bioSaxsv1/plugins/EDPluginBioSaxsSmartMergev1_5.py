@@ -475,7 +475,7 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
             if fidelity == 0:
                logFid = "infinity"
             else:
-               logFid = "%.2f" % (-log(fidelity))
+               logFid = "%.2f" % (-log(fidelity,10))
             self.lstSummary.append("-log(Fidelity) between %s and %s is %s" % (os.path.basename(file0), os.path.basename(file1), logFid))
 
 
