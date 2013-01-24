@@ -21,5 +21,8 @@
     "EDPluginBioSaxsNormalizev1_1": {
         "DummyPixelValue": -1, 
         "writeXMLInputOutput": 0
+    },
+    "EDPluginBioSaxsISPyBv1_0": {
+    	"url": "http://pcantolinos:8080/ispyb-ejb3/ispybWS/ToolsForBiosaxsWebService?wsdl"
     }
 }
