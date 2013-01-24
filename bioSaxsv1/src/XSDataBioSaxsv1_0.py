@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Thu Jan 24 02:23::06 2013 by EDGenerateDS.
+# Generated Thu Jan 24 02:54::33 2013 by EDGenerateDS.
 #
 
 import os, sys
@@ -11,8 +11,9 @@ from xml.dom import Node
 
 strEdnaHome = os.environ.get("EDNA_HOME", None)
 
-dictLocation = {    "XSDataEdnaSaxs": "ednaSaxs/datamodel",
-                    "XSDataCommon": "kernel/datamodel"
+dictLocation = {
+ "XSDataEdnaSaxs": "ednaSaxs/datamodel",
+ "XSDataCommon": "kernel/datamodel",
 }
 
 try:
@@ -1439,7 +1440,7 @@ class XSDataInputBioSaxsAzimutIntv1_0(XSDataInput):
 
 class XSDataInputBioSaxsISPyBv1_0(XSDataInput):
     """Input class for populating ISPyB"""
-    def __init__(self, configuration=None, destination=None, curves=None, frameMerged=None, frameAverage=None, volume=None, gnom=None, autoRg=None, sample=None):
+    def __init__(self, configuration=None, curves=None, frameMerged=None, frameAverage=None, volume=None, gnom=None, autoRg=None, sample=None):
         XSDataInput.__init__(self, configuration)
         if sample is None:
             self._sample = None
@@ -1489,13 +1490,6 @@ class XSDataInputBioSaxsISPyBv1_0(XSDataInput):
             self._curves = curves
         else:
             strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0 constructor argument 'curves' is not list but %s" % self._curves.__class__.__name__
-            raise BaseException(strMessage)
-        if destination is None:
-            self._destination = None
-        elif destination.__class__.__name__ == "XSDataFile":
-            self._destination = destination
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0 constructor argument 'destination' is not XSDataFile but %s" % self._destination.__class__.__name__
             raise BaseException(strMessage)
     # Methods and properties for the 'sample' attribute
     def getSample(self): return self._sample
@@ -1602,18 +1596,6 @@ class XSDataInputBioSaxsISPyBv1_0(XSDataInput):
         else:
             strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.addCurves argument is not XSDataFile but %s" % value.__class__.__name__
             raise BaseException(strMessage)
-    # Methods and properties for the 'destination' attribute
-    def getDestination(self): return self._destination
-    def setDestination(self, destination):
-        if destination is None:
-            self._destination = None
-        elif destination.__class__.__name__ == "XSDataFile":
-            self._destination = destination
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.setDestination argument is not XSDataFile but %s" % destination.__class__.__name__
-            raise BaseException(strMessage)
-    def delDestination(self): self._destination = None
-    destination = property(getDestination, setDestination, delDestination, "Property for destination")
     def export(self, outfile, level, name_='XSDataInputBioSaxsISPyBv1_0'):
         showIndent(outfile, level)
         outfile.write(unicode('<%s>\n' % name_))
@@ -1638,8 +1620,6 @@ class XSDataInputBioSaxsISPyBv1_0(XSDataInput):
             self.frameMerged.export(outfile, level, name_='frameMerged')
         for curves_ in self.getCurves():
             curves_.export(outfile, level, name_='curves')
-        if self._destination is not None:
-            self.destination.export(outfile, level, name_='destination')
     def build(self, node_):
         for child_ in node_.childNodes:
             nodeName_ = child_.nodeName.split(':')[-1]
@@ -1680,11 +1660,6 @@ class XSDataInputBioSaxsISPyBv1_0(XSDataInput):
             obj_ = XSDataFile()
             obj_.build(child_)
             self.curves.append(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'destination':
-            obj_ = XSDataFile()
-            obj_.build(child_)
-            self.setDestination(obj_)
         XSDataInput.buildChildren(self, child_, nodeName_)
     # Method for marshalling an object
     def marshal(self):
