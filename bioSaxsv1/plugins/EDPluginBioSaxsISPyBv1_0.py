@@ -30,7 +30,7 @@ __copyright__ = "2012 ESRF"
 __status__ = "Development"
 __date__ = "20130124"
 
-import os
+import os, shutil
 from EDPluginControl        import EDPluginControl
 from EDFactoryPlugin        import edFactoryPlugin
 from EDConfiguration        import EDConfiguration
@@ -225,7 +225,7 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
             pyarch = os.path.join(self.dataInput.destination.path.value, "1d")
             try:
                 if not os.path.isdir(pyarch):
-                    os.makdirs(pyarch)
+                    os.makedirs(pyarch)
             except IOError as error:
                 ermsg = "Error while directory creation in pyarch: %s " % error
                 self.lstError.append(ermsg)
