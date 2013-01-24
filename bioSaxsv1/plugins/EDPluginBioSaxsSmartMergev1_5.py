@@ -308,7 +308,7 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
                                                      frameAverage=frameAverage,
                                                      frameMerged=frameMerged,
                                                      curves=self.curves,
-                                                     destination=self.dataInput.sample.ispybDestination
+#                                                     destination=self.dataInput.sample.ispybDestination #duplicate, already in sample
                                                )
             self.__edPluginSaxsISPyB.dataInput = xsdin
             self.__edPluginSaxsISPyB.connectSUCCESS(self.doSuccessISPyB)

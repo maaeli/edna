@@ -226,7 +226,7 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
 
     def copy_to_pyarch(self):
         if self.dataInput.destination:
-            pyarch = os.path.join(self.dataInput.destination.path.value, "1d")
+            pyarch = os.path.join(self.dataInput.sample.ispybDestination.path.value, "1d")
             try:
                 if not os.path.isdir(pyarch):
                     os.makedirs(pyarch)
