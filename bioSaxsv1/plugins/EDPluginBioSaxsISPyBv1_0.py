@@ -31,6 +31,7 @@ __status__ = "Development"
 __date__ = "20130124"
 
 import os, shutil
+# todo remove
 from EDPluginControl        import EDPluginControl
 from EDFactoryPlugin        import edFactoryPlugin
 from EDConfiguration        import EDConfiguration
