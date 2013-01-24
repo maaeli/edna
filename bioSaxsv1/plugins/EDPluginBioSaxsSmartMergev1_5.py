@@ -301,7 +301,6 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
             self.curves = [XSDataFile(i.path) for i in self.lstInput]
             if self.strMergedFile is not None:
                 self.curves.append(XSDataFile(self.strMergedFile))
-            if 
             xsdin = XSDataInputBioSaxsISPyBv1_0(sample=self.dataInput.sample,
                                                      autoRg=self.autoRg,
                                                      gnom=self.gnom,
@@ -483,7 +482,7 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
             if fidelity == 0:
                logFid = "infinity"
             else:
-               logFid = "%.2f" % (-log(fidelity,10))
+               logFid = "%.2f" % (-log(fidelity, 10))
             self.lstSummary.append("-log(Fidelity) between %s and %s is %s" % (os.path.basename(file0), os.path.basename(file1), logFid))
 
 
