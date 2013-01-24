@@ -31,7 +31,6 @@ __status__ = "Development"
 __date__ = "20130124"
 
 import os, shutil
-# todo remove
 from EDPluginControl        import EDPluginControl
 from EDFactoryPlugin        import edFactoryPlugin
 from EDConfiguration        import EDConfiguration
@@ -180,6 +179,10 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
         EDPluginControl.process(self)
         self.DEBUG("EDPluginBioSaxsISPyBv1_0.process")
         self.copy_to_pyarch()
+        if self.dataInput.sample.collectionOrder is not None:
+            collectionOrder = str(self.dataInput.sample.collectionOrder.value)
+        else:
+            collectionOrder = "no collectionOrder"
         try:
             self.client.service.storeDataAnalysisResultByMeasurementId(
                                     self.dataBioSaxsSample.measurementID.value,
@@ -203,7 +206,7 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
                                     self.framesAverage,
                                     self.framesMerged,
                                     ", ".join(self.pyarchfiles),
-                                    "param2",
+                                    collectionOrder,
                                     "param3",
                                     "param4"
                                     )
@@ -236,7 +239,7 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
                     afile = xsdfile.path.value
                     if os.path.exists(afile):
                         try:
-                            shutil.copy_file(afile, pyarch)
+                            shutil.copy(afile, pyarch)
                         except IOError as error:
                             ermsg = "Error while copying %s to pyarch: %s " % (afile, error)
                             self.lstError.append(ermsg)
