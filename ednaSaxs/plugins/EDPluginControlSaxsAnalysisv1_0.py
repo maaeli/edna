@@ -121,10 +121,10 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
         EDPluginControl.postProcess(self)
         self.DEBUG("EDPluginControlSaxsAnalysisv1_0.postProcess")
         # Create some output data
-        strLog = """Rg   =   %f +/- %f 
-I(0) =   %e +/- %e
+        strLog = """Rg   =   %.2f +/- %2f 
+I(0) =   %.2e +/- %.2e
 Points   %i to %i 
-Quality: %4.2f%%     Aggregated: %s"""%(self.autoRg.rg.value, self.autoRg.rgStdev.value,
+Quality: %4.2f%%     Aggregated: %s""" % (self.autoRg.rg.value, self.autoRg.rgStdev.value,
                         self.autoRg.i0.value, self.autoRg.i0Stdev.value,
                         self.autoRg.firstPointUsed.value, self.autoRg.lastPointUsed.value,
                         self.autoRg.quality.value * 100., self.autoRg.isagregated.value)
@@ -133,15 +133,15 @@ Quality: %4.2f%%     Aggregated: %s"""%(self.autoRg.rg.value, self.autoRg.rgStde
 datGnom failed"""
         else:
             strLog += """
-Dmax    =    %12f       Total =   %12f     
-Guinier =    %12f       Gnom =    %12f"""%(self.gnom.dmax.value, self.gnom.total.value,
+Dmax    =    %12.2f       Total =   %12.2f     
+Guinier =    %12.2f       Gnom =    %12.2f""" % (self.gnom.dmax.value, self.gnom.total.value,
                         self.gnom.rgGuinier.value, self.gnom.rgGnom.value)
         if self.xVolume is None:
             strLog += """
 datPorod failed"""
         else:
             strLog += """
-Volume  =    %12f""" % (self.xVolume.value)
+Volume  =    %12.2f""" % (self.xVolume.value)
 
         xsDataResult = XSDataResultSaxsAnalysis(autoRg=self.autoRg,
                                                 gnom=self.gnom,
