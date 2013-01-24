@@ -173,7 +173,7 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
                  self.warning("Input %s does not (yet?) exist" % inp)
                  time.sleep(1.0)
             shutil.copyfile(inp, dst)
-            self.lstSummary.append("Got only one frame ... no much to merge !!!")
+            self.lstSummary.append("Got only one frame ... nothing to merge !!!")
         else:
             self.lstMerged = []
             if (self.absoluteFidelity is not None) or (self.relativeFidelity is not None):
