@@ -30,7 +30,8 @@ __copyright__ = "2012 ESRF"
 __status__ = "Development"
 __date__ = "20130124"
 
-import os
+import os, shutil
+# todo remove
 from EDPluginControl        import EDPluginControl
 from EDFactoryPlugin        import edFactoryPlugin
 from EDConfiguration        import EDConfiguration
