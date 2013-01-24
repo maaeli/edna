@@ -97,6 +97,7 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
         self.setXSDataInputClass(XSDataInputBioSaxsSmartMergev1_0)
         self.__edPluginExecDatCmp = None
         self.lstInput = []
+        self.curves = []
         self.lstMerged = []
         self.lstXsdInput = []
         self.absoluteFidelity = None
@@ -265,6 +266,7 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
                 suff = os.path.basename(self.strSubFile).split("_")[-1]
                 sub = os.path.join(os.path.dirname(self.strSubFile), base + "_" + suff)
                 xsdSubtractedCurve = XSDataFile(XSDataString(sub))
+                self.curves.append(xsdSubtractedCurve)
                 self.__edPluginExecAutoSub.dataInput = XSDataInputAutoSub(sampleCurve=self.__class__.lastSample,
                                          buffers=[self.__class__.lastBuffer, self.dataInput.mergedCurve],
                                          subtractedCurve=xsdSubtractedCurve)
@@ -296,13 +298,18 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
                 frameMerged = XSDataInteger(len(self.lstMerged))
             else:
                 frameMerged = frameAverage = XSDataInteger(1)
-
+            self.curves = [XSDataFile(i.path) for i in self.lstInput]
+            if self.strMergedFile is not None:
+                self.curves.append(XSDataFile(self.strMergedFile))
+            if 
             xsdin = XSDataInputBioSaxsISPyBv1_0(sample=self.dataInput.sample,
                                                      autoRg=self.autoRg,
                                                      gnom=self.gnom,
                                                      volume=self.volume,
                                                      frameAverage=frameAverage,
-                                                     frameMerged=frameMerged
+                                                     frameMerged=frameMerged,
+                                                     curves=self.curves,
+                                                     destination=self.dataInput.ispybDestination
                                                )
             self.__edPluginSaxsISPyB.dataInput = xsdin
             self.__edPluginSaxsISPyB.connectSUCCESS(self.doSuccessISPyB)
