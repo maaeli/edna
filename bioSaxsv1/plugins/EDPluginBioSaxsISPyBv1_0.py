@@ -58,7 +58,7 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
         self.dataAutoRg = None
         self.dataGnom = None
 
-        #Params to be sent and I dont know them
+        # Params to be sent and I dont know them
         self.volume = None
         self.framesAverage = None
         self.framesMerged = None
@@ -108,7 +108,7 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
     def preProcess(self, _edObject=None):
         EDPluginControl.preProcess(self)
 
-        #Initializing webservices
+        # Initializing webservices
         self.DEBUG("EDPluginBioSaxsISPyBv1_0.preProcess")
         self.dataBioSaxsSample = self.dataInput.sample
         user = None
@@ -122,7 +122,7 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
             self.setFailure()
             return
 
-        #I don't trust in this authentication....
+        # I don't trust in this authentication....
 
         self.httpAuthenticatedToolsForBiosaxsWebService = HttpAuthenticated(username=user, password=password)
         self.client = Client(self.URL, transport=self.httpAuthenticatedToolsForBiosaxsWebService, cache=None)
@@ -130,7 +130,7 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
         self.dataAutoRg = self.dataInput.autoRg
         self.dataGnom = self.dataInput.gnom
 
-        #Params to be sent and I dont know them
+        # Params to be sent and I dont know them
         if self.dataInput.volume:
             self.volume = self.dataInput.volume.value
         if self.dataInput.frameAverage:
@@ -226,7 +226,7 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
             try:
                 if not os.path.isdir(pyarch):
                     os.makdirs(pyarch)
-            except IOError, error:
+            except IOError as error:
                 ermsg = "Error while directory creation in pyarch: %s " % error
                 self.lstError.append(ermsg)
                 self.WARNING(errmsg)
@@ -236,7 +236,7 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
                     if os.path.exists(afile):
                         try:
                             shutil.copy_file(afile, pyarch)
-                        except IOError, error:
+                        except IOError as error:
                             ermsg = "Error while copying %s to pyarch: %s " % (afile, error)
                             self.lstError.append(ermsg)
                             self.WARNING(errmsg)
