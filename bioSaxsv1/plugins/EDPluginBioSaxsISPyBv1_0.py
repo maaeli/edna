@@ -178,11 +178,16 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
     def process(self, _edObject=None):
         EDPluginControl.process(self)
         self.DEBUG("EDPluginBioSaxsISPyBv1_0.process")
-        self.copy_to_pyarch()
+        try:
+            self.copy_to_pyarch()
+        except Exception as error:
+            strErrorMessage = "Error while copying to pyarch: %s" % error
+            self.ERROR(strErrorMessage)
+            self.lstError.append(strErrorMessage)
         if self.dataInput.sample.collectionOrder is not None:
             collectionOrder = str(self.dataInput.sample.collectionOrder.value)
         else:
-            collectionOrder = "no collectionOrder"
+            collectionOrder = "-1"
         try:
             self.client.service.storeDataAnalysisResultByMeasurementId(
                                     self.dataBioSaxsSample.measurementID.value,
@@ -225,7 +230,7 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
         self.setDataOutput(xsDataResult)
 
     def copy_to_pyarch(self):
-        if self.dataInput.destination:
+        if self.dataInput.sample.ispybDestination:
             pyarch = os.path.join(self.dataInput.sample.ispybDestination.path.value, "1d")
             try:
                 if not os.path.isdir(pyarch):
