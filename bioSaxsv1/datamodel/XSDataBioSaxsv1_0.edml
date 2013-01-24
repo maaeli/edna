@@ -112,6 +112,7 @@ complex type XSDataBioSaxsSample extends XSData {
 	login: XSDataString
 	passwd: XSDataString
 	measurementID: XSDataInteger
+        ispybDestination: XSDataFile optional
 }
 
 
@@ -353,6 +354,8 @@ complex type XSDataInputBioSaxsISPyBv1_0 extends XSDataInput  {
 	volume		: XSDataDoubleWithUnit optional
 	frameAverage: XSDataInteger optional
 	frameMerged : XSDataInteger optional
+        curves: XSDataFile [] optional
+        destination: XSDataFile optional
 	
 }
 

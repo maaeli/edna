@@ -197,7 +197,7 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
                                     self.volume,
                                     self.framesAverage,
                                     self.framesMerged,
-                                    "param1",
+                                    ", ".join([i.path.value for i in self.dataInput.curves]),
                                     "param2",
                                     "param3",
                                     "param4"

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Wed Dec 5 10:48::47 2012 by EDGenerateDS.
+# Generated Wed Jan 23 05:24::52 2013 by EDGenerateDS.
 #
 
 import os, sys
@@ -640,7 +640,7 @@ class XSDataBioSaxsExperimentSetup(XSData):
 
 
 class XSDataBioSaxsSample(XSData):
-    def __init__(self, measurementID=None, passwd=None, login=None, code=None, comments=None, concentration=None):
+    def __init__(self, ispybDestination=None, measurementID=None, passwd=None, login=None, code=None, comments=None, concentration=None):
         XSData.__init__(self, )
         if concentration is None:
             self._concentration = None
@@ -683,6 +683,13 @@ class XSDataBioSaxsSample(XSData):
             self._measurementID = measurementID
         else:
             strMessage = "ERROR! XSDataBioSaxsSample constructor argument 'measurementID' is not XSDataInteger but %s" % self._measurementID.__class__.__name__
+            raise BaseException(strMessage)
+        if ispybDestination is None:
+            self._ispybDestination = None
+        elif ispybDestination.__class__.__name__ == "XSDataFile":
+            self._ispybDestination = ispybDestination
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample constructor argument 'ispybDestination' is not XSDataFile but %s" % self._ispybDestination.__class__.__name__
             raise BaseException(strMessage)
     # Methods and properties for the 'concentration' attribute
     def getConcentration(self): return self._concentration
@@ -756,6 +763,18 @@ class XSDataBioSaxsSample(XSData):
             raise BaseException(strMessage)
     def delMeasurementID(self): self._measurementID = None
     measurementID = property(getMeasurementID, setMeasurementID, delMeasurementID, "Property for measurementID")
+    # Methods and properties for the 'ispybDestination' attribute
+    def getIspybDestination(self): return self._ispybDestination
+    def setIspybDestination(self, ispybDestination):
+        if ispybDestination is None:
+            self._ispybDestination = None
+        elif ispybDestination.__class__.__name__ == "XSDataFile":
+            self._ispybDestination = ispybDestination
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample.setIspybDestination argument is not XSDataFile but %s" % ispybDestination.__class__.__name__
+            raise BaseException(strMessage)
+    def delIspybDestination(self): self._ispybDestination = None
+    ispybDestination = property(getIspybDestination, setIspybDestination, delIspybDestination, "Property for ispybDestination")
     def export(self, outfile, level, name_='XSDataBioSaxsSample'):
         showIndent(outfile, level)
         outfile.write(unicode('<%s>\n' % name_))
@@ -782,6 +801,8 @@ class XSDataBioSaxsSample(XSData):
             self.measurementID.export(outfile, level, name_='measurementID')
         else:
             warnEmptyAttribute("measurementID", "XSDataInteger")
+        if self._ispybDestination is not None:
+            self.ispybDestination.export(outfile, level, name_='ispybDestination')
     def build(self, node_):
         for child_ in node_.childNodes:
             nodeName_ = child_.nodeName.split(':')[-1]
@@ -817,6 +838,11 @@ class XSDataBioSaxsSample(XSData):
             obj_ = XSDataInteger()
             obj_.build(child_)
             self.setMeasurementID(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'ispybDestination':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setIspybDestination(obj_)
         XSData.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
     def marshal( self ):
@@ -1394,7 +1420,7 @@ class XSDataInputBioSaxsAzimutIntv1_0(XSDataInput):
 
 class XSDataInputBioSaxsISPyBv1_0(XSDataInput):
     """Input class for populating ISPyB"""
-    def __init__(self, configuration=None, frameMerged=None, frameAverage=None, volume=None, gnom=None, autoRg=None, sample=None):
+    def __init__(self, configuration=None, destination=None, curves=None, frameMerged=None, frameAverage=None, volume=None, gnom=None, autoRg=None, sample=None):
         XSDataInput.__init__(self, configuration)
         if sample is None:
             self._sample = None
@@ -1437,6 +1463,20 @@ class XSDataInputBioSaxsISPyBv1_0(XSDataInput):
             self._frameMerged = frameMerged
         else:
             strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0 constructor argument 'frameMerged' is not XSDataInteger but %s" % self._frameMerged.__class__.__name__
+            raise BaseException(strMessage)
+        if curves is None:
+            self._curves = []
+        elif curves.__class__.__name__ == "list":
+            self._curves = curves
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0 constructor argument 'curves' is not list but %s" % self._curves.__class__.__name__
+            raise BaseException(strMessage)
+        if destination is None:
+            self._destination = None
+        elif destination.__class__.__name__ == "XSDataFile":
+            self._destination = destination
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0 constructor argument 'destination' is not XSDataFile but %s" % self._destination.__class__.__name__
             raise BaseException(strMessage)
     # Methods and properties for the 'sample' attribute
     def getSample(self): return self._sample
@@ -1510,6 +1550,51 @@ class XSDataInputBioSaxsISPyBv1_0(XSDataInput):
             raise BaseException(strMessage)
     def delFrameMerged(self): self._frameMerged = None
     frameMerged = property(getFrameMerged, setFrameMerged, delFrameMerged, "Property for frameMerged")
+    # Methods and properties for the 'curves' attribute
+    def getCurves(self): return self._curves
+    def setCurves(self, curves):
+        if curves is None:
+            self._curves = []
+        elif curves.__class__.__name__ == "list":
+            self._curves = curves
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.setCurves argument is not list but %s" % curves.__class__.__name__
+            raise BaseException(strMessage)
+    def delCurves(self): self._curves = None
+    curves = property(getCurves, setCurves, delCurves, "Property for curves")
+    def addCurves(self, value):
+        if value is None:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.addCurves argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._curves.append(value)
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.addCurves argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    def insertCurves(self, index, value):
+        if index is None:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.insertCurves argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.insertCurves argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._curves[index] = value
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.addCurves argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'destination' attribute
+    def getDestination(self): return self._destination
+    def setDestination(self, destination):
+        if destination is None:
+            self._destination = None
+        elif destination.__class__.__name__ == "XSDataFile":
+            self._destination = destination
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.setDestination argument is not XSDataFile but %s" % destination.__class__.__name__
+            raise BaseException(strMessage)
+    def delDestination(self): self._destination = None
+    destination = property(getDestination, setDestination, delDestination, "Property for destination")
     def export(self, outfile, level, name_='XSDataInputBioSaxsISPyBv1_0'):
         showIndent(outfile, level)
         outfile.write(unicode('<%s>\n' % name_))
@@ -1532,6 +1617,10 @@ class XSDataInputBioSaxsISPyBv1_0(XSDataInput):
             self.frameAverage.export(outfile, level, name_='frameAverage')
         if self._frameMerged is not None:
             self.frameMerged.export(outfile, level, name_='frameMerged')
+        for curves_ in self.getCurves():
+            curves_.export(outfile, level, name_='curves')
+        if self._destination is not None:
+            self.destination.export(outfile, level, name_='destination')
     def build(self, node_):
         for child_ in node_.childNodes:
             nodeName_ = child_.nodeName.split(':')[-1]
@@ -1567,6 +1656,16 @@ class XSDataInputBioSaxsISPyBv1_0(XSDataInput):
             obj_ = XSDataInteger()
             obj_.build(child_)
             self.setFrameMerged(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'curves':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.curves.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'destination':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setDestination(obj_)
         XSDataInput.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
     def marshal( self ):
@@ -4167,8 +4266,6 @@ class XSDataResultBioSaxsProcessOneFilev1_0(XSDataResult):
         XSDataResult.exportChildren(self, outfile, level, name_)
         if self._normalizedImage is not None:
             self.normalizedImage.export(outfile, level, name_='normalizedImage')
-        else:
-            warnEmptyAttribute("normalizedImage", "XSDataImage")
         if self._integratedImage is not None:
             self.integratedImage.export(outfile, level, name_='integratedImage')
         if self._integratedCurve is not None:
