@@ -300,7 +300,7 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
                 frameMerged = frameAverage = XSDataInteger(1)
             self.curves = [XSDataFile(i.path) for i in self.lstInput]
             if self.strMergedFile is not None:
-                self.curves.append(XSDataFile(self.strMergedFile))
+                self.curves.append(XSDataFile(XSDataString(self.strMergedFile)))
             xsdin = XSDataInputBioSaxsISPyBv1_0(sample=self.dataInput.sample,
                                                      autoRg=self.autoRg,
                                                      gnom=self.gnom,
