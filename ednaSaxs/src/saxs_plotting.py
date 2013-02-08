@@ -177,6 +177,7 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
     logI = numpy.log(I)
     allres = []
     res = []
+    t0 = time.time()
     for s in range(start_search, start_search + len_search - mininterval):
         for e in range(s + mininterval, start_search + len_search):
             slope, intercept, r, tt, stderr = stats.linregress(q2[s:e], logI[s:e])
@@ -189,6 +190,67 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
                 allres.append(ares)
                 if Rg * q[s] <= qminRg and Rg * q[e - 1] <= qmaxRg:
                     res.append(ares)
+    print "Naive implementation took: %.3fs" % (time.time() - t0)
+    t0 = time.time()
+    big_dim = (len_search - mininterval + 1) * (len_search - mininterval) / 2  # + len_search * mininterval
+    print "big_dim", big_dim
+    x = numpy.zeros((big_dim, len_search), dtype="float32")
+    y = numpy.zeros((big_dim, len_search), dtype="float32")
+    n = numpy.zeros(big_dim, dtype="int16")
+    start = numpy.zeros(big_dim, dtype="int16")
+    stop = numpy.zeros(big_dim, dtype="int16")
+    idx = 0
+    print start_search, len_search
+    for sta in range(start_search, start_search + len_search - mininterval):
+        for sto in range(sta + mininterval, start_search + len_search):
+            x[idx, sta - start_search:sto - start_search] = q2[sta :sto]
+            y[idx, sta - start_search:sto - start_search] = logI[sta :sto]
+            n[idx] = sto - sta
+            start[idx] = sta
+            stop[idx] = sto
+            idx += 1
+    print n
+    print idx, (n > 0).sum()
+    t1 = time.time()
+    print "Array creation took: %.3fs" % (t1 - t0)
+    Sx = x.sum(axis= -1)
+    Sy = y.sum(axis= -1)
+    Sxx = (x * x).sum(axis= -1)
+    Sxy = (y * x).sum(axis= -1)
+    s = (n * Sxy - Sx * Sy) / (n * Sxx - Sx * Sx)
+    Rg = numpy.sqrt(-s * 3)
+    valid = numpy.logical_and((Rg * q[start] <= qminRg) , (Rg * q[stop - 1] <= qmaxRg))
+    t2 = time.time()
+    print "Calculations took: %.3fs" % (t2 - t1)
+    print valid
+    if valid.sum()>0:
+        start = start[valid]
+        stop = stop[valid]
+        x = x[valid]
+        y = y[valid]
+        n = n[valid]
+        s = s[valid]
+        Rg = Rg[valid]
+        Sx = Sx[valid]
+        Sy = Sy[valid]
+        Sxx = Sxx[valid]
+        Sxy = Sxy[valid]
+        Syy = (y*y).sum(axis= -1)
+        intercept = (Sy - Sx * s) / n
+        I0 = numpy.exp(intercept)
+        error_square = ((y - x * numpy.outer(s, numpy.ones(y.shape[1])) - numpy.outer(intercept, numpy.ones(y.shape[1]))) ** 2).sum(axis= -1) / n
+        print error_square
+#        print Sx.shape, Sy.shape, Sxx.shape, Sxy.shape, Syy.shape
+#        r = (Sx * Sy - n * Sxy) / numpy.sqrt((n * Sxx - Sx * Sx) * (n * Syy - Sy * Sy))
+        best = error_square.argmin()
+        print best, n[best], Rg[best], I0[best], start[best], stop[best]
+#        import pylab
+#        pylab.hist(Rg, 100)
+#        pylab.hist(I0, 100)
+#        pylab.show()
+    else:
+        print("No valid region found")
+        return
     if not res:
         return
 #        print ("no good results ")
@@ -196,6 +258,8 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
     res.sort(cmp)
     if res:
         return res[-1]
+
+
 
 if __name__ == "__main__":
     if "autorg" in sys.argv[0].lower():
