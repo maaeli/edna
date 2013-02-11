@@ -199,6 +199,7 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
     print "big_dim", big_dim
     x = numpy.zeros((big_dim, len_search), dtype="float32")
     y = numpy.zeros((big_dim, len_search), dtype="float32")
+    mask = numpy.zeros((big_dim, len_search), dtype="int8")
     n = numpy.zeros(big_dim, dtype="int16")
     start = numpy.zeros(big_dim, dtype="int16")
     stop = numpy.zeros(big_dim, dtype="int16")
@@ -208,60 +209,72 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
         for sto in range(sta + mininterval, start_search + len_search):
             x[idx, sta - start_search:sto - start_search] = q2[sta :sto]
             y[idx, sta - start_search:sto - start_search] = logI[sta :sto]
+            mask[idx, sta - start_search:sto - start_search] = 1
             n[idx] = sto - sta
             start[idx] = sta
             stop[idx] = sto
             idx += 1
-    print n
-    print idx, (n > 0).sum()
     t1 = time.time()
     print "Array creation took: %.3fs" % (t1 - t0)
     Sx = x.sum(axis= -1)
     Sy = y.sum(axis= -1)
     Sxx = (x * x).sum(axis= -1)
     Sxy = (y * x).sum(axis= -1)
-    s = (n * Sxy - Sx * Sy) / (n * Sxx - Sx * Sx)
-    Rg = numpy.sqrt(-s * 3)
+    slope = (n * Sxy - Sx * Sy) / (n * Sxx - Sx * Sx)
+    Rg = numpy.sqrt(-slope * 3)
     valid = numpy.logical_and((Rg * q[start] <= qminRg) , (Rg * q[stop - 1] <= qmaxRg))
     t2 = time.time()
     print "Calculations took: %.3fs" % (t2 - t1)
     nvalid = valid.sum()
-    print nvalid
+#    print nvalid
     if nvalid > 0:
+        t3 = time.time()
         start = start[valid]
         stop = stop[valid]
         valid2D = numpy.outer(valid, numpy.ones(y.shape[1]))
-        print valid2D
+#        print valid2D
         valid2 = numpy.where(valid2D)
         x = x[valid2]
-        x.shape = nvalid, len_search
         y = y[valid2]
-        y.shape = nvalid, len_search
-        print n
+        mask = mask[valid2]
+        mask.shape = x.shape = y.shape = nvalid, len_search
         n = n[valid]
-        print n
-        s = s[valid]
+        slope = slope[valid]
         Rg = Rg[valid]
         Sx = Sx[valid]
         Sy = Sy[valid]
         Sxx = Sxx[valid]
         Sxy = Sxy[valid]
         Syy = (y * y).sum(axis= -1)
-        intercept = (Sy - Sx * s) / n
+        intercept = (Sy - Sx * slope) / n
         I0 = numpy.exp(intercept)
-        yest = x * numpy.outer(s, numpy.ones(y.shape[1])) + numpy.outer(intercept, numpy.ones(y.shape[1]))
-        delta = y - yest
-        for id0, pos in enumerate(n):
-            if pos < (delta.shape[-1] - 1):
-                delta[id0, pos:] = 0
-        error_square = (delta * delta).sum(axis= -1) / n
-        error = numpy.sqrt(error_square)
+        df = n - 2
+        r_num = ssxym = (n * Sxy) - (Sx * Sy)
+        ssxm = n * Sxx - Sx * Sx
+        ssym = n * Syy - Sy * Sy
+        r_den = numpy.sqrt(ssxm * ssym)
+        correlationR = r_num / r_den
+        correlationR[r_den == 0] = 0
+#        correlationR[correlationR > 1] = 0  # 1.0
+#        correlationR[correlationR < -1] = 0  # -1.0
+        print correlationR
+        sterrest = numpy.sqrt((1 - correlationR * correlationR) * ssym / ssxm / df)
+        print sterrest
+        print sterrest.min(), sterrest.argmin()
+#        yest = (x * numpy.outer(slope, numpy.ones(y.shape[1])) + numpy.outer(intercept, numpy.ones(y.shape[1]))) * mask
+#        delta = y - yest
+#        error_square = (delta * delta).sum(axis= -1) / n
+#        error = numpy.sqrt(error_square)
+#        print error
 #        print error_square
 #        print Sx.shape, Sy.shape, Sxx.shape, Sxy.shape, Syy.shape
 #        r = (Sx * Sy - n * Sxy) / numpy.sqrt((n * Sxx - Sx * Sx) * (n * Syy - Sy * Sy))
-        best = error.argmin()
+        best = sterrest.argmin()
         print "best, n, Rg, I0, start, stop, error"
-        print best, n[best], Rg[best], I0[best], start[best], stop[best], error[best]
+        print best, n[best], Rg[best], I0[best], start[best], stop[best], sterrest[best], correlationR[best], r_num[best], r_den[best]
+        print ssxm[best], ssym[best], ssxym[best]
+#        print y[best, :]
+#        print yest[best, :]
 #        import pylab
 #        pylab.hist(Rg, 100)
 #        pylab.hist(I0, 100)
