@@ -191,6 +191,9 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
                 if Rg * q[s] <= qminRg and Rg * q[e - 1] <= qmaxRg:
                     res.append(ares)
     print "Naive implementation took: %.3fs" % (time.time() - t0)
+    res.sort(cmp)
+    print res[-1]
+
     t0 = time.time()
     big_dim = (len_search - mininterval + 1) * (len_search - mininterval) / 2  # + len_search * mininterval
     print "big_dim", big_dim
@@ -222,28 +225,43 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
     valid = numpy.logical_and((Rg * q[start] <= qminRg) , (Rg * q[stop - 1] <= qmaxRg))
     t2 = time.time()
     print "Calculations took: %.3fs" % (t2 - t1)
-    print valid
-    if valid.sum()>0:
+    nvalid = valid.sum()
+    print nvalid
+    if nvalid > 0:
         start = start[valid]
         stop = stop[valid]
-        x = x[valid]
-        y = y[valid]
+        valid2D = numpy.outer(valid, numpy.ones(y.shape[1]))
+        print valid2D
+        valid2 = numpy.where(valid2D)
+        x = x[valid2]
+        x.shape = nvalid, len_search
+        y = y[valid2]
+        y.shape = nvalid, len_search
+        print n
         n = n[valid]
+        print n
         s = s[valid]
         Rg = Rg[valid]
         Sx = Sx[valid]
         Sy = Sy[valid]
         Sxx = Sxx[valid]
         Sxy = Sxy[valid]
-        Syy = (y*y).sum(axis= -1)
+        Syy = (y * y).sum(axis= -1)
         intercept = (Sy - Sx * s) / n
         I0 = numpy.exp(intercept)
-        error_square = ((y - x * numpy.outer(s, numpy.ones(y.shape[1])) - numpy.outer(intercept, numpy.ones(y.shape[1]))) ** 2).sum(axis= -1) / n
-        print error_square
+        yest = x * numpy.outer(s, numpy.ones(y.shape[1])) + numpy.outer(intercept, numpy.ones(y.shape[1]))
+        delta = y - yest
+        for id0, pos in enumerate(n):
+            if pos < (delta.shape[-1] - 1):
+                delta[id0, pos:] = 0
+        error_square = (delta * delta).sum(axis= -1) / n
+        error = numpy.sqrt(error_square)
+#        print error_square
 #        print Sx.shape, Sy.shape, Sxx.shape, Sxy.shape, Syy.shape
 #        r = (Sx * Sy - n * Sxy) / numpy.sqrt((n * Sxx - Sx * Sx) * (n * Syy - Sy * Sy))
-        best = error_square.argmin()
-        print best, n[best], Rg[best], I0[best], start[best], stop[best]
+        best = error.argmin()
+        print "best, n, Rg, I0, start, stop, error"
+        print best, n[best], Rg[best], I0[best], start[best], stop[best], error[best]
 #        import pylab
 #        pylab.hist(Rg, 100)
 #        pylab.hist(I0, 100)
