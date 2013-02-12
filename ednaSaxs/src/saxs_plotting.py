@@ -36,7 +36,7 @@ from optparse import OptionParser
 import numpy
 from scipy import stats
 import matplotlib
-# matplotlib.use('Agg')
+matplotlib.use('Qt4Agg')
 import matplotlib.pyplot as plt
 
 def load_saxs(filename):
@@ -152,18 +152,6 @@ def kartkyPlot(curve_file, filename=None, format="png", unit="nm"):
     return fig1
 
 def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, qmaxRg=1.3):
-    def fn(a):
-        if numpy.isfinite(a['stderr']):
-            return  a['stderr']  # / numpy.sqrt(a["len"])
-        else:
-            return sys.maxint
-    def cmp(a, b):
-        if fn(a) < fn(b):
-            return 1
-        elif fn(a) > fn(b):
-            return -1
-        else:
-            return 0
 
     if (q is None) or (I is None) and datfile:
         q, I, std = load_saxs(datfile)
@@ -178,44 +166,21 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
     allres = []
     res = []
     t0 = time.time()
-    for s in range(start_search, start_search + len_search - mininterval):
-        for e in range(s + mininterval, start_search + len_search):
-            slope, intercept, r, tt, stderr = stats.linregress(q2[s:e], logI[s:e])
-            Rg = numpy.sqrt(-slope * 3)
-            if not numpy.isnan(Rg):
-                ares = {"start":s, "end":e,
-                        "Rg":Rg, "logI0":intercept, "R":r, "tt":tt, "stderr":stderr, "len":e - s, "I0":numpy.exp(intercept),
-                        "qminRg":Rg * q[s],
-                        "qmaxRg":Rg * q[e - 1]}
-                allres.append(ares)
-                if Rg * q[s] <= qminRg and Rg * q[e - 1] <= qmaxRg:
-                    res.append(ares)
-    print "Naive implementation took: %.3fs" % (time.time() - t0)
-    res.sort(cmp)
-    print res[-1]
-
-    t0 = time.time()
     big_dim = (len_search - mininterval + 1) * (len_search - mininterval) / 2  # + len_search * mininterval
-    print "big_dim", big_dim
-    x = numpy.zeros((big_dim, len_search), dtype="float32")
-    y = numpy.zeros((big_dim, len_search), dtype="float32")
-    mask = numpy.zeros((big_dim, len_search), dtype="int8")
+    x = numpy.zeros((big_dim, len_search), dtype="float64")
+    y = numpy.zeros((big_dim, len_search), dtype="float64")
     n = numpy.zeros(big_dim, dtype="int16")
     start = numpy.zeros(big_dim, dtype="int16")
     stop = numpy.zeros(big_dim, dtype="int16")
     idx = 0
-    print start_search, len_search
     for sta in range(start_search, start_search + len_search - mininterval):
         for sto in range(sta + mininterval, start_search + len_search):
             x[idx, sta - start_search:sto - start_search] = q2[sta :sto]
             y[idx, sta - start_search:sto - start_search] = logI[sta :sto]
-            mask[idx, sta - start_search:sto - start_search] = 1
             n[idx] = sto - sta
             start[idx] = sta
             stop[idx] = sto
             idx += 1
-    t1 = time.time()
-    print "Array creation took: %.3fs" % (t1 - t0)
     Sx = x.sum(axis= -1)
     Sy = y.sum(axis= -1)
     Sxx = (x * x).sum(axis= -1)
@@ -223,21 +188,16 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
     slope = (n * Sxy - Sx * Sy) / (n * Sxx - Sx * Sx)
     Rg = numpy.sqrt(-slope * 3)
     valid = numpy.logical_and((Rg * q[start] <= qminRg) , (Rg * q[stop - 1] <= qmaxRg))
-    t2 = time.time()
-    print "Calculations took: %.3fs" % (t2 - t1)
     nvalid = valid.sum()
-#    print nvalid
     if nvalid > 0:
         t3 = time.time()
         start = start[valid]
         stop = stop[valid]
         valid2D = numpy.outer(valid, numpy.ones(y.shape[1]))
-#        print valid2D
         valid2 = numpy.where(valid2D)
         x = x[valid2]
         y = y[valid2]
-        mask = mask[valid2]
-        mask.shape = x.shape = y.shape = nvalid, len_search
+        x.shape = y.shape = nvalid, len_search
         n = n[valid]
         slope = slope[valid]
         Rg = Rg[valid]
@@ -254,41 +214,32 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
         ssym = n * Syy - Sy * Sy
         r_den = numpy.sqrt(ssxm * ssym)
         correlationR = r_num / r_den
-        correlationR[r_den == 0] = 0
-#        correlationR[correlationR > 1] = 0  # 1.0
-#        correlationR[correlationR < -1] = 0  # -1.0
-        print correlationR
-        sterrest = numpy.sqrt((1 - correlationR * correlationR) * ssym / ssxm / df)
-        print sterrest
-        print sterrest.min(), sterrest.argmin()
-#        yest = (x * numpy.outer(slope, numpy.ones(y.shape[1])) + numpy.outer(intercept, numpy.ones(y.shape[1]))) * mask
-#        delta = y - yest
-#        error_square = (delta * delta).sum(axis= -1) / n
-#        error = numpy.sqrt(error_square)
-#        print error
-#        print error_square
-#        print Sx.shape, Sy.shape, Sxx.shape, Sxy.shape, Syy.shape
-#        r = (Sx * Sy - n * Sxy) / numpy.sqrt((n * Sxx - Sx * Sx) * (n * Syy - Sy * Sy))
+        correlationR[r_den == 0] = 0.0
+        correlationR[correlationR > 1.0] = 1.0  # Numerical errors
+        correlationR[correlationR < -1.0] = -1.0  # Numerical errors
+        sterrest = numpy.sqrt((1.0 - correlationR * correlationR) * ssym / ssxm / df)
         best = sterrest.argmin()
-        print "best, n, Rg, I0, start, stop, error"
-        print best, n[best], Rg[best], I0[best], start[best], stop[best], sterrest[best], correlationR[best], r_num[best], r_den[best]
-        print ssxm[best], ssym[best], ssxym[best]
-#        print y[best, :]
-#        print yest[best, :]
-#        import pylab
-#        pylab.hist(Rg, 100)
-#        pylab.hist(I0, 100)
-#        pylab.show()
+        sta = start[best]
+        sto = stop[best]
+        res = {"start":sta, "end":sto,
+               "Rg":Rg[best], "logI0":I0[best], "R":correlationR[best], "stderr":sterrest[best], "len":sto - sta,
+               "I0":I0[best],
+               "qminRg":Rg[best] * q[sta],
+               "qmaxRg":Rg[best] * q[sto - 1]}
+        if (sto - sta) > mininterval:
+            shift = numpy.where(numpy.logical_and(start >= (sta), stop <= (sto)))[0]
+        else:
+            shift = numpy.where(numpy.logical_and(start >= (sta - 1), stop <= (sto + 1)))[0]
+        res["deltaRg"] = Rg[shift].std()
+        res["deltaI0"] = I0[shift].std()
+        res["start_search"] = start_search
+        res["stop_search"] = start_search + len_search
+        res["intervals"] = big_dim
+        return res
     else:
         print("No valid region found")
         return
-    if not res:
-        return
-#        print ("no good results ")
-#        res = allres
-    res.sort(cmp)
-    if res:
-        return res[-1]
+
 
 
 
@@ -337,9 +288,11 @@ Report bugs to <jerome.kieffer@esrf.fr>.
                 if os.path.isfile(afile):
                     r = autoRg(datfile=afile, mininterval=options.mininterval, qminRg=options.sminrg, qmaxRg=options.smaxrg)
                     if r:
-                        print """Rg   =  %5.2f 
-I(0) =  %5.1f
-Points   %i to %i (%i total)""" % (r["Rg"], r["I0"], r["start"] + 1, r["end"] , r["len"])
+                        print """Rg   =  %5.2f  +/- %.2f (%i%%)
+I(0) =  %5.1f +/- %.2f 
+Points   %i to %i (%i total)
+(Searched from point %i to %i, %i intervals analysed)
+""" % (r["Rg"], r["deltaRg"], 100 * r["deltaRg"] / r["Rg"], r["I0"], r["deltaI0"], r["start"] + 1, r["end"] , r["len"], r["start_search"] + 1, r["stop_search"], r["intervals"])
                     else:
                         print "No Rg found for '%s'." % afile
 
