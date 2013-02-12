@@ -36,7 +36,7 @@ from optparse import OptionParser
 import numpy
 from scipy import stats
 import matplotlib
-matplotlib.use('Qt4Agg')
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 def load_saxs(filename):
@@ -167,6 +167,9 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
     res = []
     t0 = time.time()
     big_dim = (len_search - mininterval + 1) * (len_search - mininterval) / 2  # + len_search * mininterval
+    array_size = big_dim * len_search * 8 / 1e6
+    if array_size > 1000:
+        print("Allocating large array!!!! expect to fail")
     x = numpy.zeros((big_dim, len_search), dtype="float64")
     y = numpy.zeros((big_dim, len_search), dtype="float64")
     n = numpy.zeros(big_dim, dtype="int16")
@@ -235,6 +238,15 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
         res["start_search"] = start_search
         res["stop_search"] = start_search + len_search
         res["intervals"] = big_dim
+        import scipy.optimize
+#        logIopt = logI[sta:sto]
+#        q2opt = q2[sta:sto]
+        parab = lambda p, x, y: p[0] * x * x + p[1] * x + p[2] - y
+        out = scipy.optimize.leastsq(parab, [0, slope[best], intercept[best]], (q2[sta:sto], logI[sta:sto]))
+        if out[0][0] > 0:
+            res["Aggregated"] = True
+        else:
+            res["Aggregated"] = False
         return res
     else:
         print("No valid region found")
@@ -290,9 +302,10 @@ Report bugs to <jerome.kieffer@esrf.fr>.
                     if r:
                         print """Rg   =  %5.2f  +/- %.2f (%i%%)
 I(0) =  %5.1f +/- %.2f 
-Points   %i to %i (%i total)
-(Searched from point %i to %i, %i intervals analysed)
-""" % (r["Rg"], r["deltaRg"], 100 * r["deltaRg"] / r["Rg"], r["I0"], r["deltaI0"], r["start"] + 1, r["end"] , r["len"], r["start_search"] + 1, r["stop_search"], r["intervals"])
+Points   %i to %i (%i total)""" % (r["Rg"], r["deltaRg"], 100 * r["deltaRg"] / r["Rg"], r["I0"], r["deltaI0"], r["start"] + 1, r["end"] , r["len"])
+                        if r.get("Aggregated", None):
+                            print "Aggregated."
+                        print """(Searched from point %i to %i, %i intervals analysed)""" % (r["start_search"] + 1, r["stop_search"], r["intervals"])
                     else:
                         print "No Rg found for '%s'." % afile
 
