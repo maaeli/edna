@@ -289,7 +289,7 @@ class EDPluginControlSolutionScatteringv0_4(EDPluginControl):
         EDPluginControl.process(self)
         self.DEBUG("EDPluginControlSolutionScatteringv0_4.process")
 
-        #Make series of GNOM runs narrowing down the optimal value of rMax
+        # Make series of GNOM runs narrowing down the optimal value of rMax
         ser = 0
         while self.__absErr > self.__absTol:
 
@@ -309,7 +309,7 @@ class EDPluginControlSolutionScatteringv0_4(EDPluginControl):
                 dictDataInputGnom[(ser, idx)].setAngularScale(XSDataInteger(self.__iUnit))
                 dictDataInputGnom[(ser, idx)].setMode(XSDataString(self.__strMode))
             self.__xsGnomJobs = EDParallelJobLauncher(self, self.__strPluginExecGnom, dictDataInputGnom, self.__iNbThreads)
-            ##self.__xsGnomJobs.connectFAILURE(self.doFailureExecGnomActionCluster)
+            # #self.__xsGnomJobs.connectFAILURE(self.doFailureExecGnomActionCluster)
             self.executePluginSynchronous(self.__xsGnomJobs)
 
             if self.__xsGnomJobs.isFailure():
@@ -791,7 +791,7 @@ class EDPluginControlSolutionScatteringv0_4(EDPluginControl):
             _indLabels.append(_tmpLabel)
             ax0.bar(_tmpInd, _tmpNSD, _width, color=_tmpColor, label=_tmpLabel)
             fig0.text(0.75, _tmpLegendPos, _tmpLabel, backgroundcolor=_tmpColor, \
-                          color='white', weight='roman', size='medium')#, transform=ax0.transAxes)
+                          color='white', weight='roman', size='medium')  # , transform=ax0.transAxes)
             ax30.barh([self.__iNbDammifJobs - ref], self.__dammifRefNSD[ref], 0.8, color=_tmpColor)
 
         fig0.subplots_adjust(right=0.7, bottom=0.3)
@@ -820,7 +820,7 @@ class EDPluginControlSolutionScatteringv0_4(EDPluginControl):
 
     def __outputHTMLSummaryTable(self):
         _pdbFilter = EDPDBFilter()
-        pathDamaverFileRaw = self.__edPluginExecDamaver.dataOutput.getDamaverPdbFile().getPath().value
+        pathDamaverFileRaw = self.__edPluginExecDamaver.dataOutput.getDamaverPdbFile().path.value
         pathDamaverFile = os.path.join(self.__edPluginExecDamaver.getWorkingDirectory(), "damaver_valid.pdb")
         if os.path.isfile(pathDamaverFileRaw):
             _pdbFilter.filterPDBFile(pathDamaverFileRaw, pathDamaverFile)
@@ -867,8 +867,8 @@ class EDPluginControlSolutionScatteringv0_4(EDPluginControl):
 
 
     def __outputHTMLGnomImages(self):
-        #_imgRMax = os.path.join(self.getWorkingDirectory(),"rMaxSearchResults.png")
-        #_imgFit = os.path.join(self.getWorkingDirectory(),"gnomFittingResults.png")
+        # _imgRMax = os.path.join(self.getWorkingDirectory(),"rMaxSearchResults.png")
+        # _imgFit = os.path.join(self.getWorkingDirectory(),"gnomFittingResults.png")
         _imgRMax = "rMaxSearchResults.png"
         _imgFit = "gnomFittingResults.png"
         _headerLines = ['<th><h3>Rmax search results</h3></th>', \
@@ -899,7 +899,7 @@ class EDPluginControlSolutionScatteringv0_4(EDPluginControl):
             _htmlCode.append('<span class="control close_control"><a href="javascript://" onclick="toggleElements(\'iteration_%(itr)d_open_view\',\'iteration_%(itr)d_closed_view\');">' % {'itr':(itr + 1)})
             _htmlCode.append('<span class="tool_tip" title="Hide table of iteration results">')
             _htmlCode.append('<h3> - Iteration # %d</h3></span></a></span><div>' % (itr + 1))
-            #_tmpImgRMax = os.path.join(self.getWorkingDirectory(),"rMaxSearchResults-%d.png" % (itr+1))
+            # _tmpImgRMax = os.path.join(self.getWorkingDirectory(),"rMaxSearchResults-%d.png" % (itr+1))
             _tmpImgRMax = "rMaxSearchResults-%d.png" % (itr + 1)
             _htmlCode.append('<table>')
             _htmlCode.append('<tr><td><img alt="Iteration %d search results" src="%s"/></td>' % ((itr + 1), _tmpImgRMax))
@@ -965,8 +965,17 @@ class EDPluginControlSolutionScatteringv0_4(EDPluginControl):
 
     def __outputHTMLDamaverResults(self):
         _pdbFilter = EDPDBFilter()
-        pathDamfiltFileRaw = self.__edPluginExecDamfilt.dataOutput.getOutputPdbFile().getPath().value
-        pathDamstartFileRaw = self.__edPluginExecDamstart.dataOutput.getOutputPdbFile().getPath().value
+        if not self.__edPluginExecDamfilt.isFailure():
+            pathDamfiltFileRaw = self.__edPluginExecDamfilt.dataOutput.getOutputPdbFile().path.value
+        else:
+            pathDamfiltFileRaw = None
+        if not self.__edPluginExecDamstart.isFailure():
+            pathDamstartFileRaw = self.__edPluginExecDamstart.dataOutput.getOutputPdbFile().path.value
+        else:
+            pathDamstartFileRaw = None
+        if not(pathDamstartFileRaw and pathDamfiltFileRaw):
+            self.WARNING("Damfilt or Damstart failed !!!")
+            return ["<h2>DAMAVER pipeline Failed</h2>"]
         pathDamaverFile = os.path.join(self.__edPluginExecDamaver.getWorkingDirectory(), "damaver_valid.pdb")
         pathDamfiltFile = os.path.join(self.__edPluginExecDamfilt.getWorkingDirectory(), "damfilt_valid.pdb")
         pathDamstartFile = os.path.join(self.__edPluginExecDamstart.getWorkingDirectory(), "damstart_valid.pdb")
