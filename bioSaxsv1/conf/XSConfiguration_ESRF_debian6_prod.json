@@ -1,5 +1,5 @@
 {
-    "__extend__": [], 
+    "__extend__": ["XSConfiguration_ESRF_debian6.json"], 
 
     "EDPluginBioSaxsSmartMergev1_4": {}, 
     "EDPluginBioSaxsProcessOneFilev1_2": {}, 
@@ -21,5 +21,8 @@
     "EDPluginBioSaxsNormalizev1_1": {
         "DummyPixelValue": -1, 
         "writeXMLInputOutput": 0
+    },
+    "EDPluginBioSaxsISPyBv1_0": {
+    	"url": "http://pcantolinos:8080/ispyb-ejb3/ispybWS/ToolsForBiosaxsWebService?wsdl"
     }
 }

@@ -42,25 +42,24 @@ EDFactoryPluginStatic.loadModule("EDInstallPILv1_1_7")
 EDFactoryPluginStatic.loadModule("EDInstallFabio_v0_0_7")
 
 import numpy
-from fabio.openimage import openimage
 
 
-class EDTestCasePluginExecuteBioSaxsProcessOneFilev1_2(EDTestCasePluginExecute):
+class EDTestCasePluginExecuteBioSaxsProcessOneFilev1_3(EDTestCasePluginExecute):
 
 
     def __init__(self, _strTestName=None):
-        EDTestCasePluginExecute.__init__(self, "EDPluginBioSaxsProcessOneFilev1_2")
+        EDTestCasePluginExecute.__init__(self, "EDPluginBioSaxsProcessOneFilev1_3")
 #        self.setConfigurationFile(os.path.join(self.getPluginTestsDataHome(),
 #                                               "XSConfiguration_BioSaxsProcessOneFile.xml"))
         self.setDataInputFile(os.path.join(self.getPluginTestsDataHome(), \
                                            "XSDataInputBioSaxsProcessOneFile_reference.xml"))
         self.setReferenceDataOutputFile(os.path.join(self.getPluginTestsDataHome(), \
-                                                     "XSDataResultBioSaxsProcessOneFile_reference_v1_2.xml"))
+                                                     "XSDataResultBioSaxsProcessOneFile_reference_v1_3.xml"))
 
     def preProcess(self):
         """
         PreProcess of the execution test: download a set of images  from http://www.edna-site.org
-        and remove any existing output file 
+        and remove any existing output file
         """
         EDTestCasePluginExecute.preProcess(self)
         self.loadTestImage(["bioSaxsRaw.edf", "bioSaxsMask.edf",
@@ -69,12 +68,12 @@ class EDTestCasePluginExecuteBioSaxsProcessOneFilev1_2(EDTestCasePluginExecute):
         strExpectedOutput = self.readAndParseFile (self.getReferenceDataOutputFile())
         EDVerbose.DEBUG("strExpectedOutput:" + strExpectedOutput)
         xsDataResultReference = XSDataResultBioSaxsProcessOneFilev1_0.parseString(strExpectedOutput)
-        self.refNormImg = xsDataResultReference.normalizedImage.path.value
+#        self.refNormImg = xsDataResultReference.normalizedImage.path.value
         self.refIntCrv = xsDataResultReference.integratedCurve.path.value
-        if not os.path.isdir(os.path.dirname(self.refNormImg)):
-            os.makedirs(os.path.dirname(self.refNormImg))
-        if os.path.isfile(self.refNormImg):
-            os.remove(self.refNormImg)
+#        if not os.path.isdir(os.path.dirname(self.refNormImg)):
+#            os.makedirs(os.path.dirname(self.refNormImg))
+#        if os.path.isfile(self.refNormImg):
+#            os.remove(self.refNormImg)
         if os.path.isfile(self.refIntCrv):
             os.remove(self.refIntCrv)
         EDUtilsParallel.initializeNbThread()
@@ -106,12 +105,11 @@ class EDTestCasePluginExecuteBioSaxsProcessOneFilev1_2(EDTestCasePluginExecute):
 
         dataObt = numpy.loadtxt(xsDataResultObtained.integratedCurve.path.value)
         dataRef = numpy.loadtxt(os.path.join(self.getTestsDataImagesHome(), "bioSaxsProcessIntegrated1_2.dat"))
-        EDAssert.curveSimilar((dataObt[:, 0], dataObt[:, 1]), (dataRef[:, 0], dataRef[:, 1]), "data are the same", 0.6)
-        EDAssert.curveSimilar((dataObt[:, 0], dataObt[:, 2]), (dataRef[:, 0], dataRef[:, 2]), "errors are the same", 0.6)
+        EDAssert.curveSimilar((dataObt[:, 0], dataObt[:, 1]), (dataRef[:, 0], dataRef[:, 1]), "data are the same")
+        EDAssert.curveSimilar((dataObt[:, 0], dataObt[:, 2]), (dataRef[:, 0], dataRef[:, 2]), "errors are the same")
 
 
         EDVerbose.screen("Execution time for %s: %.3fs" % (plugin.getClassName(), plugin.getRunTime()))
-
     def process(self):
         """
         """
@@ -122,5 +120,5 @@ class EDTestCasePluginExecuteBioSaxsProcessOneFilev1_2(EDTestCasePluginExecute):
 
 if __name__ == '__main__':
 
-    edTestCase = EDTestCasePluginExecuteBioSaxsProcessOneFilev1_2("EDTestCasePluginExecuteBioSaxsProcessOneFilev1_2")
+    edTestCase = EDTestCasePluginExecuteBioSaxsProcessOneFilev1_3("EDTestCasePluginExecuteBioSaxsProcessOneFilev1_3")
     edTestCase.execute()

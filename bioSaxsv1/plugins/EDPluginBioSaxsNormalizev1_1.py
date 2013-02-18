@@ -179,7 +179,13 @@ class EDPluginBioSaxsNormalizev1_1(EDPluginControl):
                                                   ((fabIn.data < 0) + (mask[:fabIn.dim2, :fabIn.dim1 ] < 0)))
         else:
             npaMaskedData = numpy.ma.masked_array(fabIn.data.astype("float32"), (fabIn.data < 0))
-        scale = self.dictOutputHeader["Normalization"] / self.dictOutputHeader["DiodeCurr"]
+        if self.dictOutputHeader["DiodeCurr"] == 0:
+            warn = "DiodeCurr is Null --> I Guess we are testing and take it as one"
+            self.lstProcessLog.append(warn)
+            self.warning(warn)
+            scale = self.dictOutputHeader["Normalization"]
+        else:
+            scale = self.dictOutputHeader["Normalization"] / self.dictOutputHeader["DiodeCurr"]
         self.dictOutputHeader["Dummy"] = str(self.dummy)
         self.dictOutputHeader["DDummy"] = "0.1"
         self.dictOutputHeader["EDF_DataBlockID"] = "1.Image.Psd"

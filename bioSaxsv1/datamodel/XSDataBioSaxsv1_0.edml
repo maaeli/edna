@@ -109,9 +109,11 @@ complex type XSDataBioSaxsSample extends XSData {
 	concentration : XSDataDouble optional
 	comments : XSDataString optional
 	code : XSDataString optional
-	login: XSDataString
-	passwd: XSDataString
-	measurementID: XSDataInteger
+	login: XSDataString optional
+	passwd: XSDataString optional
+	measurementID: XSDataInteger optional
+	collectionOrder: XSDataInteger optional
+	ispybDestination: XSDataFile optional
 }
 
 
@@ -209,7 +211,7 @@ complex type XSDataInputBioSaxsProcessOneFilev1_0 extends XSDataInput{
 }
 
 complex type XSDataResultBioSaxsProcessOneFilev1_0 extends XSDataResult {
-	normalizedImage: XSDataImage
+	normalizedImage: XSDataImage optional
 	integratedImage: XSDataImage optional
 	integratedCurve: XSDataFile
 	//logFile : XSDataFile
@@ -353,7 +355,7 @@ complex type XSDataInputBioSaxsISPyBv1_0 extends XSDataInput  {
 	volume		: XSDataDoubleWithUnit optional
 	frameAverage: XSDataInteger optional
 	frameMerged : XSDataInteger optional
-	
+	curves: XSDataFile [] optional
 }
 
 complex type XSDataResultBioSaxsISPyBv1_0 extends XSDataResult {

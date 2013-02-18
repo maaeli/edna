@@ -87,7 +87,8 @@ class EDPluginBioSaxsAzimutIntv1_3(EDPluginControl):
         self.xsdResult = XSDataResultBioSaxsAzimutIntv1_0()
         self.dummy = -1
         self.delta_dummy = 0.1
-        self .integrator_config = {}
+        self.integrator_config = {}
+        self.detector = None
 
     def checkParameters(self):
         """
@@ -197,34 +198,21 @@ class EDPluginBioSaxsAzimutIntv1_3(EDPluginControl):
             self.experimentSetup = self.xsdMetadata.experimentSetup
 
             self.lstProcessLog.append("Azimuthal integration of Corrected+Masked EDF image -->'%s'." % (self.integratedCurve))
-            self .integrator_config = {'dist': self.experimentSetup.detectorDistance.value,
-                            'pixel1': self.experimentSetup.pixelSize_2.value, # flip X,Y
-                            'pixel2': self.experimentSetup.pixelSize_1.value, # flip X,Y
-                            'poni1': self.experimentSetup.beamCenter_2.value * self.experimentSetup.pixelSize_2.value,
-                            'poni2': self.experimentSetup.beamCenter_1.value * self.experimentSetup.pixelSize_1.value,
-                            'rot1': 0.0,
-                            'rot2': 0.0,
-                            'rot3': 0.0,
-                            'splineFile': None}
-#
-#            detector = XSDataDetector(name=XSDataString(self.experimentSetup.detector.value.capitalize().replace(" ", "")),
-#                                      pixelSizeX=self.xsdMetadata.pixelSize_1,
-#                                      pixelSizeY=self.xsdMetadata.pixelSize_2,
-#                                      )
-#            geometry = XSDataGeometryFit2D(detector=detector,
-#                                           distance=self.experimentSetup.detectorDistance,
-#                                           beamCentreInPixelsX=self.xsdMetadata.beamCenter_1,
-#                                           beamCentreInPixelsY=self.xsdMetadata.beamCenter_2,
-#                                           tiltRotation=XSDataAngle(0.0),
-#                                           angleOfTilt=XSDataAngle(0.0))
-#            self.__edPluginPyFAI.dataInput = XSDataInputPyFAI(input=self.dataInput.normalizedImage,
-#                                             dummy=XSDataDouble(self.dummy),
-#                                             deltaDummy=XSDataDouble(self.delta_dummy),
-#                                             geometryFit2D=geometry,
-#                                             nbPt=XSDataInteger(500),
-#                                             wavelength=self.experimentSetup.wavelength,
-#                                             saxsWaxs=XSDataString("saxs"))
 
+            self.detector = self.experimentSetup.detector.value.lower()
+            if self.detector == "pilatus":
+                self.detector = "Pilatus1M"
+            self.integrator_config = {'dist': self.experimentSetup.detectorDistance.value,
+                                  'pixel1': self.experimentSetup.pixelSize_2.value, # flip X,Y
+                                  'pixel2': self.experimentSetup.pixelSize_1.value, # flip X,Y
+                                  'poni1': self.experimentSetup.beamCenter_2.value * self.experimentSetup.pixelSize_2.value,
+                                  'poni2': self.experimentSetup.beamCenter_1.value * self.experimentSetup.pixelSize_1.value,
+                                  'rot1': 0.0,
+                                  'rot2': 0.0,
+                                  'rot3': 0.0,
+                                  'splineFile': None,
+                                  'detector': self.detector
+                                  }
 
     def doFailureGetMetadata(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsAzimutIntv1_3.doFailureGetMetadata")
