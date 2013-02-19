@@ -171,7 +171,7 @@ class EDPluginBioSaxsToSASv1_0(EDPluginControl):
             lastPoint = None
         if self.dataInput.qMax is not None:
             qMax = self.dataInput.qMax.value
-        elif Rg is not None:
+        elif Rg:
             qMax = 7.0 / Rg
         else:
             qMax = None

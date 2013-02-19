@@ -115,31 +115,31 @@ class DirStorage():
 #            os.rmdir(strDirname)
         self.datasets = []
         self.attrsets = []
-class EDShare(EDLogging, EDSession):
+class _EDShare(EDLogging, EDSession):
     """
     This class implements methods to share (large) arrays between plugins.
 
-    It is a Borg
+#    It is a Borg
     """
-    _values = {}
+#    _values = {}
     def __init__(self):
-        if self._values:
-            self.__dict__ = self._values
-        else:
-            EDLogging.__init__(self)
-            # EDSession is a static class
-            self._backend = BACKEND
-            self._filename = None
-            self._storage = None
-            self._listKeys = []
-            self._dictAttrs = {}  # attr are metadata associated to an entry. The values are always cached
+#        if self._values:
+#            self.__dict__ = self._values
+#        else:
+        EDLogging.__init__(self)
+        # EDSession is a static class
+        self._backend = BACKEND
+        self._filename = None
+        self._storage = None
+        self._listKeys = []
+        self._dictAttrs = {}  # attr are metadata associated to an entry. The values are always cached
 
 
-    def __call__(self):
-        """
-        Makes this class a SINGLETON
-        """
-        return self
+#    def __call__(self):
+#        """
+#        Makes this class a SINGLETON
+#        """
+#        return self
 
     def __getitem__(self, key):
         """
@@ -355,5 +355,5 @@ class EDShare(EDLogging, EDSession):
 
 
 # Make EDShare a singleton
-EDShare = EDShare()
+EDShare = _EDShare()
 

@@ -28,8 +28,8 @@ __author__ = "Jérôme Kieffer"
 __contact__ = "Jerome.Kieffer@esrf.fr"
 __license__ = "GPLv3+"
 __copyright__ = "2011, ESRF Grenoble"
-__date__ = "20121206"
-__status__ = "Devel     "
+__date__ = "20130124"
+__status__ = "development"
 
 import os, shutil, time
 from math import log
@@ -71,7 +71,7 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
      - EdnaSaxs/Atsas/AutoSub
      - EdnaSaxs/SaxsAnalysis
     """
-    #dictAve = {} #key=?; value=path to average file
+    # dictAve = {} #key=?; value=path to average file
     lastBuffer = None
     lastSample = None
     __strControlledPluginDataver = "EDPluginExecDataverv1_0"
@@ -97,11 +97,12 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
         self.setXSDataInputClass(XSDataInputBioSaxsSmartMergev1_0)
         self.__edPluginExecDatCmp = None
         self.lstInput = []
+        self.curves = []
         self.lstMerged = []
         self.lstXsdInput = []
         self.absoluteFidelity = None
         self.relativeFidelity = None
-        self.dictSimilarities = {} #key: 2-tuple of images, similarities
+        self.dictSimilarities = {}  # key: 2-tuple of images, similarities
         self.lstSummary = []
         self.lstStrInput = []
         self.autoRg = None
@@ -172,6 +173,7 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
                  self.warning("Input %s does not (yet?) exist" % inp)
                  time.sleep(1.0)
             shutil.copyfile(inp, dst)
+            self.lstSummary.append("Got only one frame ... nothing to merge !!!")
         else:
             self.lstMerged = []
             if (self.absoluteFidelity is not None) or (self.relativeFidelity is not None):
@@ -251,7 +253,7 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
             else:
                 self.__edPluginExecDataver = self.loadPlugin(self.__strControlledPluginDataver)
                 xsd = XSDataInputDataver(inputCurve=self.lstMerged)
-                #outputCurve=self.dataInput.mergedCurve,
+                # outputCurve=self.dataInput.mergedCurve,
                 self.__edPluginExecDataver.setDataInput(xsd)
                 self.__edPluginExecDataver.connectSUCCESS(self.doSuccessExecDataver)
                 self.__edPluginExecDataver.connectFAILURE(self.doFailureExecDataver)
@@ -264,6 +266,7 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
                 suff = os.path.basename(self.strSubFile).split("_")[-1]
                 sub = os.path.join(os.path.dirname(self.strSubFile), base + "_" + suff)
                 xsdSubtractedCurve = XSDataFile(XSDataString(sub))
+                self.curves.append(xsdSubtractedCurve)
                 self.__edPluginExecAutoSub.dataInput = XSDataInputAutoSub(sampleCurve=self.__class__.lastSample,
                                          buffers=[self.__class__.lastBuffer, self.dataInput.mergedCurve],
                                          subtractedCurve=xsdSubtractedCurve)
@@ -295,13 +298,17 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
                 frameMerged = XSDataInteger(len(self.lstMerged))
             else:
                 frameMerged = frameAverage = XSDataInteger(1)
-
+            self.curves = [XSDataFile(i.path) for i in self.lstInput]
+            if self.strMergedFile is not None:
+                self.curves.append(XSDataFile(XSDataString(self.strMergedFile)))
             xsdin = XSDataInputBioSaxsISPyBv1_0(sample=self.dataInput.sample,
                                                      autoRg=self.autoRg,
                                                      gnom=self.gnom,
                                                      volume=self.volume,
                                                      frameAverage=frameAverage,
-                                                     frameMerged=frameMerged
+                                                     frameMerged=frameMerged,
+                                                     curves=self.curves,
+#                                                     destination=self.dataInput.sample.ispybDestination #duplicate, already in sample
                                                )
             self.__edPluginSaxsISPyB.dataInput = xsdin
             self.__edPluginSaxsISPyB.connectSUCCESS(self.doSuccessISPyB)
@@ -332,7 +339,7 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
         """
         Sometimes plugins are not started or not yet finished... 
         """
-        time.sleep(1) #this is just a way to give the focus to other threads
+        time.sleep(1)  # this is just a way to give the focus to other threads
         self.synchronizePlugins()
         self.ERROR("I slept a second, waiting for sub-plugins to finish")
 
@@ -475,7 +482,7 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
             if fidelity == 0:
                logFid = "infinity"
             else:
-               logFid = "%.2f" % (-log(fidelity))
+               logFid = "%.2f" % (-log(fidelity, 10))
             self.lstSummary.append("-log(Fidelity) between %s and %s is %s" % (os.path.basename(file0), os.path.basename(file1), logFid))
 
 
