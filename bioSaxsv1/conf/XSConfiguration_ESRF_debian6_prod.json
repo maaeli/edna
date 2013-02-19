@@ -23,6 +23,6 @@
         "writeXMLInputOutput": 0
     },
     "EDPluginBioSaxsISPyBv1_0": {
-    	"url": "http://pcantolinos:8080/ispyb-ejb3/ispybWS/ToolsForBiosaxsWebService?wsdl"
+    	"url": "http://pydevcz.esrf.fr:8080/ispyb-ejb3/ispybWS/ToolsForBiosaxsWebService?wsdl"
     }
 }
