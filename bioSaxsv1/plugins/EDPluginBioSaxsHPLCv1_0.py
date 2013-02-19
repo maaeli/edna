@@ -60,7 +60,7 @@ class EDPluginBioSaxsHPLCv1_0(EDPluginControl):
     only store references: Wait for flush to construct HDF5 file and (possibly) web pages with PNG graphs
     """
 
-    strControlledPluginProcessOneFile = "EDPluginBioSaxsProcessOneFilev1_2"
+    strControlledPluginProcessOneFile = "EDPluginBioSaxsProcessOneFilev1_3"
     strControlledPluginDatop = "EDPluginExecDatopv1_0"
     strControlledPluginSaxsAnalysis = "EDPluginControlSaxsAnalysisv1_0"
     strControlledPluginDatCmp = "EDPluginExecDatcmpv1_0"
