@@ -73,7 +73,7 @@ def guinierPlot(curve_file, first_point=None, last_point=None, filename=None, fo
     @param: first_point,last point: integers, by default 0 and -1
     @param  filename: name of the file where the cuve should be saved
     @param format: image format
-    @return: the matplotlib figure  
+    @return: the matplotlib figure
     """
     data = numpy.loadtxt(curve_file)
     q = data[:, 0]
@@ -126,12 +126,12 @@ def guinierPlot(curve_file, first_point=None, last_point=None, filename=None, fo
 
 def kartkyPlot(curve_file, filename=None, format="png", unit="nm"):
     """
-    Generate a Kratky: q2I(q) vs q 
+    Generate a Kratky: q2I(q) vs q
     @param curve_file: name of the saxs curve file
     @param: first_point,last point: integers, by default 0 and -1
     @param  filename: name of the file where the cuve should be saved
     @param format: image format
-    @return: the matplotlib figure  
+    @return: the matplotlib figure
     """
     data = numpy.loadtxt(curve_file)
     q = data[:, 0]
@@ -163,6 +163,10 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
     len_search = keep.sum()
     q2 = q * q
     logI = numpy.log(I)
+    if std is None:
+        I_over_std = numpy.ones_like(I)
+    else:
+        I_over_std = I / std
     allres = []
     res = []
     t0 = time.time()
@@ -172,6 +176,7 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
         print("Allocating large array!!!! expect to fail")
     x = numpy.zeros((big_dim, len_search), dtype="float64")
     y = numpy.zeros((big_dim, len_search), dtype="float64")
+    w = numpy.zeros((big_dim, len_search), dtype="float64")  # (1/dy = 1/(d(logI)=I/std)
     n = numpy.zeros(big_dim, dtype="int16")
     start = numpy.zeros(big_dim, dtype="int16")
     stop = numpy.zeros(big_dim, dtype="int16")
@@ -180,15 +185,17 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
         for sto in range(sta + mininterval, start_search + len_search):
             x[idx, sta - start_search:sto - start_search] = q2[sta :sto]
             y[idx, sta - start_search:sto - start_search] = logI[sta :sto]
+            w[idx, sta - start_search:sto - start_search] = I_over_std[sta :sto]
             n[idx] = sto - sta
             start[idx] = sta
             stop[idx] = sto
             idx += 1
-    Sx = x.sum(axis= -1)
-    Sy = y.sum(axis= -1)
-    Sxx = (x * x).sum(axis= -1)
-    Sxy = (y * x).sum(axis= -1)
-    slope = (n * Sxy - Sx * Sy) / (n * Sxx - Sx * Sx)
+    Sx = (w * x).sum(axis= -1)
+    Sy = (w * y).sum(axis= -1)
+    Sxx = (w * x * x).sum(axis= -1)
+    Sxy = (w * y * x).sum(axis= -1)
+    Sw = w.sum(axis= -1)
+    slope = (Sw * Sxy - Sx * Sy) / (Sw * Sxx - Sx * Sx)
     Rg = numpy.sqrt(-slope * 3)
     valid = numpy.logical_and((Rg * q[start] <= qminRg) , (Rg * q[stop - 1] <= qmaxRg))
     nvalid = valid.sum()
@@ -208,8 +215,8 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
         Sy = Sy[valid]
         Sxx = Sxx[valid]
         Sxy = Sxy[valid]
-        Syy = (y * y).sum(axis= -1)
-        intercept = (Sy - Sx * slope) / n
+        Syy = (w * y * y).sum(axis= -1)
+        intercept = (Sy - Sx * slope) / Sw
         I0 = numpy.exp(intercept)
         df = n - 2
         r_num = ssxym = (n * Sxy) - (Sx * Sy)
@@ -301,7 +308,7 @@ Report bugs to <jerome.kieffer@esrf.fr>.
                     r = autoRg(datfile=afile, mininterval=options.mininterval, qminRg=options.sminrg, qmaxRg=options.smaxrg)
                     if r:
                         print """Rg   =  %5.2f  +/- %.2f (%i%%)
-I(0) =  %5.1f +/- %.2f 
+I(0) =  %5.1f +/- %.2f
 Points   %i to %i (%i total)""" % (r["Rg"], r["deltaRg"], 100 * r["deltaRg"] / r["Rg"], r["I0"], r["deltaI0"], r["start"] + 1, r["end"] , r["len"])
                         if r.get("Aggregated", None):
                             print "Aggregated."
