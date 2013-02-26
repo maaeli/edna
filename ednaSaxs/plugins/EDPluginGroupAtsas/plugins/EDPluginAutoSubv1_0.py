@@ -229,8 +229,9 @@ class EDPluginAutoSubv1_0(EDPluginControl):
         if (len(_edPlugin.dataOutput.autoRgOut) == 1) and os.path.exists(self.subtractedCurve): #rewrite Headers
             res = _edPlugin.dataOutput.autoRgOut[0]
             #Scale I0 by concentration
-            res.i0.value = res.i0.value / self.fConcentration
-            res.i0Stdev.value = res.i0Stdev.value / self.fConcentration
+            if self.fConcentration < 1e-6:
+                res.i0.value = res.i0.value / self.fConcentration
+                res.i0Stdev.value = res.i0Stdev.value / self.fConcentration
             lstRg = []
             if res.rg.value < 1e-6:
                 lstRg.append("AutoRg: Rg   =   %.4f +/- %.2f" % (res.rg.value, res.rgStdev.value))
