@@ -1130,7 +1130,8 @@ class EDPluginControlSolutionScatteringv0_4(EDPluginControl):
         if not self.__bOnlyGnom:
             self.__outputDammifJobResults()
             self.addExecutiveSummarySeparator()
-            self.appendExecutiveSummary(self.__edPluginExecDamaver)
+            if self.__edPluginExecDamaver:
+                self.appendExecutiveSummary(self.__edPluginExecDamaver)
 
         self.verboseScreenExecutiveSummary()
 
