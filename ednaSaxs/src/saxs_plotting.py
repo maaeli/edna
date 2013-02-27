@@ -36,7 +36,8 @@ from optparse import OptionParser
 import numpy
 from scipy import stats
 import matplotlib
-matplotlib.use('Agg')
+# matplotlib.use('Agg')
+matplotlib.use('gtk')
 import matplotlib.pyplot as plt
 
 def load_saxs(filename):
@@ -155,6 +156,7 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
 
     if (q is None) or (I is None) and datfile:
         q, I, std = load_saxs(datfile)
+
     out = {}
     start_search = I.argmax()
     Imax = I[start_search]
@@ -207,27 +209,35 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
         valid2 = numpy.where(valid2D)
         x = x[valid2]
         y = y[valid2]
-        x.shape = y.shape = nvalid, len_search
+        w = w[valid2]
+        x.shape = y.shape = w.shape = nvalid, len_search
         n = n[valid]
         slope = slope[valid]
         Rg = Rg[valid]
         Sx = Sx[valid]
         Sy = Sy[valid]
+        Sw = Sw[valid]
         Sxx = Sxx[valid]
         Sxy = Sxy[valid]
         Syy = (w * y * y).sum(axis= -1)
         intercept = (Sy - Sx * slope) / Sw
         I0 = numpy.exp(intercept)
         df = n - 2
-        r_num = ssxym = (n * Sxy) - (Sx * Sy)
-        ssxm = n * Sxx - Sx * Sx
-        ssym = n * Syy - Sy * Sy
+        r_num = ssxym = (Sw * Sxy) - (Sx * Sy)
+        ssxm = Sw * Sxx - Sx * Sx
+        ssym = Sw * Syy - Sy * Sy
         r_den = numpy.sqrt(ssxm * ssym)
         correlationR = r_num / r_den
+#        print correlationR
         correlationR[r_den == 0] = 0.0
         correlationR[correlationR > 1.0] = 1.0  # Numerical errors
         correlationR[correlationR < -1.0] = -1.0  # Numerical errors
         sterrest = numpy.sqrt((1.0 - correlationR * correlationR) * ssym / ssxm / df)
+#        print sterrest
+#        import pylab
+#        pylab.plot(Rg, I0, "o")
+#        pylab.show()
+#        raw_input()
         best = sterrest.argmin()
         sta = start[best]
         sto = stop[best]
