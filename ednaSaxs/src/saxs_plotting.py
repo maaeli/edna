@@ -39,6 +39,8 @@ import matplotlib
 # matplotlib.use('Agg')
 matplotlib.use('gtk')
 import matplotlib.pyplot as plt
+import scipy.optimize
+import scipy.ndimage
 
 def load_saxs(filename):
     """
@@ -152,6 +154,58 @@ def kartkyPlot(curve_file, filename=None, format="png", unit="nm"):
             fig1.savefig(filename)
     return fig1
 
+def AutoRg(object):
+    """
+    a class to calculate Automatically the Radius of Giration based on Guinier approximation.
+    """
+    def __init__(self, q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, qmaxRg=1.3):
+        self.q = q
+        self.I = I
+        self.std = std
+        if (q is None) or (I is None) and datfile:
+            self.q, self.I, self.std = load_saxs(datfile)
+
+        self.mininterval = mininterval
+        self.qminRg = qminRg
+        self.qmaxRg = qmaxRg
+        self.results = {}
+        self.start_search = 0
+        self.stop_search = len(q)
+        self.len_search = len(q)
+
+
+    def select_range():
+        """
+        First step: limit the range of search:
+        
+        * remove all point before maximum I
+        * keep only up to Imax/10
+        * if some points have I<0 segment region and keep the largest sub-region
+        
+        """
+        self.start_search = self.I.argmax()
+        Imax = self.I[self.start_search]
+        keep = (self.I > (Imax / 10.0))
+        keep[:start_search] = False
+        if I[keep].min() <= 0:
+            logger.debug("Negatives values in search range: refining")
+            keep[I <= 0] = False
+            label = scipy.ndimage.label(keep)
+            lab_max = label.max()
+            res = [ 0 ]
+            for idx in range(1, lab_max + 1):
+                res.append((label == idx).sum() / idx)
+            largest_region = numpy.array(res).argmax()
+            keep = (label == largest_region)
+        self.start_search = keep.argmax()
+        self.len_search = keep.sum()
+        self.stop_search = self.start_search + self.len_search
+        logger.debug("Searching range: %i -> %i (%i points)" % (self.start_search, self.stop_search, self.len_search))
+
+
+    def allocate(self):
+        pass
+
 def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, qmaxRg=1.3):
 
     if (q is None) or (I is None) and datfile:
@@ -255,7 +309,7 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
         res["start_search"] = start_search
         res["stop_search"] = start_search + len_search
         res["intervals"] = big_dim
-        import scipy.optimize
+
 #        logIopt = logI[sta:sto]
 #        q2opt = q2[sta:sto]
         parab = lambda p, x, y: p[0] * x * x + p[1] * x + p[2] - y
