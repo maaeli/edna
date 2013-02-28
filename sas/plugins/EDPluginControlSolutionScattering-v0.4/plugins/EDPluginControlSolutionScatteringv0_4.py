@@ -965,11 +965,11 @@ class EDPluginControlSolutionScatteringv0_4(EDPluginControl):
 
     def __outputHTMLDamaverResults(self):
         _pdbFilter = EDPDBFilter()
-        if not self.__edPluginExecDamfilt.isFailure():
+        if (self.__edPluginExecDamstart is not None) and (not self.__edPluginExecDamfilt.isFailure()):
             pathDamfiltFileRaw = self.__edPluginExecDamfilt.dataOutput.getOutputPdbFile().path.value
         else:
             pathDamfiltFileRaw = None
-        if not self.__edPluginExecDamstart.isFailure():
+        if (self.__edPluginExecDamstart is not None) and (not self.__edPluginExecDamstart.isFailure()):
             pathDamstartFileRaw = self.__edPluginExecDamstart.dataOutput.getOutputPdbFile().path.value
         else:
             pathDamstartFileRaw = None
@@ -1130,7 +1130,8 @@ class EDPluginControlSolutionScatteringv0_4(EDPluginControl):
         if not self.__bOnlyGnom:
             self.__outputDammifJobResults()
             self.addExecutiveSummarySeparator()
-            self.appendExecutiveSummary(self.__edPluginExecDamaver)
+            if self.__edPluginExecDamaver:
+                self.appendExecutiveSummary(self.__edPluginExecDamaver)
 
         self.verboseScreenExecutiveSummary()
 

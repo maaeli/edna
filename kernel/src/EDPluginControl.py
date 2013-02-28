@@ -286,9 +286,10 @@ class EDPluginControl(EDPlugin):
         EDVerbose.DEBUG("EDPluginControl.appendExecutiveSummary")
         if (_bAddSeparator):
             self.addExecutiveSummarySeparator()
-        for strLine in _edPlugin.getListExecutiveSummaryLines():
-            if strLine == self.getExecutiveSummarySeparator() and _strPrefix != "":
-                strLine = strLine[ :-len(_strPrefix) ]
+        if _edPlugin:
+            for strLine in _edPlugin.getListExecutiveSummaryLines():
+                if strLine == self.getExecutiveSummarySeparator() and _strPrefix != "":
+                    strLine = strLine[ :-len(_strPrefix) ]
             self.addExecutiveSummaryLine(_strPrefix + strLine)
 
 

@@ -36,8 +36,11 @@ from optparse import OptionParser
 import numpy
 from scipy import stats
 import matplotlib
-matplotlib.use('Agg')
+# matplotlib.use('Agg')
+matplotlib.use('gtk')
 import matplotlib.pyplot as plt
+import scipy.optimize
+import scipy.ndimage
 
 def load_saxs(filename):
     """
@@ -73,7 +76,7 @@ def guinierPlot(curve_file, first_point=None, last_point=None, filename=None, fo
     @param: first_point,last point: integers, by default 0 and -1
     @param  filename: name of the file where the cuve should be saved
     @param format: image format
-    @return: the matplotlib figure  
+    @return: the matplotlib figure
     """
     data = numpy.loadtxt(curve_file)
     q = data[:, 0]
@@ -126,12 +129,12 @@ def guinierPlot(curve_file, first_point=None, last_point=None, filename=None, fo
 
 def kartkyPlot(curve_file, filename=None, format="png", unit="nm"):
     """
-    Generate a Kratky: q2I(q) vs q 
+    Generate a Kratky: q2I(q) vs q
     @param curve_file: name of the saxs curve file
     @param: first_point,last point: integers, by default 0 and -1
     @param  filename: name of the file where the cuve should be saved
     @param format: image format
-    @return: the matplotlib figure  
+    @return: the matplotlib figure
     """
     data = numpy.loadtxt(curve_file)
     q = data[:, 0]
@@ -151,10 +154,63 @@ def kartkyPlot(curve_file, filename=None, format="png", unit="nm"):
             fig1.savefig(filename)
     return fig1
 
+def AutoRg(object):
+    """
+    a class to calculate Automatically the Radius of Giration based on Guinier approximation.
+    """
+    def __init__(self, q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, qmaxRg=1.3):
+        self.q = q
+        self.I = I
+        self.std = std
+        if (q is None) or (I is None) and datfile:
+            self.q, self.I, self.std = load_saxs(datfile)
+
+        self.mininterval = mininterval
+        self.qminRg = qminRg
+        self.qmaxRg = qmaxRg
+        self.results = {}
+        self.start_search = 0
+        self.stop_search = len(q)
+        self.len_search = len(q)
+
+
+    def select_range():
+        """
+        First step: limit the range of search:
+        
+        * remove all point before maximum I
+        * keep only up to Imax/10
+        * if some points have I<0 segment region and keep the largest sub-region
+        
+        """
+        self.start_search = self.I.argmax()
+        Imax = self.I[self.start_search]
+        keep = (self.I > (Imax / 10.0))
+        keep[:start_search] = False
+        if I[keep].min() <= 0:
+            logger.debug("Negatives values in search range: refining")
+            keep[I <= 0] = False
+            label = scipy.ndimage.label(keep)
+            lab_max = label.max()
+            res = [ 0 ]
+            for idx in range(1, lab_max + 1):
+                res.append((label == idx).sum() / idx)
+            largest_region = numpy.array(res).argmax()
+            keep = (label == largest_region)
+        self.start_search = keep.argmax()
+        self.len_search = keep.sum()
+        self.stop_search = self.start_search + self.len_search
+        logger.debug("Searching range: %i -> %i (%i points)" % (self.start_search, self.stop_search, self.len_search))
+
+
+    def allocate(self):
+        pass
+
 def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, qmaxRg=1.3):
 
     if (q is None) or (I is None) and datfile:
         q, I, std = load_saxs(datfile)
+
     out = {}
     start_search = I.argmax()
     Imax = I[start_search]
@@ -163,6 +219,10 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
     len_search = keep.sum()
     q2 = q * q
     logI = numpy.log(I)
+    if std is None:
+        I_over_std = numpy.ones_like(I)
+    else:
+        I_over_std = I / std
     allres = []
     res = []
     t0 = time.time()
@@ -172,6 +232,7 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
         print("Allocating large array!!!! expect to fail")
     x = numpy.zeros((big_dim, len_search), dtype="float64")
     y = numpy.zeros((big_dim, len_search), dtype="float64")
+    w = numpy.zeros((big_dim, len_search), dtype="float64")  # (1/dy = 1/(d(logI)=I/std)
     n = numpy.zeros(big_dim, dtype="int16")
     start = numpy.zeros(big_dim, dtype="int16")
     stop = numpy.zeros(big_dim, dtype="int16")
@@ -180,15 +241,17 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
         for sto in range(sta + mininterval, start_search + len_search):
             x[idx, sta - start_search:sto - start_search] = q2[sta :sto]
             y[idx, sta - start_search:sto - start_search] = logI[sta :sto]
+            w[idx, sta - start_search:sto - start_search] = I_over_std[sta :sto]
             n[idx] = sto - sta
             start[idx] = sta
             stop[idx] = sto
             idx += 1
-    Sx = x.sum(axis= -1)
-    Sy = y.sum(axis= -1)
-    Sxx = (x * x).sum(axis= -1)
-    Sxy = (y * x).sum(axis= -1)
-    slope = (n * Sxy - Sx * Sy) / (n * Sxx - Sx * Sx)
+    Sx = (w * x).sum(axis= -1)
+    Sy = (w * y).sum(axis= -1)
+    Sxx = (w * x * x).sum(axis= -1)
+    Sxy = (w * y * x).sum(axis= -1)
+    Sw = w.sum(axis= -1)
+    slope = (Sw * Sxy - Sx * Sy) / (Sw * Sxx - Sx * Sx)
     Rg = numpy.sqrt(-slope * 3)
     valid = numpy.logical_and((Rg * q[start] <= qminRg) , (Rg * q[stop - 1] <= qmaxRg))
     nvalid = valid.sum()
@@ -200,27 +263,35 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
         valid2 = numpy.where(valid2D)
         x = x[valid2]
         y = y[valid2]
-        x.shape = y.shape = nvalid, len_search
+        w = w[valid2]
+        x.shape = y.shape = w.shape = nvalid, len_search
         n = n[valid]
         slope = slope[valid]
         Rg = Rg[valid]
         Sx = Sx[valid]
         Sy = Sy[valid]
+        Sw = Sw[valid]
         Sxx = Sxx[valid]
         Sxy = Sxy[valid]
-        Syy = (y * y).sum(axis= -1)
-        intercept = (Sy - Sx * slope) / n
+        Syy = (w * y * y).sum(axis= -1)
+        intercept = (Sy - Sx * slope) / Sw
         I0 = numpy.exp(intercept)
         df = n - 2
-        r_num = ssxym = (n * Sxy) - (Sx * Sy)
-        ssxm = n * Sxx - Sx * Sx
-        ssym = n * Syy - Sy * Sy
+        r_num = ssxym = (Sw * Sxy) - (Sx * Sy)
+        ssxm = Sw * Sxx - Sx * Sx
+        ssym = Sw * Syy - Sy * Sy
         r_den = numpy.sqrt(ssxm * ssym)
         correlationR = r_num / r_den
+#        print correlationR
         correlationR[r_den == 0] = 0.0
         correlationR[correlationR > 1.0] = 1.0  # Numerical errors
         correlationR[correlationR < -1.0] = -1.0  # Numerical errors
         sterrest = numpy.sqrt((1.0 - correlationR * correlationR) * ssym / ssxm / df)
+#        print sterrest
+#        import pylab
+#        pylab.plot(Rg, I0, "o")
+#        pylab.show()
+#        raw_input()
         best = sterrest.argmin()
         sta = start[best]
         sto = stop[best]
@@ -238,7 +309,7 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
         res["start_search"] = start_search
         res["stop_search"] = start_search + len_search
         res["intervals"] = big_dim
-        import scipy.optimize
+
 #        logIopt = logI[sta:sto]
 #        q2opt = q2[sta:sto]
         parab = lambda p, x, y: p[0] * x * x + p[1] * x + p[2] - y
@@ -301,7 +372,7 @@ Report bugs to <jerome.kieffer@esrf.fr>.
                     r = autoRg(datfile=afile, mininterval=options.mininterval, qminRg=options.sminrg, qmaxRg=options.smaxrg)
                     if r:
                         print """Rg   =  %5.2f  +/- %.2f (%i%%)
-I(0) =  %5.1f +/- %.2f 
+I(0) =  %5.1f +/- %.2f
 Points   %i to %i (%i total)""" % (r["Rg"], r["deltaRg"], 100 * r["deltaRg"] / r["Rg"], r["I0"], r["deltaI0"], r["start"] + 1, r["end"] , r["len"])
                         if r.get("Aggregated", None):
                             print "Aggregated."

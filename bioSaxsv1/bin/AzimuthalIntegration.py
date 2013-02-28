@@ -27,8 +27,13 @@ __author__ = "Jérôme Kieffer"
 __contact__ = "Jerome.Kieffer@ESRF.eu"
 __license__ = "GPLv3+"
 __copyright__ = "European Synchrotron Radiation Facility, Grenoble, France"
+__version__ = "20130226"
 
-import os, sys
+import os, sys, optparse, multiprocessing, threading, types, time
+if sys.version > (3, 0):
+    from queue import Queue
+else:
+    from Queue import Queue
 
 # Append the EDNA kernel source directory to the python path
 if not os.environ.has_key("EDNA_HOME"):
@@ -42,85 +47,175 @@ if not os.environ.has_key("EDNA_HOME"):
 
     os.environ["EDNA_HOME"] = pyStrEdnaHomePath
 
-
 sys.path.append(os.path.join(os.environ["EDNA_HOME"], "kernel", "src"))
 
-from EDVerbose          import EDVerbose
-from EDParallelExecute  import EDParallelExecute
+from EDVerbose import EDVerbose
+from EDJob import EDJob
+from EDThreading import Semaphore
+# from EDParallelExecute  import EDParallelExecute
 
 
-EDNAPluginName = "EDPluginBioSaxsAzimutIntv1_0"
-
-def fileName2xml(filename):
-    """Here we create the XML string to be passed to the EDNA plugin from the input filename
-    This can / should be modified by the final user
-    
-    @param filename: full path of the input file
-    @type filename: python string representing the path
-    @rtype: XML string
-    @return: python string  
-    """
-    if filename.endswith(".edf"):
-        upperDir = os.path.dirname(os.path.dirname(filename))
-        if not os.path.isdir(os.path.join(upperDir, "1d")):
-               os.makedirs(os.path.join(upperDir, "1d"), int("775", 8))
-
-        if not os.path.isdir(os.path.join(upperDir, "misc")):
-               os.makedirs(os.path.join(upperDir, "misc"), int("775", 8))
-
-        specfile = os.path.join(upperDir, "1d", os.path.splitext(os.path.basename(filename))[0] + ".dat")
-        base = os.path.join(upperDir, "misc", os.path.splitext(os.path.basename(filename))[0])
-        correctedImg = base + ".msk"
-        integImg = base + ".ang"
-        maskFile = os.path.join(upperDir, "Pcon_01Apr_msk.edf")
-        xml = "<XSDataInput>\
-<normalizedImage><path><value>%s</value></path></normalizedImage>\
-<correctedImage><path><value>%s</value></path></correctedImage>\
+class Reprocess(object):
+    EDNAPluginName = "EDPluginBioSaxsProcessOneFilev1_3"
+    hc = 12.398419292004204
+    def __init__(self):
+        self.XML = "<XSDataInput>\
+<normalizedImage><path><value>${FULLPATH}</value></path></normalizedImage>\
+<correctedImage><path><value>${DIRDIRNAME}/2d/${BASENAME}.edf</value></path></correctedImage>\
 <normalizedImageSize><value>4100000</value></normalizedImageSize>\
-<integratedImage><path><value>%s</value></path></integratedImage>\
-<integratedCurve><path><value>%s</value></path></integratedCurve>\
-<maskFile><path><value>%s</value></path></maskFile>\
-<code><value>BSAS</value></code>\
-</XSDataInput>" % (filename, correctedImg, integImg, specfile, maskFile)
-    return xml
+<integratedCurve><path><value>${DIRDIRNAME}/1d/${BASENAME}.edf</value></path></integratedCurve>\
+<maskFile><path><value>${MASKFILE}</value></path></maskFile>\
+<code><value>BSA</value></code>\
+</XSDataInput>"
+        self.maskfile = None
+        self.dataFiles = []
+        self.wavelength = 1.0
+        self.debug = False
+        self.mode = "offline"
+        self.newerOnly = False
+        self.nbcpu = multiprocessing.cpu_count()
+        self.cpu_sem = Semaphore(self.nbcpu)
+        self.process_sem = Semaphore()
+        self.queue = Queue()
+        
+    def fileName2xml(self, filename):
+        """Here we create the XML string to be passed to the EDNA plugin from the input filename
+        This can / should be modified by the final user
+        
+        @param filename: full path of the input file
+        @type filename: python string representing the path
+        @rtype: XML string
+        @return: python string  
+        """
+        if filename.endswith(".edf"):
+            FULLPATH = os.path.abspath(filename)
+            DIRNAME, NAME = os.path.split(FULLPATH)
+            DIRDIRNAME = os.path.dirname(DIRNAME)
+            BASENAME, EXT = os.path.splitext(NAME)
+            if not os.path.isdir(os.path.join(DIRDIRNAME, "1d")):
+                   os.makedirs(os.path.join(DIRDIRNAME, "1d"), int("775", 8))
+            return self.xml.replace("${FULLPATH}", FULLPATH).\
+                replace("${DIRNAME}", DIRNAME).replace("${NAME}", NAME).\
+                replace("${DIRDIRNAME}", DIRDIRNAME).replace("${BASENAME}", BASENAME).\
+                replace("${EXT}", EXT).replace("$MASKFILE", self.maskfile or "")
 
-def XMLerr(strXMLin):
-    """
-    This is an example of XMLerr function ... it prints only the name of the file created
-    @param srXMLin: The XML string used to launch the job
-    @type strXMLin: python string with the input XML
-    @rtype: None
-    @return: None     
-    """
-    EDVerbose.WARNING("Error in the processing of :\n%s" % strXMLin)
-    return None
+    def XMLerr(self, strXMLin):
+        """
+        This is an example of XMLerr function ... it prints only the name of the file created
+        @param srXMLin: The XML string used to launch the job
+        @type strXMLin: python string with the input XML
+        @rtype: None
+        @return: None     
+        """
+        self.cpu_sem.release()
+        if type(strXMLin) not in types.StringTypes:
+            strXMLin= strXMLin.marshal()
+        EDVerbose.WARNING("Error in the processing of :\n%s" % strXMLin)
+        return None
+
+    def XMLsuccess(self, strXMLin):
+        """
+        This is an example of XMLerr function ... it prints only the name of the file created
+        @param srXMLin: The XML string used to launch the job
+        @type strXMLin: python string with the input XML
+        @rtype: None
+        @return: None     
+        """
+        self.cpu_sem.release()
+#        EDVerbose.WARNING("Error in the processing of :\n%s" % strXMLin)
+        return None
+
+
+    def parse(self):
+        """
+        parse options from command line
+        """
+        parser = optparse.OptionParser()
+        parser.add_option("-V", "--version", dest="version", action="store_true",
+                          help="print version of the program and quit", metavar="FILE", default=False)
+        parser.add_option("-v", "--verbose",
+                          action="store_true", dest="debug", default=False,
+                          help="switch to debug/verbose mode")
+        parser.add_option("-m", "--mask", dest="mask",
+                      help="file containing the mask (for image reconstruction)", default=None)
+        parser.add_option("-M", "--mode", dest="mode",
+                      help="Mode can be online/offline/all", default="offline")
+        parser.add_option("-o", "--out", dest="output",
+                      help="file for log", default=None)
+        parser.add_option("-w", "--wavelength", dest="wavelength", type="float",
+                      help="wavelength of the X-Ray beam in Angstrom", default=None)
+        parser.add_option("-e", "--energy", dest="energy", type="float",
+                      help="energy of the X-Ray beam in keV (hc=%skeV.A)" % self.hc, default=None)
+        parser.add_option("-t", "--template", dest="template", type="str",
+                      help="template XML file", default=None)
+        parser.add_option("-n", "--nbcpu", dest="nbcpu", type="int",
+                      help="template XML file", default=self.nbcpu)
+
+
+        (options, args) = parser.parse_args()
+
+        # Analyse aruments and options
+        if options.version:
+            print("BioSaxs Azimuthal integration version %s" % __version__)
+            sys.exit(0)
+        if options.debug:
+            EDVerbose.setVerboseDebugOn()
+            self.debug = True
+        if options.output:
+            EDVerbose.setLogFileName(options.output)
+        if options.mask and os.path.isfile(options.mask):
+            self.maskfile = options.mask
+        if options.template and os.path.isfile(options.template):
+            self.xml = open(options.template).read()
+        if options.wavelength:
+            self.wavelength = 1e-10 * options.wavelength
+        elif options.energy:
+            self.wavelength = 1e-10 * self.hc / options.energy
+        if options.mode=="offline":
+            self.mode = "offline"
+            self.newerOnly = False
+        elif options.mode=="online":
+            self.mode = "dirwarch"
+            self.newerOnly = True
+        elif options.mode=="dirwatch":
+            self.mode = "dirwarch"
+            self.newerOnly = False
+        self.cpu_sem = Semaphore(options.nbcpu)
+        self.nbcpu = options.nbcpu
+        self.dataFiles = [f for f in args if os.path.isfile(f)]
+        if not self.dataFiles:
+            raise RuntimeError("Please provide datafiles or read the --help")
+
+
+    def process(self):
+        for fn in self.dataFiles:
+            EDVerbose.screen("Processing file %s" % fn)
+            edj = EDJob(self.EDNAPluginName)
+            edj.dataInput = self.fileName2xml(fn)
+            edj.connectSUCCESS(self.XMLsuccess)
+            edj.connectFAILURE(self.XMLerr)
+            self.queue.put(edj)
+            if self.process_sem._Semaphore__value > 0 :
+                t = threading.Thread(target=self.startProcessing)
+                t.start()
+        EDVerbose.screen("Back in main")
+        while self.cpu_sem._Semaphore__value < self.nbcpu:
+            time.sleep(0.1)
+        EDJob.synchronizeAll()
+        EDJob.stats()
+
+    def startProcessing(self):
+        with self.process_sem:
+            while not self.queue.empty():
+                self.cpu_sem.acquire()
+                edj = self.queue.get()
+                edj.execute()
+#                    edj.synchronize()
+
 
 
 if __name__ == '__main__':
-    paths = []
-    mode = "OffLine"
-    newerOnly = True
-    debug = False
-    for i in sys.argv[1:]:
-        if i.lower().find("-online") in [0, 1]:
-            mode = "dirwatch"
-        elif i.lower().find("-all") in [0, 1]:
-            newerOnly = False
-        elif i.lower().find("-debug") in [0, 1]:
-            debug = True
-        if os.path.exists(i):
-            paths.append(os.path.abspath(i))
+    r = Reprocess()
+    r.parse()
+    r.process()
 
-    if len(paths) == 0:
-        if mode == "OffLine":
-            print "This is the Azimuthal Integration application of EDNA-BioSaxs, \nplease give a path to process offline or the option:\n\
-            --online to process online incoming data in the given directory.\n\
-            --all to process all existing files (unless they will be excluded)\n\
-            --debug to turn on debugging mode in EDNA"
-
-            sys.exit()
-        else:
-            paths = [os.getcwd()]
-    edna = EDParallelExecute(EDNAPluginName, fileName2xml, _functXMLerr=XMLerr, _bVerbose=True, _bDebug=debug)
-    edna.runEDNA(paths, mode , newerOnly)
-    EDVerbose.screen("Back in main")
