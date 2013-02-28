@@ -80,16 +80,21 @@ class MergeFFX(object):
             else:
                 filepath, h5path = h.split(":", 1)
                 if os.path.isfile(filepath):
-                    h5file = h5py.File(filepath)
-                    self._h5files.append(h5file)
+                    h5file = h5py.File(filepath, "r")
+
 #                    cls.set_cache(h5file, policy=0.0)
                     if h5path in h5file:
                         if h5file[h5path].__class__.__name__ == "Group":
-                            res[h] = h5file[h5path]
+                            grp = h5file[h5path]
                         else:
-                            res[h] = h5file[h5path].parent
-                    else:
-                        logger.warning("No such group %s in file: %s" % (h5path, filepath))
+                            grp = h5file[h5path].parent
+                        res[h] = grp
+                        if self.STACK in grp:
+                            ds = grp[self.STACK]
+                            logger.debug("hfd5: %s\tdataset: %s\t shape: %s" % (filepath, ds.name, ds.shape))
+                        self._h5files.append(h5file)
+                else:
+                    logger.warning("No such group %s in file: %s" % (h5path, filepath))
         return res
 
     @classmethod
@@ -103,7 +108,7 @@ class MergeFFX(object):
                 cache_settings[2] = int(10 * cache_settings[2])
             else:
                 cache_settings[2] = int(size)
-            # if we are not going to use the read or written chunks, set the 
+            # if we are not going to use the read or written chunks, set the
             # preemption policy to 0
             if policy is not None:
                 cache_settings[3] = float(policy)
@@ -128,11 +133,13 @@ class MergeFFX(object):
             for path, h5grp in self.inputs.items():
                 if self.OFFSETS in h5grp:
                     offsets = h5grp[self.OFFSETS]
-                    if (self.offsets_security is None) and (self.MAX_OFFSET in offsets.attrs):
-                        self.offsets_security = offsets.attrs[self.MAX_OFFSET]
+                    if (self.MAX_OFFSET in offsets.attrs):
+                        my_offset = offsets.attrs[self.MAX_OFFSET]
+                        logger.debug("%s offset %s" % (path, my_offset))
+                        self.offsets_security = my_offset
                     npa = offsets[:]
                     self.offsets[path] = npa
-                    print path, npa.min(axis=0), npa.max(axis=0)
+                    logger.debug("%s: min offset= %s max offset= %s" % (path, npa.min(axis=0), npa.max(axis=0)))
 
     def get_crop_region(self):
         if not self._crop_region:
@@ -141,8 +148,11 @@ class MergeFFX(object):
                 secu = self.offsets_security
                 start = numpy.ceil(numpy.array([npa.max(axis=0) for npa in self.offsets.values()]).max(axis=0) + secu).astype(int)
                 stop = numpy.floor(numpy.array([npa.min(axis=0) for npa in self.offsets.values()]).min(axis=0) - secu + shape).astype(int)
+                #handle the cas of offsets larger than secu
+                start = numpy.maximum(start, 0)
+                stop = numpy.minimum(stop, shape - secu)
                 self._crop_region = (slice(start[0], stop[0]), slice(start[1], stop[1]))
-                print start, stop
+                logger.debug("Crop region: %s, %s" % (start, stop))
             else:
                 self._crop_region = tuple([slice(i) for i in numpy.array(self.shape[1:])])
         return self._crop_region
@@ -169,7 +179,8 @@ class MergeFFX(object):
 
 
     def merge_dataset(self):
-        print('Crop region: %s %s'% self.crop_region)
+        print('Crop region: [%i:%i, %i:%i] ' % (self.crop_region[0].start, self.crop_region[0].stop,
+                                               self.crop_region[1].start, self.crop_region[1].stop))
         dim1 = self.crop_region[0].stop - self.crop_region[0].start
         dim2 = self.crop_region[1].stop - self.crop_region[1].start
         if not self.ENERGY in self.h5grp:
@@ -179,6 +190,7 @@ class MergeFFX(object):
             self.h5grp.create_dataset(self.STACK, (self.shape[0], dim1, dim2),
                                        dtype="float32", chunks=(1, max(1, dim1 // 8), max(1, dim2 // 8)))
         ds = self.h5grp[self.STACK]
+        logger.debug("Output dataset shape: (%i,%i,%i)" % ds.shape)
         sys.stdout.write("Averaging out frame ")
         readt = []
         writet = []
@@ -194,11 +206,12 @@ class MergeFFX(object):
                     norm_factor = 1.0
                 if self.STACK in h5grp:
                     idx = (frn,) + self.crop_region
-                    cropped = h5grp[self.STACK][idx]
+                    cropped = numpy.array(h5grp[self.STACK][idx])
                     if abs(cropped).max() < 1e-10:
                         continue
                     i += 1
-                    fr += h5grp[self.STACK][idx] / norm_factor
+                    logger.debug("%s frame shape: %s new_ %s target %s" % (path, idx, cropped.shape, fr.shape))
+                    fr += cropped / norm_factor
                 else:
                     logger.warning("no %s in %s ?????"(self.STACK, frn))
             tr = time.time() - tr0
@@ -231,30 +244,33 @@ if __name__ == "__main__":
     parser.add_option("-c", "--crop", dest="crop",
                       help="Shall we crop the dataset to valid area", default=True)
     parser.add_option("-k", "--check", dest="recheck",
-                      help="Shall we recheck the consistency of the various frames ... very time consuming !!! (not implemented", default=False)
+                      help="Shall we recheck the consistency of the various frames ... very time consuming !!! (not implemented)", default=False)
     parser.add_option("-n", "--normalize", dest="normalize",
                       help="renormalize frames from intensity", default=True)
     parser.add_option("-q", "--quiet",
                       action="store_false", dest="verbose", default=True,
                       help="don't print status messages to stdout")
     parser.add_option("-l", "--ln",
-                      dest="ln", default=False,
+                      dest="ln", default=False, action="store_true",
                       help="write data as -logarithm of merged input")
-
-
+    parser.add_option("-d", "--debug",
+                      dest="debug", default=False, action="store_true",
+                      help="switch to debug mode with more information printed out")
 
     (options, args) = parser.parse_args()
     print("")
     print("Options:")
     print('========')
-    for k,v in options.__dict__.items():
-        print("    %s: %s"%(k,v))
+    for k, v in options.__dict__.items():
+        print("    %s: %s" % (k, v))
     print("")
     print("Input files and HDF5 path:")
     print("==========================")
-    for f in list(args): 
-        print("    %s"%f)
+    for f in list(args):
+        print("    %s" % f)
     print(" ")
+    if options.debug:
+        logger.setLevel(level=logging.DEBUG)
     mfx = MergeFFX(args, options.h5path, crop=options.crop, check=options.recheck, normalize=options.normalize, logarithm=options.ln)
     mfx.create_output()
     mfx.get_offsets()
