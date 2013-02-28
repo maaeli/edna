@@ -41,6 +41,8 @@ matplotlib.use('gtk')
 import matplotlib.pyplot as plt
 import scipy.optimize
 import scipy.ndimage
+from scipy.cluster.vq import kmeans, vq
+logging.basicConfig()
 logger = logging.getLogger("saxs")
 timelog = logging.getLogger("timeit")
 
@@ -208,11 +210,11 @@ class AutoRg(object):
     def select_range(self):
         """
         First step: limit the range of search:
-        
+
         * remove all point before maximum I
         * keep only up to Imax/10
         * if some points have I<0 segment region and keep the largest sub-region
-        
+
         """
         self.start_search = self.I.argmax()
         Imax = self.I[self.start_search]
@@ -240,7 +242,7 @@ class AutoRg(object):
         x = q*q
         y = log(I)
         w = 1/dy = I/std
-        
+
         calculate the sums: xw, wy, w, wxy, wxx and wyy
         """
         self.big_dim = (self.len_search - self.mininterval + 1) * (self.len_search - self.mininterval) / 2  # + len_search * mininterval
@@ -286,12 +288,13 @@ class AutoRg(object):
     def refine(self):
         """
         Keep only ranges with valid qminRg and qmaxRg.
-        
+
         Calculate Rg, I0 and the linear regression quality fit.
         """
         self.slope = (self.Sw * self.Sxy - self.Sx * self.Sy) / (self.Sw * self.Sxx - self.Sx * self.Sx)
         self.Rg = numpy.sqrt(-self.slope * 3)
         valid = numpy.logical_and((self.Rg * self.q[self.start] <= self.qminRg) , (self.Rg * self.q[self.stop - 1] <= self.qmaxRg))
+        valid[self.slope > 0] = False
         nvalid = valid.sum()
         if nvalid > 0:
             for ds in ("start", "stop", "n", "slope", "Rg", "Sx", "Sy", "Sw", "Sxx", "Sxy", "Syy"):
@@ -310,14 +313,35 @@ class AutoRg(object):
             self.sterrest = numpy.sqrt((1.0 - self.correlationR * self.correlationR) * ssym / ssxm / df)
 
     @timeit
+    def cluster(self):
+        features = numpy.hstack((self.Rg.reshape(-1, 1), self.I0.reshape(-1, 1)))
+        centroids, variance = kmeans(features, 2)
+        code, distance = vq(features, centroids)
+
+        fig = matplotlib.pyplot.figure()
+        ax = fig.add_subplot(111)
+        code0 = numpy.where(code == 0)
+        code1 = numpy.where(code == 1)
+        ax.plot(self.Rg[code0], self.I0[code0], 'b*')
+        ax.plot(self.Rg[code1], self.I0[code1], 'r*')
+        ax.plot([p[0] for p in centroids], [p[1] for p in centroids], 'go')
+        fig.show()
+        raw_input()
+        code_max_rg = numpy.array(centroids[:, 0]).argmax()  # code with largest Rg
+        valid = numpy.where(code == code_max_rg)
+        for ds in ("start", "stop", "n", "slope", "Rg", "Sx", "Sy", "Sw", "Sxx", "Sxy", "Syy", "sterrest"):
+            setattr(self, ds, getattr(self, ds)[valid])
+
+
+    @timeit
     def finish(self):
         if self.sterrest is not None:
             self.best = self.sterrest.argmin()
             sta = self.start[self.best]
             sto = self.stop[self.best]
             res = {"start":sta, "end":sto,
-                   "Rg":self.Rg[self.best], "logI0":self.I0[self.best], 
-                   "R":self.correlationR[self.best], "stderr":self.sterrest[self.best], 
+                   "Rg":self.Rg[self.best], "logI0":self.I0[self.best],
+                   "R":self.correlationR[self.best], "stderr":self.sterrest[self.best],
                    "len":sto - sta,
                    "I0":self.I0[self.best],
                    "qminRg":self.Rg[self.best] * self.q[sta],
@@ -333,7 +357,7 @@ class AutoRg(object):
             res["intervals"] = self.big_dim
 
             parab = lambda p, x, y: p[0] * x * x + p[1] * x + p[2] - y
-            out = scipy.optimize.leastsq(parab, [0, slope[best], intercept[best]], (q2[sta:sto], logI[sta:sto]))
+            out = scipy.optimize.leastsq(parab, [0, self.slope[self.best], self.intercept[self.best]], (self.q[sta:sto] * self.q[sta:sto], numpy.log(self.I[sta:sto])))
             if out[0][0] > 0:
                 res["Aggregated"] = True
             else:
@@ -347,6 +371,9 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
     ag.select_range()
     ag.allocate()
     ag.refine()
+#    ag.cluster()
+#    fig.show()
+
     return ag.finish()
 #    if (q is None) or (I is None) and datfile:
 #        q, I, std = load_saxs(datfile)
@@ -422,16 +449,16 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
 #        ssym = Sw * Syy - Sy * Sy
 #        r_den = numpy.sqrt(ssxm * ssym)
 #        correlationR = r_num / r_den
-##        print correlationR
+# #        print correlationR
 #        correlationR[r_den == 0] = 0.0
 #        correlationR[correlationR > 1.0] = 1.0  # Numerical errors
 #        correlationR[correlationR < -1.0] = -1.0  # Numerical errors
 #        sterrest = numpy.sqrt((1.0 - correlationR * correlationR) * ssym / ssxm / df)
-##        print sterrest
-##        import pylab
-##        pylab.plot(Rg, I0, "o")
-##        pylab.show()
-##        raw_input()
+# #        print sterrest
+# #        import pylab
+# #        pylab.plot(Rg, I0, "o")
+# #        pylab.show()
+# #        raw_input()
 #        best = sterrest.argmin()
 #        sta = start[best]
 #        sto = stop[best]
@@ -450,8 +477,8 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
 #        res["stop_search"] = start_search + len_search
 #        res["intervals"] = big_dim
 #
-##        logIopt = logI[sta:sto]
-##        q2opt = q2[sta:sto]
+# #        logIopt = logI[sta:sto]
+# #        q2opt = q2[sta:sto]
 #        parab = lambda p, x, y: p[0] * x * x + p[1] * x + p[2] - y
 #        out = scipy.optimize.leastsq(parab, [0, slope[best], intercept[best]], (q2[sta:sto], logI[sta:sto]))
 #        if out[0][0] > 0:
