@@ -43,7 +43,7 @@ if  os.path.isdir(specClientPath) and (specClientPath not in sys.path):
     sys.path.insert(1, specClientPath)
 
 
-from EDVerbose          import EDVerbose
+from EDVerbose          import EDVerbose 
 #from EDFactoryPluginStatic      import EDFactoryPluginStatic
 from EDObject           import EDObject
 try:
@@ -313,6 +313,11 @@ class HPLCrun(object):
         self.quality = None
         self.q = None
         self.size = None
+        self.scattering_I = None
+        self.scattering_Stdev = None
+        self.subtracted_I = None
+        self.subtracted_Stdev = None
+
 
     def reset(self):
         self.frames = []

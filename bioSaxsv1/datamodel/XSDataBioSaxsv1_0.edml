@@ -356,6 +356,7 @@ complex type XSDataInputBioSaxsISPyBv1_0 extends XSDataInput  {
 	frameAverage: XSDataInteger optional
 	frameMerged : XSDataInteger optional
 	curves: XSDataFile [] optional
+	bestBuffer: XSDataFile optional
 }
 
 complex type XSDataResultBioSaxsISPyBv1_0 extends XSDataResult {

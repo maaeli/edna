@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Fri Sep 7 02:23::26 2012 by EDGenerateDS.
+# Generated Fri Mar 15 04:01::44 2013 by EDGenerateDS.
 #
 
 import os, sys
@@ -12,21 +12,7 @@ from xml.dom import Node
 strEdnaHome = os.environ.get("EDNA_HOME", None)
 
 dictLocation = { \
- "XSDataCommon": "kernel/datamodel", \
- "XSDataCommon": "kernel/datamodel", \
- "XSDataCommon": "kernel/datamodel", \
- "XSDataCommon": "kernel/datamodel", \
- "XSDataCommon": "kernel/datamodel", \
- "XSDataCommon": "kernel/datamodel", \
- "XSDataCommon": "kernel/datamodel", \
- "XSDataCommon": "kernel/datamodel", \
- "XSDataCommon": "kernel/datamodel", \
- "XSDataCommon": "kernel/datamodel", \
- "XSDataCommon": "kernel/datamodel", \
- "XSDataCommon": "kernel/datamodel", \
- "XSDataCommon": "kernel/datamodel", \
- "XSDataCommon": "kernel/datamodel", \
- "XSDataCommon": "kernel/datamodel", \
+ "XSDataCommon": "kernel/datamodel"
 }
 
 try:
@@ -91,23 +77,10 @@ def showIndent(outfile, level):
         outfile.write(unicode('    '))
 
 
-def checkType(_strClassName, _strMethodName, _value, _strExpectedType):
-    if _value != None:
-        if _strExpectedType not in (_value.__class__.__name__,)+(_value.__class__.__bases__):
-            if (_value.__class__.__name__ == "unicode") and (_strExpectedType == "str"):
-                # Accept unicode as expected str
-                return
-            elif (_value.__class__.__name__ == "int") and (_strExpectedType in ["float", "double"]):
-                # Accept int as expected double or float
-                return
-            else:
-                strMessage = "ERROR! %s.%s argument is not %s but %s" % (_strClassName, _strMethodName, _strExpectedType, _value.__class__.__name__)
-                print(strMessage)
-
-
 def warnEmptyAttribute(_strName, _strTypeName):
-    if not _strTypeName in ["float", "double", "string", "boolean", "integer"]:
-        print("Warning! Non-optional attribute %s of type %s is None!" % (_strName, _strTypeName))
+    pass
+    #if not _strTypeName in ["float", "double", "string", "boolean", "integer"]:
+    #    print("Warning! Non-optional attribute %s of type %s is None!" % (_strName, _strTypeName))
 
 class MixedContainer(object):
     # Constants for category:
@@ -161,91 +134,180 @@ class MixedContainer(object):
 #
 
 
+
 class XSDataAutoRg(XSData):
     def __init__(self, isagregated=None, quality=None, lastPointUsed=None, firstPointUsed=None, i0Stdev=None, i0=None, rgStdev=None, rg=None, filename=None):
         XSData.__init__(self, )
-    
-    
-        checkType("XSDataAutoRg", "Constructor of XSDataAutoRg", filename, "XSDataFile")
-        self._filename = filename
-        checkType("XSDataAutoRg", "Constructor of XSDataAutoRg", rg, "XSDataLength")
-        self._rg = rg
-        checkType("XSDataAutoRg", "Constructor of XSDataAutoRg", rgStdev, "XSDataLength")
-        self._rgStdev = rgStdev
-        checkType("XSDataAutoRg", "Constructor of XSDataAutoRg", i0, "XSDataDouble")
-        self._i0 = i0
-        checkType("XSDataAutoRg", "Constructor of XSDataAutoRg", i0Stdev, "XSDataDouble")
-        self._i0Stdev = i0Stdev
-        checkType("XSDataAutoRg", "Constructor of XSDataAutoRg", firstPointUsed, "XSDataInteger")
-        self._firstPointUsed = firstPointUsed
-        checkType("XSDataAutoRg", "Constructor of XSDataAutoRg", lastPointUsed, "XSDataInteger")
-        self._lastPointUsed = lastPointUsed
-        checkType("XSDataAutoRg", "Constructor of XSDataAutoRg", quality, "XSDataDouble")
-        self._quality = quality
-        checkType("XSDataAutoRg", "Constructor of XSDataAutoRg", isagregated, "XSDataBoolean")
-        self._isagregated = isagregated
+        if filename is None:
+            self._filename = None
+        elif filename.__class__.__name__ == "XSDataFile":
+            self._filename = filename
+        else:
+            strMessage = "ERROR! XSDataAutoRg constructor argument 'filename' is not XSDataFile but %s" % self._filename.__class__.__name__
+            raise BaseException(strMessage)
+        if rg is None:
+            self._rg = None
+        elif rg.__class__.__name__ == "XSDataLength":
+            self._rg = rg
+        else:
+            strMessage = "ERROR! XSDataAutoRg constructor argument 'rg' is not XSDataLength but %s" % self._rg.__class__.__name__
+            raise BaseException(strMessage)
+        if rgStdev is None:
+            self._rgStdev = None
+        elif rgStdev.__class__.__name__ == "XSDataLength":
+            self._rgStdev = rgStdev
+        else:
+            strMessage = "ERROR! XSDataAutoRg constructor argument 'rgStdev' is not XSDataLength but %s" % self._rgStdev.__class__.__name__
+            raise BaseException(strMessage)
+        if i0 is None:
+            self._i0 = None
+        elif i0.__class__.__name__ == "XSDataDouble":
+            self._i0 = i0
+        else:
+            strMessage = "ERROR! XSDataAutoRg constructor argument 'i0' is not XSDataDouble but %s" % self._i0.__class__.__name__
+            raise BaseException(strMessage)
+        if i0Stdev is None:
+            self._i0Stdev = None
+        elif i0Stdev.__class__.__name__ == "XSDataDouble":
+            self._i0Stdev = i0Stdev
+        else:
+            strMessage = "ERROR! XSDataAutoRg constructor argument 'i0Stdev' is not XSDataDouble but %s" % self._i0Stdev.__class__.__name__
+            raise BaseException(strMessage)
+        if firstPointUsed is None:
+            self._firstPointUsed = None
+        elif firstPointUsed.__class__.__name__ == "XSDataInteger":
+            self._firstPointUsed = firstPointUsed
+        else:
+            strMessage = "ERROR! XSDataAutoRg constructor argument 'firstPointUsed' is not XSDataInteger but %s" % self._firstPointUsed.__class__.__name__
+            raise BaseException(strMessage)
+        if lastPointUsed is None:
+            self._lastPointUsed = None
+        elif lastPointUsed.__class__.__name__ == "XSDataInteger":
+            self._lastPointUsed = lastPointUsed
+        else:
+            strMessage = "ERROR! XSDataAutoRg constructor argument 'lastPointUsed' is not XSDataInteger but %s" % self._lastPointUsed.__class__.__name__
+            raise BaseException(strMessage)
+        if quality is None:
+            self._quality = None
+        elif quality.__class__.__name__ == "XSDataDouble":
+            self._quality = quality
+        else:
+            strMessage = "ERROR! XSDataAutoRg constructor argument 'quality' is not XSDataDouble but %s" % self._quality.__class__.__name__
+            raise BaseException(strMessage)
+        if isagregated is None:
+            self._isagregated = None
+        elif isagregated.__class__.__name__ == "XSDataBoolean":
+            self._isagregated = isagregated
+        else:
+            strMessage = "ERROR! XSDataAutoRg constructor argument 'isagregated' is not XSDataBoolean but %s" % self._isagregated.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'filename' attribute
     def getFilename(self): return self._filename
     def setFilename(self, filename):
-        checkType("XSDataAutoRg", "setFilename", filename, "XSDataFile")
-        self._filename = filename
+        if filename is None:
+            self._filename = None
+        elif filename.__class__.__name__ == "XSDataFile":
+            self._filename = filename
+        else:
+            strMessage = "ERROR! XSDataAutoRg.setFilename argument is not XSDataFile but %s" % filename.__class__.__name__
+            raise BaseException(strMessage)
     def delFilename(self): self._filename = None
-    # Properties
     filename = property(getFilename, setFilename, delFilename, "Property for filename")
+    # Methods and properties for the 'rg' attribute
     def getRg(self): return self._rg
     def setRg(self, rg):
-        checkType("XSDataAutoRg", "setRg", rg, "XSDataLength")
-        self._rg = rg
+        if rg is None:
+            self._rg = None
+        elif rg.__class__.__name__ == "XSDataLength":
+            self._rg = rg
+        else:
+            strMessage = "ERROR! XSDataAutoRg.setRg argument is not XSDataLength but %s" % rg.__class__.__name__
+            raise BaseException(strMessage)
     def delRg(self): self._rg = None
-    # Properties
     rg = property(getRg, setRg, delRg, "Property for rg")
+    # Methods and properties for the 'rgStdev' attribute
     def getRgStdev(self): return self._rgStdev
     def setRgStdev(self, rgStdev):
-        checkType("XSDataAutoRg", "setRgStdev", rgStdev, "XSDataLength")
-        self._rgStdev = rgStdev
+        if rgStdev is None:
+            self._rgStdev = None
+        elif rgStdev.__class__.__name__ == "XSDataLength":
+            self._rgStdev = rgStdev
+        else:
+            strMessage = "ERROR! XSDataAutoRg.setRgStdev argument is not XSDataLength but %s" % rgStdev.__class__.__name__
+            raise BaseException(strMessage)
     def delRgStdev(self): self._rgStdev = None
-    # Properties
     rgStdev = property(getRgStdev, setRgStdev, delRgStdev, "Property for rgStdev")
+    # Methods and properties for the 'i0' attribute
     def getI0(self): return self._i0
     def setI0(self, i0):
-        checkType("XSDataAutoRg", "setI0", i0, "XSDataDouble")
-        self._i0 = i0
+        if i0 is None:
+            self._i0 = None
+        elif i0.__class__.__name__ == "XSDataDouble":
+            self._i0 = i0
+        else:
+            strMessage = "ERROR! XSDataAutoRg.setI0 argument is not XSDataDouble but %s" % i0.__class__.__name__
+            raise BaseException(strMessage)
     def delI0(self): self._i0 = None
-    # Properties
     i0 = property(getI0, setI0, delI0, "Property for i0")
+    # Methods and properties for the 'i0Stdev' attribute
     def getI0Stdev(self): return self._i0Stdev
     def setI0Stdev(self, i0Stdev):
-        checkType("XSDataAutoRg", "setI0Stdev", i0Stdev, "XSDataDouble")
-        self._i0Stdev = i0Stdev
+        if i0Stdev is None:
+            self._i0Stdev = None
+        elif i0Stdev.__class__.__name__ == "XSDataDouble":
+            self._i0Stdev = i0Stdev
+        else:
+            strMessage = "ERROR! XSDataAutoRg.setI0Stdev argument is not XSDataDouble but %s" % i0Stdev.__class__.__name__
+            raise BaseException(strMessage)
     def delI0Stdev(self): self._i0Stdev = None
-    # Properties
     i0Stdev = property(getI0Stdev, setI0Stdev, delI0Stdev, "Property for i0Stdev")
+    # Methods and properties for the 'firstPointUsed' attribute
     def getFirstPointUsed(self): return self._firstPointUsed
     def setFirstPointUsed(self, firstPointUsed):
-        checkType("XSDataAutoRg", "setFirstPointUsed", firstPointUsed, "XSDataInteger")
-        self._firstPointUsed = firstPointUsed
+        if firstPointUsed is None:
+            self._firstPointUsed = None
+        elif firstPointUsed.__class__.__name__ == "XSDataInteger":
+            self._firstPointUsed = firstPointUsed
+        else:
+            strMessage = "ERROR! XSDataAutoRg.setFirstPointUsed argument is not XSDataInteger but %s" % firstPointUsed.__class__.__name__
+            raise BaseException(strMessage)
     def delFirstPointUsed(self): self._firstPointUsed = None
-    # Properties
     firstPointUsed = property(getFirstPointUsed, setFirstPointUsed, delFirstPointUsed, "Property for firstPointUsed")
+    # Methods and properties for the 'lastPointUsed' attribute
     def getLastPointUsed(self): return self._lastPointUsed
     def setLastPointUsed(self, lastPointUsed):
-        checkType("XSDataAutoRg", "setLastPointUsed", lastPointUsed, "XSDataInteger")
-        self._lastPointUsed = lastPointUsed
+        if lastPointUsed is None:
+            self._lastPointUsed = None
+        elif lastPointUsed.__class__.__name__ == "XSDataInteger":
+            self._lastPointUsed = lastPointUsed
+        else:
+            strMessage = "ERROR! XSDataAutoRg.setLastPointUsed argument is not XSDataInteger but %s" % lastPointUsed.__class__.__name__
+            raise BaseException(strMessage)
     def delLastPointUsed(self): self._lastPointUsed = None
-    # Properties
     lastPointUsed = property(getLastPointUsed, setLastPointUsed, delLastPointUsed, "Property for lastPointUsed")
+    # Methods and properties for the 'quality' attribute
     def getQuality(self): return self._quality
     def setQuality(self, quality):
-        checkType("XSDataAutoRg", "setQuality", quality, "XSDataDouble")
-        self._quality = quality
+        if quality is None:
+            self._quality = None
+        elif quality.__class__.__name__ == "XSDataDouble":
+            self._quality = quality
+        else:
+            strMessage = "ERROR! XSDataAutoRg.setQuality argument is not XSDataDouble but %s" % quality.__class__.__name__
+            raise BaseException(strMessage)
     def delQuality(self): self._quality = None
-    # Properties
     quality = property(getQuality, setQuality, delQuality, "Property for quality")
+    # Methods and properties for the 'isagregated' attribute
     def getIsagregated(self): return self._isagregated
     def setIsagregated(self, isagregated):
-        checkType("XSDataAutoRg", "setIsagregated", isagregated, "XSDataBoolean")
-        self._isagregated = isagregated
+        if isagregated is None:
+            self._isagregated = None
+        elif isagregated.__class__.__name__ == "XSDataBoolean":
+            self._isagregated = isagregated
+        else:
+            strMessage = "ERROR! XSDataAutoRg.setIsagregated argument is not XSDataBoolean but %s" % isagregated.__class__.__name__
+            raise BaseException(strMessage)
     def delIsagregated(self): self._isagregated = None
-    # Properties
     isagregated = property(getIsagregated, setIsagregated, delIsagregated, "Property for isagregated")
     def export(self, outfile, level, name_='XSDataAutoRg'):
         showIndent(outfile, level)
@@ -385,109 +447,218 @@ class XSDataAutoRg(XSData):
     parseFile = staticmethod( parseFile )
 # end class XSDataAutoRg
 
+
 class XSDataBioSaxsExperimentSetup(XSData):
     def __init__(self, normalizationFactor=None, maskFile=None, machineCurrent=None, wavelength=None, beamStopDiode=None, beamCenter_2=None, beamCenter_1=None, pixelSize_2=None, pixelSize_1=None, detectorDistance=None, detector=None):
         XSData.__init__(self, )
-    
-    
-        checkType("XSDataBioSaxsExperimentSetup", "Constructor of XSDataBioSaxsExperimentSetup", detector, "XSDataString")
-        self._detector = detector
-        checkType("XSDataBioSaxsExperimentSetup", "Constructor of XSDataBioSaxsExperimentSetup", detectorDistance, "XSDataLength")
-        self._detectorDistance = detectorDistance
-        checkType("XSDataBioSaxsExperimentSetup", "Constructor of XSDataBioSaxsExperimentSetup", pixelSize_1, "XSDataLength")
-        self._pixelSize_1 = pixelSize_1
-        checkType("XSDataBioSaxsExperimentSetup", "Constructor of XSDataBioSaxsExperimentSetup", pixelSize_2, "XSDataLength")
-        self._pixelSize_2 = pixelSize_2
-        checkType("XSDataBioSaxsExperimentSetup", "Constructor of XSDataBioSaxsExperimentSetup", beamCenter_1, "XSDataDouble")
-        self._beamCenter_1 = beamCenter_1
-        checkType("XSDataBioSaxsExperimentSetup", "Constructor of XSDataBioSaxsExperimentSetup", beamCenter_2, "XSDataDouble")
-        self._beamCenter_2 = beamCenter_2
-        checkType("XSDataBioSaxsExperimentSetup", "Constructor of XSDataBioSaxsExperimentSetup", beamStopDiode, "XSDataDouble")
-        self._beamStopDiode = beamStopDiode
-        checkType("XSDataBioSaxsExperimentSetup", "Constructor of XSDataBioSaxsExperimentSetup", wavelength, "XSDataWavelength")
-        self._wavelength = wavelength
-        checkType("XSDataBioSaxsExperimentSetup", "Constructor of XSDataBioSaxsExperimentSetup", machineCurrent, "XSDataDouble")
-        self._machineCurrent = machineCurrent
-        checkType("XSDataBioSaxsExperimentSetup", "Constructor of XSDataBioSaxsExperimentSetup", maskFile, "XSDataImage")
-        self._maskFile = maskFile
-        checkType("XSDataBioSaxsExperimentSetup", "Constructor of XSDataBioSaxsExperimentSetup", normalizationFactor, "XSDataDouble")
-        self._normalizationFactor = normalizationFactor
+        if detector is None:
+            self._detector = None
+        elif detector.__class__.__name__ == "XSDataString":
+            self._detector = detector
+        else:
+            strMessage = "ERROR! XSDataBioSaxsExperimentSetup constructor argument 'detector' is not XSDataString but %s" % self._detector.__class__.__name__
+            raise BaseException(strMessage)
+        if detectorDistance is None:
+            self._detectorDistance = None
+        elif detectorDistance.__class__.__name__ == "XSDataLength":
+            self._detectorDistance = detectorDistance
+        else:
+            strMessage = "ERROR! XSDataBioSaxsExperimentSetup constructor argument 'detectorDistance' is not XSDataLength but %s" % self._detectorDistance.__class__.__name__
+            raise BaseException(strMessage)
+        if pixelSize_1 is None:
+            self._pixelSize_1 = None
+        elif pixelSize_1.__class__.__name__ == "XSDataLength":
+            self._pixelSize_1 = pixelSize_1
+        else:
+            strMessage = "ERROR! XSDataBioSaxsExperimentSetup constructor argument 'pixelSize_1' is not XSDataLength but %s" % self._pixelSize_1.__class__.__name__
+            raise BaseException(strMessage)
+        if pixelSize_2 is None:
+            self._pixelSize_2 = None
+        elif pixelSize_2.__class__.__name__ == "XSDataLength":
+            self._pixelSize_2 = pixelSize_2
+        else:
+            strMessage = "ERROR! XSDataBioSaxsExperimentSetup constructor argument 'pixelSize_2' is not XSDataLength but %s" % self._pixelSize_2.__class__.__name__
+            raise BaseException(strMessage)
+        if beamCenter_1 is None:
+            self._beamCenter_1 = None
+        elif beamCenter_1.__class__.__name__ == "XSDataDouble":
+            self._beamCenter_1 = beamCenter_1
+        else:
+            strMessage = "ERROR! XSDataBioSaxsExperimentSetup constructor argument 'beamCenter_1' is not XSDataDouble but %s" % self._beamCenter_1.__class__.__name__
+            raise BaseException(strMessage)
+        if beamCenter_2 is None:
+            self._beamCenter_2 = None
+        elif beamCenter_2.__class__.__name__ == "XSDataDouble":
+            self._beamCenter_2 = beamCenter_2
+        else:
+            strMessage = "ERROR! XSDataBioSaxsExperimentSetup constructor argument 'beamCenter_2' is not XSDataDouble but %s" % self._beamCenter_2.__class__.__name__
+            raise BaseException(strMessage)
+        if beamStopDiode is None:
+            self._beamStopDiode = None
+        elif beamStopDiode.__class__.__name__ == "XSDataDouble":
+            self._beamStopDiode = beamStopDiode
+        else:
+            strMessage = "ERROR! XSDataBioSaxsExperimentSetup constructor argument 'beamStopDiode' is not XSDataDouble but %s" % self._beamStopDiode.__class__.__name__
+            raise BaseException(strMessage)
+        if wavelength is None:
+            self._wavelength = None
+        elif wavelength.__class__.__name__ == "XSDataWavelength":
+            self._wavelength = wavelength
+        else:
+            strMessage = "ERROR! XSDataBioSaxsExperimentSetup constructor argument 'wavelength' is not XSDataWavelength but %s" % self._wavelength.__class__.__name__
+            raise BaseException(strMessage)
+        if machineCurrent is None:
+            self._machineCurrent = None
+        elif machineCurrent.__class__.__name__ == "XSDataDouble":
+            self._machineCurrent = machineCurrent
+        else:
+            strMessage = "ERROR! XSDataBioSaxsExperimentSetup constructor argument 'machineCurrent' is not XSDataDouble but %s" % self._machineCurrent.__class__.__name__
+            raise BaseException(strMessage)
+        if maskFile is None:
+            self._maskFile = None
+        elif maskFile.__class__.__name__ == "XSDataImage":
+            self._maskFile = maskFile
+        else:
+            strMessage = "ERROR! XSDataBioSaxsExperimentSetup constructor argument 'maskFile' is not XSDataImage but %s" % self._maskFile.__class__.__name__
+            raise BaseException(strMessage)
+        if normalizationFactor is None:
+            self._normalizationFactor = None
+        elif normalizationFactor.__class__.__name__ == "XSDataDouble":
+            self._normalizationFactor = normalizationFactor
+        else:
+            strMessage = "ERROR! XSDataBioSaxsExperimentSetup constructor argument 'normalizationFactor' is not XSDataDouble but %s" % self._normalizationFactor.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'detector' attribute
     def getDetector(self): return self._detector
     def setDetector(self, detector):
-        checkType("XSDataBioSaxsExperimentSetup", "setDetector", detector, "XSDataString")
-        self._detector = detector
+        if detector is None:
+            self._detector = None
+        elif detector.__class__.__name__ == "XSDataString":
+            self._detector = detector
+        else:
+            strMessage = "ERROR! XSDataBioSaxsExperimentSetup.setDetector argument is not XSDataString but %s" % detector.__class__.__name__
+            raise BaseException(strMessage)
     def delDetector(self): self._detector = None
-    # Properties
     detector = property(getDetector, setDetector, delDetector, "Property for detector")
+    # Methods and properties for the 'detectorDistance' attribute
     def getDetectorDistance(self): return self._detectorDistance
     def setDetectorDistance(self, detectorDistance):
-        checkType("XSDataBioSaxsExperimentSetup", "setDetectorDistance", detectorDistance, "XSDataLength")
-        self._detectorDistance = detectorDistance
+        if detectorDistance is None:
+            self._detectorDistance = None
+        elif detectorDistance.__class__.__name__ == "XSDataLength":
+            self._detectorDistance = detectorDistance
+        else:
+            strMessage = "ERROR! XSDataBioSaxsExperimentSetup.setDetectorDistance argument is not XSDataLength but %s" % detectorDistance.__class__.__name__
+            raise BaseException(strMessage)
     def delDetectorDistance(self): self._detectorDistance = None
-    # Properties
     detectorDistance = property(getDetectorDistance, setDetectorDistance, delDetectorDistance, "Property for detectorDistance")
+    # Methods and properties for the 'pixelSize_1' attribute
     def getPixelSize_1(self): return self._pixelSize_1
     def setPixelSize_1(self, pixelSize_1):
-        checkType("XSDataBioSaxsExperimentSetup", "setPixelSize_1", pixelSize_1, "XSDataLength")
-        self._pixelSize_1 = pixelSize_1
+        if pixelSize_1 is None:
+            self._pixelSize_1 = None
+        elif pixelSize_1.__class__.__name__ == "XSDataLength":
+            self._pixelSize_1 = pixelSize_1
+        else:
+            strMessage = "ERROR! XSDataBioSaxsExperimentSetup.setPixelSize_1 argument is not XSDataLength but %s" % pixelSize_1.__class__.__name__
+            raise BaseException(strMessage)
     def delPixelSize_1(self): self._pixelSize_1 = None
-    # Properties
     pixelSize_1 = property(getPixelSize_1, setPixelSize_1, delPixelSize_1, "Property for pixelSize_1")
+    # Methods and properties for the 'pixelSize_2' attribute
     def getPixelSize_2(self): return self._pixelSize_2
     def setPixelSize_2(self, pixelSize_2):
-        checkType("XSDataBioSaxsExperimentSetup", "setPixelSize_2", pixelSize_2, "XSDataLength")
-        self._pixelSize_2 = pixelSize_2
+        if pixelSize_2 is None:
+            self._pixelSize_2 = None
+        elif pixelSize_2.__class__.__name__ == "XSDataLength":
+            self._pixelSize_2 = pixelSize_2
+        else:
+            strMessage = "ERROR! XSDataBioSaxsExperimentSetup.setPixelSize_2 argument is not XSDataLength but %s" % pixelSize_2.__class__.__name__
+            raise BaseException(strMessage)
     def delPixelSize_2(self): self._pixelSize_2 = None
-    # Properties
     pixelSize_2 = property(getPixelSize_2, setPixelSize_2, delPixelSize_2, "Property for pixelSize_2")
+    # Methods and properties for the 'beamCenter_1' attribute
     def getBeamCenter_1(self): return self._beamCenter_1
     def setBeamCenter_1(self, beamCenter_1):
-        checkType("XSDataBioSaxsExperimentSetup", "setBeamCenter_1", beamCenter_1, "XSDataDouble")
-        self._beamCenter_1 = beamCenter_1
+        if beamCenter_1 is None:
+            self._beamCenter_1 = None
+        elif beamCenter_1.__class__.__name__ == "XSDataDouble":
+            self._beamCenter_1 = beamCenter_1
+        else:
+            strMessage = "ERROR! XSDataBioSaxsExperimentSetup.setBeamCenter_1 argument is not XSDataDouble but %s" % beamCenter_1.__class__.__name__
+            raise BaseException(strMessage)
     def delBeamCenter_1(self): self._beamCenter_1 = None
-    # Properties
     beamCenter_1 = property(getBeamCenter_1, setBeamCenter_1, delBeamCenter_1, "Property for beamCenter_1")
+    # Methods and properties for the 'beamCenter_2' attribute
     def getBeamCenter_2(self): return self._beamCenter_2
     def setBeamCenter_2(self, beamCenter_2):
-        checkType("XSDataBioSaxsExperimentSetup", "setBeamCenter_2", beamCenter_2, "XSDataDouble")
-        self._beamCenter_2 = beamCenter_2
+        if beamCenter_2 is None:
+            self._beamCenter_2 = None
+        elif beamCenter_2.__class__.__name__ == "XSDataDouble":
+            self._beamCenter_2 = beamCenter_2
+        else:
+            strMessage = "ERROR! XSDataBioSaxsExperimentSetup.setBeamCenter_2 argument is not XSDataDouble but %s" % beamCenter_2.__class__.__name__
+            raise BaseException(strMessage)
     def delBeamCenter_2(self): self._beamCenter_2 = None
-    # Properties
     beamCenter_2 = property(getBeamCenter_2, setBeamCenter_2, delBeamCenter_2, "Property for beamCenter_2")
+    # Methods and properties for the 'beamStopDiode' attribute
     def getBeamStopDiode(self): return self._beamStopDiode
     def setBeamStopDiode(self, beamStopDiode):
-        checkType("XSDataBioSaxsExperimentSetup", "setBeamStopDiode", beamStopDiode, "XSDataDouble")
-        self._beamStopDiode = beamStopDiode
+        if beamStopDiode is None:
+            self._beamStopDiode = None
+        elif beamStopDiode.__class__.__name__ == "XSDataDouble":
+            self._beamStopDiode = beamStopDiode
+        else:
+            strMessage = "ERROR! XSDataBioSaxsExperimentSetup.setBeamStopDiode argument is not XSDataDouble but %s" % beamStopDiode.__class__.__name__
+            raise BaseException(strMessage)
     def delBeamStopDiode(self): self._beamStopDiode = None
-    # Properties
     beamStopDiode = property(getBeamStopDiode, setBeamStopDiode, delBeamStopDiode, "Property for beamStopDiode")
+    # Methods and properties for the 'wavelength' attribute
     def getWavelength(self): return self._wavelength
     def setWavelength(self, wavelength):
-        checkType("XSDataBioSaxsExperimentSetup", "setWavelength", wavelength, "XSDataWavelength")
-        self._wavelength = wavelength
+        if wavelength is None:
+            self._wavelength = None
+        elif wavelength.__class__.__name__ == "XSDataWavelength":
+            self._wavelength = wavelength
+        else:
+            strMessage = "ERROR! XSDataBioSaxsExperimentSetup.setWavelength argument is not XSDataWavelength but %s" % wavelength.__class__.__name__
+            raise BaseException(strMessage)
     def delWavelength(self): self._wavelength = None
-    # Properties
     wavelength = property(getWavelength, setWavelength, delWavelength, "Property for wavelength")
+    # Methods and properties for the 'machineCurrent' attribute
     def getMachineCurrent(self): return self._machineCurrent
     def setMachineCurrent(self, machineCurrent):
-        checkType("XSDataBioSaxsExperimentSetup", "setMachineCurrent", machineCurrent, "XSDataDouble")
-        self._machineCurrent = machineCurrent
+        if machineCurrent is None:
+            self._machineCurrent = None
+        elif machineCurrent.__class__.__name__ == "XSDataDouble":
+            self._machineCurrent = machineCurrent
+        else:
+            strMessage = "ERROR! XSDataBioSaxsExperimentSetup.setMachineCurrent argument is not XSDataDouble but %s" % machineCurrent.__class__.__name__
+            raise BaseException(strMessage)
     def delMachineCurrent(self): self._machineCurrent = None
-    # Properties
     machineCurrent = property(getMachineCurrent, setMachineCurrent, delMachineCurrent, "Property for machineCurrent")
+    # Methods and properties for the 'maskFile' attribute
     def getMaskFile(self): return self._maskFile
     def setMaskFile(self, maskFile):
-        checkType("XSDataBioSaxsExperimentSetup", "setMaskFile", maskFile, "XSDataImage")
-        self._maskFile = maskFile
+        if maskFile is None:
+            self._maskFile = None
+        elif maskFile.__class__.__name__ == "XSDataImage":
+            self._maskFile = maskFile
+        else:
+            strMessage = "ERROR! XSDataBioSaxsExperimentSetup.setMaskFile argument is not XSDataImage but %s" % maskFile.__class__.__name__
+            raise BaseException(strMessage)
     def delMaskFile(self): self._maskFile = None
-    # Properties
     maskFile = property(getMaskFile, setMaskFile, delMaskFile, "Property for maskFile")
+    # Methods and properties for the 'normalizationFactor' attribute
     def getNormalizationFactor(self): return self._normalizationFactor
     def setNormalizationFactor(self, normalizationFactor):
-        checkType("XSDataBioSaxsExperimentSetup", "setNormalizationFactor", normalizationFactor, "XSDataDouble")
-        self._normalizationFactor = normalizationFactor
+        if normalizationFactor is None:
+            self._normalizationFactor = None
+        elif normalizationFactor.__class__.__name__ == "XSDataDouble":
+            self._normalizationFactor = normalizationFactor
+        else:
+            strMessage = "ERROR! XSDataBioSaxsExperimentSetup.setNormalizationFactor argument is not XSDataDouble but %s" % normalizationFactor.__class__.__name__
+            raise BaseException(strMessage)
     def delNormalizationFactor(self): self._normalizationFactor = None
-    # Properties
     normalizationFactor = property(getNormalizationFactor, setNormalizationFactor, delNormalizationFactor, "Property for normalizationFactor")
     def export(self, outfile, level, name_='XSDataBioSaxsExperimentSetup'):
         showIndent(outfile, level)
@@ -623,46 +794,85 @@ class XSDataBioSaxsExperimentSetup(XSData):
     parseFile = staticmethod( parseFile )
 # end class XSDataBioSaxsExperimentSetup
 
+
 class XSDataBioSaxsSample(XSData):
     def __init__(self, temperature=None, code=None, comments=None, concentration=None):
         XSData.__init__(self, )
-    
-    
-        checkType("XSDataBioSaxsSample", "Constructor of XSDataBioSaxsSample", concentration, "XSDataDouble")
-        self._concentration = concentration
-        checkType("XSDataBioSaxsSample", "Constructor of XSDataBioSaxsSample", comments, "XSDataString")
-        self._comments = comments
-        checkType("XSDataBioSaxsSample", "Constructor of XSDataBioSaxsSample", code, "XSDataString")
-        self._code = code
-        checkType("XSDataBioSaxsSample", "Constructor of XSDataBioSaxsSample", temperature, "XSDataDouble")
-        self._temperature = temperature
+        if concentration is None:
+            self._concentration = None
+        elif concentration.__class__.__name__ == "XSDataDouble":
+            self._concentration = concentration
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample constructor argument 'concentration' is not XSDataDouble but %s" % self._concentration.__class__.__name__
+            raise BaseException(strMessage)
+        if comments is None:
+            self._comments = None
+        elif comments.__class__.__name__ == "XSDataString":
+            self._comments = comments
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample constructor argument 'comments' is not XSDataString but %s" % self._comments.__class__.__name__
+            raise BaseException(strMessage)
+        if code is None:
+            self._code = None
+        elif code.__class__.__name__ == "XSDataString":
+            self._code = code
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample constructor argument 'code' is not XSDataString but %s" % self._code.__class__.__name__
+            raise BaseException(strMessage)
+        if temperature is None:
+            self._temperature = None
+        elif temperature.__class__.__name__ == "XSDataDouble":
+            self._temperature = temperature
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample constructor argument 'temperature' is not XSDataDouble but %s" % self._temperature.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'concentration' attribute
     def getConcentration(self): return self._concentration
     def setConcentration(self, concentration):
-        checkType("XSDataBioSaxsSample", "setConcentration", concentration, "XSDataDouble")
-        self._concentration = concentration
+        if concentration is None:
+            self._concentration = None
+        elif concentration.__class__.__name__ == "XSDataDouble":
+            self._concentration = concentration
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample.setConcentration argument is not XSDataDouble but %s" % concentration.__class__.__name__
+            raise BaseException(strMessage)
     def delConcentration(self): self._concentration = None
-    # Properties
     concentration = property(getConcentration, setConcentration, delConcentration, "Property for concentration")
+    # Methods and properties for the 'comments' attribute
     def getComments(self): return self._comments
     def setComments(self, comments):
-        checkType("XSDataBioSaxsSample", "setComments", comments, "XSDataString")
-        self._comments = comments
+        if comments is None:
+            self._comments = None
+        elif comments.__class__.__name__ == "XSDataString":
+            self._comments = comments
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample.setComments argument is not XSDataString but %s" % comments.__class__.__name__
+            raise BaseException(strMessage)
     def delComments(self): self._comments = None
-    # Properties
     comments = property(getComments, setComments, delComments, "Property for comments")
+    # Methods and properties for the 'code' attribute
     def getCode(self): return self._code
     def setCode(self, code):
-        checkType("XSDataBioSaxsSample", "setCode", code, "XSDataString")
-        self._code = code
+        if code is None:
+            self._code = None
+        elif code.__class__.__name__ == "XSDataString":
+            self._code = code
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample.setCode argument is not XSDataString but %s" % code.__class__.__name__
+            raise BaseException(strMessage)
     def delCode(self): self._code = None
-    # Properties
     code = property(getCode, setCode, delCode, "Property for code")
+    # Methods and properties for the 'temperature' attribute
     def getTemperature(self): return self._temperature
     def setTemperature(self, temperature):
-        checkType("XSDataBioSaxsSample", "setTemperature", temperature, "XSDataDouble")
-        self._temperature = temperature
+        if temperature is None:
+            self._temperature = None
+        elif temperature.__class__.__name__ == "XSDataDouble":
+            self._temperature = temperature
+        else:
+            strMessage = "ERROR! XSDataBioSaxsSample.setTemperature argument is not XSDataDouble but %s" % temperature.__class__.__name__
+            raise BaseException(strMessage)
     def delTemperature(self): self._temperature = None
-    # Properties
     temperature = property(getTemperature, setTemperature, delTemperature, "Property for temperature")
     def export(self, outfile, level, name_='XSDataBioSaxsSample'):
         showIndent(outfile, level)
@@ -749,370 +959,771 @@ class XSDataBioSaxsSample(XSData):
     parseFile = staticmethod( parseFile )
 # end class XSDataBioSaxsSample
 
+
 class XSDataConfigGnom(XSData):
     def __init__(self, nextjob=None, rad56=None, coef=None, nreal=None, alpha=None, spot2=None, spot1=None, lw2=None, aw2=None, lh2=None, ah2=None, lw1=None, aw1=None, lh1=None, ah1=None, fwhm2=None, fwhm1=None, idet=None, deviat=None, kernel=None, lzrmax=None, lzrmin=None, rmax=None, rmin=None, jobtyp=None, lkern=None, ploerr=None, evaerr=None, plores=None, plonp=None, iscale=None, output=None, nskip2=None, nskip1=None, input2=None, input1=None, expert=None, forfac=None, printer=None):
         XSData.__init__(self, )
-    
-    
         if printer is None:
             self._printer = []
-        else:
-            checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", printer, "list")
+        elif printer.__class__.__name__ == "list":
             self._printer = printer
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", forfac, "XSDataFile")
-        self._forfac = forfac
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", expert, "XSDataFile")
-        self._expert = expert
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", input1, "XSDataFile")
-        self._input1 = input1
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", input2, "XSDataFile")
-        self._input2 = input2
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", nskip1, "XSDataInteger")
-        self._nskip1 = nskip1
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", nskip2, "XSDataInteger")
-        self._nskip2 = nskip2
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", output, "XSDataFile")
-        self._output = output
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", iscale, "XSDataInteger")
-        self._iscale = iscale
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", plonp, "XSDataBoolean")
-        self._plonp = plonp
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", plores, "XSDataBoolean")
-        self._plores = plores
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", evaerr, "XSDataBoolean")
-        self._evaerr = evaerr
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", ploerr, "XSDataBoolean")
-        self._ploerr = ploerr
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", lkern, "XSDataBoolean")
-        self._lkern = lkern
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", jobtyp, "XSDataInteger")
-        self._jobtyp = jobtyp
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", rmin, "XSDataDouble")
-        self._rmin = rmin
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", rmax, "XSDataDouble")
-        self._rmax = rmax
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", lzrmin, "XSDataBoolean")
-        self._lzrmin = lzrmin
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", lzrmax, "XSDataBoolean")
-        self._lzrmax = lzrmax
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", kernel, "XSDataFile")
-        self._kernel = kernel
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", deviat, "XSDataDouble")
-        self._deviat = deviat
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", idet, "XSDataInteger")
-        self._idet = idet
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", fwhm1, "XSDataDouble")
-        self._fwhm1 = fwhm1
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", fwhm2, "XSDataDouble")
-        self._fwhm2 = fwhm2
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", ah1, "XSDataDouble")
-        self._ah1 = ah1
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", lh1, "XSDataDouble")
-        self._lh1 = lh1
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", aw1, "XSDataDouble")
-        self._aw1 = aw1
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", lw1, "XSDataDouble")
-        self._lw1 = lw1
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", ah2, "XSDataDouble")
-        self._ah2 = ah2
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", lh2, "XSDataDouble")
-        self._lh2 = lh2
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", aw2, "XSDataDouble")
-        self._aw2 = aw2
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", lw2, "XSDataDouble")
-        self._lw2 = lw2
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", spot1, "XSDataFile")
-        self._spot1 = spot1
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", spot2, "XSDataFile")
-        self._spot2 = spot2
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", alpha, "XSDataDouble")
-        self._alpha = alpha
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", nreal, "XSDataInteger")
-        self._nreal = nreal
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", coef, "XSDataDouble")
-        self._coef = coef
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", rad56, "XSDataDouble")
-        self._rad56 = rad56
-        checkType("XSDataConfigGnom", "Constructor of XSDataConfigGnom", nextjob, "XSDataBoolean")
-        self._nextjob = nextjob
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'printer' is not list but %s" % self._printer.__class__.__name__
+            raise BaseException(strMessage)
+        if forfac is None:
+            self._forfac = None
+        elif forfac.__class__.__name__ == "XSDataFile":
+            self._forfac = forfac
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'forfac' is not XSDataFile but %s" % self._forfac.__class__.__name__
+            raise BaseException(strMessage)
+        if expert is None:
+            self._expert = None
+        elif expert.__class__.__name__ == "XSDataFile":
+            self._expert = expert
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'expert' is not XSDataFile but %s" % self._expert.__class__.__name__
+            raise BaseException(strMessage)
+        if input1 is None:
+            self._input1 = None
+        elif input1.__class__.__name__ == "XSDataFile":
+            self._input1 = input1
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'input1' is not XSDataFile but %s" % self._input1.__class__.__name__
+            raise BaseException(strMessage)
+        if input2 is None:
+            self._input2 = None
+        elif input2.__class__.__name__ == "XSDataFile":
+            self._input2 = input2
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'input2' is not XSDataFile but %s" % self._input2.__class__.__name__
+            raise BaseException(strMessage)
+        if nskip1 is None:
+            self._nskip1 = None
+        elif nskip1.__class__.__name__ == "XSDataInteger":
+            self._nskip1 = nskip1
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'nskip1' is not XSDataInteger but %s" % self._nskip1.__class__.__name__
+            raise BaseException(strMessage)
+        if nskip2 is None:
+            self._nskip2 = None
+        elif nskip2.__class__.__name__ == "XSDataInteger":
+            self._nskip2 = nskip2
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'nskip2' is not XSDataInteger but %s" % self._nskip2.__class__.__name__
+            raise BaseException(strMessage)
+        if output is None:
+            self._output = None
+        elif output.__class__.__name__ == "XSDataFile":
+            self._output = output
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'output' is not XSDataFile but %s" % self._output.__class__.__name__
+            raise BaseException(strMessage)
+        if iscale is None:
+            self._iscale = None
+        elif iscale.__class__.__name__ == "XSDataInteger":
+            self._iscale = iscale
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'iscale' is not XSDataInteger but %s" % self._iscale.__class__.__name__
+            raise BaseException(strMessage)
+        if plonp is None:
+            self._plonp = None
+        elif plonp.__class__.__name__ == "XSDataBoolean":
+            self._plonp = plonp
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'plonp' is not XSDataBoolean but %s" % self._plonp.__class__.__name__
+            raise BaseException(strMessage)
+        if plores is None:
+            self._plores = None
+        elif plores.__class__.__name__ == "XSDataBoolean":
+            self._plores = plores
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'plores' is not XSDataBoolean but %s" % self._plores.__class__.__name__
+            raise BaseException(strMessage)
+        if evaerr is None:
+            self._evaerr = None
+        elif evaerr.__class__.__name__ == "XSDataBoolean":
+            self._evaerr = evaerr
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'evaerr' is not XSDataBoolean but %s" % self._evaerr.__class__.__name__
+            raise BaseException(strMessage)
+        if ploerr is None:
+            self._ploerr = None
+        elif ploerr.__class__.__name__ == "XSDataBoolean":
+            self._ploerr = ploerr
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'ploerr' is not XSDataBoolean but %s" % self._ploerr.__class__.__name__
+            raise BaseException(strMessage)
+        if lkern is None:
+            self._lkern = None
+        elif lkern.__class__.__name__ == "XSDataBoolean":
+            self._lkern = lkern
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'lkern' is not XSDataBoolean but %s" % self._lkern.__class__.__name__
+            raise BaseException(strMessage)
+        if jobtyp is None:
+            self._jobtyp = None
+        elif jobtyp.__class__.__name__ == "XSDataInteger":
+            self._jobtyp = jobtyp
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'jobtyp' is not XSDataInteger but %s" % self._jobtyp.__class__.__name__
+            raise BaseException(strMessage)
+        if rmin is None:
+            self._rmin = None
+        elif rmin.__class__.__name__ == "XSDataDouble":
+            self._rmin = rmin
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'rmin' is not XSDataDouble but %s" % self._rmin.__class__.__name__
+            raise BaseException(strMessage)
+        if rmax is None:
+            self._rmax = None
+        elif rmax.__class__.__name__ == "XSDataDouble":
+            self._rmax = rmax
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'rmax' is not XSDataDouble but %s" % self._rmax.__class__.__name__
+            raise BaseException(strMessage)
+        if lzrmin is None:
+            self._lzrmin = None
+        elif lzrmin.__class__.__name__ == "XSDataBoolean":
+            self._lzrmin = lzrmin
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'lzrmin' is not XSDataBoolean but %s" % self._lzrmin.__class__.__name__
+            raise BaseException(strMessage)
+        if lzrmax is None:
+            self._lzrmax = None
+        elif lzrmax.__class__.__name__ == "XSDataBoolean":
+            self._lzrmax = lzrmax
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'lzrmax' is not XSDataBoolean but %s" % self._lzrmax.__class__.__name__
+            raise BaseException(strMessage)
+        if kernel is None:
+            self._kernel = None
+        elif kernel.__class__.__name__ == "XSDataFile":
+            self._kernel = kernel
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'kernel' is not XSDataFile but %s" % self._kernel.__class__.__name__
+            raise BaseException(strMessage)
+        if deviat is None:
+            self._deviat = None
+        elif deviat.__class__.__name__ == "XSDataDouble":
+            self._deviat = deviat
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'deviat' is not XSDataDouble but %s" % self._deviat.__class__.__name__
+            raise BaseException(strMessage)
+        if idet is None:
+            self._idet = None
+        elif idet.__class__.__name__ == "XSDataInteger":
+            self._idet = idet
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'idet' is not XSDataInteger but %s" % self._idet.__class__.__name__
+            raise BaseException(strMessage)
+        if fwhm1 is None:
+            self._fwhm1 = None
+        elif fwhm1.__class__.__name__ == "XSDataDouble":
+            self._fwhm1 = fwhm1
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'fwhm1' is not XSDataDouble but %s" % self._fwhm1.__class__.__name__
+            raise BaseException(strMessage)
+        if fwhm2 is None:
+            self._fwhm2 = None
+        elif fwhm2.__class__.__name__ == "XSDataDouble":
+            self._fwhm2 = fwhm2
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'fwhm2' is not XSDataDouble but %s" % self._fwhm2.__class__.__name__
+            raise BaseException(strMessage)
+        if ah1 is None:
+            self._ah1 = None
+        elif ah1.__class__.__name__ == "XSDataDouble":
+            self._ah1 = ah1
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'ah1' is not XSDataDouble but %s" % self._ah1.__class__.__name__
+            raise BaseException(strMessage)
+        if lh1 is None:
+            self._lh1 = None
+        elif lh1.__class__.__name__ == "XSDataDouble":
+            self._lh1 = lh1
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'lh1' is not XSDataDouble but %s" % self._lh1.__class__.__name__
+            raise BaseException(strMessage)
+        if aw1 is None:
+            self._aw1 = None
+        elif aw1.__class__.__name__ == "XSDataDouble":
+            self._aw1 = aw1
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'aw1' is not XSDataDouble but %s" % self._aw1.__class__.__name__
+            raise BaseException(strMessage)
+        if lw1 is None:
+            self._lw1 = None
+        elif lw1.__class__.__name__ == "XSDataDouble":
+            self._lw1 = lw1
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'lw1' is not XSDataDouble but %s" % self._lw1.__class__.__name__
+            raise BaseException(strMessage)
+        if ah2 is None:
+            self._ah2 = None
+        elif ah2.__class__.__name__ == "XSDataDouble":
+            self._ah2 = ah2
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'ah2' is not XSDataDouble but %s" % self._ah2.__class__.__name__
+            raise BaseException(strMessage)
+        if lh2 is None:
+            self._lh2 = None
+        elif lh2.__class__.__name__ == "XSDataDouble":
+            self._lh2 = lh2
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'lh2' is not XSDataDouble but %s" % self._lh2.__class__.__name__
+            raise BaseException(strMessage)
+        if aw2 is None:
+            self._aw2 = None
+        elif aw2.__class__.__name__ == "XSDataDouble":
+            self._aw2 = aw2
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'aw2' is not XSDataDouble but %s" % self._aw2.__class__.__name__
+            raise BaseException(strMessage)
+        if lw2 is None:
+            self._lw2 = None
+        elif lw2.__class__.__name__ == "XSDataDouble":
+            self._lw2 = lw2
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'lw2' is not XSDataDouble but %s" % self._lw2.__class__.__name__
+            raise BaseException(strMessage)
+        if spot1 is None:
+            self._spot1 = None
+        elif spot1.__class__.__name__ == "XSDataFile":
+            self._spot1 = spot1
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'spot1' is not XSDataFile but %s" % self._spot1.__class__.__name__
+            raise BaseException(strMessage)
+        if spot2 is None:
+            self._spot2 = None
+        elif spot2.__class__.__name__ == "XSDataFile":
+            self._spot2 = spot2
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'spot2' is not XSDataFile but %s" % self._spot2.__class__.__name__
+            raise BaseException(strMessage)
+        if alpha is None:
+            self._alpha = None
+        elif alpha.__class__.__name__ == "XSDataDouble":
+            self._alpha = alpha
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'alpha' is not XSDataDouble but %s" % self._alpha.__class__.__name__
+            raise BaseException(strMessage)
+        if nreal is None:
+            self._nreal = None
+        elif nreal.__class__.__name__ == "XSDataInteger":
+            self._nreal = nreal
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'nreal' is not XSDataInteger but %s" % self._nreal.__class__.__name__
+            raise BaseException(strMessage)
+        if coef is None:
+            self._coef = None
+        elif coef.__class__.__name__ == "XSDataDouble":
+            self._coef = coef
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'coef' is not XSDataDouble but %s" % self._coef.__class__.__name__
+            raise BaseException(strMessage)
+        if rad56 is None:
+            self._rad56 = None
+        elif rad56.__class__.__name__ == "XSDataDouble":
+            self._rad56 = rad56
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'rad56' is not XSDataDouble but %s" % self._rad56.__class__.__name__
+            raise BaseException(strMessage)
+        if nextjob is None:
+            self._nextjob = None
+        elif nextjob.__class__.__name__ == "XSDataBoolean":
+            self._nextjob = nextjob
+        else:
+            strMessage = "ERROR! XSDataConfigGnom constructor argument 'nextjob' is not XSDataBoolean but %s" % self._nextjob.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'printer' attribute
     def getPrinter(self): return self._printer
     def setPrinter(self, printer):
-        checkType("XSDataConfigGnom", "setPrinter", printer, "list")
-        self._printer = printer
+        if printer is None:
+            self._printer = []
+        elif printer.__class__.__name__ == "list":
+            self._printer = printer
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setPrinter argument is not list but %s" % printer.__class__.__name__
+            raise BaseException(strMessage)
     def delPrinter(self): self._printer = None
-    # Properties
     printer = property(getPrinter, setPrinter, delPrinter, "Property for printer")
     def addPrinter(self, value):
-        checkType("XSDataConfigGnom", "setPrinter", value, "XSDataString")
-        self._printer.append(value)
+        if value is None:
+            strMessage = "ERROR! XSDataConfigGnom.addPrinter argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataString":
+            self._printer.append(value)
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.addPrinter argument is not XSDataString but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
     def insertPrinter(self, index, value):
-        checkType("XSDataConfigGnom", "setPrinter", value, "XSDataString")
-        self._printer[index] = value
+        if index is None:
+            strMessage = "ERROR! XSDataConfigGnom.insertPrinter argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataConfigGnom.insertPrinter argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataString":
+            self._printer[index] = value
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.addPrinter argument is not XSDataString but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'forfac' attribute
     def getForfac(self): return self._forfac
     def setForfac(self, forfac):
-        checkType("XSDataConfigGnom", "setForfac", forfac, "XSDataFile")
-        self._forfac = forfac
+        if forfac is None:
+            self._forfac = None
+        elif forfac.__class__.__name__ == "XSDataFile":
+            self._forfac = forfac
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setForfac argument is not XSDataFile but %s" % forfac.__class__.__name__
+            raise BaseException(strMessage)
     def delForfac(self): self._forfac = None
-    # Properties
     forfac = property(getForfac, setForfac, delForfac, "Property for forfac")
+    # Methods and properties for the 'expert' attribute
     def getExpert(self): return self._expert
     def setExpert(self, expert):
-        checkType("XSDataConfigGnom", "setExpert", expert, "XSDataFile")
-        self._expert = expert
+        if expert is None:
+            self._expert = None
+        elif expert.__class__.__name__ == "XSDataFile":
+            self._expert = expert
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setExpert argument is not XSDataFile but %s" % expert.__class__.__name__
+            raise BaseException(strMessage)
     def delExpert(self): self._expert = None
-    # Properties
     expert = property(getExpert, setExpert, delExpert, "Property for expert")
+    # Methods and properties for the 'input1' attribute
     def getInput1(self): return self._input1
     def setInput1(self, input1):
-        checkType("XSDataConfigGnom", "setInput1", input1, "XSDataFile")
-        self._input1 = input1
+        if input1 is None:
+            self._input1 = None
+        elif input1.__class__.__name__ == "XSDataFile":
+            self._input1 = input1
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setInput1 argument is not XSDataFile but %s" % input1.__class__.__name__
+            raise BaseException(strMessage)
     def delInput1(self): self._input1 = None
-    # Properties
     input1 = property(getInput1, setInput1, delInput1, "Property for input1")
+    # Methods and properties for the 'input2' attribute
     def getInput2(self): return self._input2
     def setInput2(self, input2):
-        checkType("XSDataConfigGnom", "setInput2", input2, "XSDataFile")
-        self._input2 = input2
+        if input2 is None:
+            self._input2 = None
+        elif input2.__class__.__name__ == "XSDataFile":
+            self._input2 = input2
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setInput2 argument is not XSDataFile but %s" % input2.__class__.__name__
+            raise BaseException(strMessage)
     def delInput2(self): self._input2 = None
-    # Properties
     input2 = property(getInput2, setInput2, delInput2, "Property for input2")
+    # Methods and properties for the 'nskip1' attribute
     def getNskip1(self): return self._nskip1
     def setNskip1(self, nskip1):
-        checkType("XSDataConfigGnom", "setNskip1", nskip1, "XSDataInteger")
-        self._nskip1 = nskip1
+        if nskip1 is None:
+            self._nskip1 = None
+        elif nskip1.__class__.__name__ == "XSDataInteger":
+            self._nskip1 = nskip1
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setNskip1 argument is not XSDataInteger but %s" % nskip1.__class__.__name__
+            raise BaseException(strMessage)
     def delNskip1(self): self._nskip1 = None
-    # Properties
     nskip1 = property(getNskip1, setNskip1, delNskip1, "Property for nskip1")
+    # Methods and properties for the 'nskip2' attribute
     def getNskip2(self): return self._nskip2
     def setNskip2(self, nskip2):
-        checkType("XSDataConfigGnom", "setNskip2", nskip2, "XSDataInteger")
-        self._nskip2 = nskip2
+        if nskip2 is None:
+            self._nskip2 = None
+        elif nskip2.__class__.__name__ == "XSDataInteger":
+            self._nskip2 = nskip2
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setNskip2 argument is not XSDataInteger but %s" % nskip2.__class__.__name__
+            raise BaseException(strMessage)
     def delNskip2(self): self._nskip2 = None
-    # Properties
     nskip2 = property(getNskip2, setNskip2, delNskip2, "Property for nskip2")
+    # Methods and properties for the 'output' attribute
     def getOutput(self): return self._output
     def setOutput(self, output):
-        checkType("XSDataConfigGnom", "setOutput", output, "XSDataFile")
-        self._output = output
+        if output is None:
+            self._output = None
+        elif output.__class__.__name__ == "XSDataFile":
+            self._output = output
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setOutput argument is not XSDataFile but %s" % output.__class__.__name__
+            raise BaseException(strMessage)
     def delOutput(self): self._output = None
-    # Properties
     output = property(getOutput, setOutput, delOutput, "Property for output")
+    # Methods and properties for the 'iscale' attribute
     def getIscale(self): return self._iscale
     def setIscale(self, iscale):
-        checkType("XSDataConfigGnom", "setIscale", iscale, "XSDataInteger")
-        self._iscale = iscale
+        if iscale is None:
+            self._iscale = None
+        elif iscale.__class__.__name__ == "XSDataInteger":
+            self._iscale = iscale
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setIscale argument is not XSDataInteger but %s" % iscale.__class__.__name__
+            raise BaseException(strMessage)
     def delIscale(self): self._iscale = None
-    # Properties
     iscale = property(getIscale, setIscale, delIscale, "Property for iscale")
+    # Methods and properties for the 'plonp' attribute
     def getPlonp(self): return self._plonp
     def setPlonp(self, plonp):
-        checkType("XSDataConfigGnom", "setPlonp", plonp, "XSDataBoolean")
-        self._plonp = plonp
+        if plonp is None:
+            self._plonp = None
+        elif plonp.__class__.__name__ == "XSDataBoolean":
+            self._plonp = plonp
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setPlonp argument is not XSDataBoolean but %s" % plonp.__class__.__name__
+            raise BaseException(strMessage)
     def delPlonp(self): self._plonp = None
-    # Properties
     plonp = property(getPlonp, setPlonp, delPlonp, "Property for plonp")
+    # Methods and properties for the 'plores' attribute
     def getPlores(self): return self._plores
     def setPlores(self, plores):
-        checkType("XSDataConfigGnom", "setPlores", plores, "XSDataBoolean")
-        self._plores = plores
+        if plores is None:
+            self._plores = None
+        elif plores.__class__.__name__ == "XSDataBoolean":
+            self._plores = plores
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setPlores argument is not XSDataBoolean but %s" % plores.__class__.__name__
+            raise BaseException(strMessage)
     def delPlores(self): self._plores = None
-    # Properties
     plores = property(getPlores, setPlores, delPlores, "Property for plores")
+    # Methods and properties for the 'evaerr' attribute
     def getEvaerr(self): return self._evaerr
     def setEvaerr(self, evaerr):
-        checkType("XSDataConfigGnom", "setEvaerr", evaerr, "XSDataBoolean")
-        self._evaerr = evaerr
+        if evaerr is None:
+            self._evaerr = None
+        elif evaerr.__class__.__name__ == "XSDataBoolean":
+            self._evaerr = evaerr
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setEvaerr argument is not XSDataBoolean but %s" % evaerr.__class__.__name__
+            raise BaseException(strMessage)
     def delEvaerr(self): self._evaerr = None
-    # Properties
     evaerr = property(getEvaerr, setEvaerr, delEvaerr, "Property for evaerr")
+    # Methods and properties for the 'ploerr' attribute
     def getPloerr(self): return self._ploerr
     def setPloerr(self, ploerr):
-        checkType("XSDataConfigGnom", "setPloerr", ploerr, "XSDataBoolean")
-        self._ploerr = ploerr
+        if ploerr is None:
+            self._ploerr = None
+        elif ploerr.__class__.__name__ == "XSDataBoolean":
+            self._ploerr = ploerr
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setPloerr argument is not XSDataBoolean but %s" % ploerr.__class__.__name__
+            raise BaseException(strMessage)
     def delPloerr(self): self._ploerr = None
-    # Properties
     ploerr = property(getPloerr, setPloerr, delPloerr, "Property for ploerr")
+    # Methods and properties for the 'lkern' attribute
     def getLkern(self): return self._lkern
     def setLkern(self, lkern):
-        checkType("XSDataConfigGnom", "setLkern", lkern, "XSDataBoolean")
-        self._lkern = lkern
+        if lkern is None:
+            self._lkern = None
+        elif lkern.__class__.__name__ == "XSDataBoolean":
+            self._lkern = lkern
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setLkern argument is not XSDataBoolean but %s" % lkern.__class__.__name__
+            raise BaseException(strMessage)
     def delLkern(self): self._lkern = None
-    # Properties
     lkern = property(getLkern, setLkern, delLkern, "Property for lkern")
+    # Methods and properties for the 'jobtyp' attribute
     def getJobtyp(self): return self._jobtyp
     def setJobtyp(self, jobtyp):
-        checkType("XSDataConfigGnom", "setJobtyp", jobtyp, "XSDataInteger")
-        self._jobtyp = jobtyp
+        if jobtyp is None:
+            self._jobtyp = None
+        elif jobtyp.__class__.__name__ == "XSDataInteger":
+            self._jobtyp = jobtyp
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setJobtyp argument is not XSDataInteger but %s" % jobtyp.__class__.__name__
+            raise BaseException(strMessage)
     def delJobtyp(self): self._jobtyp = None
-    # Properties
     jobtyp = property(getJobtyp, setJobtyp, delJobtyp, "Property for jobtyp")
+    # Methods and properties for the 'rmin' attribute
     def getRmin(self): return self._rmin
     def setRmin(self, rmin):
-        checkType("XSDataConfigGnom", "setRmin", rmin, "XSDataDouble")
-        self._rmin = rmin
+        if rmin is None:
+            self._rmin = None
+        elif rmin.__class__.__name__ == "XSDataDouble":
+            self._rmin = rmin
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setRmin argument is not XSDataDouble but %s" % rmin.__class__.__name__
+            raise BaseException(strMessage)
     def delRmin(self): self._rmin = None
-    # Properties
     rmin = property(getRmin, setRmin, delRmin, "Property for rmin")
+    # Methods and properties for the 'rmax' attribute
     def getRmax(self): return self._rmax
     def setRmax(self, rmax):
-        checkType("XSDataConfigGnom", "setRmax", rmax, "XSDataDouble")
-        self._rmax = rmax
+        if rmax is None:
+            self._rmax = None
+        elif rmax.__class__.__name__ == "XSDataDouble":
+            self._rmax = rmax
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setRmax argument is not XSDataDouble but %s" % rmax.__class__.__name__
+            raise BaseException(strMessage)
     def delRmax(self): self._rmax = None
-    # Properties
     rmax = property(getRmax, setRmax, delRmax, "Property for rmax")
+    # Methods and properties for the 'lzrmin' attribute
     def getLzrmin(self): return self._lzrmin
     def setLzrmin(self, lzrmin):
-        checkType("XSDataConfigGnom", "setLzrmin", lzrmin, "XSDataBoolean")
-        self._lzrmin = lzrmin
+        if lzrmin is None:
+            self._lzrmin = None
+        elif lzrmin.__class__.__name__ == "XSDataBoolean":
+            self._lzrmin = lzrmin
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setLzrmin argument is not XSDataBoolean but %s" % lzrmin.__class__.__name__
+            raise BaseException(strMessage)
     def delLzrmin(self): self._lzrmin = None
-    # Properties
     lzrmin = property(getLzrmin, setLzrmin, delLzrmin, "Property for lzrmin")
+    # Methods and properties for the 'lzrmax' attribute
     def getLzrmax(self): return self._lzrmax
     def setLzrmax(self, lzrmax):
-        checkType("XSDataConfigGnom", "setLzrmax", lzrmax, "XSDataBoolean")
-        self._lzrmax = lzrmax
+        if lzrmax is None:
+            self._lzrmax = None
+        elif lzrmax.__class__.__name__ == "XSDataBoolean":
+            self._lzrmax = lzrmax
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setLzrmax argument is not XSDataBoolean but %s" % lzrmax.__class__.__name__
+            raise BaseException(strMessage)
     def delLzrmax(self): self._lzrmax = None
-    # Properties
     lzrmax = property(getLzrmax, setLzrmax, delLzrmax, "Property for lzrmax")
+    # Methods and properties for the 'kernel' attribute
     def getKernel(self): return self._kernel
     def setKernel(self, kernel):
-        checkType("XSDataConfigGnom", "setKernel", kernel, "XSDataFile")
-        self._kernel = kernel
+        if kernel is None:
+            self._kernel = None
+        elif kernel.__class__.__name__ == "XSDataFile":
+            self._kernel = kernel
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setKernel argument is not XSDataFile but %s" % kernel.__class__.__name__
+            raise BaseException(strMessage)
     def delKernel(self): self._kernel = None
-    # Properties
     kernel = property(getKernel, setKernel, delKernel, "Property for kernel")
+    # Methods and properties for the 'deviat' attribute
     def getDeviat(self): return self._deviat
     def setDeviat(self, deviat):
-        checkType("XSDataConfigGnom", "setDeviat", deviat, "XSDataDouble")
-        self._deviat = deviat
+        if deviat is None:
+            self._deviat = None
+        elif deviat.__class__.__name__ == "XSDataDouble":
+            self._deviat = deviat
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setDeviat argument is not XSDataDouble but %s" % deviat.__class__.__name__
+            raise BaseException(strMessage)
     def delDeviat(self): self._deviat = None
-    # Properties
     deviat = property(getDeviat, setDeviat, delDeviat, "Property for deviat")
+    # Methods and properties for the 'idet' attribute
     def getIdet(self): return self._idet
     def setIdet(self, idet):
-        checkType("XSDataConfigGnom", "setIdet", idet, "XSDataInteger")
-        self._idet = idet
+        if idet is None:
+            self._idet = None
+        elif idet.__class__.__name__ == "XSDataInteger":
+            self._idet = idet
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setIdet argument is not XSDataInteger but %s" % idet.__class__.__name__
+            raise BaseException(strMessage)
     def delIdet(self): self._idet = None
-    # Properties
     idet = property(getIdet, setIdet, delIdet, "Property for idet")
+    # Methods and properties for the 'fwhm1' attribute
     def getFwhm1(self): return self._fwhm1
     def setFwhm1(self, fwhm1):
-        checkType("XSDataConfigGnom", "setFwhm1", fwhm1, "XSDataDouble")
-        self._fwhm1 = fwhm1
+        if fwhm1 is None:
+            self._fwhm1 = None
+        elif fwhm1.__class__.__name__ == "XSDataDouble":
+            self._fwhm1 = fwhm1
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setFwhm1 argument is not XSDataDouble but %s" % fwhm1.__class__.__name__
+            raise BaseException(strMessage)
     def delFwhm1(self): self._fwhm1 = None
-    # Properties
     fwhm1 = property(getFwhm1, setFwhm1, delFwhm1, "Property for fwhm1")
+    # Methods and properties for the 'fwhm2' attribute
     def getFwhm2(self): return self._fwhm2
     def setFwhm2(self, fwhm2):
-        checkType("XSDataConfigGnom", "setFwhm2", fwhm2, "XSDataDouble")
-        self._fwhm2 = fwhm2
+        if fwhm2 is None:
+            self._fwhm2 = None
+        elif fwhm2.__class__.__name__ == "XSDataDouble":
+            self._fwhm2 = fwhm2
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setFwhm2 argument is not XSDataDouble but %s" % fwhm2.__class__.__name__
+            raise BaseException(strMessage)
     def delFwhm2(self): self._fwhm2 = None
-    # Properties
     fwhm2 = property(getFwhm2, setFwhm2, delFwhm2, "Property for fwhm2")
+    # Methods and properties for the 'ah1' attribute
     def getAh1(self): return self._ah1
     def setAh1(self, ah1):
-        checkType("XSDataConfigGnom", "setAh1", ah1, "XSDataDouble")
-        self._ah1 = ah1
+        if ah1 is None:
+            self._ah1 = None
+        elif ah1.__class__.__name__ == "XSDataDouble":
+            self._ah1 = ah1
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setAh1 argument is not XSDataDouble but %s" % ah1.__class__.__name__
+            raise BaseException(strMessage)
     def delAh1(self): self._ah1 = None
-    # Properties
     ah1 = property(getAh1, setAh1, delAh1, "Property for ah1")
+    # Methods and properties for the 'lh1' attribute
     def getLh1(self): return self._lh1
     def setLh1(self, lh1):
-        checkType("XSDataConfigGnom", "setLh1", lh1, "XSDataDouble")
-        self._lh1 = lh1
+        if lh1 is None:
+            self._lh1 = None
+        elif lh1.__class__.__name__ == "XSDataDouble":
+            self._lh1 = lh1
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setLh1 argument is not XSDataDouble but %s" % lh1.__class__.__name__
+            raise BaseException(strMessage)
     def delLh1(self): self._lh1 = None
-    # Properties
     lh1 = property(getLh1, setLh1, delLh1, "Property for lh1")
+    # Methods and properties for the 'aw1' attribute
     def getAw1(self): return self._aw1
     def setAw1(self, aw1):
-        checkType("XSDataConfigGnom", "setAw1", aw1, "XSDataDouble")
-        self._aw1 = aw1
+        if aw1 is None:
+            self._aw1 = None
+        elif aw1.__class__.__name__ == "XSDataDouble":
+            self._aw1 = aw1
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setAw1 argument is not XSDataDouble but %s" % aw1.__class__.__name__
+            raise BaseException(strMessage)
     def delAw1(self): self._aw1 = None
-    # Properties
     aw1 = property(getAw1, setAw1, delAw1, "Property for aw1")
+    # Methods and properties for the 'lw1' attribute
     def getLw1(self): return self._lw1
     def setLw1(self, lw1):
-        checkType("XSDataConfigGnom", "setLw1", lw1, "XSDataDouble")
-        self._lw1 = lw1
+        if lw1 is None:
+            self._lw1 = None
+        elif lw1.__class__.__name__ == "XSDataDouble":
+            self._lw1 = lw1
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setLw1 argument is not XSDataDouble but %s" % lw1.__class__.__name__
+            raise BaseException(strMessage)
     def delLw1(self): self._lw1 = None
-    # Properties
     lw1 = property(getLw1, setLw1, delLw1, "Property for lw1")
+    # Methods and properties for the 'ah2' attribute
     def getAh2(self): return self._ah2
     def setAh2(self, ah2):
-        checkType("XSDataConfigGnom", "setAh2", ah2, "XSDataDouble")
-        self._ah2 = ah2
+        if ah2 is None:
+            self._ah2 = None
+        elif ah2.__class__.__name__ == "XSDataDouble":
+            self._ah2 = ah2
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setAh2 argument is not XSDataDouble but %s" % ah2.__class__.__name__
+            raise BaseException(strMessage)
     def delAh2(self): self._ah2 = None
-    # Properties
     ah2 = property(getAh2, setAh2, delAh2, "Property for ah2")
+    # Methods and properties for the 'lh2' attribute
     def getLh2(self): return self._lh2
     def setLh2(self, lh2):
-        checkType("XSDataConfigGnom", "setLh2", lh2, "XSDataDouble")
-        self._lh2 = lh2
+        if lh2 is None:
+            self._lh2 = None
+        elif lh2.__class__.__name__ == "XSDataDouble":
+            self._lh2 = lh2
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setLh2 argument is not XSDataDouble but %s" % lh2.__class__.__name__
+            raise BaseException(strMessage)
     def delLh2(self): self._lh2 = None
-    # Properties
     lh2 = property(getLh2, setLh2, delLh2, "Property for lh2")
+    # Methods and properties for the 'aw2' attribute
     def getAw2(self): return self._aw2
     def setAw2(self, aw2):
-        checkType("XSDataConfigGnom", "setAw2", aw2, "XSDataDouble")
-        self._aw2 = aw2
+        if aw2 is None:
+            self._aw2 = None
+        elif aw2.__class__.__name__ == "XSDataDouble":
+            self._aw2 = aw2
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setAw2 argument is not XSDataDouble but %s" % aw2.__class__.__name__
+            raise BaseException(strMessage)
     def delAw2(self): self._aw2 = None
-    # Properties
     aw2 = property(getAw2, setAw2, delAw2, "Property for aw2")
+    # Methods and properties for the 'lw2' attribute
     def getLw2(self): return self._lw2
     def setLw2(self, lw2):
-        checkType("XSDataConfigGnom", "setLw2", lw2, "XSDataDouble")
-        self._lw2 = lw2
+        if lw2 is None:
+            self._lw2 = None
+        elif lw2.__class__.__name__ == "XSDataDouble":
+            self._lw2 = lw2
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setLw2 argument is not XSDataDouble but %s" % lw2.__class__.__name__
+            raise BaseException(strMessage)
     def delLw2(self): self._lw2 = None
-    # Properties
     lw2 = property(getLw2, setLw2, delLw2, "Property for lw2")
+    # Methods and properties for the 'spot1' attribute
     def getSpot1(self): return self._spot1
     def setSpot1(self, spot1):
-        checkType("XSDataConfigGnom", "setSpot1", spot1, "XSDataFile")
-        self._spot1 = spot1
+        if spot1 is None:
+            self._spot1 = None
+        elif spot1.__class__.__name__ == "XSDataFile":
+            self._spot1 = spot1
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setSpot1 argument is not XSDataFile but %s" % spot1.__class__.__name__
+            raise BaseException(strMessage)
     def delSpot1(self): self._spot1 = None
-    # Properties
     spot1 = property(getSpot1, setSpot1, delSpot1, "Property for spot1")
+    # Methods and properties for the 'spot2' attribute
     def getSpot2(self): return self._spot2
     def setSpot2(self, spot2):
-        checkType("XSDataConfigGnom", "setSpot2", spot2, "XSDataFile")
-        self._spot2 = spot2
+        if spot2 is None:
+            self._spot2 = None
+        elif spot2.__class__.__name__ == "XSDataFile":
+            self._spot2 = spot2
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setSpot2 argument is not XSDataFile but %s" % spot2.__class__.__name__
+            raise BaseException(strMessage)
     def delSpot2(self): self._spot2 = None
-    # Properties
     spot2 = property(getSpot2, setSpot2, delSpot2, "Property for spot2")
+    # Methods and properties for the 'alpha' attribute
     def getAlpha(self): return self._alpha
     def setAlpha(self, alpha):
-        checkType("XSDataConfigGnom", "setAlpha", alpha, "XSDataDouble")
-        self._alpha = alpha
+        if alpha is None:
+            self._alpha = None
+        elif alpha.__class__.__name__ == "XSDataDouble":
+            self._alpha = alpha
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setAlpha argument is not XSDataDouble but %s" % alpha.__class__.__name__
+            raise BaseException(strMessage)
     def delAlpha(self): self._alpha = None
-    # Properties
     alpha = property(getAlpha, setAlpha, delAlpha, "Property for alpha")
+    # Methods and properties for the 'nreal' attribute
     def getNreal(self): return self._nreal
     def setNreal(self, nreal):
-        checkType("XSDataConfigGnom", "setNreal", nreal, "XSDataInteger")
-        self._nreal = nreal
+        if nreal is None:
+            self._nreal = None
+        elif nreal.__class__.__name__ == "XSDataInteger":
+            self._nreal = nreal
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setNreal argument is not XSDataInteger but %s" % nreal.__class__.__name__
+            raise BaseException(strMessage)
     def delNreal(self): self._nreal = None
-    # Properties
     nreal = property(getNreal, setNreal, delNreal, "Property for nreal")
+    # Methods and properties for the 'coef' attribute
     def getCoef(self): return self._coef
     def setCoef(self, coef):
-        checkType("XSDataConfigGnom", "setCoef", coef, "XSDataDouble")
-        self._coef = coef
+        if coef is None:
+            self._coef = None
+        elif coef.__class__.__name__ == "XSDataDouble":
+            self._coef = coef
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setCoef argument is not XSDataDouble but %s" % coef.__class__.__name__
+            raise BaseException(strMessage)
     def delCoef(self): self._coef = None
-    # Properties
     coef = property(getCoef, setCoef, delCoef, "Property for coef")
+    # Methods and properties for the 'rad56' attribute
     def getRad56(self): return self._rad56
     def setRad56(self, rad56):
-        checkType("XSDataConfigGnom", "setRad56", rad56, "XSDataDouble")
-        self._rad56 = rad56
+        if rad56 is None:
+            self._rad56 = None
+        elif rad56.__class__.__name__ == "XSDataDouble":
+            self._rad56 = rad56
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setRad56 argument is not XSDataDouble but %s" % rad56.__class__.__name__
+            raise BaseException(strMessage)
     def delRad56(self): self._rad56 = None
-    # Properties
     rad56 = property(getRad56, setRad56, delRad56, "Property for rad56")
+    # Methods and properties for the 'nextjob' attribute
     def getNextjob(self): return self._nextjob
     def setNextjob(self, nextjob):
-        checkType("XSDataConfigGnom", "setNextjob", nextjob, "XSDataBoolean")
-        self._nextjob = nextjob
+        if nextjob is None:
+            self._nextjob = None
+        elif nextjob.__class__.__name__ == "XSDataBoolean":
+            self._nextjob = nextjob
+        else:
+            strMessage = "ERROR! XSDataConfigGnom.setNextjob argument is not XSDataBoolean but %s" % nextjob.__class__.__name__
+            raise BaseException(strMessage)
     def delNextjob(self): self._nextjob = None
-    # Properties
     nextjob = property(getNextjob, setNextjob, delNextjob, "Property for nextjob")
     def export(self, outfile, level, name_='XSDataConfigGnom'):
         showIndent(outfile, level)
@@ -1458,29 +2069,50 @@ class XSDataConfigGnom(XSData):
     parseFile = staticmethod( parseFile )
 # end class XSDataConfigGnom
 
+
 class XSDataFileSeries(XSData):
     def __init__(self, files=None):
         XSData.__init__(self, )
-    
-    
         if files is None:
             self._files = []
-        else:
-            checkType("XSDataFileSeries", "Constructor of XSDataFileSeries", files, "list")
+        elif files.__class__.__name__ == "list":
             self._files = files
+        else:
+            strMessage = "ERROR! XSDataFileSeries constructor argument 'files' is not list but %s" % self._files.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'files' attribute
     def getFiles(self): return self._files
     def setFiles(self, files):
-        checkType("XSDataFileSeries", "setFiles", files, "list")
-        self._files = files
+        if files is None:
+            self._files = []
+        elif files.__class__.__name__ == "list":
+            self._files = files
+        else:
+            strMessage = "ERROR! XSDataFileSeries.setFiles argument is not list but %s" % files.__class__.__name__
+            raise BaseException(strMessage)
     def delFiles(self): self._files = None
-    # Properties
     files = property(getFiles, setFiles, delFiles, "Property for files")
     def addFiles(self, value):
-        checkType("XSDataFileSeries", "setFiles", value, "XSDataFile")
-        self._files.append(value)
+        if value is None:
+            strMessage = "ERROR! XSDataFileSeries.addFiles argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._files.append(value)
+        else:
+            strMessage = "ERROR! XSDataFileSeries.addFiles argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
     def insertFiles(self, index, value):
-        checkType("XSDataFileSeries", "setFiles", value, "XSDataFile")
-        self._files[index] = value
+        if index is None:
+            strMessage = "ERROR! XSDataFileSeries.insertFiles argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataFileSeries.insertFiles argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._files[index] = value
+        else:
+            strMessage = "ERROR! XSDataFileSeries.addFiles argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
     def export(self, outfile, level, name_='XSDataFileSeries'):
         showIndent(outfile, level)
         outfile.write(unicode('<%s>\n' % name_))
@@ -1547,55 +2179,104 @@ class XSDataFileSeries(XSData):
     parseFile = staticmethod( parseFile )
 # end class XSDataFileSeries
 
+
 class XSDataGnom(XSData):
     def __init__(self, total=None, dmax=None, rgGnom=None, rgGuinier=None, gnomFile=None):
         XSData.__init__(self, )
-    
-    
-        checkType("XSDataGnom", "Constructor of XSDataGnom", gnomFile, "XSDataFile")
-        self._gnomFile = gnomFile
-        checkType("XSDataGnom", "Constructor of XSDataGnom", rgGuinier, "XSDataLength")
-        self._rgGuinier = rgGuinier
-        checkType("XSDataGnom", "Constructor of XSDataGnom", rgGnom, "XSDataLength")
-        self._rgGnom = rgGnom
-        checkType("XSDataGnom", "Constructor of XSDataGnom", dmax, "XSDataLength")
-        self._dmax = dmax
-        checkType("XSDataGnom", "Constructor of XSDataGnom", total, "XSDataDouble")
-        self._total = total
+        if gnomFile is None:
+            self._gnomFile = None
+        elif gnomFile.__class__.__name__ == "XSDataFile":
+            self._gnomFile = gnomFile
+        else:
+            strMessage = "ERROR! XSDataGnom constructor argument 'gnomFile' is not XSDataFile but %s" % self._gnomFile.__class__.__name__
+            raise BaseException(strMessage)
+        if rgGuinier is None:
+            self._rgGuinier = None
+        elif rgGuinier.__class__.__name__ == "XSDataLength":
+            self._rgGuinier = rgGuinier
+        else:
+            strMessage = "ERROR! XSDataGnom constructor argument 'rgGuinier' is not XSDataLength but %s" % self._rgGuinier.__class__.__name__
+            raise BaseException(strMessage)
+        if rgGnom is None:
+            self._rgGnom = None
+        elif rgGnom.__class__.__name__ == "XSDataLength":
+            self._rgGnom = rgGnom
+        else:
+            strMessage = "ERROR! XSDataGnom constructor argument 'rgGnom' is not XSDataLength but %s" % self._rgGnom.__class__.__name__
+            raise BaseException(strMessage)
+        if dmax is None:
+            self._dmax = None
+        elif dmax.__class__.__name__ == "XSDataLength":
+            self._dmax = dmax
+        else:
+            strMessage = "ERROR! XSDataGnom constructor argument 'dmax' is not XSDataLength but %s" % self._dmax.__class__.__name__
+            raise BaseException(strMessage)
+        if total is None:
+            self._total = None
+        elif total.__class__.__name__ == "XSDataDouble":
+            self._total = total
+        else:
+            strMessage = "ERROR! XSDataGnom constructor argument 'total' is not XSDataDouble but %s" % self._total.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'gnomFile' attribute
     def getGnomFile(self): return self._gnomFile
     def setGnomFile(self, gnomFile):
-        checkType("XSDataGnom", "setGnomFile", gnomFile, "XSDataFile")
-        self._gnomFile = gnomFile
+        if gnomFile is None:
+            self._gnomFile = None
+        elif gnomFile.__class__.__name__ == "XSDataFile":
+            self._gnomFile = gnomFile
+        else:
+            strMessage = "ERROR! XSDataGnom.setGnomFile argument is not XSDataFile but %s" % gnomFile.__class__.__name__
+            raise BaseException(strMessage)
     def delGnomFile(self): self._gnomFile = None
-    # Properties
     gnomFile = property(getGnomFile, setGnomFile, delGnomFile, "Property for gnomFile")
+    # Methods and properties for the 'rgGuinier' attribute
     def getRgGuinier(self): return self._rgGuinier
     def setRgGuinier(self, rgGuinier):
-        checkType("XSDataGnom", "setRgGuinier", rgGuinier, "XSDataLength")
-        self._rgGuinier = rgGuinier
+        if rgGuinier is None:
+            self._rgGuinier = None
+        elif rgGuinier.__class__.__name__ == "XSDataLength":
+            self._rgGuinier = rgGuinier
+        else:
+            strMessage = "ERROR! XSDataGnom.setRgGuinier argument is not XSDataLength but %s" % rgGuinier.__class__.__name__
+            raise BaseException(strMessage)
     def delRgGuinier(self): self._rgGuinier = None
-    # Properties
     rgGuinier = property(getRgGuinier, setRgGuinier, delRgGuinier, "Property for rgGuinier")
+    # Methods and properties for the 'rgGnom' attribute
     def getRgGnom(self): return self._rgGnom
     def setRgGnom(self, rgGnom):
-        checkType("XSDataGnom", "setRgGnom", rgGnom, "XSDataLength")
-        self._rgGnom = rgGnom
+        if rgGnom is None:
+            self._rgGnom = None
+        elif rgGnom.__class__.__name__ == "XSDataLength":
+            self._rgGnom = rgGnom
+        else:
+            strMessage = "ERROR! XSDataGnom.setRgGnom argument is not XSDataLength but %s" % rgGnom.__class__.__name__
+            raise BaseException(strMessage)
     def delRgGnom(self): self._rgGnom = None
-    # Properties
     rgGnom = property(getRgGnom, setRgGnom, delRgGnom, "Property for rgGnom")
+    # Methods and properties for the 'dmax' attribute
     def getDmax(self): return self._dmax
     def setDmax(self, dmax):
-        checkType("XSDataGnom", "setDmax", dmax, "XSDataLength")
-        self._dmax = dmax
+        if dmax is None:
+            self._dmax = None
+        elif dmax.__class__.__name__ == "XSDataLength":
+            self._dmax = dmax
+        else:
+            strMessage = "ERROR! XSDataGnom.setDmax argument is not XSDataLength but %s" % dmax.__class__.__name__
+            raise BaseException(strMessage)
     def delDmax(self): self._dmax = None
-    # Properties
     dmax = property(getDmax, setDmax, delDmax, "Property for dmax")
+    # Methods and properties for the 'total' attribute
     def getTotal(self): return self._total
     def setTotal(self, total):
-        checkType("XSDataGnom", "setTotal", total, "XSDataDouble")
-        self._total = total
+        if total is None:
+            self._total = None
+        elif total.__class__.__name__ == "XSDataDouble":
+            self._total = total
+        else:
+            strMessage = "ERROR! XSDataGnom.setTotal argument is not XSDataDouble but %s" % total.__class__.__name__
+            raise BaseException(strMessage)
     def delTotal(self): self._total = None
-    # Properties
     total = property(getTotal, setTotal, delTotal, "Property for total")
     def export(self, outfile, level, name_='XSDataGnom'):
         showIndent(outfile, level)
@@ -1699,38 +2380,67 @@ class XSDataGnom(XSData):
     parseFile = staticmethod( parseFile )
 # end class XSDataGnom
 
+
 class XSDataSaxsSample(XSData):
     """Everything describing the sample"""
     def __init__(self, code=None, comment=None, name=None):
         XSData.__init__(self, )
-    
-    
-        checkType("XSDataSaxsSample", "Constructor of XSDataSaxsSample", name, "XSDataString")
-        self._name = name
-        checkType("XSDataSaxsSample", "Constructor of XSDataSaxsSample", comment, "XSDataString")
-        self._comment = comment
-        checkType("XSDataSaxsSample", "Constructor of XSDataSaxsSample", code, "XSDataString")
-        self._code = code
+        if name is None:
+            self._name = None
+        elif name.__class__.__name__ == "XSDataString":
+            self._name = name
+        else:
+            strMessage = "ERROR! XSDataSaxsSample constructor argument 'name' is not XSDataString but %s" % self._name.__class__.__name__
+            raise BaseException(strMessage)
+        if comment is None:
+            self._comment = None
+        elif comment.__class__.__name__ == "XSDataString":
+            self._comment = comment
+        else:
+            strMessage = "ERROR! XSDataSaxsSample constructor argument 'comment' is not XSDataString but %s" % self._comment.__class__.__name__
+            raise BaseException(strMessage)
+        if code is None:
+            self._code = None
+        elif code.__class__.__name__ == "XSDataString":
+            self._code = code
+        else:
+            strMessage = "ERROR! XSDataSaxsSample constructor argument 'code' is not XSDataString but %s" % self._code.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'name' attribute
     def getName(self): return self._name
     def setName(self, name):
-        checkType("XSDataSaxsSample", "setName", name, "XSDataString")
-        self._name = name
+        if name is None:
+            self._name = None
+        elif name.__class__.__name__ == "XSDataString":
+            self._name = name
+        else:
+            strMessage = "ERROR! XSDataSaxsSample.setName argument is not XSDataString but %s" % name.__class__.__name__
+            raise BaseException(strMessage)
     def delName(self): self._name = None
-    # Properties
     name = property(getName, setName, delName, "Property for name")
+    # Methods and properties for the 'comment' attribute
     def getComment(self): return self._comment
     def setComment(self, comment):
-        checkType("XSDataSaxsSample", "setComment", comment, "XSDataString")
-        self._comment = comment
+        if comment is None:
+            self._comment = None
+        elif comment.__class__.__name__ == "XSDataString":
+            self._comment = comment
+        else:
+            strMessage = "ERROR! XSDataSaxsSample.setComment argument is not XSDataString but %s" % comment.__class__.__name__
+            raise BaseException(strMessage)
     def delComment(self): self._comment = None
-    # Properties
     comment = property(getComment, setComment, delComment, "Property for comment")
+    # Methods and properties for the 'code' attribute
     def getCode(self): return self._code
     def setCode(self, code):
-        checkType("XSDataSaxsSample", "setCode", code, "XSDataString")
-        self._code = code
+        if code is None:
+            self._code = None
+        elif code.__class__.__name__ == "XSDataString":
+            self._code = code
+        else:
+            strMessage = "ERROR! XSDataSaxsSample.setCode argument is not XSDataString but %s" % code.__class__.__name__
+            raise BaseException(strMessage)
     def delCode(self): self._code = None
-    # Properties
     code = property(getCode, setCode, delCode, "Property for code")
     def export(self, outfile, level, name_='XSDataSaxsSample'):
         showIndent(outfile, level)
@@ -1810,29 +2520,48 @@ class XSDataSaxsSample(XSData):
     parseFile = staticmethod( parseFile )
 # end class XSDataSaxsSample
 
+
 class XSDataSaxsSeries(XSData):
     """Basical"""
     def __init__(self, concentration=None, curve=None):
         XSData.__init__(self, )
-    
-    
-        checkType("XSDataSaxsSeries", "Constructor of XSDataSaxsSeries", curve, "XSDataFile")
-        self._curve = curve
-        checkType("XSDataSaxsSeries", "Constructor of XSDataSaxsSeries", concentration, "XSDataDouble")
-        self._concentration = concentration
+        if curve is None:
+            self._curve = None
+        elif curve.__class__.__name__ == "XSDataFile":
+            self._curve = curve
+        else:
+            strMessage = "ERROR! XSDataSaxsSeries constructor argument 'curve' is not XSDataFile but %s" % self._curve.__class__.__name__
+            raise BaseException(strMessage)
+        if concentration is None:
+            self._concentration = None
+        elif concentration.__class__.__name__ == "XSDataDouble":
+            self._concentration = concentration
+        else:
+            strMessage = "ERROR! XSDataSaxsSeries constructor argument 'concentration' is not XSDataDouble but %s" % self._concentration.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'curve' attribute
     def getCurve(self): return self._curve
     def setCurve(self, curve):
-        checkType("XSDataSaxsSeries", "setCurve", curve, "XSDataFile")
-        self._curve = curve
+        if curve is None:
+            self._curve = None
+        elif curve.__class__.__name__ == "XSDataFile":
+            self._curve = curve
+        else:
+            strMessage = "ERROR! XSDataSaxsSeries.setCurve argument is not XSDataFile but %s" % curve.__class__.__name__
+            raise BaseException(strMessage)
     def delCurve(self): self._curve = None
-    # Properties
     curve = property(getCurve, setCurve, delCurve, "Property for curve")
+    # Methods and properties for the 'concentration' attribute
     def getConcentration(self): return self._concentration
     def setConcentration(self, concentration):
-        checkType("XSDataSaxsSeries", "setConcentration", concentration, "XSDataDouble")
-        self._concentration = concentration
+        if concentration is None:
+            self._concentration = None
+        elif concentration.__class__.__name__ == "XSDataDouble":
+            self._concentration = concentration
+        else:
+            strMessage = "ERROR! XSDataSaxsSeries.setConcentration argument is not XSDataDouble but %s" % concentration.__class__.__name__
+            raise BaseException(strMessage)
     def delConcentration(self): self._concentration = None
-    # Properties
     concentration = property(getConcentration, setConcentration, delConcentration, "Property for concentration")
     def export(self, outfile, level, name_='XSDataSaxsSeries'):
         showIndent(outfile, level)
@@ -1907,64 +2636,125 @@ class XSDataSaxsSeries(XSData):
     parseFile = staticmethod( parseFile )
 # end class XSDataSaxsSeries
 
+
 class XSDataInputAutoRg(XSDataInput):
     def __init__(self, configuration=None, maxSminRg=None, maxSmaxRg=None, minIntervalLength=None, inputCurve=None, sample=None):
         XSDataInput.__init__(self, configuration)
-    
-    
-        checkType("XSDataInputAutoRg", "Constructor of XSDataInputAutoRg", sample, "XSDataSaxsSample")
-        self._sample = sample
+        if sample is None:
+            self._sample = None
+        elif sample.__class__.__name__ == "XSDataSaxsSample":
+            self._sample = sample
+        else:
+            strMessage = "ERROR! XSDataInputAutoRg constructor argument 'sample' is not XSDataSaxsSample but %s" % self._sample.__class__.__name__
+            raise BaseException(strMessage)
         if inputCurve is None:
             self._inputCurve = []
-        else:
-            checkType("XSDataInputAutoRg", "Constructor of XSDataInputAutoRg", inputCurve, "list")
+        elif inputCurve.__class__.__name__ == "list":
             self._inputCurve = inputCurve
-        checkType("XSDataInputAutoRg", "Constructor of XSDataInputAutoRg", minIntervalLength, "XSDataInteger")
-        self._minIntervalLength = minIntervalLength
-        checkType("XSDataInputAutoRg", "Constructor of XSDataInputAutoRg", maxSmaxRg, "XSDataDouble")
-        self._maxSmaxRg = maxSmaxRg
-        checkType("XSDataInputAutoRg", "Constructor of XSDataInputAutoRg", maxSminRg, "XSDataDouble")
-        self._maxSminRg = maxSminRg
+        else:
+            strMessage = "ERROR! XSDataInputAutoRg constructor argument 'inputCurve' is not list but %s" % self._inputCurve.__class__.__name__
+            raise BaseException(strMessage)
+        if minIntervalLength is None:
+            self._minIntervalLength = None
+        elif minIntervalLength.__class__.__name__ == "XSDataInteger":
+            self._minIntervalLength = minIntervalLength
+        else:
+            strMessage = "ERROR! XSDataInputAutoRg constructor argument 'minIntervalLength' is not XSDataInteger but %s" % self._minIntervalLength.__class__.__name__
+            raise BaseException(strMessage)
+        if maxSmaxRg is None:
+            self._maxSmaxRg = None
+        elif maxSmaxRg.__class__.__name__ == "XSDataDouble":
+            self._maxSmaxRg = maxSmaxRg
+        else:
+            strMessage = "ERROR! XSDataInputAutoRg constructor argument 'maxSmaxRg' is not XSDataDouble but %s" % self._maxSmaxRg.__class__.__name__
+            raise BaseException(strMessage)
+        if maxSminRg is None:
+            self._maxSminRg = None
+        elif maxSminRg.__class__.__name__ == "XSDataDouble":
+            self._maxSminRg = maxSminRg
+        else:
+            strMessage = "ERROR! XSDataInputAutoRg constructor argument 'maxSminRg' is not XSDataDouble but %s" % self._maxSminRg.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'sample' attribute
     def getSample(self): return self._sample
     def setSample(self, sample):
-        checkType("XSDataInputAutoRg", "setSample", sample, "XSDataSaxsSample")
-        self._sample = sample
+        if sample is None:
+            self._sample = None
+        elif sample.__class__.__name__ == "XSDataSaxsSample":
+            self._sample = sample
+        else:
+            strMessage = "ERROR! XSDataInputAutoRg.setSample argument is not XSDataSaxsSample but %s" % sample.__class__.__name__
+            raise BaseException(strMessage)
     def delSample(self): self._sample = None
-    # Properties
     sample = property(getSample, setSample, delSample, "Property for sample")
+    # Methods and properties for the 'inputCurve' attribute
     def getInputCurve(self): return self._inputCurve
     def setInputCurve(self, inputCurve):
-        checkType("XSDataInputAutoRg", "setInputCurve", inputCurve, "list")
-        self._inputCurve = inputCurve
+        if inputCurve is None:
+            self._inputCurve = []
+        elif inputCurve.__class__.__name__ == "list":
+            self._inputCurve = inputCurve
+        else:
+            strMessage = "ERROR! XSDataInputAutoRg.setInputCurve argument is not list but %s" % inputCurve.__class__.__name__
+            raise BaseException(strMessage)
     def delInputCurve(self): self._inputCurve = None
-    # Properties
     inputCurve = property(getInputCurve, setInputCurve, delInputCurve, "Property for inputCurve")
     def addInputCurve(self, value):
-        checkType("XSDataInputAutoRg", "setInputCurve", value, "XSDataFile")
-        self._inputCurve.append(value)
+        if value is None:
+            strMessage = "ERROR! XSDataInputAutoRg.addInputCurve argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._inputCurve.append(value)
+        else:
+            strMessage = "ERROR! XSDataInputAutoRg.addInputCurve argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
     def insertInputCurve(self, index, value):
-        checkType("XSDataInputAutoRg", "setInputCurve", value, "XSDataFile")
-        self._inputCurve[index] = value
+        if index is None:
+            strMessage = "ERROR! XSDataInputAutoRg.insertInputCurve argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataInputAutoRg.insertInputCurve argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._inputCurve[index] = value
+        else:
+            strMessage = "ERROR! XSDataInputAutoRg.addInputCurve argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'minIntervalLength' attribute
     def getMinIntervalLength(self): return self._minIntervalLength
     def setMinIntervalLength(self, minIntervalLength):
-        checkType("XSDataInputAutoRg", "setMinIntervalLength", minIntervalLength, "XSDataInteger")
-        self._minIntervalLength = minIntervalLength
+        if minIntervalLength is None:
+            self._minIntervalLength = None
+        elif minIntervalLength.__class__.__name__ == "XSDataInteger":
+            self._minIntervalLength = minIntervalLength
+        else:
+            strMessage = "ERROR! XSDataInputAutoRg.setMinIntervalLength argument is not XSDataInteger but %s" % minIntervalLength.__class__.__name__
+            raise BaseException(strMessage)
     def delMinIntervalLength(self): self._minIntervalLength = None
-    # Properties
     minIntervalLength = property(getMinIntervalLength, setMinIntervalLength, delMinIntervalLength, "Property for minIntervalLength")
+    # Methods and properties for the 'maxSmaxRg' attribute
     def getMaxSmaxRg(self): return self._maxSmaxRg
     def setMaxSmaxRg(self, maxSmaxRg):
-        checkType("XSDataInputAutoRg", "setMaxSmaxRg", maxSmaxRg, "XSDataDouble")
-        self._maxSmaxRg = maxSmaxRg
+        if maxSmaxRg is None:
+            self._maxSmaxRg = None
+        elif maxSmaxRg.__class__.__name__ == "XSDataDouble":
+            self._maxSmaxRg = maxSmaxRg
+        else:
+            strMessage = "ERROR! XSDataInputAutoRg.setMaxSmaxRg argument is not XSDataDouble but %s" % maxSmaxRg.__class__.__name__
+            raise BaseException(strMessage)
     def delMaxSmaxRg(self): self._maxSmaxRg = None
-    # Properties
     maxSmaxRg = property(getMaxSmaxRg, setMaxSmaxRg, delMaxSmaxRg, "Property for maxSmaxRg")
+    # Methods and properties for the 'maxSminRg' attribute
     def getMaxSminRg(self): return self._maxSminRg
     def setMaxSminRg(self, maxSminRg):
-        checkType("XSDataInputAutoRg", "setMaxSminRg", maxSminRg, "XSDataDouble")
-        self._maxSminRg = maxSminRg
+        if maxSminRg is None:
+            self._maxSminRg = None
+        elif maxSminRg.__class__.__name__ == "XSDataDouble":
+            self._maxSminRg = maxSminRg
+        else:
+            strMessage = "ERROR! XSDataInputAutoRg.setMaxSminRg argument is not XSDataDouble but %s" % maxSminRg.__class__.__name__
+            raise BaseException(strMessage)
     def delMaxSminRg(self): self._maxSminRg = None
-    # Properties
     maxSminRg = property(getMaxSminRg, setMaxSminRg, delMaxSminRg, "Property for maxSminRg")
     def export(self, outfile, level, name_='XSDataInputAutoRg'):
         showIndent(outfile, level)
@@ -2060,47 +2850,88 @@ class XSDataInputAutoRg(XSDataInput):
     parseFile = staticmethod( parseFile )
 # end class XSDataInputAutoRg
 
+
 class XSDataInputAutoSub(XSDataInput):
     """Autosub works by default in sampleCurve directory """
     def __init__(self, configuration=None, subtractedCurve=None, sampleCurve=None, buffers=None):
         XSDataInput.__init__(self, configuration)
-    
-    
         if buffers is None:
             self._buffers = []
-        else:
-            checkType("XSDataInputAutoSub", "Constructor of XSDataInputAutoSub", buffers, "list")
+        elif buffers.__class__.__name__ == "list":
             self._buffers = buffers
-        checkType("XSDataInputAutoSub", "Constructor of XSDataInputAutoSub", sampleCurve, "XSDataFile")
-        self._sampleCurve = sampleCurve
-        checkType("XSDataInputAutoSub", "Constructor of XSDataInputAutoSub", subtractedCurve, "XSDataFile")
-        self._subtractedCurve = subtractedCurve
+        else:
+            strMessage = "ERROR! XSDataInputAutoSub constructor argument 'buffers' is not list but %s" % self._buffers.__class__.__name__
+            raise BaseException(strMessage)
+        if sampleCurve is None:
+            self._sampleCurve = None
+        elif sampleCurve.__class__.__name__ == "XSDataFile":
+            self._sampleCurve = sampleCurve
+        else:
+            strMessage = "ERROR! XSDataInputAutoSub constructor argument 'sampleCurve' is not XSDataFile but %s" % self._sampleCurve.__class__.__name__
+            raise BaseException(strMessage)
+        if subtractedCurve is None:
+            self._subtractedCurve = None
+        elif subtractedCurve.__class__.__name__ == "XSDataFile":
+            self._subtractedCurve = subtractedCurve
+        else:
+            strMessage = "ERROR! XSDataInputAutoSub constructor argument 'subtractedCurve' is not XSDataFile but %s" % self._subtractedCurve.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'buffers' attribute
     def getBuffers(self): return self._buffers
     def setBuffers(self, buffers):
-        checkType("XSDataInputAutoSub", "setBuffers", buffers, "list")
-        self._buffers = buffers
+        if buffers is None:
+            self._buffers = []
+        elif buffers.__class__.__name__ == "list":
+            self._buffers = buffers
+        else:
+            strMessage = "ERROR! XSDataInputAutoSub.setBuffers argument is not list but %s" % buffers.__class__.__name__
+            raise BaseException(strMessage)
     def delBuffers(self): self._buffers = None
-    # Properties
     buffers = property(getBuffers, setBuffers, delBuffers, "Property for buffers")
     def addBuffers(self, value):
-        checkType("XSDataInputAutoSub", "setBuffers", value, "XSDataFile")
-        self._buffers.append(value)
+        if value is None:
+            strMessage = "ERROR! XSDataInputAutoSub.addBuffers argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._buffers.append(value)
+        else:
+            strMessage = "ERROR! XSDataInputAutoSub.addBuffers argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
     def insertBuffers(self, index, value):
-        checkType("XSDataInputAutoSub", "setBuffers", value, "XSDataFile")
-        self._buffers[index] = value
+        if index is None:
+            strMessage = "ERROR! XSDataInputAutoSub.insertBuffers argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataInputAutoSub.insertBuffers argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._buffers[index] = value
+        else:
+            strMessage = "ERROR! XSDataInputAutoSub.addBuffers argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'sampleCurve' attribute
     def getSampleCurve(self): return self._sampleCurve
     def setSampleCurve(self, sampleCurve):
-        checkType("XSDataInputAutoSub", "setSampleCurve", sampleCurve, "XSDataFile")
-        self._sampleCurve = sampleCurve
+        if sampleCurve is None:
+            self._sampleCurve = None
+        elif sampleCurve.__class__.__name__ == "XSDataFile":
+            self._sampleCurve = sampleCurve
+        else:
+            strMessage = "ERROR! XSDataInputAutoSub.setSampleCurve argument is not XSDataFile but %s" % sampleCurve.__class__.__name__
+            raise BaseException(strMessage)
     def delSampleCurve(self): self._sampleCurve = None
-    # Properties
     sampleCurve = property(getSampleCurve, setSampleCurve, delSampleCurve, "Property for sampleCurve")
+    # Methods and properties for the 'subtractedCurve' attribute
     def getSubtractedCurve(self): return self._subtractedCurve
     def setSubtractedCurve(self, subtractedCurve):
-        checkType("XSDataInputAutoSub", "setSubtractedCurve", subtractedCurve, "XSDataFile")
-        self._subtractedCurve = subtractedCurve
+        if subtractedCurve is None:
+            self._subtractedCurve = None
+        elif subtractedCurve.__class__.__name__ == "XSDataFile":
+            self._subtractedCurve = subtractedCurve
+        else:
+            strMessage = "ERROR! XSDataInputAutoSub.setSubtractedCurve argument is not XSDataFile but %s" % subtractedCurve.__class__.__name__
+            raise BaseException(strMessage)
     def delSubtractedCurve(self): self._subtractedCurve = None
-    # Properties
     subtractedCurve = property(getSubtractedCurve, setSubtractedCurve, delSubtractedCurve, "Property for subtractedCurve")
     def export(self, outfile, level, name_='XSDataInputAutoSub'):
         showIndent(outfile, level)
@@ -2184,46 +3015,87 @@ class XSDataInputAutoSub(XSDataInput):
     parseFile = staticmethod( parseFile )
 # end class XSDataInputAutoSub
 
+
 class XSDataInputDamaver(XSDataInput):
     def __init__(self, configuration=None, automatic=None, symmetry=None, pdbInputFiles=None):
         XSDataInput.__init__(self, configuration)
-    
-    
         if pdbInputFiles is None:
             self._pdbInputFiles = []
-        else:
-            checkType("XSDataInputDamaver", "Constructor of XSDataInputDamaver", pdbInputFiles, "list")
+        elif pdbInputFiles.__class__.__name__ == "list":
             self._pdbInputFiles = pdbInputFiles
-        checkType("XSDataInputDamaver", "Constructor of XSDataInputDamaver", symmetry, "XSDataString")
-        self._symmetry = symmetry
-        checkType("XSDataInputDamaver", "Constructor of XSDataInputDamaver", automatic, "XSDataBoolean")
-        self._automatic = automatic
+        else:
+            strMessage = "ERROR! XSDataInputDamaver constructor argument 'pdbInputFiles' is not list but %s" % self._pdbInputFiles.__class__.__name__
+            raise BaseException(strMessage)
+        if symmetry is None:
+            self._symmetry = None
+        elif symmetry.__class__.__name__ == "XSDataString":
+            self._symmetry = symmetry
+        else:
+            strMessage = "ERROR! XSDataInputDamaver constructor argument 'symmetry' is not XSDataString but %s" % self._symmetry.__class__.__name__
+            raise BaseException(strMessage)
+        if automatic is None:
+            self._automatic = None
+        elif automatic.__class__.__name__ == "XSDataBoolean":
+            self._automatic = automatic
+        else:
+            strMessage = "ERROR! XSDataInputDamaver constructor argument 'automatic' is not XSDataBoolean but %s" % self._automatic.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'pdbInputFiles' attribute
     def getPdbInputFiles(self): return self._pdbInputFiles
     def setPdbInputFiles(self, pdbInputFiles):
-        checkType("XSDataInputDamaver", "setPdbInputFiles", pdbInputFiles, "list")
-        self._pdbInputFiles = pdbInputFiles
+        if pdbInputFiles is None:
+            self._pdbInputFiles = []
+        elif pdbInputFiles.__class__.__name__ == "list":
+            self._pdbInputFiles = pdbInputFiles
+        else:
+            strMessage = "ERROR! XSDataInputDamaver.setPdbInputFiles argument is not list but %s" % pdbInputFiles.__class__.__name__
+            raise BaseException(strMessage)
     def delPdbInputFiles(self): self._pdbInputFiles = None
-    # Properties
     pdbInputFiles = property(getPdbInputFiles, setPdbInputFiles, delPdbInputFiles, "Property for pdbInputFiles")
     def addPdbInputFiles(self, value):
-        checkType("XSDataInputDamaver", "setPdbInputFiles", value, "XSDataFile")
-        self._pdbInputFiles.append(value)
+        if value is None:
+            strMessage = "ERROR! XSDataInputDamaver.addPdbInputFiles argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._pdbInputFiles.append(value)
+        else:
+            strMessage = "ERROR! XSDataInputDamaver.addPdbInputFiles argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
     def insertPdbInputFiles(self, index, value):
-        checkType("XSDataInputDamaver", "setPdbInputFiles", value, "XSDataFile")
-        self._pdbInputFiles[index] = value
+        if index is None:
+            strMessage = "ERROR! XSDataInputDamaver.insertPdbInputFiles argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataInputDamaver.insertPdbInputFiles argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._pdbInputFiles[index] = value
+        else:
+            strMessage = "ERROR! XSDataInputDamaver.addPdbInputFiles argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'symmetry' attribute
     def getSymmetry(self): return self._symmetry
     def setSymmetry(self, symmetry):
-        checkType("XSDataInputDamaver", "setSymmetry", symmetry, "XSDataString")
-        self._symmetry = symmetry
+        if symmetry is None:
+            self._symmetry = None
+        elif symmetry.__class__.__name__ == "XSDataString":
+            self._symmetry = symmetry
+        else:
+            strMessage = "ERROR! XSDataInputDamaver.setSymmetry argument is not XSDataString but %s" % symmetry.__class__.__name__
+            raise BaseException(strMessage)
     def delSymmetry(self): self._symmetry = None
-    # Properties
     symmetry = property(getSymmetry, setSymmetry, delSymmetry, "Property for symmetry")
+    # Methods and properties for the 'automatic' attribute
     def getAutomatic(self): return self._automatic
     def setAutomatic(self, automatic):
-        checkType("XSDataInputDamaver", "setAutomatic", automatic, "XSDataBoolean")
-        self._automatic = automatic
+        if automatic is None:
+            self._automatic = None
+        elif automatic.__class__.__name__ == "XSDataBoolean":
+            self._automatic = automatic
+        else:
+            strMessage = "ERROR! XSDataInputDamaver.setAutomatic argument is not XSDataBoolean but %s" % automatic.__class__.__name__
+            raise BaseException(strMessage)
     def delAutomatic(self): self._automatic = None
-    # Properties
     automatic = property(getAutomatic, setAutomatic, delAutomatic, "Property for automatic")
     def export(self, outfile, level, name_='XSDataInputDamaver'):
         showIndent(outfile, level)
@@ -2305,19 +3177,28 @@ class XSDataInputDamaver(XSDataInput):
     parseFile = staticmethod( parseFile )
 # end class XSDataInputDamaver
 
+
 class XSDataInputDamfilt(XSDataInput):
     def __init__(self, configuration=None, inputPdbFile=None):
         XSDataInput.__init__(self, configuration)
-    
-    
-        checkType("XSDataInputDamfilt", "Constructor of XSDataInputDamfilt", inputPdbFile, "XSDataFile")
-        self._inputPdbFile = inputPdbFile
+        if inputPdbFile is None:
+            self._inputPdbFile = None
+        elif inputPdbFile.__class__.__name__ == "XSDataFile":
+            self._inputPdbFile = inputPdbFile
+        else:
+            strMessage = "ERROR! XSDataInputDamfilt constructor argument 'inputPdbFile' is not XSDataFile but %s" % self._inputPdbFile.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'inputPdbFile' attribute
     def getInputPdbFile(self): return self._inputPdbFile
     def setInputPdbFile(self, inputPdbFile):
-        checkType("XSDataInputDamfilt", "setInputPdbFile", inputPdbFile, "XSDataFile")
-        self._inputPdbFile = inputPdbFile
+        if inputPdbFile is None:
+            self._inputPdbFile = None
+        elif inputPdbFile.__class__.__name__ == "XSDataFile":
+            self._inputPdbFile = inputPdbFile
+        else:
+            strMessage = "ERROR! XSDataInputDamfilt.setInputPdbFile argument is not XSDataFile but %s" % inputPdbFile.__class__.__name__
+            raise BaseException(strMessage)
     def delInputPdbFile(self): self._inputPdbFile = None
-    # Properties
     inputPdbFile = property(getInputPdbFile, setInputPdbFile, delInputPdbFile, "Property for inputPdbFile")
     def export(self, outfile, level, name_='XSDataInputDamfilt'):
         showIndent(outfile, level)
@@ -2385,73 +3266,142 @@ class XSDataInputDamfilt(XSDataInput):
     parseFile = staticmethod( parseFile )
 # end class XSDataInputDamfilt
 
+
 class XSDataInputDammif(XSDataInput):
     def __init__(self, configuration=None, constant=None, chained=None, mode=None, symmetry=None, unit=None, gnomOutputFile=None, expectedParticleShape=None):
         XSDataInput.__init__(self, configuration)
-    
-    
-        checkType("XSDataInputDammif", "Constructor of XSDataInputDammif", expectedParticleShape, "XSDataInteger")
-        self._expectedParticleShape = expectedParticleShape
-        checkType("XSDataInputDammif", "Constructor of XSDataInputDammif", gnomOutputFile, "XSDataFile")
-        self._gnomOutputFile = gnomOutputFile
-        checkType("XSDataInputDammif", "Constructor of XSDataInputDammif", unit, "XSDataString")
-        self._unit = unit
-        checkType("XSDataInputDammif", "Constructor of XSDataInputDammif", symmetry, "XSDataString")
-        self._symmetry = symmetry
-        checkType("XSDataInputDammif", "Constructor of XSDataInputDammif", mode, "XSDataString")
-        self._mode = mode
-        checkType("XSDataInputDammif", "Constructor of XSDataInputDammif", chained, "XSDataBoolean")
-        self._chained = chained
-        checkType("XSDataInputDammif", "Constructor of XSDataInputDammif", constant, "XSDataDouble")
-        self._constant = constant
+        if expectedParticleShape is None:
+            self._expectedParticleShape = None
+        elif expectedParticleShape.__class__.__name__ == "XSDataInteger":
+            self._expectedParticleShape = expectedParticleShape
+        else:
+            strMessage = "ERROR! XSDataInputDammif constructor argument 'expectedParticleShape' is not XSDataInteger but %s" % self._expectedParticleShape.__class__.__name__
+            raise BaseException(strMessage)
+        if gnomOutputFile is None:
+            self._gnomOutputFile = None
+        elif gnomOutputFile.__class__.__name__ == "XSDataFile":
+            self._gnomOutputFile = gnomOutputFile
+        else:
+            strMessage = "ERROR! XSDataInputDammif constructor argument 'gnomOutputFile' is not XSDataFile but %s" % self._gnomOutputFile.__class__.__name__
+            raise BaseException(strMessage)
+        if unit is None:
+            self._unit = None
+        elif unit.__class__.__name__ == "XSDataString":
+            self._unit = unit
+        else:
+            strMessage = "ERROR! XSDataInputDammif constructor argument 'unit' is not XSDataString but %s" % self._unit.__class__.__name__
+            raise BaseException(strMessage)
+        if symmetry is None:
+            self._symmetry = None
+        elif symmetry.__class__.__name__ == "XSDataString":
+            self._symmetry = symmetry
+        else:
+            strMessage = "ERROR! XSDataInputDammif constructor argument 'symmetry' is not XSDataString but %s" % self._symmetry.__class__.__name__
+            raise BaseException(strMessage)
+        if mode is None:
+            self._mode = None
+        elif mode.__class__.__name__ == "XSDataString":
+            self._mode = mode
+        else:
+            strMessage = "ERROR! XSDataInputDammif constructor argument 'mode' is not XSDataString but %s" % self._mode.__class__.__name__
+            raise BaseException(strMessage)
+        if chained is None:
+            self._chained = None
+        elif chained.__class__.__name__ == "XSDataBoolean":
+            self._chained = chained
+        else:
+            strMessage = "ERROR! XSDataInputDammif constructor argument 'chained' is not XSDataBoolean but %s" % self._chained.__class__.__name__
+            raise BaseException(strMessage)
+        if constant is None:
+            self._constant = None
+        elif constant.__class__.__name__ == "XSDataDouble":
+            self._constant = constant
+        else:
+            strMessage = "ERROR! XSDataInputDammif constructor argument 'constant' is not XSDataDouble but %s" % self._constant.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'expectedParticleShape' attribute
     def getExpectedParticleShape(self): return self._expectedParticleShape
     def setExpectedParticleShape(self, expectedParticleShape):
-        checkType("XSDataInputDammif", "setExpectedParticleShape", expectedParticleShape, "XSDataInteger")
-        self._expectedParticleShape = expectedParticleShape
+        if expectedParticleShape is None:
+            self._expectedParticleShape = None
+        elif expectedParticleShape.__class__.__name__ == "XSDataInteger":
+            self._expectedParticleShape = expectedParticleShape
+        else:
+            strMessage = "ERROR! XSDataInputDammif.setExpectedParticleShape argument is not XSDataInteger but %s" % expectedParticleShape.__class__.__name__
+            raise BaseException(strMessage)
     def delExpectedParticleShape(self): self._expectedParticleShape = None
-    # Properties
     expectedParticleShape = property(getExpectedParticleShape, setExpectedParticleShape, delExpectedParticleShape, "Property for expectedParticleShape")
+    # Methods and properties for the 'gnomOutputFile' attribute
     def getGnomOutputFile(self): return self._gnomOutputFile
     def setGnomOutputFile(self, gnomOutputFile):
-        checkType("XSDataInputDammif", "setGnomOutputFile", gnomOutputFile, "XSDataFile")
-        self._gnomOutputFile = gnomOutputFile
+        if gnomOutputFile is None:
+            self._gnomOutputFile = None
+        elif gnomOutputFile.__class__.__name__ == "XSDataFile":
+            self._gnomOutputFile = gnomOutputFile
+        else:
+            strMessage = "ERROR! XSDataInputDammif.setGnomOutputFile argument is not XSDataFile but %s" % gnomOutputFile.__class__.__name__
+            raise BaseException(strMessage)
     def delGnomOutputFile(self): self._gnomOutputFile = None
-    # Properties
     gnomOutputFile = property(getGnomOutputFile, setGnomOutputFile, delGnomOutputFile, "Property for gnomOutputFile")
+    # Methods and properties for the 'unit' attribute
     def getUnit(self): return self._unit
     def setUnit(self, unit):
-        checkType("XSDataInputDammif", "setUnit", unit, "XSDataString")
-        self._unit = unit
+        if unit is None:
+            self._unit = None
+        elif unit.__class__.__name__ == "XSDataString":
+            self._unit = unit
+        else:
+            strMessage = "ERROR! XSDataInputDammif.setUnit argument is not XSDataString but %s" % unit.__class__.__name__
+            raise BaseException(strMessage)
     def delUnit(self): self._unit = None
-    # Properties
     unit = property(getUnit, setUnit, delUnit, "Property for unit")
+    # Methods and properties for the 'symmetry' attribute
     def getSymmetry(self): return self._symmetry
     def setSymmetry(self, symmetry):
-        checkType("XSDataInputDammif", "setSymmetry", symmetry, "XSDataString")
-        self._symmetry = symmetry
+        if symmetry is None:
+            self._symmetry = None
+        elif symmetry.__class__.__name__ == "XSDataString":
+            self._symmetry = symmetry
+        else:
+            strMessage = "ERROR! XSDataInputDammif.setSymmetry argument is not XSDataString but %s" % symmetry.__class__.__name__
+            raise BaseException(strMessage)
     def delSymmetry(self): self._symmetry = None
-    # Properties
     symmetry = property(getSymmetry, setSymmetry, delSymmetry, "Property for symmetry")
+    # Methods and properties for the 'mode' attribute
     def getMode(self): return self._mode
     def setMode(self, mode):
-        checkType("XSDataInputDammif", "setMode", mode, "XSDataString")
-        self._mode = mode
+        if mode is None:
+            self._mode = None
+        elif mode.__class__.__name__ == "XSDataString":
+            self._mode = mode
+        else:
+            strMessage = "ERROR! XSDataInputDammif.setMode argument is not XSDataString but %s" % mode.__class__.__name__
+            raise BaseException(strMessage)
     def delMode(self): self._mode = None
-    # Properties
     mode = property(getMode, setMode, delMode, "Property for mode")
+    # Methods and properties for the 'chained' attribute
     def getChained(self): return self._chained
     def setChained(self, chained):
-        checkType("XSDataInputDammif", "setChained", chained, "XSDataBoolean")
-        self._chained = chained
+        if chained is None:
+            self._chained = None
+        elif chained.__class__.__name__ == "XSDataBoolean":
+            self._chained = chained
+        else:
+            strMessage = "ERROR! XSDataInputDammif.setChained argument is not XSDataBoolean but %s" % chained.__class__.__name__
+            raise BaseException(strMessage)
     def delChained(self): self._chained = None
-    # Properties
     chained = property(getChained, setChained, delChained, "Property for chained")
+    # Methods and properties for the 'constant' attribute
     def getConstant(self): return self._constant
     def setConstant(self, constant):
-        checkType("XSDataInputDammif", "setConstant", constant, "XSDataDouble")
-        self._constant = constant
+        if constant is None:
+            self._constant = None
+        elif constant.__class__.__name__ == "XSDataDouble":
+            self._constant = constant
+        else:
+            strMessage = "ERROR! XSDataInputDammif.setConstant argument is not XSDataDouble but %s" % constant.__class__.__name__
+            raise BaseException(strMessage)
     def delConstant(self): self._constant = None
-    # Properties
     constant = property(getConstant, setConstant, delConstant, "Property for constant")
     def export(self, outfile, level, name_='XSDataInputDammif'):
         showIndent(outfile, level)
@@ -2565,64 +3515,123 @@ class XSDataInputDammif(XSDataInput):
     parseFile = staticmethod( parseFile )
 # end class XSDataInputDammif
 
+
 class XSDataInputDammin(XSDataInput):
     def __init__(self, configuration=None, mode=None, symmetry=None, pdbInputFile=None, initialDummyAtomModel=None, gnomOutputFile=None, expectedParticleShape=None):
         XSDataInput.__init__(self, configuration)
-    
-    
-        checkType("XSDataInputDammin", "Constructor of XSDataInputDammin", expectedParticleShape, "XSDataInteger")
-        self._expectedParticleShape = expectedParticleShape
-        checkType("XSDataInputDammin", "Constructor of XSDataInputDammin", gnomOutputFile, "XSDataFile")
-        self._gnomOutputFile = gnomOutputFile
-        checkType("XSDataInputDammin", "Constructor of XSDataInputDammin", initialDummyAtomModel, "XSDataInteger")
-        self._initialDummyAtomModel = initialDummyAtomModel
-        checkType("XSDataInputDammin", "Constructor of XSDataInputDammin", pdbInputFile, "XSDataFile")
-        self._pdbInputFile = pdbInputFile
-        checkType("XSDataInputDammin", "Constructor of XSDataInputDammin", symmetry, "XSDataString")
-        self._symmetry = symmetry
-        checkType("XSDataInputDammin", "Constructor of XSDataInputDammin", mode, "XSDataString")
-        self._mode = mode
+        if expectedParticleShape is None:
+            self._expectedParticleShape = None
+        elif expectedParticleShape.__class__.__name__ == "XSDataInteger":
+            self._expectedParticleShape = expectedParticleShape
+        else:
+            strMessage = "ERROR! XSDataInputDammin constructor argument 'expectedParticleShape' is not XSDataInteger but %s" % self._expectedParticleShape.__class__.__name__
+            raise BaseException(strMessage)
+        if gnomOutputFile is None:
+            self._gnomOutputFile = None
+        elif gnomOutputFile.__class__.__name__ == "XSDataFile":
+            self._gnomOutputFile = gnomOutputFile
+        else:
+            strMessage = "ERROR! XSDataInputDammin constructor argument 'gnomOutputFile' is not XSDataFile but %s" % self._gnomOutputFile.__class__.__name__
+            raise BaseException(strMessage)
+        if initialDummyAtomModel is None:
+            self._initialDummyAtomModel = None
+        elif initialDummyAtomModel.__class__.__name__ == "XSDataInteger":
+            self._initialDummyAtomModel = initialDummyAtomModel
+        else:
+            strMessage = "ERROR! XSDataInputDammin constructor argument 'initialDummyAtomModel' is not XSDataInteger but %s" % self._initialDummyAtomModel.__class__.__name__
+            raise BaseException(strMessage)
+        if pdbInputFile is None:
+            self._pdbInputFile = None
+        elif pdbInputFile.__class__.__name__ == "XSDataFile":
+            self._pdbInputFile = pdbInputFile
+        else:
+            strMessage = "ERROR! XSDataInputDammin constructor argument 'pdbInputFile' is not XSDataFile but %s" % self._pdbInputFile.__class__.__name__
+            raise BaseException(strMessage)
+        if symmetry is None:
+            self._symmetry = None
+        elif symmetry.__class__.__name__ == "XSDataString":
+            self._symmetry = symmetry
+        else:
+            strMessage = "ERROR! XSDataInputDammin constructor argument 'symmetry' is not XSDataString but %s" % self._symmetry.__class__.__name__
+            raise BaseException(strMessage)
+        if mode is None:
+            self._mode = None
+        elif mode.__class__.__name__ == "XSDataString":
+            self._mode = mode
+        else:
+            strMessage = "ERROR! XSDataInputDammin constructor argument 'mode' is not XSDataString but %s" % self._mode.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'expectedParticleShape' attribute
     def getExpectedParticleShape(self): return self._expectedParticleShape
     def setExpectedParticleShape(self, expectedParticleShape):
-        checkType("XSDataInputDammin", "setExpectedParticleShape", expectedParticleShape, "XSDataInteger")
-        self._expectedParticleShape = expectedParticleShape
+        if expectedParticleShape is None:
+            self._expectedParticleShape = None
+        elif expectedParticleShape.__class__.__name__ == "XSDataInteger":
+            self._expectedParticleShape = expectedParticleShape
+        else:
+            strMessage = "ERROR! XSDataInputDammin.setExpectedParticleShape argument is not XSDataInteger but %s" % expectedParticleShape.__class__.__name__
+            raise BaseException(strMessage)
     def delExpectedParticleShape(self): self._expectedParticleShape = None
-    # Properties
     expectedParticleShape = property(getExpectedParticleShape, setExpectedParticleShape, delExpectedParticleShape, "Property for expectedParticleShape")
+    # Methods and properties for the 'gnomOutputFile' attribute
     def getGnomOutputFile(self): return self._gnomOutputFile
     def setGnomOutputFile(self, gnomOutputFile):
-        checkType("XSDataInputDammin", "setGnomOutputFile", gnomOutputFile, "XSDataFile")
-        self._gnomOutputFile = gnomOutputFile
+        if gnomOutputFile is None:
+            self._gnomOutputFile = None
+        elif gnomOutputFile.__class__.__name__ == "XSDataFile":
+            self._gnomOutputFile = gnomOutputFile
+        else:
+            strMessage = "ERROR! XSDataInputDammin.setGnomOutputFile argument is not XSDataFile but %s" % gnomOutputFile.__class__.__name__
+            raise BaseException(strMessage)
     def delGnomOutputFile(self): self._gnomOutputFile = None
-    # Properties
     gnomOutputFile = property(getGnomOutputFile, setGnomOutputFile, delGnomOutputFile, "Property for gnomOutputFile")
+    # Methods and properties for the 'initialDummyAtomModel' attribute
     def getInitialDummyAtomModel(self): return self._initialDummyAtomModel
     def setInitialDummyAtomModel(self, initialDummyAtomModel):
-        checkType("XSDataInputDammin", "setInitialDummyAtomModel", initialDummyAtomModel, "XSDataInteger")
-        self._initialDummyAtomModel = initialDummyAtomModel
+        if initialDummyAtomModel is None:
+            self._initialDummyAtomModel = None
+        elif initialDummyAtomModel.__class__.__name__ == "XSDataInteger":
+            self._initialDummyAtomModel = initialDummyAtomModel
+        else:
+            strMessage = "ERROR! XSDataInputDammin.setInitialDummyAtomModel argument is not XSDataInteger but %s" % initialDummyAtomModel.__class__.__name__
+            raise BaseException(strMessage)
     def delInitialDummyAtomModel(self): self._initialDummyAtomModel = None
-    # Properties
     initialDummyAtomModel = property(getInitialDummyAtomModel, setInitialDummyAtomModel, delInitialDummyAtomModel, "Property for initialDummyAtomModel")
+    # Methods and properties for the 'pdbInputFile' attribute
     def getPdbInputFile(self): return self._pdbInputFile
     def setPdbInputFile(self, pdbInputFile):
-        checkType("XSDataInputDammin", "setPdbInputFile", pdbInputFile, "XSDataFile")
-        self._pdbInputFile = pdbInputFile
+        if pdbInputFile is None:
+            self._pdbInputFile = None
+        elif pdbInputFile.__class__.__name__ == "XSDataFile":
+            self._pdbInputFile = pdbInputFile
+        else:
+            strMessage = "ERROR! XSDataInputDammin.setPdbInputFile argument is not XSDataFile but %s" % pdbInputFile.__class__.__name__
+            raise BaseException(strMessage)
     def delPdbInputFile(self): self._pdbInputFile = None
-    # Properties
     pdbInputFile = property(getPdbInputFile, setPdbInputFile, delPdbInputFile, "Property for pdbInputFile")
+    # Methods and properties for the 'symmetry' attribute
     def getSymmetry(self): return self._symmetry
     def setSymmetry(self, symmetry):
-        checkType("XSDataInputDammin", "setSymmetry", symmetry, "XSDataString")
-        self._symmetry = symmetry
+        if symmetry is None:
+            self._symmetry = None
+        elif symmetry.__class__.__name__ == "XSDataString":
+            self._symmetry = symmetry
+        else:
+            strMessage = "ERROR! XSDataInputDammin.setSymmetry argument is not XSDataString but %s" % symmetry.__class__.__name__
+            raise BaseException(strMessage)
     def delSymmetry(self): self._symmetry = None
-    # Properties
     symmetry = property(getSymmetry, setSymmetry, delSymmetry, "Property for symmetry")
+    # Methods and properties for the 'mode' attribute
     def getMode(self): return self._mode
     def setMode(self, mode):
-        checkType("XSDataInputDammin", "setMode", mode, "XSDataString")
-        self._mode = mode
+        if mode is None:
+            self._mode = None
+        elif mode.__class__.__name__ == "XSDataString":
+            self._mode = mode
+        else:
+            strMessage = "ERROR! XSDataInputDammin.setMode argument is not XSDataString but %s" % mode.__class__.__name__
+            raise BaseException(strMessage)
     def delMode(self): self._mode = None
-    # Properties
     mode = property(getMode, setMode, delMode, "Property for mode")
     def export(self, outfile, level, name_='XSDataInputDammin'):
         showIndent(outfile, level)
@@ -2733,19 +3742,28 @@ class XSDataInputDammin(XSDataInput):
     parseFile = staticmethod( parseFile )
 # end class XSDataInputDammin
 
+
 class XSDataInputDamstart(XSDataInput):
     def __init__(self, configuration=None, inputPdbFile=None):
         XSDataInput.__init__(self, configuration)
-    
-    
-        checkType("XSDataInputDamstart", "Constructor of XSDataInputDamstart", inputPdbFile, "XSDataFile")
-        self._inputPdbFile = inputPdbFile
+        if inputPdbFile is None:
+            self._inputPdbFile = None
+        elif inputPdbFile.__class__.__name__ == "XSDataFile":
+            self._inputPdbFile = inputPdbFile
+        else:
+            strMessage = "ERROR! XSDataInputDamstart constructor argument 'inputPdbFile' is not XSDataFile but %s" % self._inputPdbFile.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'inputPdbFile' attribute
     def getInputPdbFile(self): return self._inputPdbFile
     def setInputPdbFile(self, inputPdbFile):
-        checkType("XSDataInputDamstart", "setInputPdbFile", inputPdbFile, "XSDataFile")
-        self._inputPdbFile = inputPdbFile
+        if inputPdbFile is None:
+            self._inputPdbFile = None
+        elif inputPdbFile.__class__.__name__ == "XSDataFile":
+            self._inputPdbFile = inputPdbFile
+        else:
+            strMessage = "ERROR! XSDataInputDamstart.setInputPdbFile argument is not XSDataFile but %s" % inputPdbFile.__class__.__name__
+            raise BaseException(strMessage)
     def delInputPdbFile(self): self._inputPdbFile = None
-    # Properties
     inputPdbFile = property(getInputPdbFile, setInputPdbFile, delInputPdbFile, "Property for inputPdbFile")
     def export(self, outfile, level, name_='XSDataInputDamstart'):
         showIndent(outfile, level)
@@ -2813,47 +3831,86 @@ class XSDataInputDamstart(XSDataInput):
     parseFile = staticmethod( parseFile )
 # end class XSDataInputDamstart
 
+
 class XSDataInputDatGnom(XSDataInput):
     """Input file can be in 1/nm or 1/A, result will be in the same unit."""
     def __init__(self, configuration=None, output=None, skip=None, rg=None, inputCurve=None):
         XSDataInput.__init__(self, configuration)
-    
-    
-        checkType("XSDataInputDatGnom", "Constructor of XSDataInputDatGnom", inputCurve, "XSDataFile")
-        self._inputCurve = inputCurve
-        checkType("XSDataInputDatGnom", "Constructor of XSDataInputDatGnom", rg, "XSDataLength")
-        self._rg = rg
-        checkType("XSDataInputDatGnom", "Constructor of XSDataInputDatGnom", skip, "XSDataInteger")
-        self._skip = skip
-        checkType("XSDataInputDatGnom", "Constructor of XSDataInputDatGnom", output, "XSDataFile")
-        self._output = output
+        if inputCurve is None:
+            self._inputCurve = None
+        elif inputCurve.__class__.__name__ == "XSDataFile":
+            self._inputCurve = inputCurve
+        else:
+            strMessage = "ERROR! XSDataInputDatGnom constructor argument 'inputCurve' is not XSDataFile but %s" % self._inputCurve.__class__.__name__
+            raise BaseException(strMessage)
+        if rg is None:
+            self._rg = None
+        elif rg.__class__.__name__ == "XSDataLength":
+            self._rg = rg
+        else:
+            strMessage = "ERROR! XSDataInputDatGnom constructor argument 'rg' is not XSDataLength but %s" % self._rg.__class__.__name__
+            raise BaseException(strMessage)
+        if skip is None:
+            self._skip = None
+        elif skip.__class__.__name__ == "XSDataInteger":
+            self._skip = skip
+        else:
+            strMessage = "ERROR! XSDataInputDatGnom constructor argument 'skip' is not XSDataInteger but %s" % self._skip.__class__.__name__
+            raise BaseException(strMessage)
+        if output is None:
+            self._output = None
+        elif output.__class__.__name__ == "XSDataFile":
+            self._output = output
+        else:
+            strMessage = "ERROR! XSDataInputDatGnom constructor argument 'output' is not XSDataFile but %s" % self._output.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'inputCurve' attribute
     def getInputCurve(self): return self._inputCurve
     def setInputCurve(self, inputCurve):
-        checkType("XSDataInputDatGnom", "setInputCurve", inputCurve, "XSDataFile")
-        self._inputCurve = inputCurve
+        if inputCurve is None:
+            self._inputCurve = None
+        elif inputCurve.__class__.__name__ == "XSDataFile":
+            self._inputCurve = inputCurve
+        else:
+            strMessage = "ERROR! XSDataInputDatGnom.setInputCurve argument is not XSDataFile but %s" % inputCurve.__class__.__name__
+            raise BaseException(strMessage)
     def delInputCurve(self): self._inputCurve = None
-    # Properties
     inputCurve = property(getInputCurve, setInputCurve, delInputCurve, "Property for inputCurve")
+    # Methods and properties for the 'rg' attribute
     def getRg(self): return self._rg
     def setRg(self, rg):
-        checkType("XSDataInputDatGnom", "setRg", rg, "XSDataLength")
-        self._rg = rg
+        if rg is None:
+            self._rg = None
+        elif rg.__class__.__name__ == "XSDataLength":
+            self._rg = rg
+        else:
+            strMessage = "ERROR! XSDataInputDatGnom.setRg argument is not XSDataLength but %s" % rg.__class__.__name__
+            raise BaseException(strMessage)
     def delRg(self): self._rg = None
-    # Properties
     rg = property(getRg, setRg, delRg, "Property for rg")
+    # Methods and properties for the 'skip' attribute
     def getSkip(self): return self._skip
     def setSkip(self, skip):
-        checkType("XSDataInputDatGnom", "setSkip", skip, "XSDataInteger")
-        self._skip = skip
+        if skip is None:
+            self._skip = None
+        elif skip.__class__.__name__ == "XSDataInteger":
+            self._skip = skip
+        else:
+            strMessage = "ERROR! XSDataInputDatGnom.setSkip argument is not XSDataInteger but %s" % skip.__class__.__name__
+            raise BaseException(strMessage)
     def delSkip(self): self._skip = None
-    # Properties
     skip = property(getSkip, setSkip, delSkip, "Property for skip")
+    # Methods and properties for the 'output' attribute
     def getOutput(self): return self._output
     def setOutput(self, output):
-        checkType("XSDataInputDatGnom", "setOutput", output, "XSDataFile")
-        self._output = output
+        if output is None:
+            self._output = None
+        elif output.__class__.__name__ == "XSDataFile":
+            self._output = output
+        else:
+            strMessage = "ERROR! XSDataInputDatGnom.setOutput argument is not XSDataFile but %s" % output.__class__.__name__
+            raise BaseException(strMessage)
     def delOutput(self): self._output = None
-    # Properties
     output = property(getOutput, setOutput, delOutput, "Property for output")
     def export(self, outfile, level, name_='XSDataInputDatGnom'):
         showIndent(outfile, level)
@@ -2942,20 +3999,29 @@ class XSDataInputDatGnom(XSDataInput):
     parseFile = staticmethod( parseFile )
 # end class XSDataInputDatGnom
 
+
 class XSDataInputDatPorod(XSDataInput):
     """Input file can be in 1/nm or 1/A, result will be in the same unit(^3)."""
     def __init__(self, configuration=None, gnomFile=None):
         XSDataInput.__init__(self, configuration)
-    
-    
-        checkType("XSDataInputDatPorod", "Constructor of XSDataInputDatPorod", gnomFile, "XSDataFile")
-        self._gnomFile = gnomFile
+        if gnomFile is None:
+            self._gnomFile = None
+        elif gnomFile.__class__.__name__ == "XSDataFile":
+            self._gnomFile = gnomFile
+        else:
+            strMessage = "ERROR! XSDataInputDatPorod constructor argument 'gnomFile' is not XSDataFile but %s" % self._gnomFile.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'gnomFile' attribute
     def getGnomFile(self): return self._gnomFile
     def setGnomFile(self, gnomFile):
-        checkType("XSDataInputDatPorod", "setGnomFile", gnomFile, "XSDataFile")
-        self._gnomFile = gnomFile
+        if gnomFile is None:
+            self._gnomFile = None
+        elif gnomFile.__class__.__name__ == "XSDataFile":
+            self._gnomFile = gnomFile
+        else:
+            strMessage = "ERROR! XSDataInputDatPorod.setGnomFile argument is not XSDataFile but %s" % gnomFile.__class__.__name__
+            raise BaseException(strMessage)
     def delGnomFile(self): self._gnomFile = None
-    # Properties
     gnomFile = property(getGnomFile, setGnomFile, delGnomFile, "Property for gnomFile")
     def export(self, outfile, level, name_='XSDataInputDatPorod'):
         showIndent(outfile, level)
@@ -3021,38 +4087,69 @@ class XSDataInputDatPorod(XSDataInput):
     parseFile = staticmethod( parseFile )
 # end class XSDataInputDatPorod
 
+
 class XSDataInputDataver(XSDataInput):
     """dataver averages two or more curves from files"""
     def __init__(self, configuration=None, outputCurve=None, inputCurve=None):
         XSDataInput.__init__(self, configuration)
-    
-    
         if inputCurve is None:
             self._inputCurve = []
-        else:
-            checkType("XSDataInputDataver", "Constructor of XSDataInputDataver", inputCurve, "list")
+        elif inputCurve.__class__.__name__ == "list":
             self._inputCurve = inputCurve
-        checkType("XSDataInputDataver", "Constructor of XSDataInputDataver", outputCurve, "XSDataFile")
-        self._outputCurve = outputCurve
+        else:
+            strMessage = "ERROR! XSDataInputDataver constructor argument 'inputCurve' is not list but %s" % self._inputCurve.__class__.__name__
+            raise BaseException(strMessage)
+        if outputCurve is None:
+            self._outputCurve = None
+        elif outputCurve.__class__.__name__ == "XSDataFile":
+            self._outputCurve = outputCurve
+        else:
+            strMessage = "ERROR! XSDataInputDataver constructor argument 'outputCurve' is not XSDataFile but %s" % self._outputCurve.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'inputCurve' attribute
     def getInputCurve(self): return self._inputCurve
     def setInputCurve(self, inputCurve):
-        checkType("XSDataInputDataver", "setInputCurve", inputCurve, "list")
-        self._inputCurve = inputCurve
+        if inputCurve is None:
+            self._inputCurve = []
+        elif inputCurve.__class__.__name__ == "list":
+            self._inputCurve = inputCurve
+        else:
+            strMessage = "ERROR! XSDataInputDataver.setInputCurve argument is not list but %s" % inputCurve.__class__.__name__
+            raise BaseException(strMessage)
     def delInputCurve(self): self._inputCurve = None
-    # Properties
     inputCurve = property(getInputCurve, setInputCurve, delInputCurve, "Property for inputCurve")
     def addInputCurve(self, value):
-        checkType("XSDataInputDataver", "setInputCurve", value, "XSDataFile")
-        self._inputCurve.append(value)
+        if value is None:
+            strMessage = "ERROR! XSDataInputDataver.addInputCurve argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._inputCurve.append(value)
+        else:
+            strMessage = "ERROR! XSDataInputDataver.addInputCurve argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
     def insertInputCurve(self, index, value):
-        checkType("XSDataInputDataver", "setInputCurve", value, "XSDataFile")
-        self._inputCurve[index] = value
+        if index is None:
+            strMessage = "ERROR! XSDataInputDataver.insertInputCurve argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataInputDataver.insertInputCurve argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._inputCurve[index] = value
+        else:
+            strMessage = "ERROR! XSDataInputDataver.addInputCurve argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'outputCurve' attribute
     def getOutputCurve(self): return self._outputCurve
     def setOutputCurve(self, outputCurve):
-        checkType("XSDataInputDataver", "setOutputCurve", outputCurve, "XSDataFile")
-        self._outputCurve = outputCurve
+        if outputCurve is None:
+            self._outputCurve = None
+        elif outputCurve.__class__.__name__ == "XSDataFile":
+            self._outputCurve = outputCurve
+        else:
+            strMessage = "ERROR! XSDataInputDataver.setOutputCurve argument is not XSDataFile but %s" % outputCurve.__class__.__name__
+            raise BaseException(strMessage)
     def delOutputCurve(self): self._outputCurve = None
-    # Properties
     outputCurve = property(getOutputCurve, setOutputCurve, delOutputCurve, "Property for outputCurve")
     def export(self, outfile, level, name_='XSDataInputDataver'):
         showIndent(outfile, level)
@@ -3127,31 +4224,52 @@ class XSDataInputDataver(XSDataInput):
     parseFile = staticmethod( parseFile )
 # end class XSDataInputDataver
 
+
 class XSDataInputDatcmp(XSDataInput):
     """datcmp compares two curves from files
 	"""
     def __init__(self, configuration=None, inputCurve=None):
         XSDataInput.__init__(self, configuration)
-    
-    
         if inputCurve is None:
             self._inputCurve = []
-        else:
-            checkType("XSDataInputDatcmp", "Constructor of XSDataInputDatcmp", inputCurve, "list")
+        elif inputCurve.__class__.__name__ == "list":
             self._inputCurve = inputCurve
+        else:
+            strMessage = "ERROR! XSDataInputDatcmp constructor argument 'inputCurve' is not list but %s" % self._inputCurve.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'inputCurve' attribute
     def getInputCurve(self): return self._inputCurve
     def setInputCurve(self, inputCurve):
-        checkType("XSDataInputDatcmp", "setInputCurve", inputCurve, "list")
-        self._inputCurve = inputCurve
+        if inputCurve is None:
+            self._inputCurve = []
+        elif inputCurve.__class__.__name__ == "list":
+            self._inputCurve = inputCurve
+        else:
+            strMessage = "ERROR! XSDataInputDatcmp.setInputCurve argument is not list but %s" % inputCurve.__class__.__name__
+            raise BaseException(strMessage)
     def delInputCurve(self): self._inputCurve = None
-    # Properties
     inputCurve = property(getInputCurve, setInputCurve, delInputCurve, "Property for inputCurve")
     def addInputCurve(self, value):
-        checkType("XSDataInputDatcmp", "setInputCurve", value, "XSDataFile")
-        self._inputCurve.append(value)
+        if value is None:
+            strMessage = "ERROR! XSDataInputDatcmp.addInputCurve argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._inputCurve.append(value)
+        else:
+            strMessage = "ERROR! XSDataInputDatcmp.addInputCurve argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
     def insertInputCurve(self, index, value):
-        checkType("XSDataInputDatcmp", "setInputCurve", value, "XSDataFile")
-        self._inputCurve[index] = value
+        if index is None:
+            strMessage = "ERROR! XSDataInputDatcmp.insertInputCurve argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataInputDatcmp.insertInputCurve argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._inputCurve[index] = value
+        else:
+            strMessage = "ERROR! XSDataInputDatcmp.addInputCurve argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
     def export(self, outfile, level, name_='XSDataInputDatcmp'):
         showIndent(outfile, level)
         outfile.write(unicode('<%s>\n' % name_))
@@ -3218,56 +4336,107 @@ class XSDataInputDatcmp(XSDataInput):
     parseFile = staticmethod( parseFile )
 # end class XSDataInputDatcmp
 
+
 class XSDataInputDatop(XSDataInput):
     """datop makes an operation on curves"""
     def __init__(self, configuration=None, constant=None, operation=None, outputCurve=None, inputCurve=None):
         XSDataInput.__init__(self, configuration)
-    
-    
         if inputCurve is None:
             self._inputCurve = []
-        else:
-            checkType("XSDataInputDatop", "Constructor of XSDataInputDatop", inputCurve, "list")
+        elif inputCurve.__class__.__name__ == "list":
             self._inputCurve = inputCurve
-        checkType("XSDataInputDatop", "Constructor of XSDataInputDatop", outputCurve, "XSDataFile")
-        self._outputCurve = outputCurve
-        checkType("XSDataInputDatop", "Constructor of XSDataInputDatop", operation, "XSDataString")
-        self._operation = operation
-        checkType("XSDataInputDatop", "Constructor of XSDataInputDatop", constant, "XSDataDouble")
-        self._constant = constant
+        else:
+            strMessage = "ERROR! XSDataInputDatop constructor argument 'inputCurve' is not list but %s" % self._inputCurve.__class__.__name__
+            raise BaseException(strMessage)
+        if outputCurve is None:
+            self._outputCurve = None
+        elif outputCurve.__class__.__name__ == "XSDataFile":
+            self._outputCurve = outputCurve
+        else:
+            strMessage = "ERROR! XSDataInputDatop constructor argument 'outputCurve' is not XSDataFile but %s" % self._outputCurve.__class__.__name__
+            raise BaseException(strMessage)
+        if operation is None:
+            self._operation = None
+        elif operation.__class__.__name__ == "XSDataString":
+            self._operation = operation
+        else:
+            strMessage = "ERROR! XSDataInputDatop constructor argument 'operation' is not XSDataString but %s" % self._operation.__class__.__name__
+            raise BaseException(strMessage)
+        if constant is None:
+            self._constant = None
+        elif constant.__class__.__name__ == "XSDataDouble":
+            self._constant = constant
+        else:
+            strMessage = "ERROR! XSDataInputDatop constructor argument 'constant' is not XSDataDouble but %s" % self._constant.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'inputCurve' attribute
     def getInputCurve(self): return self._inputCurve
     def setInputCurve(self, inputCurve):
-        checkType("XSDataInputDatop", "setInputCurve", inputCurve, "list")
-        self._inputCurve = inputCurve
+        if inputCurve is None:
+            self._inputCurve = []
+        elif inputCurve.__class__.__name__ == "list":
+            self._inputCurve = inputCurve
+        else:
+            strMessage = "ERROR! XSDataInputDatop.setInputCurve argument is not list but %s" % inputCurve.__class__.__name__
+            raise BaseException(strMessage)
     def delInputCurve(self): self._inputCurve = None
-    # Properties
     inputCurve = property(getInputCurve, setInputCurve, delInputCurve, "Property for inputCurve")
     def addInputCurve(self, value):
-        checkType("XSDataInputDatop", "setInputCurve", value, "XSDataFile")
-        self._inputCurve.append(value)
+        if value is None:
+            strMessage = "ERROR! XSDataInputDatop.addInputCurve argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._inputCurve.append(value)
+        else:
+            strMessage = "ERROR! XSDataInputDatop.addInputCurve argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
     def insertInputCurve(self, index, value):
-        checkType("XSDataInputDatop", "setInputCurve", value, "XSDataFile")
-        self._inputCurve[index] = value
+        if index is None:
+            strMessage = "ERROR! XSDataInputDatop.insertInputCurve argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataInputDatop.insertInputCurve argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._inputCurve[index] = value
+        else:
+            strMessage = "ERROR! XSDataInputDatop.addInputCurve argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'outputCurve' attribute
     def getOutputCurve(self): return self._outputCurve
     def setOutputCurve(self, outputCurve):
-        checkType("XSDataInputDatop", "setOutputCurve", outputCurve, "XSDataFile")
-        self._outputCurve = outputCurve
+        if outputCurve is None:
+            self._outputCurve = None
+        elif outputCurve.__class__.__name__ == "XSDataFile":
+            self._outputCurve = outputCurve
+        else:
+            strMessage = "ERROR! XSDataInputDatop.setOutputCurve argument is not XSDataFile but %s" % outputCurve.__class__.__name__
+            raise BaseException(strMessage)
     def delOutputCurve(self): self._outputCurve = None
-    # Properties
     outputCurve = property(getOutputCurve, setOutputCurve, delOutputCurve, "Property for outputCurve")
+    # Methods and properties for the 'operation' attribute
     def getOperation(self): return self._operation
     def setOperation(self, operation):
-        checkType("XSDataInputDatop", "setOperation", operation, "XSDataString")
-        self._operation = operation
+        if operation is None:
+            self._operation = None
+        elif operation.__class__.__name__ == "XSDataString":
+            self._operation = operation
+        else:
+            strMessage = "ERROR! XSDataInputDatop.setOperation argument is not XSDataString but %s" % operation.__class__.__name__
+            raise BaseException(strMessage)
     def delOperation(self): self._operation = None
-    # Properties
     operation = property(getOperation, setOperation, delOperation, "Property for operation")
+    # Methods and properties for the 'constant' attribute
     def getConstant(self): return self._constant
     def setConstant(self, constant):
-        checkType("XSDataInputDatop", "setConstant", constant, "XSDataDouble")
-        self._constant = constant
+        if constant is None:
+            self._constant = None
+        elif constant.__class__.__name__ == "XSDataDouble":
+            self._constant = constant
+        else:
+            strMessage = "ERROR! XSDataInputDatop.setConstant argument is not XSDataDouble but %s" % constant.__class__.__name__
+            raise BaseException(strMessage)
     def delConstant(self): self._constant = None
-    # Properties
     constant = property(getConstant, setConstant, delConstant, "Property for constant")
     def export(self, outfile, level, name_='XSDataInputDatop'):
         showIndent(outfile, level)
@@ -3360,128 +4529,263 @@ class XSDataInputDatop(XSDataInput):
     parseFile = staticmethod( parseFile )
 # end class XSDataInputDatop
 
+
 class XSDataInputGnom(XSDataInput):
     """Input data can be provided either as a list of doubles, as Arrays or as a filename"""
     def __init__(self, configuration=None, mode=None, angularScale=None, experimentalDataFile=None, experimentalDataStdArray=None, experimentalDataStdDev=None, experimentalDataIArray=None, experimentalDataValues=None, experimentalDataQArray=None, experimentalDataQ=None, rMax=None):
         XSDataInput.__init__(self, configuration)
-    
-    
-        checkType("XSDataInputGnom", "Constructor of XSDataInputGnom", rMax, "XSDataDouble")
-        self._rMax = rMax
+        if rMax is None:
+            self._rMax = None
+        elif rMax.__class__.__name__ == "XSDataDouble":
+            self._rMax = rMax
+        else:
+            strMessage = "ERROR! XSDataInputGnom constructor argument 'rMax' is not XSDataDouble but %s" % self._rMax.__class__.__name__
+            raise BaseException(strMessage)
         if experimentalDataQ is None:
             self._experimentalDataQ = []
-        else:
-            checkType("XSDataInputGnom", "Constructor of XSDataInputGnom", experimentalDataQ, "list")
+        elif experimentalDataQ.__class__.__name__ == "list":
             self._experimentalDataQ = experimentalDataQ
-        checkType("XSDataInputGnom", "Constructor of XSDataInputGnom", experimentalDataQArray, "XSDataArray")
-        self._experimentalDataQArray = experimentalDataQArray
+        else:
+            strMessage = "ERROR! XSDataInputGnom constructor argument 'experimentalDataQ' is not list but %s" % self._experimentalDataQ.__class__.__name__
+            raise BaseException(strMessage)
+        if experimentalDataQArray is None:
+            self._experimentalDataQArray = None
+        elif experimentalDataQArray.__class__.__name__ == "XSDataArray":
+            self._experimentalDataQArray = experimentalDataQArray
+        else:
+            strMessage = "ERROR! XSDataInputGnom constructor argument 'experimentalDataQArray' is not XSDataArray but %s" % self._experimentalDataQArray.__class__.__name__
+            raise BaseException(strMessage)
         if experimentalDataValues is None:
             self._experimentalDataValues = []
-        else:
-            checkType("XSDataInputGnom", "Constructor of XSDataInputGnom", experimentalDataValues, "list")
+        elif experimentalDataValues.__class__.__name__ == "list":
             self._experimentalDataValues = experimentalDataValues
-        checkType("XSDataInputGnom", "Constructor of XSDataInputGnom", experimentalDataIArray, "XSDataArray")
-        self._experimentalDataIArray = experimentalDataIArray
+        else:
+            strMessage = "ERROR! XSDataInputGnom constructor argument 'experimentalDataValues' is not list but %s" % self._experimentalDataValues.__class__.__name__
+            raise BaseException(strMessage)
+        if experimentalDataIArray is None:
+            self._experimentalDataIArray = None
+        elif experimentalDataIArray.__class__.__name__ == "XSDataArray":
+            self._experimentalDataIArray = experimentalDataIArray
+        else:
+            strMessage = "ERROR! XSDataInputGnom constructor argument 'experimentalDataIArray' is not XSDataArray but %s" % self._experimentalDataIArray.__class__.__name__
+            raise BaseException(strMessage)
         if experimentalDataStdDev is None:
             self._experimentalDataStdDev = []
-        else:
-            checkType("XSDataInputGnom", "Constructor of XSDataInputGnom", experimentalDataStdDev, "list")
+        elif experimentalDataStdDev.__class__.__name__ == "list":
             self._experimentalDataStdDev = experimentalDataStdDev
-        checkType("XSDataInputGnom", "Constructor of XSDataInputGnom", experimentalDataStdArray, "XSDataArray")
-        self._experimentalDataStdArray = experimentalDataStdArray
-        checkType("XSDataInputGnom", "Constructor of XSDataInputGnom", experimentalDataFile, "XSDataFile")
-        self._experimentalDataFile = experimentalDataFile
-        checkType("XSDataInputGnom", "Constructor of XSDataInputGnom", angularScale, "XSDataInteger")
-        self._angularScale = angularScale
-        checkType("XSDataInputGnom", "Constructor of XSDataInputGnom", mode, "XSDataString")
-        self._mode = mode
+        else:
+            strMessage = "ERROR! XSDataInputGnom constructor argument 'experimentalDataStdDev' is not list but %s" % self._experimentalDataStdDev.__class__.__name__
+            raise BaseException(strMessage)
+        if experimentalDataStdArray is None:
+            self._experimentalDataStdArray = None
+        elif experimentalDataStdArray.__class__.__name__ == "XSDataArray":
+            self._experimentalDataStdArray = experimentalDataStdArray
+        else:
+            strMessage = "ERROR! XSDataInputGnom constructor argument 'experimentalDataStdArray' is not XSDataArray but %s" % self._experimentalDataStdArray.__class__.__name__
+            raise BaseException(strMessage)
+        if experimentalDataFile is None:
+            self._experimentalDataFile = None
+        elif experimentalDataFile.__class__.__name__ == "XSDataFile":
+            self._experimentalDataFile = experimentalDataFile
+        else:
+            strMessage = "ERROR! XSDataInputGnom constructor argument 'experimentalDataFile' is not XSDataFile but %s" % self._experimentalDataFile.__class__.__name__
+            raise BaseException(strMessage)
+        if angularScale is None:
+            self._angularScale = None
+        elif angularScale.__class__.__name__ == "XSDataInteger":
+            self._angularScale = angularScale
+        else:
+            strMessage = "ERROR! XSDataInputGnom constructor argument 'angularScale' is not XSDataInteger but %s" % self._angularScale.__class__.__name__
+            raise BaseException(strMessage)
+        if mode is None:
+            self._mode = None
+        elif mode.__class__.__name__ == "XSDataString":
+            self._mode = mode
+        else:
+            strMessage = "ERROR! XSDataInputGnom constructor argument 'mode' is not XSDataString but %s" % self._mode.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'rMax' attribute
     def getRMax(self): return self._rMax
     def setRMax(self, rMax):
-        checkType("XSDataInputGnom", "setRMax", rMax, "XSDataDouble")
-        self._rMax = rMax
+        if rMax is None:
+            self._rMax = None
+        elif rMax.__class__.__name__ == "XSDataDouble":
+            self._rMax = rMax
+        else:
+            strMessage = "ERROR! XSDataInputGnom.setRMax argument is not XSDataDouble but %s" % rMax.__class__.__name__
+            raise BaseException(strMessage)
     def delRMax(self): self._rMax = None
-    # Properties
     rMax = property(getRMax, setRMax, delRMax, "Property for rMax")
+    # Methods and properties for the 'experimentalDataQ' attribute
     def getExperimentalDataQ(self): return self._experimentalDataQ
     def setExperimentalDataQ(self, experimentalDataQ):
-        checkType("XSDataInputGnom", "setExperimentalDataQ", experimentalDataQ, "list")
-        self._experimentalDataQ = experimentalDataQ
+        if experimentalDataQ is None:
+            self._experimentalDataQ = []
+        elif experimentalDataQ.__class__.__name__ == "list":
+            self._experimentalDataQ = experimentalDataQ
+        else:
+            strMessage = "ERROR! XSDataInputGnom.setExperimentalDataQ argument is not list but %s" % experimentalDataQ.__class__.__name__
+            raise BaseException(strMessage)
     def delExperimentalDataQ(self): self._experimentalDataQ = None
-    # Properties
     experimentalDataQ = property(getExperimentalDataQ, setExperimentalDataQ, delExperimentalDataQ, "Property for experimentalDataQ")
     def addExperimentalDataQ(self, value):
-        checkType("XSDataInputGnom", "setExperimentalDataQ", value, "XSDataDouble")
-        self._experimentalDataQ.append(value)
+        if value is None:
+            strMessage = "ERROR! XSDataInputGnom.addExperimentalDataQ argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataDouble":
+            self._experimentalDataQ.append(value)
+        else:
+            strMessage = "ERROR! XSDataInputGnom.addExperimentalDataQ argument is not XSDataDouble but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
     def insertExperimentalDataQ(self, index, value):
-        checkType("XSDataInputGnom", "setExperimentalDataQ", value, "XSDataDouble")
-        self._experimentalDataQ[index] = value
+        if index is None:
+            strMessage = "ERROR! XSDataInputGnom.insertExperimentalDataQ argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataInputGnom.insertExperimentalDataQ argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataDouble":
+            self._experimentalDataQ[index] = value
+        else:
+            strMessage = "ERROR! XSDataInputGnom.addExperimentalDataQ argument is not XSDataDouble but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'experimentalDataQArray' attribute
     def getExperimentalDataQArray(self): return self._experimentalDataQArray
     def setExperimentalDataQArray(self, experimentalDataQArray):
-        checkType("XSDataInputGnom", "setExperimentalDataQArray", experimentalDataQArray, "XSDataArray")
-        self._experimentalDataQArray = experimentalDataQArray
+        if experimentalDataQArray is None:
+            self._experimentalDataQArray = None
+        elif experimentalDataQArray.__class__.__name__ == "XSDataArray":
+            self._experimentalDataQArray = experimentalDataQArray
+        else:
+            strMessage = "ERROR! XSDataInputGnom.setExperimentalDataQArray argument is not XSDataArray but %s" % experimentalDataQArray.__class__.__name__
+            raise BaseException(strMessage)
     def delExperimentalDataQArray(self): self._experimentalDataQArray = None
-    # Properties
     experimentalDataQArray = property(getExperimentalDataQArray, setExperimentalDataQArray, delExperimentalDataQArray, "Property for experimentalDataQArray")
+    # Methods and properties for the 'experimentalDataValues' attribute
     def getExperimentalDataValues(self): return self._experimentalDataValues
     def setExperimentalDataValues(self, experimentalDataValues):
-        checkType("XSDataInputGnom", "setExperimentalDataValues", experimentalDataValues, "list")
-        self._experimentalDataValues = experimentalDataValues
+        if experimentalDataValues is None:
+            self._experimentalDataValues = []
+        elif experimentalDataValues.__class__.__name__ == "list":
+            self._experimentalDataValues = experimentalDataValues
+        else:
+            strMessage = "ERROR! XSDataInputGnom.setExperimentalDataValues argument is not list but %s" % experimentalDataValues.__class__.__name__
+            raise BaseException(strMessage)
     def delExperimentalDataValues(self): self._experimentalDataValues = None
-    # Properties
     experimentalDataValues = property(getExperimentalDataValues, setExperimentalDataValues, delExperimentalDataValues, "Property for experimentalDataValues")
     def addExperimentalDataValues(self, value):
-        checkType("XSDataInputGnom", "setExperimentalDataValues", value, "XSDataDouble")
-        self._experimentalDataValues.append(value)
+        if value is None:
+            strMessage = "ERROR! XSDataInputGnom.addExperimentalDataValues argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataDouble":
+            self._experimentalDataValues.append(value)
+        else:
+            strMessage = "ERROR! XSDataInputGnom.addExperimentalDataValues argument is not XSDataDouble but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
     def insertExperimentalDataValues(self, index, value):
-        checkType("XSDataInputGnom", "setExperimentalDataValues", value, "XSDataDouble")
-        self._experimentalDataValues[index] = value
+        if index is None:
+            strMessage = "ERROR! XSDataInputGnom.insertExperimentalDataValues argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataInputGnom.insertExperimentalDataValues argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataDouble":
+            self._experimentalDataValues[index] = value
+        else:
+            strMessage = "ERROR! XSDataInputGnom.addExperimentalDataValues argument is not XSDataDouble but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'experimentalDataIArray' attribute
     def getExperimentalDataIArray(self): return self._experimentalDataIArray
     def setExperimentalDataIArray(self, experimentalDataIArray):
-        checkType("XSDataInputGnom", "setExperimentalDataIArray", experimentalDataIArray, "XSDataArray")
-        self._experimentalDataIArray = experimentalDataIArray
+        if experimentalDataIArray is None:
+            self._experimentalDataIArray = None
+        elif experimentalDataIArray.__class__.__name__ == "XSDataArray":
+            self._experimentalDataIArray = experimentalDataIArray
+        else:
+            strMessage = "ERROR! XSDataInputGnom.setExperimentalDataIArray argument is not XSDataArray but %s" % experimentalDataIArray.__class__.__name__
+            raise BaseException(strMessage)
     def delExperimentalDataIArray(self): self._experimentalDataIArray = None
-    # Properties
     experimentalDataIArray = property(getExperimentalDataIArray, setExperimentalDataIArray, delExperimentalDataIArray, "Property for experimentalDataIArray")
+    # Methods and properties for the 'experimentalDataStdDev' attribute
     def getExperimentalDataStdDev(self): return self._experimentalDataStdDev
     def setExperimentalDataStdDev(self, experimentalDataStdDev):
-        checkType("XSDataInputGnom", "setExperimentalDataStdDev", experimentalDataStdDev, "list")
-        self._experimentalDataStdDev = experimentalDataStdDev
+        if experimentalDataStdDev is None:
+            self._experimentalDataStdDev = []
+        elif experimentalDataStdDev.__class__.__name__ == "list":
+            self._experimentalDataStdDev = experimentalDataStdDev
+        else:
+            strMessage = "ERROR! XSDataInputGnom.setExperimentalDataStdDev argument is not list but %s" % experimentalDataStdDev.__class__.__name__
+            raise BaseException(strMessage)
     def delExperimentalDataStdDev(self): self._experimentalDataStdDev = None
-    # Properties
     experimentalDataStdDev = property(getExperimentalDataStdDev, setExperimentalDataStdDev, delExperimentalDataStdDev, "Property for experimentalDataStdDev")
     def addExperimentalDataStdDev(self, value):
-        checkType("XSDataInputGnom", "setExperimentalDataStdDev", value, "XSDataDouble")
-        self._experimentalDataStdDev.append(value)
+        if value is None:
+            strMessage = "ERROR! XSDataInputGnom.addExperimentalDataStdDev argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataDouble":
+            self._experimentalDataStdDev.append(value)
+        else:
+            strMessage = "ERROR! XSDataInputGnom.addExperimentalDataStdDev argument is not XSDataDouble but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
     def insertExperimentalDataStdDev(self, index, value):
-        checkType("XSDataInputGnom", "setExperimentalDataStdDev", value, "XSDataDouble")
-        self._experimentalDataStdDev[index] = value
+        if index is None:
+            strMessage = "ERROR! XSDataInputGnom.insertExperimentalDataStdDev argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataInputGnom.insertExperimentalDataStdDev argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataDouble":
+            self._experimentalDataStdDev[index] = value
+        else:
+            strMessage = "ERROR! XSDataInputGnom.addExperimentalDataStdDev argument is not XSDataDouble but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'experimentalDataStdArray' attribute
     def getExperimentalDataStdArray(self): return self._experimentalDataStdArray
     def setExperimentalDataStdArray(self, experimentalDataStdArray):
-        checkType("XSDataInputGnom", "setExperimentalDataStdArray", experimentalDataStdArray, "XSDataArray")
-        self._experimentalDataStdArray = experimentalDataStdArray
+        if experimentalDataStdArray is None:
+            self._experimentalDataStdArray = None
+        elif experimentalDataStdArray.__class__.__name__ == "XSDataArray":
+            self._experimentalDataStdArray = experimentalDataStdArray
+        else:
+            strMessage = "ERROR! XSDataInputGnom.setExperimentalDataStdArray argument is not XSDataArray but %s" % experimentalDataStdArray.__class__.__name__
+            raise BaseException(strMessage)
     def delExperimentalDataStdArray(self): self._experimentalDataStdArray = None
-    # Properties
     experimentalDataStdArray = property(getExperimentalDataStdArray, setExperimentalDataStdArray, delExperimentalDataStdArray, "Property for experimentalDataStdArray")
+    # Methods and properties for the 'experimentalDataFile' attribute
     def getExperimentalDataFile(self): return self._experimentalDataFile
     def setExperimentalDataFile(self, experimentalDataFile):
-        checkType("XSDataInputGnom", "setExperimentalDataFile", experimentalDataFile, "XSDataFile")
-        self._experimentalDataFile = experimentalDataFile
+        if experimentalDataFile is None:
+            self._experimentalDataFile = None
+        elif experimentalDataFile.__class__.__name__ == "XSDataFile":
+            self._experimentalDataFile = experimentalDataFile
+        else:
+            strMessage = "ERROR! XSDataInputGnom.setExperimentalDataFile argument is not XSDataFile but %s" % experimentalDataFile.__class__.__name__
+            raise BaseException(strMessage)
     def delExperimentalDataFile(self): self._experimentalDataFile = None
-    # Properties
     experimentalDataFile = property(getExperimentalDataFile, setExperimentalDataFile, delExperimentalDataFile, "Property for experimentalDataFile")
+    # Methods and properties for the 'angularScale' attribute
     def getAngularScale(self): return self._angularScale
     def setAngularScale(self, angularScale):
-        checkType("XSDataInputGnom", "setAngularScale", angularScale, "XSDataInteger")
-        self._angularScale = angularScale
+        if angularScale is None:
+            self._angularScale = None
+        elif angularScale.__class__.__name__ == "XSDataInteger":
+            self._angularScale = angularScale
+        else:
+            strMessage = "ERROR! XSDataInputGnom.setAngularScale argument is not XSDataInteger but %s" % angularScale.__class__.__name__
+            raise BaseException(strMessage)
     def delAngularScale(self): self._angularScale = None
-    # Properties
     angularScale = property(getAngularScale, setAngularScale, delAngularScale, "Property for angularScale")
+    # Methods and properties for the 'mode' attribute
     def getMode(self): return self._mode
     def setMode(self, mode):
-        checkType("XSDataInputGnom", "setMode", mode, "XSDataString")
-        self._mode = mode
+        if mode is None:
+            self._mode = None
+        elif mode.__class__.__name__ == "XSDataString":
+            self._mode = mode
+        else:
+            strMessage = "ERROR! XSDataInputGnom.setMode argument is not XSDataString but %s" % mode.__class__.__name__
+            raise BaseException(strMessage)
     def delMode(self): self._mode = None
-    # Properties
     mode = property(getMode, setMode, delMode, "Property for mode")
     def export(self, outfile, level, name_='XSDataInputGnom'):
         showIndent(outfile, level)
@@ -3612,38 +4916,67 @@ class XSDataInputGnom(XSDataInput):
     parseFile = staticmethod( parseFile )
 # end class XSDataInputGnom
 
+
 class XSDataInputSaxsAnalysis(XSDataInput):
     """AutoRg -> Gnom -> Prod pipeline"""
     def __init__(self, configuration=None, gnomFile=None, autoRg=None, scatterCurve=None):
         XSDataInput.__init__(self, configuration)
-    
-    
-        checkType("XSDataInputSaxsAnalysis", "Constructor of XSDataInputSaxsAnalysis", scatterCurve, "XSDataFile")
-        self._scatterCurve = scatterCurve
-        checkType("XSDataInputSaxsAnalysis", "Constructor of XSDataInputSaxsAnalysis", autoRg, "XSDataAutoRg")
-        self._autoRg = autoRg
-        checkType("XSDataInputSaxsAnalysis", "Constructor of XSDataInputSaxsAnalysis", gnomFile, "XSDataFile")
-        self._gnomFile = gnomFile
+        if scatterCurve is None:
+            self._scatterCurve = None
+        elif scatterCurve.__class__.__name__ == "XSDataFile":
+            self._scatterCurve = scatterCurve
+        else:
+            strMessage = "ERROR! XSDataInputSaxsAnalysis constructor argument 'scatterCurve' is not XSDataFile but %s" % self._scatterCurve.__class__.__name__
+            raise BaseException(strMessage)
+        if autoRg is None:
+            self._autoRg = None
+        elif autoRg.__class__.__name__ == "XSDataAutoRg":
+            self._autoRg = autoRg
+        else:
+            strMessage = "ERROR! XSDataInputSaxsAnalysis constructor argument 'autoRg' is not XSDataAutoRg but %s" % self._autoRg.__class__.__name__
+            raise BaseException(strMessage)
+        if gnomFile is None:
+            self._gnomFile = None
+        elif gnomFile.__class__.__name__ == "XSDataFile":
+            self._gnomFile = gnomFile
+        else:
+            strMessage = "ERROR! XSDataInputSaxsAnalysis constructor argument 'gnomFile' is not XSDataFile but %s" % self._gnomFile.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'scatterCurve' attribute
     def getScatterCurve(self): return self._scatterCurve
     def setScatterCurve(self, scatterCurve):
-        checkType("XSDataInputSaxsAnalysis", "setScatterCurve", scatterCurve, "XSDataFile")
-        self._scatterCurve = scatterCurve
+        if scatterCurve is None:
+            self._scatterCurve = None
+        elif scatterCurve.__class__.__name__ == "XSDataFile":
+            self._scatterCurve = scatterCurve
+        else:
+            strMessage = "ERROR! XSDataInputSaxsAnalysis.setScatterCurve argument is not XSDataFile but %s" % scatterCurve.__class__.__name__
+            raise BaseException(strMessage)
     def delScatterCurve(self): self._scatterCurve = None
-    # Properties
     scatterCurve = property(getScatterCurve, setScatterCurve, delScatterCurve, "Property for scatterCurve")
+    # Methods and properties for the 'autoRg' attribute
     def getAutoRg(self): return self._autoRg
     def setAutoRg(self, autoRg):
-        checkType("XSDataInputSaxsAnalysis", "setAutoRg", autoRg, "XSDataAutoRg")
-        self._autoRg = autoRg
+        if autoRg is None:
+            self._autoRg = None
+        elif autoRg.__class__.__name__ == "XSDataAutoRg":
+            self._autoRg = autoRg
+        else:
+            strMessage = "ERROR! XSDataInputSaxsAnalysis.setAutoRg argument is not XSDataAutoRg but %s" % autoRg.__class__.__name__
+            raise BaseException(strMessage)
     def delAutoRg(self): self._autoRg = None
-    # Properties
     autoRg = property(getAutoRg, setAutoRg, delAutoRg, "Property for autoRg")
+    # Methods and properties for the 'gnomFile' attribute
     def getGnomFile(self): return self._gnomFile
     def setGnomFile(self, gnomFile):
-        checkType("XSDataInputSaxsAnalysis", "setGnomFile", gnomFile, "XSDataFile")
-        self._gnomFile = gnomFile
+        if gnomFile is None:
+            self._gnomFile = None
+        elif gnomFile.__class__.__name__ == "XSDataFile":
+            self._gnomFile = gnomFile
+        else:
+            strMessage = "ERROR! XSDataInputSaxsAnalysis.setGnomFile argument is not XSDataFile but %s" % gnomFile.__class__.__name__
+            raise BaseException(strMessage)
     def delGnomFile(self): self._gnomFile = None
-    # Properties
     gnomFile = property(getGnomFile, setGnomFile, delGnomFile, "Property for gnomFile")
     def export(self, outfile, level, name_='XSDataInputSaxsAnalysis'):
         showIndent(outfile, level)
@@ -3725,101 +5058,200 @@ class XSDataInputSaxsAnalysis(XSDataInput):
     parseFile = staticmethod( parseFile )
 # end class XSDataInputSaxsAnalysis
 
+
 class XSDataInputSaxsPipeline(XSDataInput):
     """Run ProcessOneFile on each file of a time time serie until autorg """
     def __init__(self, configuration=None, rawImageSize=None, relativeFidelity=None, absoluteFidelity=None, forceReprocess=None, directoryMisc=None, directory2D=None, directory1D=None, experimentSetup=None, sample=None, fileSerie=None):
         XSDataInput.__init__(self, configuration)
-    
-    
-        checkType("XSDataInputSaxsPipeline", "Constructor of XSDataInputSaxsPipeline", fileSerie, "XSDataFileSeries")
-        self._fileSerie = fileSerie
-        checkType("XSDataInputSaxsPipeline", "Constructor of XSDataInputSaxsPipeline", sample, "XSDataBioSaxsSample")
-        self._sample = sample
-        checkType("XSDataInputSaxsPipeline", "Constructor of XSDataInputSaxsPipeline", experimentSetup, "XSDataBioSaxsExperimentSetup")
-        self._experimentSetup = experimentSetup
-        checkType("XSDataInputSaxsPipeline", "Constructor of XSDataInputSaxsPipeline", directory1D, "XSDataFile")
-        self._directory1D = directory1D
-        checkType("XSDataInputSaxsPipeline", "Constructor of XSDataInputSaxsPipeline", directory2D, "XSDataFile")
-        self._directory2D = directory2D
-        checkType("XSDataInputSaxsPipeline", "Constructor of XSDataInputSaxsPipeline", directoryMisc, "XSDataFile")
-        self._directoryMisc = directoryMisc
-        checkType("XSDataInputSaxsPipeline", "Constructor of XSDataInputSaxsPipeline", forceReprocess, "XSDataBoolean")
-        self._forceReprocess = forceReprocess
-        checkType("XSDataInputSaxsPipeline", "Constructor of XSDataInputSaxsPipeline", absoluteFidelity, "XSDataDouble")
-        self._absoluteFidelity = absoluteFidelity
-        checkType("XSDataInputSaxsPipeline", "Constructor of XSDataInputSaxsPipeline", relativeFidelity, "XSDataDouble")
-        self._relativeFidelity = relativeFidelity
-        checkType("XSDataInputSaxsPipeline", "Constructor of XSDataInputSaxsPipeline", rawImageSize, "XSDataInteger")
-        self._rawImageSize = rawImageSize
+        if fileSerie is None:
+            self._fileSerie = None
+        elif fileSerie.__class__.__name__ == "XSDataFileSeries":
+            self._fileSerie = fileSerie
+        else:
+            strMessage = "ERROR! XSDataInputSaxsPipeline constructor argument 'fileSerie' is not XSDataFileSeries but %s" % self._fileSerie.__class__.__name__
+            raise BaseException(strMessage)
+        if sample is None:
+            self._sample = None
+        elif sample.__class__.__name__ == "XSDataBioSaxsSample":
+            self._sample = sample
+        else:
+            strMessage = "ERROR! XSDataInputSaxsPipeline constructor argument 'sample' is not XSDataBioSaxsSample but %s" % self._sample.__class__.__name__
+            raise BaseException(strMessage)
+        if experimentSetup is None:
+            self._experimentSetup = None
+        elif experimentSetup.__class__.__name__ == "XSDataBioSaxsExperimentSetup":
+            self._experimentSetup = experimentSetup
+        else:
+            strMessage = "ERROR! XSDataInputSaxsPipeline constructor argument 'experimentSetup' is not XSDataBioSaxsExperimentSetup but %s" % self._experimentSetup.__class__.__name__
+            raise BaseException(strMessage)
+        if directory1D is None:
+            self._directory1D = None
+        elif directory1D.__class__.__name__ == "XSDataFile":
+            self._directory1D = directory1D
+        else:
+            strMessage = "ERROR! XSDataInputSaxsPipeline constructor argument 'directory1D' is not XSDataFile but %s" % self._directory1D.__class__.__name__
+            raise BaseException(strMessage)
+        if directory2D is None:
+            self._directory2D = None
+        elif directory2D.__class__.__name__ == "XSDataFile":
+            self._directory2D = directory2D
+        else:
+            strMessage = "ERROR! XSDataInputSaxsPipeline constructor argument 'directory2D' is not XSDataFile but %s" % self._directory2D.__class__.__name__
+            raise BaseException(strMessage)
+        if directoryMisc is None:
+            self._directoryMisc = None
+        elif directoryMisc.__class__.__name__ == "XSDataFile":
+            self._directoryMisc = directoryMisc
+        else:
+            strMessage = "ERROR! XSDataInputSaxsPipeline constructor argument 'directoryMisc' is not XSDataFile but %s" % self._directoryMisc.__class__.__name__
+            raise BaseException(strMessage)
+        if forceReprocess is None:
+            self._forceReprocess = None
+        elif forceReprocess.__class__.__name__ == "XSDataBoolean":
+            self._forceReprocess = forceReprocess
+        else:
+            strMessage = "ERROR! XSDataInputSaxsPipeline constructor argument 'forceReprocess' is not XSDataBoolean but %s" % self._forceReprocess.__class__.__name__
+            raise BaseException(strMessage)
+        if absoluteFidelity is None:
+            self._absoluteFidelity = None
+        elif absoluteFidelity.__class__.__name__ == "XSDataDouble":
+            self._absoluteFidelity = absoluteFidelity
+        else:
+            strMessage = "ERROR! XSDataInputSaxsPipeline constructor argument 'absoluteFidelity' is not XSDataDouble but %s" % self._absoluteFidelity.__class__.__name__
+            raise BaseException(strMessage)
+        if relativeFidelity is None:
+            self._relativeFidelity = None
+        elif relativeFidelity.__class__.__name__ == "XSDataDouble":
+            self._relativeFidelity = relativeFidelity
+        else:
+            strMessage = "ERROR! XSDataInputSaxsPipeline constructor argument 'relativeFidelity' is not XSDataDouble but %s" % self._relativeFidelity.__class__.__name__
+            raise BaseException(strMessage)
+        if rawImageSize is None:
+            self._rawImageSize = None
+        elif rawImageSize.__class__.__name__ == "XSDataInteger":
+            self._rawImageSize = rawImageSize
+        else:
+            strMessage = "ERROR! XSDataInputSaxsPipeline constructor argument 'rawImageSize' is not XSDataInteger but %s" % self._rawImageSize.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'fileSerie' attribute
     def getFileSerie(self): return self._fileSerie
     def setFileSerie(self, fileSerie):
-        checkType("XSDataInputSaxsPipeline", "setFileSerie", fileSerie, "XSDataFileSeries")
-        self._fileSerie = fileSerie
+        if fileSerie is None:
+            self._fileSerie = None
+        elif fileSerie.__class__.__name__ == "XSDataFileSeries":
+            self._fileSerie = fileSerie
+        else:
+            strMessage = "ERROR! XSDataInputSaxsPipeline.setFileSerie argument is not XSDataFileSeries but %s" % fileSerie.__class__.__name__
+            raise BaseException(strMessage)
     def delFileSerie(self): self._fileSerie = None
-    # Properties
     fileSerie = property(getFileSerie, setFileSerie, delFileSerie, "Property for fileSerie")
+    # Methods and properties for the 'sample' attribute
     def getSample(self): return self._sample
     def setSample(self, sample):
-        checkType("XSDataInputSaxsPipeline", "setSample", sample, "XSDataBioSaxsSample")
-        self._sample = sample
+        if sample is None:
+            self._sample = None
+        elif sample.__class__.__name__ == "XSDataBioSaxsSample":
+            self._sample = sample
+        else:
+            strMessage = "ERROR! XSDataInputSaxsPipeline.setSample argument is not XSDataBioSaxsSample but %s" % sample.__class__.__name__
+            raise BaseException(strMessage)
     def delSample(self): self._sample = None
-    # Properties
     sample = property(getSample, setSample, delSample, "Property for sample")
+    # Methods and properties for the 'experimentSetup' attribute
     def getExperimentSetup(self): return self._experimentSetup
     def setExperimentSetup(self, experimentSetup):
-        checkType("XSDataInputSaxsPipeline", "setExperimentSetup", experimentSetup, "XSDataBioSaxsExperimentSetup")
-        self._experimentSetup = experimentSetup
+        if experimentSetup is None:
+            self._experimentSetup = None
+        elif experimentSetup.__class__.__name__ == "XSDataBioSaxsExperimentSetup":
+            self._experimentSetup = experimentSetup
+        else:
+            strMessage = "ERROR! XSDataInputSaxsPipeline.setExperimentSetup argument is not XSDataBioSaxsExperimentSetup but %s" % experimentSetup.__class__.__name__
+            raise BaseException(strMessage)
     def delExperimentSetup(self): self._experimentSetup = None
-    # Properties
     experimentSetup = property(getExperimentSetup, setExperimentSetup, delExperimentSetup, "Property for experimentSetup")
+    # Methods and properties for the 'directory1D' attribute
     def getDirectory1D(self): return self._directory1D
     def setDirectory1D(self, directory1D):
-        checkType("XSDataInputSaxsPipeline", "setDirectory1D", directory1D, "XSDataFile")
-        self._directory1D = directory1D
+        if directory1D is None:
+            self._directory1D = None
+        elif directory1D.__class__.__name__ == "XSDataFile":
+            self._directory1D = directory1D
+        else:
+            strMessage = "ERROR! XSDataInputSaxsPipeline.setDirectory1D argument is not XSDataFile but %s" % directory1D.__class__.__name__
+            raise BaseException(strMessage)
     def delDirectory1D(self): self._directory1D = None
-    # Properties
     directory1D = property(getDirectory1D, setDirectory1D, delDirectory1D, "Property for directory1D")
+    # Methods and properties for the 'directory2D' attribute
     def getDirectory2D(self): return self._directory2D
     def setDirectory2D(self, directory2D):
-        checkType("XSDataInputSaxsPipeline", "setDirectory2D", directory2D, "XSDataFile")
-        self._directory2D = directory2D
+        if directory2D is None:
+            self._directory2D = None
+        elif directory2D.__class__.__name__ == "XSDataFile":
+            self._directory2D = directory2D
+        else:
+            strMessage = "ERROR! XSDataInputSaxsPipeline.setDirectory2D argument is not XSDataFile but %s" % directory2D.__class__.__name__
+            raise BaseException(strMessage)
     def delDirectory2D(self): self._directory2D = None
-    # Properties
     directory2D = property(getDirectory2D, setDirectory2D, delDirectory2D, "Property for directory2D")
+    # Methods and properties for the 'directoryMisc' attribute
     def getDirectoryMisc(self): return self._directoryMisc
     def setDirectoryMisc(self, directoryMisc):
-        checkType("XSDataInputSaxsPipeline", "setDirectoryMisc", directoryMisc, "XSDataFile")
-        self._directoryMisc = directoryMisc
+        if directoryMisc is None:
+            self._directoryMisc = None
+        elif directoryMisc.__class__.__name__ == "XSDataFile":
+            self._directoryMisc = directoryMisc
+        else:
+            strMessage = "ERROR! XSDataInputSaxsPipeline.setDirectoryMisc argument is not XSDataFile but %s" % directoryMisc.__class__.__name__
+            raise BaseException(strMessage)
     def delDirectoryMisc(self): self._directoryMisc = None
-    # Properties
     directoryMisc = property(getDirectoryMisc, setDirectoryMisc, delDirectoryMisc, "Property for directoryMisc")
+    # Methods and properties for the 'forceReprocess' attribute
     def getForceReprocess(self): return self._forceReprocess
     def setForceReprocess(self, forceReprocess):
-        checkType("XSDataInputSaxsPipeline", "setForceReprocess", forceReprocess, "XSDataBoolean")
-        self._forceReprocess = forceReprocess
+        if forceReprocess is None:
+            self._forceReprocess = None
+        elif forceReprocess.__class__.__name__ == "XSDataBoolean":
+            self._forceReprocess = forceReprocess
+        else:
+            strMessage = "ERROR! XSDataInputSaxsPipeline.setForceReprocess argument is not XSDataBoolean but %s" % forceReprocess.__class__.__name__
+            raise BaseException(strMessage)
     def delForceReprocess(self): self._forceReprocess = None
-    # Properties
     forceReprocess = property(getForceReprocess, setForceReprocess, delForceReprocess, "Property for forceReprocess")
+    # Methods and properties for the 'absoluteFidelity' attribute
     def getAbsoluteFidelity(self): return self._absoluteFidelity
     def setAbsoluteFidelity(self, absoluteFidelity):
-        checkType("XSDataInputSaxsPipeline", "setAbsoluteFidelity", absoluteFidelity, "XSDataDouble")
-        self._absoluteFidelity = absoluteFidelity
+        if absoluteFidelity is None:
+            self._absoluteFidelity = None
+        elif absoluteFidelity.__class__.__name__ == "XSDataDouble":
+            self._absoluteFidelity = absoluteFidelity
+        else:
+            strMessage = "ERROR! XSDataInputSaxsPipeline.setAbsoluteFidelity argument is not XSDataDouble but %s" % absoluteFidelity.__class__.__name__
+            raise BaseException(strMessage)
     def delAbsoluteFidelity(self): self._absoluteFidelity = None
-    # Properties
     absoluteFidelity = property(getAbsoluteFidelity, setAbsoluteFidelity, delAbsoluteFidelity, "Property for absoluteFidelity")
+    # Methods and properties for the 'relativeFidelity' attribute
     def getRelativeFidelity(self): return self._relativeFidelity
     def setRelativeFidelity(self, relativeFidelity):
-        checkType("XSDataInputSaxsPipeline", "setRelativeFidelity", relativeFidelity, "XSDataDouble")
-        self._relativeFidelity = relativeFidelity
+        if relativeFidelity is None:
+            self._relativeFidelity = None
+        elif relativeFidelity.__class__.__name__ == "XSDataDouble":
+            self._relativeFidelity = relativeFidelity
+        else:
+            strMessage = "ERROR! XSDataInputSaxsPipeline.setRelativeFidelity argument is not XSDataDouble but %s" % relativeFidelity.__class__.__name__
+            raise BaseException(strMessage)
     def delRelativeFidelity(self): self._relativeFidelity = None
-    # Properties
     relativeFidelity = property(getRelativeFidelity, setRelativeFidelity, delRelativeFidelity, "Property for relativeFidelity")
+    # Methods and properties for the 'rawImageSize' attribute
     def getRawImageSize(self): return self._rawImageSize
     def setRawImageSize(self, rawImageSize):
-        checkType("XSDataInputSaxsPipeline", "setRawImageSize", rawImageSize, "XSDataInteger")
-        self._rawImageSize = rawImageSize
+        if rawImageSize is None:
+            self._rawImageSize = None
+        elif rawImageSize.__class__.__name__ == "XSDataInteger":
+            self._rawImageSize = rawImageSize
+        else:
+            strMessage = "ERROR! XSDataInputSaxsPipeline.setRawImageSize argument is not XSDataInteger but %s" % rawImageSize.__class__.__name__
+            raise BaseException(strMessage)
     def delRawImageSize(self): self._rawImageSize = None
-    # Properties
     rawImageSize = property(getRawImageSize, setRawImageSize, delRawImageSize, "Property for rawImageSize")
     def export(self, outfile, level, name_='XSDataInputSaxsPipeline'):
         showIndent(outfile, level)
@@ -3960,46 +5392,85 @@ class XSDataInputSaxsPipeline(XSDataInput):
     parseFile = staticmethod( parseFile )
 # end class XSDataInputSaxsPipeline
 
+
 class XSDataInputSupcomb(XSDataInput):
     def __init__(self, configuration=None, backbone=None, enantiomorphs=None, superimposeFile=None, templateFile=None):
         XSDataInput.__init__(self, configuration)
-    
-    
-        checkType("XSDataInputSupcomb", "Constructor of XSDataInputSupcomb", templateFile, "XSDataFile")
-        self._templateFile = templateFile
-        checkType("XSDataInputSupcomb", "Constructor of XSDataInputSupcomb", superimposeFile, "XSDataFile")
-        self._superimposeFile = superimposeFile
-        checkType("XSDataInputSupcomb", "Constructor of XSDataInputSupcomb", enantiomorphs, "XSDataBoolean")
-        self._enantiomorphs = enantiomorphs
-        checkType("XSDataInputSupcomb", "Constructor of XSDataInputSupcomb", backbone, "XSDataBoolean")
-        self._backbone = backbone
+        if templateFile is None:
+            self._templateFile = None
+        elif templateFile.__class__.__name__ == "XSDataFile":
+            self._templateFile = templateFile
+        else:
+            strMessage = "ERROR! XSDataInputSupcomb constructor argument 'templateFile' is not XSDataFile but %s" % self._templateFile.__class__.__name__
+            raise BaseException(strMessage)
+        if superimposeFile is None:
+            self._superimposeFile = None
+        elif superimposeFile.__class__.__name__ == "XSDataFile":
+            self._superimposeFile = superimposeFile
+        else:
+            strMessage = "ERROR! XSDataInputSupcomb constructor argument 'superimposeFile' is not XSDataFile but %s" % self._superimposeFile.__class__.__name__
+            raise BaseException(strMessage)
+        if enantiomorphs is None:
+            self._enantiomorphs = None
+        elif enantiomorphs.__class__.__name__ == "XSDataBoolean":
+            self._enantiomorphs = enantiomorphs
+        else:
+            strMessage = "ERROR! XSDataInputSupcomb constructor argument 'enantiomorphs' is not XSDataBoolean but %s" % self._enantiomorphs.__class__.__name__
+            raise BaseException(strMessage)
+        if backbone is None:
+            self._backbone = None
+        elif backbone.__class__.__name__ == "XSDataBoolean":
+            self._backbone = backbone
+        else:
+            strMessage = "ERROR! XSDataInputSupcomb constructor argument 'backbone' is not XSDataBoolean but %s" % self._backbone.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'templateFile' attribute
     def getTemplateFile(self): return self._templateFile
     def setTemplateFile(self, templateFile):
-        checkType("XSDataInputSupcomb", "setTemplateFile", templateFile, "XSDataFile")
-        self._templateFile = templateFile
+        if templateFile is None:
+            self._templateFile = None
+        elif templateFile.__class__.__name__ == "XSDataFile":
+            self._templateFile = templateFile
+        else:
+            strMessage = "ERROR! XSDataInputSupcomb.setTemplateFile argument is not XSDataFile but %s" % templateFile.__class__.__name__
+            raise BaseException(strMessage)
     def delTemplateFile(self): self._templateFile = None
-    # Properties
     templateFile = property(getTemplateFile, setTemplateFile, delTemplateFile, "Property for templateFile")
+    # Methods and properties for the 'superimposeFile' attribute
     def getSuperimposeFile(self): return self._superimposeFile
     def setSuperimposeFile(self, superimposeFile):
-        checkType("XSDataInputSupcomb", "setSuperimposeFile", superimposeFile, "XSDataFile")
-        self._superimposeFile = superimposeFile
+        if superimposeFile is None:
+            self._superimposeFile = None
+        elif superimposeFile.__class__.__name__ == "XSDataFile":
+            self._superimposeFile = superimposeFile
+        else:
+            strMessage = "ERROR! XSDataInputSupcomb.setSuperimposeFile argument is not XSDataFile but %s" % superimposeFile.__class__.__name__
+            raise BaseException(strMessage)
     def delSuperimposeFile(self): self._superimposeFile = None
-    # Properties
     superimposeFile = property(getSuperimposeFile, setSuperimposeFile, delSuperimposeFile, "Property for superimposeFile")
+    # Methods and properties for the 'enantiomorphs' attribute
     def getEnantiomorphs(self): return self._enantiomorphs
     def setEnantiomorphs(self, enantiomorphs):
-        checkType("XSDataInputSupcomb", "setEnantiomorphs", enantiomorphs, "XSDataBoolean")
-        self._enantiomorphs = enantiomorphs
+        if enantiomorphs is None:
+            self._enantiomorphs = None
+        elif enantiomorphs.__class__.__name__ == "XSDataBoolean":
+            self._enantiomorphs = enantiomorphs
+        else:
+            strMessage = "ERROR! XSDataInputSupcomb.setEnantiomorphs argument is not XSDataBoolean but %s" % enantiomorphs.__class__.__name__
+            raise BaseException(strMessage)
     def delEnantiomorphs(self): self._enantiomorphs = None
-    # Properties
     enantiomorphs = property(getEnantiomorphs, setEnantiomorphs, delEnantiomorphs, "Property for enantiomorphs")
+    # Methods and properties for the 'backbone' attribute
     def getBackbone(self): return self._backbone
     def setBackbone(self, backbone):
-        checkType("XSDataInputSupcomb", "setBackbone", backbone, "XSDataBoolean")
-        self._backbone = backbone
+        if backbone is None:
+            self._backbone = None
+        elif backbone.__class__.__name__ == "XSDataBoolean":
+            self._backbone = backbone
+        else:
+            strMessage = "ERROR! XSDataInputSupcomb.setBackbone argument is not XSDataBoolean but %s" % backbone.__class__.__name__
+            raise BaseException(strMessage)
     def delBackbone(self): self._backbone = None
-    # Properties
     backbone = property(getBackbone, setBackbone, delBackbone, "Property for backbone")
     def export(self, outfile, level, name_='XSDataInputSupcomb'):
         showIndent(outfile, level)
@@ -4090,29 +5561,50 @@ class XSDataInputSupcomb(XSDataInput):
     parseFile = staticmethod( parseFile )
 # end class XSDataInputSupcomb
 
+
 class XSDataResultAutoRg(XSDataResult):
     def __init__(self, status=None, autoRgOut=None):
         XSDataResult.__init__(self, status)
-    
-    
         if autoRgOut is None:
             self._autoRgOut = []
-        else:
-            checkType("XSDataResultAutoRg", "Constructor of XSDataResultAutoRg", autoRgOut, "list")
+        elif autoRgOut.__class__.__name__ == "list":
             self._autoRgOut = autoRgOut
+        else:
+            strMessage = "ERROR! XSDataResultAutoRg constructor argument 'autoRgOut' is not list but %s" % self._autoRgOut.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'autoRgOut' attribute
     def getAutoRgOut(self): return self._autoRgOut
     def setAutoRgOut(self, autoRgOut):
-        checkType("XSDataResultAutoRg", "setAutoRgOut", autoRgOut, "list")
-        self._autoRgOut = autoRgOut
+        if autoRgOut is None:
+            self._autoRgOut = []
+        elif autoRgOut.__class__.__name__ == "list":
+            self._autoRgOut = autoRgOut
+        else:
+            strMessage = "ERROR! XSDataResultAutoRg.setAutoRgOut argument is not list but %s" % autoRgOut.__class__.__name__
+            raise BaseException(strMessage)
     def delAutoRgOut(self): self._autoRgOut = None
-    # Properties
     autoRgOut = property(getAutoRgOut, setAutoRgOut, delAutoRgOut, "Property for autoRgOut")
     def addAutoRgOut(self, value):
-        checkType("XSDataResultAutoRg", "setAutoRgOut", value, "XSDataAutoRg")
-        self._autoRgOut.append(value)
+        if value is None:
+            strMessage = "ERROR! XSDataResultAutoRg.addAutoRgOut argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataAutoRg":
+            self._autoRgOut.append(value)
+        else:
+            strMessage = "ERROR! XSDataResultAutoRg.addAutoRgOut argument is not XSDataAutoRg but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
     def insertAutoRgOut(self, index, value):
-        checkType("XSDataResultAutoRg", "setAutoRgOut", value, "XSDataAutoRg")
-        self._autoRgOut[index] = value
+        if index is None:
+            strMessage = "ERROR! XSDataResultAutoRg.insertAutoRgOut argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataResultAutoRg.insertAutoRgOut argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataAutoRg":
+            self._autoRgOut[index] = value
+        else:
+            strMessage = "ERROR! XSDataResultAutoRg.addAutoRgOut argument is not XSDataAutoRg but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
     def export(self, outfile, level, name_='XSDataResultAutoRg'):
         showIndent(outfile, level)
         outfile.write(unicode('<%s>\n' % name_))
@@ -4179,29 +5671,67 @@ class XSDataResultAutoRg(XSDataResult):
     parseFile = staticmethod( parseFile )
 # end class XSDataResultAutoRg
 
+
 class XSDataResultAutoSub(XSDataResult):
     """Result of AutoSub (EDNA implementation) 	"""
-    def __init__(self, status=None, autoRg=None, subtractedCurve=None):
+    def __init__(self, status=None, autoRg=None, bestBuffer=None, subtractedCurve=None):
         XSDataResult.__init__(self, status)
-    
-    
-        checkType("XSDataResultAutoSub", "Constructor of XSDataResultAutoSub", subtractedCurve, "XSDataFile")
-        self._subtractedCurve = subtractedCurve
-        checkType("XSDataResultAutoSub", "Constructor of XSDataResultAutoSub", autoRg, "XSDataAutoRg")
-        self._autoRg = autoRg
+        if subtractedCurve is None:
+            self._subtractedCurve = None
+        elif subtractedCurve.__class__.__name__ == "XSDataFile":
+            self._subtractedCurve = subtractedCurve
+        else:
+            strMessage = "ERROR! XSDataResultAutoSub constructor argument 'subtractedCurve' is not XSDataFile but %s" % self._subtractedCurve.__class__.__name__
+            raise BaseException(strMessage)
+        if bestBuffer is None:
+            self._bestBuffer = None
+        elif bestBuffer.__class__.__name__ == "XSDataFile":
+            self._bestBuffer = bestBuffer
+        else:
+            strMessage = "ERROR! XSDataResultAutoSub constructor argument 'bestBuffer' is not XSDataFile but %s" % self._bestBuffer.__class__.__name__
+            raise BaseException(strMessage)
+        if autoRg is None:
+            self._autoRg = None
+        elif autoRg.__class__.__name__ == "XSDataAutoRg":
+            self._autoRg = autoRg
+        else:
+            strMessage = "ERROR! XSDataResultAutoSub constructor argument 'autoRg' is not XSDataAutoRg but %s" % self._autoRg.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'subtractedCurve' attribute
     def getSubtractedCurve(self): return self._subtractedCurve
     def setSubtractedCurve(self, subtractedCurve):
-        checkType("XSDataResultAutoSub", "setSubtractedCurve", subtractedCurve, "XSDataFile")
-        self._subtractedCurve = subtractedCurve
+        if subtractedCurve is None:
+            self._subtractedCurve = None
+        elif subtractedCurve.__class__.__name__ == "XSDataFile":
+            self._subtractedCurve = subtractedCurve
+        else:
+            strMessage = "ERROR! XSDataResultAutoSub.setSubtractedCurve argument is not XSDataFile but %s" % subtractedCurve.__class__.__name__
+            raise BaseException(strMessage)
     def delSubtractedCurve(self): self._subtractedCurve = None
-    # Properties
     subtractedCurve = property(getSubtractedCurve, setSubtractedCurve, delSubtractedCurve, "Property for subtractedCurve")
+    # Methods and properties for the 'bestBuffer' attribute
+    def getBestBuffer(self): return self._bestBuffer
+    def setBestBuffer(self, bestBuffer):
+        if bestBuffer is None:
+            self._bestBuffer = None
+        elif bestBuffer.__class__.__name__ == "XSDataFile":
+            self._bestBuffer = bestBuffer
+        else:
+            strMessage = "ERROR! XSDataResultAutoSub.setBestBuffer argument is not XSDataFile but %s" % bestBuffer.__class__.__name__
+            raise BaseException(strMessage)
+    def delBestBuffer(self): self._bestBuffer = None
+    bestBuffer = property(getBestBuffer, setBestBuffer, delBestBuffer, "Property for bestBuffer")
+    # Methods and properties for the 'autoRg' attribute
     def getAutoRg(self): return self._autoRg
     def setAutoRg(self, autoRg):
-        checkType("XSDataResultAutoSub", "setAutoRg", autoRg, "XSDataAutoRg")
-        self._autoRg = autoRg
+        if autoRg is None:
+            self._autoRg = None
+        elif autoRg.__class__.__name__ == "XSDataAutoRg":
+            self._autoRg = autoRg
+        else:
+            strMessage = "ERROR! XSDataResultAutoSub.setAutoRg argument is not XSDataAutoRg but %s" % autoRg.__class__.__name__
+            raise BaseException(strMessage)
     def delAutoRg(self): self._autoRg = None
-    # Properties
     autoRg = property(getAutoRg, setAutoRg, delAutoRg, "Property for autoRg")
     def export(self, outfile, level, name_='XSDataResultAutoSub'):
         showIndent(outfile, level)
@@ -4215,6 +5745,10 @@ class XSDataResultAutoSub(XSDataResult):
             self.subtractedCurve.export(outfile, level, name_='subtractedCurve')
         else:
             warnEmptyAttribute("subtractedCurve", "XSDataFile")
+        if self._bestBuffer is not None:
+            self.bestBuffer.export(outfile, level, name_='bestBuffer')
+        else:
+            warnEmptyAttribute("bestBuffer", "XSDataFile")
         if self._autoRg is not None:
             self.autoRg.export(outfile, level, name_='autoRg')
         else:
@@ -4229,6 +5763,11 @@ class XSDataResultAutoSub(XSDataResult):
             obj_ = XSDataFile()
             obj_.build(child_)
             self.setSubtractedCurve(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'bestBuffer':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setBestBuffer(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'autoRg':
             obj_ = XSDataAutoRg()
@@ -4278,55 +5817,104 @@ class XSDataResultAutoSub(XSDataResult):
     parseFile = staticmethod( parseFile )
 # end class XSDataResultAutoSub
 
+
 class XSDataResultDamaver(XSDataResult):
     def __init__(self, status=None, damstartPdbFile=None, damfilterPdbFile=None, damaverPdbFile=None, variationNSD=None, meanNSD=None):
         XSDataResult.__init__(self, status)
-    
-    
-        checkType("XSDataResultDamaver", "Constructor of XSDataResultDamaver", meanNSD, "XSDataDouble")
-        self._meanNSD = meanNSD
-        checkType("XSDataResultDamaver", "Constructor of XSDataResultDamaver", variationNSD, "XSDataDouble")
-        self._variationNSD = variationNSD
-        checkType("XSDataResultDamaver", "Constructor of XSDataResultDamaver", damaverPdbFile, "XSDataFile")
-        self._damaverPdbFile = damaverPdbFile
-        checkType("XSDataResultDamaver", "Constructor of XSDataResultDamaver", damfilterPdbFile, "XSDataFile")
-        self._damfilterPdbFile = damfilterPdbFile
-        checkType("XSDataResultDamaver", "Constructor of XSDataResultDamaver", damstartPdbFile, "XSDataFile")
-        self._damstartPdbFile = damstartPdbFile
+        if meanNSD is None:
+            self._meanNSD = None
+        elif meanNSD.__class__.__name__ == "XSDataDouble":
+            self._meanNSD = meanNSD
+        else:
+            strMessage = "ERROR! XSDataResultDamaver constructor argument 'meanNSD' is not XSDataDouble but %s" % self._meanNSD.__class__.__name__
+            raise BaseException(strMessage)
+        if variationNSD is None:
+            self._variationNSD = None
+        elif variationNSD.__class__.__name__ == "XSDataDouble":
+            self._variationNSD = variationNSD
+        else:
+            strMessage = "ERROR! XSDataResultDamaver constructor argument 'variationNSD' is not XSDataDouble but %s" % self._variationNSD.__class__.__name__
+            raise BaseException(strMessage)
+        if damaverPdbFile is None:
+            self._damaverPdbFile = None
+        elif damaverPdbFile.__class__.__name__ == "XSDataFile":
+            self._damaverPdbFile = damaverPdbFile
+        else:
+            strMessage = "ERROR! XSDataResultDamaver constructor argument 'damaverPdbFile' is not XSDataFile but %s" % self._damaverPdbFile.__class__.__name__
+            raise BaseException(strMessage)
+        if damfilterPdbFile is None:
+            self._damfilterPdbFile = None
+        elif damfilterPdbFile.__class__.__name__ == "XSDataFile":
+            self._damfilterPdbFile = damfilterPdbFile
+        else:
+            strMessage = "ERROR! XSDataResultDamaver constructor argument 'damfilterPdbFile' is not XSDataFile but %s" % self._damfilterPdbFile.__class__.__name__
+            raise BaseException(strMessage)
+        if damstartPdbFile is None:
+            self._damstartPdbFile = None
+        elif damstartPdbFile.__class__.__name__ == "XSDataFile":
+            self._damstartPdbFile = damstartPdbFile
+        else:
+            strMessage = "ERROR! XSDataResultDamaver constructor argument 'damstartPdbFile' is not XSDataFile but %s" % self._damstartPdbFile.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'meanNSD' attribute
     def getMeanNSD(self): return self._meanNSD
     def setMeanNSD(self, meanNSD):
-        checkType("XSDataResultDamaver", "setMeanNSD", meanNSD, "XSDataDouble")
-        self._meanNSD = meanNSD
+        if meanNSD is None:
+            self._meanNSD = None
+        elif meanNSD.__class__.__name__ == "XSDataDouble":
+            self._meanNSD = meanNSD
+        else:
+            strMessage = "ERROR! XSDataResultDamaver.setMeanNSD argument is not XSDataDouble but %s" % meanNSD.__class__.__name__
+            raise BaseException(strMessage)
     def delMeanNSD(self): self._meanNSD = None
-    # Properties
     meanNSD = property(getMeanNSD, setMeanNSD, delMeanNSD, "Property for meanNSD")
+    # Methods and properties for the 'variationNSD' attribute
     def getVariationNSD(self): return self._variationNSD
     def setVariationNSD(self, variationNSD):
-        checkType("XSDataResultDamaver", "setVariationNSD", variationNSD, "XSDataDouble")
-        self._variationNSD = variationNSD
+        if variationNSD is None:
+            self._variationNSD = None
+        elif variationNSD.__class__.__name__ == "XSDataDouble":
+            self._variationNSD = variationNSD
+        else:
+            strMessage = "ERROR! XSDataResultDamaver.setVariationNSD argument is not XSDataDouble but %s" % variationNSD.__class__.__name__
+            raise BaseException(strMessage)
     def delVariationNSD(self): self._variationNSD = None
-    # Properties
     variationNSD = property(getVariationNSD, setVariationNSD, delVariationNSD, "Property for variationNSD")
+    # Methods and properties for the 'damaverPdbFile' attribute
     def getDamaverPdbFile(self): return self._damaverPdbFile
     def setDamaverPdbFile(self, damaverPdbFile):
-        checkType("XSDataResultDamaver", "setDamaverPdbFile", damaverPdbFile, "XSDataFile")
-        self._damaverPdbFile = damaverPdbFile
+        if damaverPdbFile is None:
+            self._damaverPdbFile = None
+        elif damaverPdbFile.__class__.__name__ == "XSDataFile":
+            self._damaverPdbFile = damaverPdbFile
+        else:
+            strMessage = "ERROR! XSDataResultDamaver.setDamaverPdbFile argument is not XSDataFile but %s" % damaverPdbFile.__class__.__name__
+            raise BaseException(strMessage)
     def delDamaverPdbFile(self): self._damaverPdbFile = None
-    # Properties
     damaverPdbFile = property(getDamaverPdbFile, setDamaverPdbFile, delDamaverPdbFile, "Property for damaverPdbFile")
+    # Methods and properties for the 'damfilterPdbFile' attribute
     def getDamfilterPdbFile(self): return self._damfilterPdbFile
     def setDamfilterPdbFile(self, damfilterPdbFile):
-        checkType("XSDataResultDamaver", "setDamfilterPdbFile", damfilterPdbFile, "XSDataFile")
-        self._damfilterPdbFile = damfilterPdbFile
+        if damfilterPdbFile is None:
+            self._damfilterPdbFile = None
+        elif damfilterPdbFile.__class__.__name__ == "XSDataFile":
+            self._damfilterPdbFile = damfilterPdbFile
+        else:
+            strMessage = "ERROR! XSDataResultDamaver.setDamfilterPdbFile argument is not XSDataFile but %s" % damfilterPdbFile.__class__.__name__
+            raise BaseException(strMessage)
     def delDamfilterPdbFile(self): self._damfilterPdbFile = None
-    # Properties
     damfilterPdbFile = property(getDamfilterPdbFile, setDamfilterPdbFile, delDamfilterPdbFile, "Property for damfilterPdbFile")
+    # Methods and properties for the 'damstartPdbFile' attribute
     def getDamstartPdbFile(self): return self._damstartPdbFile
     def setDamstartPdbFile(self, damstartPdbFile):
-        checkType("XSDataResultDamaver", "setDamstartPdbFile", damstartPdbFile, "XSDataFile")
-        self._damstartPdbFile = damstartPdbFile
+        if damstartPdbFile is None:
+            self._damstartPdbFile = None
+        elif damstartPdbFile.__class__.__name__ == "XSDataFile":
+            self._damstartPdbFile = damstartPdbFile
+        else:
+            strMessage = "ERROR! XSDataResultDamaver.setDamstartPdbFile argument is not XSDataFile but %s" % damstartPdbFile.__class__.__name__
+            raise BaseException(strMessage)
     def delDamstartPdbFile(self): self._damstartPdbFile = None
-    # Properties
     damstartPdbFile = property(getDamstartPdbFile, setDamstartPdbFile, delDamstartPdbFile, "Property for damstartPdbFile")
     def export(self, outfile, level, name_='XSDataResultDamaver'):
         showIndent(outfile, level)
@@ -4420,19 +6008,28 @@ class XSDataResultDamaver(XSDataResult):
     parseFile = staticmethod( parseFile )
 # end class XSDataResultDamaver
 
+
 class XSDataResultDamfilt(XSDataResult):
     def __init__(self, status=None, outputPdbFile=None):
         XSDataResult.__init__(self, status)
-    
-    
-        checkType("XSDataResultDamfilt", "Constructor of XSDataResultDamfilt", outputPdbFile, "XSDataFile")
-        self._outputPdbFile = outputPdbFile
+        if outputPdbFile is None:
+            self._outputPdbFile = None
+        elif outputPdbFile.__class__.__name__ == "XSDataFile":
+            self._outputPdbFile = outputPdbFile
+        else:
+            strMessage = "ERROR! XSDataResultDamfilt constructor argument 'outputPdbFile' is not XSDataFile but %s" % self._outputPdbFile.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'outputPdbFile' attribute
     def getOutputPdbFile(self): return self._outputPdbFile
     def setOutputPdbFile(self, outputPdbFile):
-        checkType("XSDataResultDamfilt", "setOutputPdbFile", outputPdbFile, "XSDataFile")
-        self._outputPdbFile = outputPdbFile
+        if outputPdbFile is None:
+            self._outputPdbFile = None
+        elif outputPdbFile.__class__.__name__ == "XSDataFile":
+            self._outputPdbFile = outputPdbFile
+        else:
+            strMessage = "ERROR! XSDataResultDamfilt.setOutputPdbFile argument is not XSDataFile but %s" % outputPdbFile.__class__.__name__
+            raise BaseException(strMessage)
     def delOutputPdbFile(self): self._outputPdbFile = None
-    # Properties
     outputPdbFile = property(getOutputPdbFile, setOutputPdbFile, delOutputPdbFile, "Property for outputPdbFile")
     def export(self, outfile, level, name_='XSDataResultDamfilt'):
         showIndent(outfile, level)
@@ -4498,64 +6095,123 @@ class XSDataResultDamfilt(XSDataResult):
     parseFile = staticmethod( parseFile )
 # end class XSDataResultDamfilt
 
+
 class XSDataResultDammif(XSDataResult):
     def __init__(self, status=None, chiSqrt=None, rfactor=None, pdbSolventFile=None, pdbMoleculeFile=None, logFile=None, fitFile=None):
         XSDataResult.__init__(self, status)
-    
-    
-        checkType("XSDataResultDammif", "Constructor of XSDataResultDammif", fitFile, "XSDataFile")
-        self._fitFile = fitFile
-        checkType("XSDataResultDammif", "Constructor of XSDataResultDammif", logFile, "XSDataFile")
-        self._logFile = logFile
-        checkType("XSDataResultDammif", "Constructor of XSDataResultDammif", pdbMoleculeFile, "XSDataFile")
-        self._pdbMoleculeFile = pdbMoleculeFile
-        checkType("XSDataResultDammif", "Constructor of XSDataResultDammif", pdbSolventFile, "XSDataFile")
-        self._pdbSolventFile = pdbSolventFile
-        checkType("XSDataResultDammif", "Constructor of XSDataResultDammif", rfactor, "XSDataDouble")
-        self._rfactor = rfactor
-        checkType("XSDataResultDammif", "Constructor of XSDataResultDammif", chiSqrt, "XSDataDouble")
-        self._chiSqrt = chiSqrt
+        if fitFile is None:
+            self._fitFile = None
+        elif fitFile.__class__.__name__ == "XSDataFile":
+            self._fitFile = fitFile
+        else:
+            strMessage = "ERROR! XSDataResultDammif constructor argument 'fitFile' is not XSDataFile but %s" % self._fitFile.__class__.__name__
+            raise BaseException(strMessage)
+        if logFile is None:
+            self._logFile = None
+        elif logFile.__class__.__name__ == "XSDataFile":
+            self._logFile = logFile
+        else:
+            strMessage = "ERROR! XSDataResultDammif constructor argument 'logFile' is not XSDataFile but %s" % self._logFile.__class__.__name__
+            raise BaseException(strMessage)
+        if pdbMoleculeFile is None:
+            self._pdbMoleculeFile = None
+        elif pdbMoleculeFile.__class__.__name__ == "XSDataFile":
+            self._pdbMoleculeFile = pdbMoleculeFile
+        else:
+            strMessage = "ERROR! XSDataResultDammif constructor argument 'pdbMoleculeFile' is not XSDataFile but %s" % self._pdbMoleculeFile.__class__.__name__
+            raise BaseException(strMessage)
+        if pdbSolventFile is None:
+            self._pdbSolventFile = None
+        elif pdbSolventFile.__class__.__name__ == "XSDataFile":
+            self._pdbSolventFile = pdbSolventFile
+        else:
+            strMessage = "ERROR! XSDataResultDammif constructor argument 'pdbSolventFile' is not XSDataFile but %s" % self._pdbSolventFile.__class__.__name__
+            raise BaseException(strMessage)
+        if rfactor is None:
+            self._rfactor = None
+        elif rfactor.__class__.__name__ == "XSDataDouble":
+            self._rfactor = rfactor
+        else:
+            strMessage = "ERROR! XSDataResultDammif constructor argument 'rfactor' is not XSDataDouble but %s" % self._rfactor.__class__.__name__
+            raise BaseException(strMessage)
+        if chiSqrt is None:
+            self._chiSqrt = None
+        elif chiSqrt.__class__.__name__ == "XSDataDouble":
+            self._chiSqrt = chiSqrt
+        else:
+            strMessage = "ERROR! XSDataResultDammif constructor argument 'chiSqrt' is not XSDataDouble but %s" % self._chiSqrt.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'fitFile' attribute
     def getFitFile(self): return self._fitFile
     def setFitFile(self, fitFile):
-        checkType("XSDataResultDammif", "setFitFile", fitFile, "XSDataFile")
-        self._fitFile = fitFile
+        if fitFile is None:
+            self._fitFile = None
+        elif fitFile.__class__.__name__ == "XSDataFile":
+            self._fitFile = fitFile
+        else:
+            strMessage = "ERROR! XSDataResultDammif.setFitFile argument is not XSDataFile but %s" % fitFile.__class__.__name__
+            raise BaseException(strMessage)
     def delFitFile(self): self._fitFile = None
-    # Properties
     fitFile = property(getFitFile, setFitFile, delFitFile, "Property for fitFile")
+    # Methods and properties for the 'logFile' attribute
     def getLogFile(self): return self._logFile
     def setLogFile(self, logFile):
-        checkType("XSDataResultDammif", "setLogFile", logFile, "XSDataFile")
-        self._logFile = logFile
+        if logFile is None:
+            self._logFile = None
+        elif logFile.__class__.__name__ == "XSDataFile":
+            self._logFile = logFile
+        else:
+            strMessage = "ERROR! XSDataResultDammif.setLogFile argument is not XSDataFile but %s" % logFile.__class__.__name__
+            raise BaseException(strMessage)
     def delLogFile(self): self._logFile = None
-    # Properties
     logFile = property(getLogFile, setLogFile, delLogFile, "Property for logFile")
+    # Methods and properties for the 'pdbMoleculeFile' attribute
     def getPdbMoleculeFile(self): return self._pdbMoleculeFile
     def setPdbMoleculeFile(self, pdbMoleculeFile):
-        checkType("XSDataResultDammif", "setPdbMoleculeFile", pdbMoleculeFile, "XSDataFile")
-        self._pdbMoleculeFile = pdbMoleculeFile
+        if pdbMoleculeFile is None:
+            self._pdbMoleculeFile = None
+        elif pdbMoleculeFile.__class__.__name__ == "XSDataFile":
+            self._pdbMoleculeFile = pdbMoleculeFile
+        else:
+            strMessage = "ERROR! XSDataResultDammif.setPdbMoleculeFile argument is not XSDataFile but %s" % pdbMoleculeFile.__class__.__name__
+            raise BaseException(strMessage)
     def delPdbMoleculeFile(self): self._pdbMoleculeFile = None
-    # Properties
     pdbMoleculeFile = property(getPdbMoleculeFile, setPdbMoleculeFile, delPdbMoleculeFile, "Property for pdbMoleculeFile")
+    # Methods and properties for the 'pdbSolventFile' attribute
     def getPdbSolventFile(self): return self._pdbSolventFile
     def setPdbSolventFile(self, pdbSolventFile):
-        checkType("XSDataResultDammif", "setPdbSolventFile", pdbSolventFile, "XSDataFile")
-        self._pdbSolventFile = pdbSolventFile
+        if pdbSolventFile is None:
+            self._pdbSolventFile = None
+        elif pdbSolventFile.__class__.__name__ == "XSDataFile":
+            self._pdbSolventFile = pdbSolventFile
+        else:
+            strMessage = "ERROR! XSDataResultDammif.setPdbSolventFile argument is not XSDataFile but %s" % pdbSolventFile.__class__.__name__
+            raise BaseException(strMessage)
     def delPdbSolventFile(self): self._pdbSolventFile = None
-    # Properties
     pdbSolventFile = property(getPdbSolventFile, setPdbSolventFile, delPdbSolventFile, "Property for pdbSolventFile")
+    # Methods and properties for the 'rfactor' attribute
     def getRfactor(self): return self._rfactor
     def setRfactor(self, rfactor):
-        checkType("XSDataResultDammif", "setRfactor", rfactor, "XSDataDouble")
-        self._rfactor = rfactor
+        if rfactor is None:
+            self._rfactor = None
+        elif rfactor.__class__.__name__ == "XSDataDouble":
+            self._rfactor = rfactor
+        else:
+            strMessage = "ERROR! XSDataResultDammif.setRfactor argument is not XSDataDouble but %s" % rfactor.__class__.__name__
+            raise BaseException(strMessage)
     def delRfactor(self): self._rfactor = None
-    # Properties
     rfactor = property(getRfactor, setRfactor, delRfactor, "Property for rfactor")
+    # Methods and properties for the 'chiSqrt' attribute
     def getChiSqrt(self): return self._chiSqrt
     def setChiSqrt(self, chiSqrt):
-        checkType("XSDataResultDammif", "setChiSqrt", chiSqrt, "XSDataDouble")
-        self._chiSqrt = chiSqrt
+        if chiSqrt is None:
+            self._chiSqrt = None
+        elif chiSqrt.__class__.__name__ == "XSDataDouble":
+            self._chiSqrt = chiSqrt
+        else:
+            strMessage = "ERROR! XSDataResultDammif.setChiSqrt argument is not XSDataDouble but %s" % chiSqrt.__class__.__name__
+            raise BaseException(strMessage)
     def delChiSqrt(self): self._chiSqrt = None
-    # Properties
     chiSqrt = property(getChiSqrt, setChiSqrt, delChiSqrt, "Property for chiSqrt")
     def export(self, outfile, level, name_='XSDataResultDammif'):
         showIndent(outfile, level)
@@ -4664,64 +6320,123 @@ class XSDataResultDammif(XSDataResult):
     parseFile = staticmethod( parseFile )
 # end class XSDataResultDammif
 
+
 class XSDataResultDammin(XSDataResult):
     def __init__(self, status=None, chiSqrt=None, rfactor=None, pdbSolventFile=None, pdbMoleculeFile=None, logFile=None, fitFile=None):
         XSDataResult.__init__(self, status)
-    
-    
-        checkType("XSDataResultDammin", "Constructor of XSDataResultDammin", fitFile, "XSDataFile")
-        self._fitFile = fitFile
-        checkType("XSDataResultDammin", "Constructor of XSDataResultDammin", logFile, "XSDataFile")
-        self._logFile = logFile
-        checkType("XSDataResultDammin", "Constructor of XSDataResultDammin", pdbMoleculeFile, "XSDataFile")
-        self._pdbMoleculeFile = pdbMoleculeFile
-        checkType("XSDataResultDammin", "Constructor of XSDataResultDammin", pdbSolventFile, "XSDataFile")
-        self._pdbSolventFile = pdbSolventFile
-        checkType("XSDataResultDammin", "Constructor of XSDataResultDammin", rfactor, "XSDataDouble")
-        self._rfactor = rfactor
-        checkType("XSDataResultDammin", "Constructor of XSDataResultDammin", chiSqrt, "XSDataDouble")
-        self._chiSqrt = chiSqrt
+        if fitFile is None:
+            self._fitFile = None
+        elif fitFile.__class__.__name__ == "XSDataFile":
+            self._fitFile = fitFile
+        else:
+            strMessage = "ERROR! XSDataResultDammin constructor argument 'fitFile' is not XSDataFile but %s" % self._fitFile.__class__.__name__
+            raise BaseException(strMessage)
+        if logFile is None:
+            self._logFile = None
+        elif logFile.__class__.__name__ == "XSDataFile":
+            self._logFile = logFile
+        else:
+            strMessage = "ERROR! XSDataResultDammin constructor argument 'logFile' is not XSDataFile but %s" % self._logFile.__class__.__name__
+            raise BaseException(strMessage)
+        if pdbMoleculeFile is None:
+            self._pdbMoleculeFile = None
+        elif pdbMoleculeFile.__class__.__name__ == "XSDataFile":
+            self._pdbMoleculeFile = pdbMoleculeFile
+        else:
+            strMessage = "ERROR! XSDataResultDammin constructor argument 'pdbMoleculeFile' is not XSDataFile but %s" % self._pdbMoleculeFile.__class__.__name__
+            raise BaseException(strMessage)
+        if pdbSolventFile is None:
+            self._pdbSolventFile = None
+        elif pdbSolventFile.__class__.__name__ == "XSDataFile":
+            self._pdbSolventFile = pdbSolventFile
+        else:
+            strMessage = "ERROR! XSDataResultDammin constructor argument 'pdbSolventFile' is not XSDataFile but %s" % self._pdbSolventFile.__class__.__name__
+            raise BaseException(strMessage)
+        if rfactor is None:
+            self._rfactor = None
+        elif rfactor.__class__.__name__ == "XSDataDouble":
+            self._rfactor = rfactor
+        else:
+            strMessage = "ERROR! XSDataResultDammin constructor argument 'rfactor' is not XSDataDouble but %s" % self._rfactor.__class__.__name__
+            raise BaseException(strMessage)
+        if chiSqrt is None:
+            self._chiSqrt = None
+        elif chiSqrt.__class__.__name__ == "XSDataDouble":
+            self._chiSqrt = chiSqrt
+        else:
+            strMessage = "ERROR! XSDataResultDammin constructor argument 'chiSqrt' is not XSDataDouble but %s" % self._chiSqrt.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'fitFile' attribute
     def getFitFile(self): return self._fitFile
     def setFitFile(self, fitFile):
-        checkType("XSDataResultDammin", "setFitFile", fitFile, "XSDataFile")
-        self._fitFile = fitFile
+        if fitFile is None:
+            self._fitFile = None
+        elif fitFile.__class__.__name__ == "XSDataFile":
+            self._fitFile = fitFile
+        else:
+            strMessage = "ERROR! XSDataResultDammin.setFitFile argument is not XSDataFile but %s" % fitFile.__class__.__name__
+            raise BaseException(strMessage)
     def delFitFile(self): self._fitFile = None
-    # Properties
     fitFile = property(getFitFile, setFitFile, delFitFile, "Property for fitFile")
+    # Methods and properties for the 'logFile' attribute
     def getLogFile(self): return self._logFile
     def setLogFile(self, logFile):
-        checkType("XSDataResultDammin", "setLogFile", logFile, "XSDataFile")
-        self._logFile = logFile
+        if logFile is None:
+            self._logFile = None
+        elif logFile.__class__.__name__ == "XSDataFile":
+            self._logFile = logFile
+        else:
+            strMessage = "ERROR! XSDataResultDammin.setLogFile argument is not XSDataFile but %s" % logFile.__class__.__name__
+            raise BaseException(strMessage)
     def delLogFile(self): self._logFile = None
-    # Properties
     logFile = property(getLogFile, setLogFile, delLogFile, "Property for logFile")
+    # Methods and properties for the 'pdbMoleculeFile' attribute
     def getPdbMoleculeFile(self): return self._pdbMoleculeFile
     def setPdbMoleculeFile(self, pdbMoleculeFile):
-        checkType("XSDataResultDammin", "setPdbMoleculeFile", pdbMoleculeFile, "XSDataFile")
-        self._pdbMoleculeFile = pdbMoleculeFile
+        if pdbMoleculeFile is None:
+            self._pdbMoleculeFile = None
+        elif pdbMoleculeFile.__class__.__name__ == "XSDataFile":
+            self._pdbMoleculeFile = pdbMoleculeFile
+        else:
+            strMessage = "ERROR! XSDataResultDammin.setPdbMoleculeFile argument is not XSDataFile but %s" % pdbMoleculeFile.__class__.__name__
+            raise BaseException(strMessage)
     def delPdbMoleculeFile(self): self._pdbMoleculeFile = None
-    # Properties
     pdbMoleculeFile = property(getPdbMoleculeFile, setPdbMoleculeFile, delPdbMoleculeFile, "Property for pdbMoleculeFile")
+    # Methods and properties for the 'pdbSolventFile' attribute
     def getPdbSolventFile(self): return self._pdbSolventFile
     def setPdbSolventFile(self, pdbSolventFile):
-        checkType("XSDataResultDammin", "setPdbSolventFile", pdbSolventFile, "XSDataFile")
-        self._pdbSolventFile = pdbSolventFile
+        if pdbSolventFile is None:
+            self._pdbSolventFile = None
+        elif pdbSolventFile.__class__.__name__ == "XSDataFile":
+            self._pdbSolventFile = pdbSolventFile
+        else:
+            strMessage = "ERROR! XSDataResultDammin.setPdbSolventFile argument is not XSDataFile but %s" % pdbSolventFile.__class__.__name__
+            raise BaseException(strMessage)
     def delPdbSolventFile(self): self._pdbSolventFile = None
-    # Properties
     pdbSolventFile = property(getPdbSolventFile, setPdbSolventFile, delPdbSolventFile, "Property for pdbSolventFile")
+    # Methods and properties for the 'rfactor' attribute
     def getRfactor(self): return self._rfactor
     def setRfactor(self, rfactor):
-        checkType("XSDataResultDammin", "setRfactor", rfactor, "XSDataDouble")
-        self._rfactor = rfactor
+        if rfactor is None:
+            self._rfactor = None
+        elif rfactor.__class__.__name__ == "XSDataDouble":
+            self._rfactor = rfactor
+        else:
+            strMessage = "ERROR! XSDataResultDammin.setRfactor argument is not XSDataDouble but %s" % rfactor.__class__.__name__
+            raise BaseException(strMessage)
     def delRfactor(self): self._rfactor = None
-    # Properties
     rfactor = property(getRfactor, setRfactor, delRfactor, "Property for rfactor")
+    # Methods and properties for the 'chiSqrt' attribute
     def getChiSqrt(self): return self._chiSqrt
     def setChiSqrt(self, chiSqrt):
-        checkType("XSDataResultDammin", "setChiSqrt", chiSqrt, "XSDataDouble")
-        self._chiSqrt = chiSqrt
+        if chiSqrt is None:
+            self._chiSqrt = None
+        elif chiSqrt.__class__.__name__ == "XSDataDouble":
+            self._chiSqrt = chiSqrt
+        else:
+            strMessage = "ERROR! XSDataResultDammin.setChiSqrt argument is not XSDataDouble but %s" % chiSqrt.__class__.__name__
+            raise BaseException(strMessage)
     def delChiSqrt(self): self._chiSqrt = None
-    # Properties
     chiSqrt = property(getChiSqrt, setChiSqrt, delChiSqrt, "Property for chiSqrt")
     def export(self, outfile, level, name_='XSDataResultDammin'):
         showIndent(outfile, level)
@@ -4830,19 +6545,28 @@ class XSDataResultDammin(XSDataResult):
     parseFile = staticmethod( parseFile )
 # end class XSDataResultDammin
 
+
 class XSDataResultDamstart(XSDataResult):
     def __init__(self, status=None, outputPdbFile=None):
         XSDataResult.__init__(self, status)
-    
-    
-        checkType("XSDataResultDamstart", "Constructor of XSDataResultDamstart", outputPdbFile, "XSDataFile")
-        self._outputPdbFile = outputPdbFile
+        if outputPdbFile is None:
+            self._outputPdbFile = None
+        elif outputPdbFile.__class__.__name__ == "XSDataFile":
+            self._outputPdbFile = outputPdbFile
+        else:
+            strMessage = "ERROR! XSDataResultDamstart constructor argument 'outputPdbFile' is not XSDataFile but %s" % self._outputPdbFile.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'outputPdbFile' attribute
     def getOutputPdbFile(self): return self._outputPdbFile
     def setOutputPdbFile(self, outputPdbFile):
-        checkType("XSDataResultDamstart", "setOutputPdbFile", outputPdbFile, "XSDataFile")
-        self._outputPdbFile = outputPdbFile
+        if outputPdbFile is None:
+            self._outputPdbFile = None
+        elif outputPdbFile.__class__.__name__ == "XSDataFile":
+            self._outputPdbFile = outputPdbFile
+        else:
+            strMessage = "ERROR! XSDataResultDamstart.setOutputPdbFile argument is not XSDataFile but %s" % outputPdbFile.__class__.__name__
+            raise BaseException(strMessage)
     def delOutputPdbFile(self): self._outputPdbFile = None
-    # Properties
     outputPdbFile = property(getOutputPdbFile, setOutputPdbFile, delOutputPdbFile, "Property for outputPdbFile")
     def export(self, outfile, level, name_='XSDataResultDamstart'):
         showIndent(outfile, level)
@@ -4908,19 +6632,28 @@ class XSDataResultDamstart(XSDataResult):
     parseFile = staticmethod( parseFile )
 # end class XSDataResultDamstart
 
+
 class XSDataResultDatGnom(XSDataResult):
     def __init__(self, status=None, gnom=None):
         XSDataResult.__init__(self, status)
-    
-    
-        checkType("XSDataResultDatGnom", "Constructor of XSDataResultDatGnom", gnom, "XSDataGnom")
-        self._gnom = gnom
+        if gnom is None:
+            self._gnom = None
+        elif gnom.__class__.__name__ == "XSDataGnom":
+            self._gnom = gnom
+        else:
+            strMessage = "ERROR! XSDataResultDatGnom constructor argument 'gnom' is not XSDataGnom but %s" % self._gnom.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'gnom' attribute
     def getGnom(self): return self._gnom
     def setGnom(self, gnom):
-        checkType("XSDataResultDatGnom", "setGnom", gnom, "XSDataGnom")
-        self._gnom = gnom
+        if gnom is None:
+            self._gnom = None
+        elif gnom.__class__.__name__ == "XSDataGnom":
+            self._gnom = gnom
+        else:
+            strMessage = "ERROR! XSDataResultDatGnom.setGnom argument is not XSDataGnom but %s" % gnom.__class__.__name__
+            raise BaseException(strMessage)
     def delGnom(self): self._gnom = None
-    # Properties
     gnom = property(getGnom, setGnom, delGnom, "Property for gnom")
     def export(self, outfile, level, name_='XSDataResultDatGnom'):
         showIndent(outfile, level)
@@ -4988,19 +6721,28 @@ class XSDataResultDatGnom(XSDataResult):
     parseFile = staticmethod( parseFile )
 # end class XSDataResultDatGnom
 
+
 class XSDataResultDatPorod(XSDataResult):
     def __init__(self, status=None, volume=None):
         XSDataResult.__init__(self, status)
-    
-    
-        checkType("XSDataResultDatPorod", "Constructor of XSDataResultDatPorod", volume, "XSDataDoubleWithUnit")
-        self._volume = volume
+        if volume is None:
+            self._volume = None
+        elif volume.__class__.__name__ == "XSDataDoubleWithUnit":
+            self._volume = volume
+        else:
+            strMessage = "ERROR! XSDataResultDatPorod constructor argument 'volume' is not XSDataDoubleWithUnit but %s" % self._volume.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'volume' attribute
     def getVolume(self): return self._volume
     def setVolume(self, volume):
-        checkType("XSDataResultDatPorod", "setVolume", volume, "XSDataDoubleWithUnit")
-        self._volume = volume
+        if volume is None:
+            self._volume = None
+        elif volume.__class__.__name__ == "XSDataDoubleWithUnit":
+            self._volume = volume
+        else:
+            strMessage = "ERROR! XSDataResultDatPorod.setVolume argument is not XSDataDoubleWithUnit but %s" % volume.__class__.__name__
+            raise BaseException(strMessage)
     def delVolume(self): self._volume = None
-    # Properties
     volume = property(getVolume, setVolume, delVolume, "Property for volume")
     def export(self, outfile, level, name_='XSDataResultDatPorod'):
         showIndent(outfile, level)
@@ -5068,20 +6810,29 @@ class XSDataResultDatPorod(XSDataResult):
     parseFile = staticmethod( parseFile )
 # end class XSDataResultDatPorod
 
+
 class XSDataResultDataver(XSDataResult):
     """Result of Dataver 	"""
     def __init__(self, status=None, outputCurve=None):
         XSDataResult.__init__(self, status)
-    
-    
-        checkType("XSDataResultDataver", "Constructor of XSDataResultDataver", outputCurve, "XSDataFile")
-        self._outputCurve = outputCurve
+        if outputCurve is None:
+            self._outputCurve = None
+        elif outputCurve.__class__.__name__ == "XSDataFile":
+            self._outputCurve = outputCurve
+        else:
+            strMessage = "ERROR! XSDataResultDataver constructor argument 'outputCurve' is not XSDataFile but %s" % self._outputCurve.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'outputCurve' attribute
     def getOutputCurve(self): return self._outputCurve
     def setOutputCurve(self, outputCurve):
-        checkType("XSDataResultDataver", "setOutputCurve", outputCurve, "XSDataFile")
-        self._outputCurve = outputCurve
+        if outputCurve is None:
+            self._outputCurve = None
+        elif outputCurve.__class__.__name__ == "XSDataFile":
+            self._outputCurve = outputCurve
+        else:
+            strMessage = "ERROR! XSDataResultDataver.setOutputCurve argument is not XSDataFile but %s" % outputCurve.__class__.__name__
+            raise BaseException(strMessage)
     def delOutputCurve(self): self._outputCurve = None
-    # Properties
     outputCurve = property(getOutputCurve, setOutputCurve, delOutputCurve, "Property for outputCurve")
     def export(self, outfile, level, name_='XSDataResultDataver'):
         showIndent(outfile, level)
@@ -5149,6 +6900,7 @@ class XSDataResultDataver(XSDataResult):
     parseFile = staticmethod( parseFile )
 # end class XSDataResultDataver
 
+
 class XSDataResultDatcmp(XSDataResult):
     """Higher chi-values indicate dis-similarities in the input.
 
@@ -5156,25 +6908,43 @@ class XSDataResultDatcmp(XSDataResult):
 	"""
     def __init__(self, status=None, fidelity=None, chi=None):
         XSDataResult.__init__(self, status)
-    
-    
-        checkType("XSDataResultDatcmp", "Constructor of XSDataResultDatcmp", chi, "XSDataDouble")
-        self._chi = chi
-        checkType("XSDataResultDatcmp", "Constructor of XSDataResultDatcmp", fidelity, "XSDataDouble")
-        self._fidelity = fidelity
+        if chi is None:
+            self._chi = None
+        elif chi.__class__.__name__ == "XSDataDouble":
+            self._chi = chi
+        else:
+            strMessage = "ERROR! XSDataResultDatcmp constructor argument 'chi' is not XSDataDouble but %s" % self._chi.__class__.__name__
+            raise BaseException(strMessage)
+        if fidelity is None:
+            self._fidelity = None
+        elif fidelity.__class__.__name__ == "XSDataDouble":
+            self._fidelity = fidelity
+        else:
+            strMessage = "ERROR! XSDataResultDatcmp constructor argument 'fidelity' is not XSDataDouble but %s" % self._fidelity.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'chi' attribute
     def getChi(self): return self._chi
     def setChi(self, chi):
-        checkType("XSDataResultDatcmp", "setChi", chi, "XSDataDouble")
-        self._chi = chi
+        if chi is None:
+            self._chi = None
+        elif chi.__class__.__name__ == "XSDataDouble":
+            self._chi = chi
+        else:
+            strMessage = "ERROR! XSDataResultDatcmp.setChi argument is not XSDataDouble but %s" % chi.__class__.__name__
+            raise BaseException(strMessage)
     def delChi(self): self._chi = None
-    # Properties
     chi = property(getChi, setChi, delChi, "Property for chi")
+    # Methods and properties for the 'fidelity' attribute
     def getFidelity(self): return self._fidelity
     def setFidelity(self, fidelity):
-        checkType("XSDataResultDatcmp", "setFidelity", fidelity, "XSDataDouble")
-        self._fidelity = fidelity
+        if fidelity is None:
+            self._fidelity = None
+        elif fidelity.__class__.__name__ == "XSDataDouble":
+            self._fidelity = fidelity
+        else:
+            strMessage = "ERROR! XSDataResultDatcmp.setFidelity argument is not XSDataDouble but %s" % fidelity.__class__.__name__
+            raise BaseException(strMessage)
     def delFidelity(self): self._fidelity = None
-    # Properties
     fidelity = property(getFidelity, setFidelity, delFidelity, "Property for fidelity")
     def export(self, outfile, level, name_='XSDataResultDatcmp'):
         showIndent(outfile, level)
@@ -5251,20 +7021,29 @@ class XSDataResultDatcmp(XSDataResult):
     parseFile = staticmethod( parseFile )
 # end class XSDataResultDatcmp
 
+
 class XSDataResultDatop(XSDataResult):
     """Result of Datop 	"""
     def __init__(self, status=None, outputCurve=None):
         XSDataResult.__init__(self, status)
-    
-    
-        checkType("XSDataResultDatop", "Constructor of XSDataResultDatop", outputCurve, "XSDataFile")
-        self._outputCurve = outputCurve
+        if outputCurve is None:
+            self._outputCurve = None
+        elif outputCurve.__class__.__name__ == "XSDataFile":
+            self._outputCurve = outputCurve
+        else:
+            strMessage = "ERROR! XSDataResultDatop constructor argument 'outputCurve' is not XSDataFile but %s" % self._outputCurve.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'outputCurve' attribute
     def getOutputCurve(self): return self._outputCurve
     def setOutputCurve(self, outputCurve):
-        checkType("XSDataResultDatop", "setOutputCurve", outputCurve, "XSDataFile")
-        self._outputCurve = outputCurve
+        if outputCurve is None:
+            self._outputCurve = None
+        elif outputCurve.__class__.__name__ == "XSDataFile":
+            self._outputCurve = outputCurve
+        else:
+            strMessage = "ERROR! XSDataResultDatop.setOutputCurve argument is not XSDataFile but %s" % outputCurve.__class__.__name__
+            raise BaseException(strMessage)
     def delOutputCurve(self): self._outputCurve = None
-    # Properties
     outputCurve = property(getOutputCurve, setOutputCurve, delOutputCurve, "Property for outputCurve")
     def export(self, outfile, level, name_='XSDataResultDatop'):
         showIndent(outfile, level)
@@ -5332,181 +7111,380 @@ class XSDataResultDatop(XSDataResult):
     parseFile = staticmethod( parseFile )
 # end class XSDataResultDatop
 
+
 class XSDataResultGnom(XSDataResult):
     def __init__(self, status=None, radiusOfGyration=None, radiusOfCrossSection=None, arrayErr=None, arrayPr=None, arrayR=None, distributionErr=None, distributionPr=None, distributionR=None, scatteringFitIArray=None, scatteringFitQArray=None, scatteringFitValues=None, scatteringFitQ=None, output=None, fitQuality=None):
         XSDataResult.__init__(self, status)
-    
-    
-        checkType("XSDataResultGnom", "Constructor of XSDataResultGnom", fitQuality, "XSDataDouble")
-        self._fitQuality = fitQuality
-        checkType("XSDataResultGnom", "Constructor of XSDataResultGnom", output, "XSDataFile")
-        self._output = output
+        if fitQuality is None:
+            self._fitQuality = None
+        elif fitQuality.__class__.__name__ == "XSDataDouble":
+            self._fitQuality = fitQuality
+        else:
+            strMessage = "ERROR! XSDataResultGnom constructor argument 'fitQuality' is not XSDataDouble but %s" % self._fitQuality.__class__.__name__
+            raise BaseException(strMessage)
+        if output is None:
+            self._output = None
+        elif output.__class__.__name__ == "XSDataFile":
+            self._output = output
+        else:
+            strMessage = "ERROR! XSDataResultGnom constructor argument 'output' is not XSDataFile but %s" % self._output.__class__.__name__
+            raise BaseException(strMessage)
         if scatteringFitQ is None:
             self._scatteringFitQ = []
-        else:
-            checkType("XSDataResultGnom", "Constructor of XSDataResultGnom", scatteringFitQ, "list")
+        elif scatteringFitQ.__class__.__name__ == "list":
             self._scatteringFitQ = scatteringFitQ
+        else:
+            strMessage = "ERROR! XSDataResultGnom constructor argument 'scatteringFitQ' is not list but %s" % self._scatteringFitQ.__class__.__name__
+            raise BaseException(strMessage)
         if scatteringFitValues is None:
             self._scatteringFitValues = []
-        else:
-            checkType("XSDataResultGnom", "Constructor of XSDataResultGnom", scatteringFitValues, "list")
+        elif scatteringFitValues.__class__.__name__ == "list":
             self._scatteringFitValues = scatteringFitValues
-        checkType("XSDataResultGnom", "Constructor of XSDataResultGnom", scatteringFitQArray, "XSDataArray")
-        self._scatteringFitQArray = scatteringFitQArray
-        checkType("XSDataResultGnom", "Constructor of XSDataResultGnom", scatteringFitIArray, "XSDataArray")
-        self._scatteringFitIArray = scatteringFitIArray
+        else:
+            strMessage = "ERROR! XSDataResultGnom constructor argument 'scatteringFitValues' is not list but %s" % self._scatteringFitValues.__class__.__name__
+            raise BaseException(strMessage)
+        if scatteringFitQArray is None:
+            self._scatteringFitQArray = None
+        elif scatteringFitQArray.__class__.__name__ == "XSDataArray":
+            self._scatteringFitQArray = scatteringFitQArray
+        else:
+            strMessage = "ERROR! XSDataResultGnom constructor argument 'scatteringFitQArray' is not XSDataArray but %s" % self._scatteringFitQArray.__class__.__name__
+            raise BaseException(strMessage)
+        if scatteringFitIArray is None:
+            self._scatteringFitIArray = None
+        elif scatteringFitIArray.__class__.__name__ == "XSDataArray":
+            self._scatteringFitIArray = scatteringFitIArray
+        else:
+            strMessage = "ERROR! XSDataResultGnom constructor argument 'scatteringFitIArray' is not XSDataArray but %s" % self._scatteringFitIArray.__class__.__name__
+            raise BaseException(strMessage)
         if distributionR is None:
             self._distributionR = []
-        else:
-            checkType("XSDataResultGnom", "Constructor of XSDataResultGnom", distributionR, "list")
+        elif distributionR.__class__.__name__ == "list":
             self._distributionR = distributionR
+        else:
+            strMessage = "ERROR! XSDataResultGnom constructor argument 'distributionR' is not list but %s" % self._distributionR.__class__.__name__
+            raise BaseException(strMessage)
         if distributionPr is None:
             self._distributionPr = []
-        else:
-            checkType("XSDataResultGnom", "Constructor of XSDataResultGnom", distributionPr, "list")
+        elif distributionPr.__class__.__name__ == "list":
             self._distributionPr = distributionPr
+        else:
+            strMessage = "ERROR! XSDataResultGnom constructor argument 'distributionPr' is not list but %s" % self._distributionPr.__class__.__name__
+            raise BaseException(strMessage)
         if distributionErr is None:
             self._distributionErr = []
-        else:
-            checkType("XSDataResultGnom", "Constructor of XSDataResultGnom", distributionErr, "list")
+        elif distributionErr.__class__.__name__ == "list":
             self._distributionErr = distributionErr
-        checkType("XSDataResultGnom", "Constructor of XSDataResultGnom", arrayR, "XSDataArray")
-        self._arrayR = arrayR
-        checkType("XSDataResultGnom", "Constructor of XSDataResultGnom", arrayPr, "XSDataArray")
-        self._arrayPr = arrayPr
-        checkType("XSDataResultGnom", "Constructor of XSDataResultGnom", arrayErr, "XSDataArray")
-        self._arrayErr = arrayErr
-        checkType("XSDataResultGnom", "Constructor of XSDataResultGnom", radiusOfCrossSection, "XSDataDouble")
-        self._radiusOfCrossSection = radiusOfCrossSection
-        checkType("XSDataResultGnom", "Constructor of XSDataResultGnom", radiusOfGyration, "XSDataDouble")
-        self._radiusOfGyration = radiusOfGyration
+        else:
+            strMessage = "ERROR! XSDataResultGnom constructor argument 'distributionErr' is not list but %s" % self._distributionErr.__class__.__name__
+            raise BaseException(strMessage)
+        if arrayR is None:
+            self._arrayR = None
+        elif arrayR.__class__.__name__ == "XSDataArray":
+            self._arrayR = arrayR
+        else:
+            strMessage = "ERROR! XSDataResultGnom constructor argument 'arrayR' is not XSDataArray but %s" % self._arrayR.__class__.__name__
+            raise BaseException(strMessage)
+        if arrayPr is None:
+            self._arrayPr = None
+        elif arrayPr.__class__.__name__ == "XSDataArray":
+            self._arrayPr = arrayPr
+        else:
+            strMessage = "ERROR! XSDataResultGnom constructor argument 'arrayPr' is not XSDataArray but %s" % self._arrayPr.__class__.__name__
+            raise BaseException(strMessage)
+        if arrayErr is None:
+            self._arrayErr = None
+        elif arrayErr.__class__.__name__ == "XSDataArray":
+            self._arrayErr = arrayErr
+        else:
+            strMessage = "ERROR! XSDataResultGnom constructor argument 'arrayErr' is not XSDataArray but %s" % self._arrayErr.__class__.__name__
+            raise BaseException(strMessage)
+        if radiusOfCrossSection is None:
+            self._radiusOfCrossSection = None
+        elif radiusOfCrossSection.__class__.__name__ == "XSDataDouble":
+            self._radiusOfCrossSection = radiusOfCrossSection
+        else:
+            strMessage = "ERROR! XSDataResultGnom constructor argument 'radiusOfCrossSection' is not XSDataDouble but %s" % self._radiusOfCrossSection.__class__.__name__
+            raise BaseException(strMessage)
+        if radiusOfGyration is None:
+            self._radiusOfGyration = None
+        elif radiusOfGyration.__class__.__name__ == "XSDataDouble":
+            self._radiusOfGyration = radiusOfGyration
+        else:
+            strMessage = "ERROR! XSDataResultGnom constructor argument 'radiusOfGyration' is not XSDataDouble but %s" % self._radiusOfGyration.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'fitQuality' attribute
     def getFitQuality(self): return self._fitQuality
     def setFitQuality(self, fitQuality):
-        checkType("XSDataResultGnom", "setFitQuality", fitQuality, "XSDataDouble")
-        self._fitQuality = fitQuality
+        if fitQuality is None:
+            self._fitQuality = None
+        elif fitQuality.__class__.__name__ == "XSDataDouble":
+            self._fitQuality = fitQuality
+        else:
+            strMessage = "ERROR! XSDataResultGnom.setFitQuality argument is not XSDataDouble but %s" % fitQuality.__class__.__name__
+            raise BaseException(strMessage)
     def delFitQuality(self): self._fitQuality = None
-    # Properties
     fitQuality = property(getFitQuality, setFitQuality, delFitQuality, "Property for fitQuality")
+    # Methods and properties for the 'output' attribute
     def getOutput(self): return self._output
     def setOutput(self, output):
-        checkType("XSDataResultGnom", "setOutput", output, "XSDataFile")
-        self._output = output
+        if output is None:
+            self._output = None
+        elif output.__class__.__name__ == "XSDataFile":
+            self._output = output
+        else:
+            strMessage = "ERROR! XSDataResultGnom.setOutput argument is not XSDataFile but %s" % output.__class__.__name__
+            raise BaseException(strMessage)
     def delOutput(self): self._output = None
-    # Properties
     output = property(getOutput, setOutput, delOutput, "Property for output")
+    # Methods and properties for the 'scatteringFitQ' attribute
     def getScatteringFitQ(self): return self._scatteringFitQ
     def setScatteringFitQ(self, scatteringFitQ):
-        checkType("XSDataResultGnom", "setScatteringFitQ", scatteringFitQ, "list")
-        self._scatteringFitQ = scatteringFitQ
+        if scatteringFitQ is None:
+            self._scatteringFitQ = []
+        elif scatteringFitQ.__class__.__name__ == "list":
+            self._scatteringFitQ = scatteringFitQ
+        else:
+            strMessage = "ERROR! XSDataResultGnom.setScatteringFitQ argument is not list but %s" % scatteringFitQ.__class__.__name__
+            raise BaseException(strMessage)
     def delScatteringFitQ(self): self._scatteringFitQ = None
-    # Properties
     scatteringFitQ = property(getScatteringFitQ, setScatteringFitQ, delScatteringFitQ, "Property for scatteringFitQ")
     def addScatteringFitQ(self, value):
-        checkType("XSDataResultGnom", "setScatteringFitQ", value, "XSDataDouble")
-        self._scatteringFitQ.append(value)
+        if value is None:
+            strMessage = "ERROR! XSDataResultGnom.addScatteringFitQ argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataDouble":
+            self._scatteringFitQ.append(value)
+        else:
+            strMessage = "ERROR! XSDataResultGnom.addScatteringFitQ argument is not XSDataDouble but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
     def insertScatteringFitQ(self, index, value):
-        checkType("XSDataResultGnom", "setScatteringFitQ", value, "XSDataDouble")
-        self._scatteringFitQ[index] = value
+        if index is None:
+            strMessage = "ERROR! XSDataResultGnom.insertScatteringFitQ argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataResultGnom.insertScatteringFitQ argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataDouble":
+            self._scatteringFitQ[index] = value
+        else:
+            strMessage = "ERROR! XSDataResultGnom.addScatteringFitQ argument is not XSDataDouble but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'scatteringFitValues' attribute
     def getScatteringFitValues(self): return self._scatteringFitValues
     def setScatteringFitValues(self, scatteringFitValues):
-        checkType("XSDataResultGnom", "setScatteringFitValues", scatteringFitValues, "list")
-        self._scatteringFitValues = scatteringFitValues
+        if scatteringFitValues is None:
+            self._scatteringFitValues = []
+        elif scatteringFitValues.__class__.__name__ == "list":
+            self._scatteringFitValues = scatteringFitValues
+        else:
+            strMessage = "ERROR! XSDataResultGnom.setScatteringFitValues argument is not list but %s" % scatteringFitValues.__class__.__name__
+            raise BaseException(strMessage)
     def delScatteringFitValues(self): self._scatteringFitValues = None
-    # Properties
     scatteringFitValues = property(getScatteringFitValues, setScatteringFitValues, delScatteringFitValues, "Property for scatteringFitValues")
     def addScatteringFitValues(self, value):
-        checkType("XSDataResultGnom", "setScatteringFitValues", value, "XSDataDouble")
-        self._scatteringFitValues.append(value)
+        if value is None:
+            strMessage = "ERROR! XSDataResultGnom.addScatteringFitValues argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataDouble":
+            self._scatteringFitValues.append(value)
+        else:
+            strMessage = "ERROR! XSDataResultGnom.addScatteringFitValues argument is not XSDataDouble but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
     def insertScatteringFitValues(self, index, value):
-        checkType("XSDataResultGnom", "setScatteringFitValues", value, "XSDataDouble")
-        self._scatteringFitValues[index] = value
+        if index is None:
+            strMessage = "ERROR! XSDataResultGnom.insertScatteringFitValues argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataResultGnom.insertScatteringFitValues argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataDouble":
+            self._scatteringFitValues[index] = value
+        else:
+            strMessage = "ERROR! XSDataResultGnom.addScatteringFitValues argument is not XSDataDouble but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'scatteringFitQArray' attribute
     def getScatteringFitQArray(self): return self._scatteringFitQArray
     def setScatteringFitQArray(self, scatteringFitQArray):
-        checkType("XSDataResultGnom", "setScatteringFitQArray", scatteringFitQArray, "XSDataArray")
-        self._scatteringFitQArray = scatteringFitQArray
+        if scatteringFitQArray is None:
+            self._scatteringFitQArray = None
+        elif scatteringFitQArray.__class__.__name__ == "XSDataArray":
+            self._scatteringFitQArray = scatteringFitQArray
+        else:
+            strMessage = "ERROR! XSDataResultGnom.setScatteringFitQArray argument is not XSDataArray but %s" % scatteringFitQArray.__class__.__name__
+            raise BaseException(strMessage)
     def delScatteringFitQArray(self): self._scatteringFitQArray = None
-    # Properties
     scatteringFitQArray = property(getScatteringFitQArray, setScatteringFitQArray, delScatteringFitQArray, "Property for scatteringFitQArray")
+    # Methods and properties for the 'scatteringFitIArray' attribute
     def getScatteringFitIArray(self): return self._scatteringFitIArray
     def setScatteringFitIArray(self, scatteringFitIArray):
-        checkType("XSDataResultGnom", "setScatteringFitIArray", scatteringFitIArray, "XSDataArray")
-        self._scatteringFitIArray = scatteringFitIArray
+        if scatteringFitIArray is None:
+            self._scatteringFitIArray = None
+        elif scatteringFitIArray.__class__.__name__ == "XSDataArray":
+            self._scatteringFitIArray = scatteringFitIArray
+        else:
+            strMessage = "ERROR! XSDataResultGnom.setScatteringFitIArray argument is not XSDataArray but %s" % scatteringFitIArray.__class__.__name__
+            raise BaseException(strMessage)
     def delScatteringFitIArray(self): self._scatteringFitIArray = None
-    # Properties
     scatteringFitIArray = property(getScatteringFitIArray, setScatteringFitIArray, delScatteringFitIArray, "Property for scatteringFitIArray")
+    # Methods and properties for the 'distributionR' attribute
     def getDistributionR(self): return self._distributionR
     def setDistributionR(self, distributionR):
-        checkType("XSDataResultGnom", "setDistributionR", distributionR, "list")
-        self._distributionR = distributionR
+        if distributionR is None:
+            self._distributionR = []
+        elif distributionR.__class__.__name__ == "list":
+            self._distributionR = distributionR
+        else:
+            strMessage = "ERROR! XSDataResultGnom.setDistributionR argument is not list but %s" % distributionR.__class__.__name__
+            raise BaseException(strMessage)
     def delDistributionR(self): self._distributionR = None
-    # Properties
     distributionR = property(getDistributionR, setDistributionR, delDistributionR, "Property for distributionR")
     def addDistributionR(self, value):
-        checkType("XSDataResultGnom", "setDistributionR", value, "XSDataDouble")
-        self._distributionR.append(value)
+        if value is None:
+            strMessage = "ERROR! XSDataResultGnom.addDistributionR argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataDouble":
+            self._distributionR.append(value)
+        else:
+            strMessage = "ERROR! XSDataResultGnom.addDistributionR argument is not XSDataDouble but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
     def insertDistributionR(self, index, value):
-        checkType("XSDataResultGnom", "setDistributionR", value, "XSDataDouble")
-        self._distributionR[index] = value
+        if index is None:
+            strMessage = "ERROR! XSDataResultGnom.insertDistributionR argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataResultGnom.insertDistributionR argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataDouble":
+            self._distributionR[index] = value
+        else:
+            strMessage = "ERROR! XSDataResultGnom.addDistributionR argument is not XSDataDouble but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'distributionPr' attribute
     def getDistributionPr(self): return self._distributionPr
     def setDistributionPr(self, distributionPr):
-        checkType("XSDataResultGnom", "setDistributionPr", distributionPr, "list")
-        self._distributionPr = distributionPr
+        if distributionPr is None:
+            self._distributionPr = []
+        elif distributionPr.__class__.__name__ == "list":
+            self._distributionPr = distributionPr
+        else:
+            strMessage = "ERROR! XSDataResultGnom.setDistributionPr argument is not list but %s" % distributionPr.__class__.__name__
+            raise BaseException(strMessage)
     def delDistributionPr(self): self._distributionPr = None
-    # Properties
     distributionPr = property(getDistributionPr, setDistributionPr, delDistributionPr, "Property for distributionPr")
     def addDistributionPr(self, value):
-        checkType("XSDataResultGnom", "setDistributionPr", value, "XSDataDouble")
-        self._distributionPr.append(value)
+        if value is None:
+            strMessage = "ERROR! XSDataResultGnom.addDistributionPr argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataDouble":
+            self._distributionPr.append(value)
+        else:
+            strMessage = "ERROR! XSDataResultGnom.addDistributionPr argument is not XSDataDouble but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
     def insertDistributionPr(self, index, value):
-        checkType("XSDataResultGnom", "setDistributionPr", value, "XSDataDouble")
-        self._distributionPr[index] = value
+        if index is None:
+            strMessage = "ERROR! XSDataResultGnom.insertDistributionPr argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataResultGnom.insertDistributionPr argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataDouble":
+            self._distributionPr[index] = value
+        else:
+            strMessage = "ERROR! XSDataResultGnom.addDistributionPr argument is not XSDataDouble but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'distributionErr' attribute
     def getDistributionErr(self): return self._distributionErr
     def setDistributionErr(self, distributionErr):
-        checkType("XSDataResultGnom", "setDistributionErr", distributionErr, "list")
-        self._distributionErr = distributionErr
+        if distributionErr is None:
+            self._distributionErr = []
+        elif distributionErr.__class__.__name__ == "list":
+            self._distributionErr = distributionErr
+        else:
+            strMessage = "ERROR! XSDataResultGnom.setDistributionErr argument is not list but %s" % distributionErr.__class__.__name__
+            raise BaseException(strMessage)
     def delDistributionErr(self): self._distributionErr = None
-    # Properties
     distributionErr = property(getDistributionErr, setDistributionErr, delDistributionErr, "Property for distributionErr")
     def addDistributionErr(self, value):
-        checkType("XSDataResultGnom", "setDistributionErr", value, "XSDataDouble")
-        self._distributionErr.append(value)
+        if value is None:
+            strMessage = "ERROR! XSDataResultGnom.addDistributionErr argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataDouble":
+            self._distributionErr.append(value)
+        else:
+            strMessage = "ERROR! XSDataResultGnom.addDistributionErr argument is not XSDataDouble but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
     def insertDistributionErr(self, index, value):
-        checkType("XSDataResultGnom", "setDistributionErr", value, "XSDataDouble")
-        self._distributionErr[index] = value
+        if index is None:
+            strMessage = "ERROR! XSDataResultGnom.insertDistributionErr argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataResultGnom.insertDistributionErr argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataDouble":
+            self._distributionErr[index] = value
+        else:
+            strMessage = "ERROR! XSDataResultGnom.addDistributionErr argument is not XSDataDouble but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'arrayR' attribute
     def getArrayR(self): return self._arrayR
     def setArrayR(self, arrayR):
-        checkType("XSDataResultGnom", "setArrayR", arrayR, "XSDataArray")
-        self._arrayR = arrayR
+        if arrayR is None:
+            self._arrayR = None
+        elif arrayR.__class__.__name__ == "XSDataArray":
+            self._arrayR = arrayR
+        else:
+            strMessage = "ERROR! XSDataResultGnom.setArrayR argument is not XSDataArray but %s" % arrayR.__class__.__name__
+            raise BaseException(strMessage)
     def delArrayR(self): self._arrayR = None
-    # Properties
     arrayR = property(getArrayR, setArrayR, delArrayR, "Property for arrayR")
+    # Methods and properties for the 'arrayPr' attribute
     def getArrayPr(self): return self._arrayPr
     def setArrayPr(self, arrayPr):
-        checkType("XSDataResultGnom", "setArrayPr", arrayPr, "XSDataArray")
-        self._arrayPr = arrayPr
+        if arrayPr is None:
+            self._arrayPr = None
+        elif arrayPr.__class__.__name__ == "XSDataArray":
+            self._arrayPr = arrayPr
+        else:
+            strMessage = "ERROR! XSDataResultGnom.setArrayPr argument is not XSDataArray but %s" % arrayPr.__class__.__name__
+            raise BaseException(strMessage)
     def delArrayPr(self): self._arrayPr = None
-    # Properties
     arrayPr = property(getArrayPr, setArrayPr, delArrayPr, "Property for arrayPr")
+    # Methods and properties for the 'arrayErr' attribute
     def getArrayErr(self): return self._arrayErr
     def setArrayErr(self, arrayErr):
-        checkType("XSDataResultGnom", "setArrayErr", arrayErr, "XSDataArray")
-        self._arrayErr = arrayErr
+        if arrayErr is None:
+            self._arrayErr = None
+        elif arrayErr.__class__.__name__ == "XSDataArray":
+            self._arrayErr = arrayErr
+        else:
+            strMessage = "ERROR! XSDataResultGnom.setArrayErr argument is not XSDataArray but %s" % arrayErr.__class__.__name__
+            raise BaseException(strMessage)
     def delArrayErr(self): self._arrayErr = None
-    # Properties
     arrayErr = property(getArrayErr, setArrayErr, delArrayErr, "Property for arrayErr")
+    # Methods and properties for the 'radiusOfCrossSection' attribute
     def getRadiusOfCrossSection(self): return self._radiusOfCrossSection
     def setRadiusOfCrossSection(self, radiusOfCrossSection):
-        checkType("XSDataResultGnom", "setRadiusOfCrossSection", radiusOfCrossSection, "XSDataDouble")
-        self._radiusOfCrossSection = radiusOfCrossSection
+        if radiusOfCrossSection is None:
+            self._radiusOfCrossSection = None
+        elif radiusOfCrossSection.__class__.__name__ == "XSDataDouble":
+            self._radiusOfCrossSection = radiusOfCrossSection
+        else:
+            strMessage = "ERROR! XSDataResultGnom.setRadiusOfCrossSection argument is not XSDataDouble but %s" % radiusOfCrossSection.__class__.__name__
+            raise BaseException(strMessage)
     def delRadiusOfCrossSection(self): self._radiusOfCrossSection = None
-    # Properties
     radiusOfCrossSection = property(getRadiusOfCrossSection, setRadiusOfCrossSection, delRadiusOfCrossSection, "Property for radiusOfCrossSection")
+    # Methods and properties for the 'radiusOfGyration' attribute
     def getRadiusOfGyration(self): return self._radiusOfGyration
     def setRadiusOfGyration(self, radiusOfGyration):
-        checkType("XSDataResultGnom", "setRadiusOfGyration", radiusOfGyration, "XSDataDouble")
-        self._radiusOfGyration = radiusOfGyration
+        if radiusOfGyration is None:
+            self._radiusOfGyration = None
+        elif radiusOfGyration.__class__.__name__ == "XSDataDouble":
+            self._radiusOfGyration = radiusOfGyration
+        else:
+            strMessage = "ERROR! XSDataResultGnom.setRadiusOfGyration argument is not XSDataDouble but %s" % radiusOfGyration.__class__.__name__
+            raise BaseException(strMessage)
     def delRadiusOfGyration(self): self._radiusOfGyration = None
-    # Properties
     radiusOfGyration = property(getRadiusOfGyration, setRadiusOfGyration, delRadiusOfGyration, "Property for radiusOfGyration")
     def export(self, outfile, level, name_='XSDataResultGnom'):
         showIndent(outfile, level)
@@ -5671,38 +7649,67 @@ class XSDataResultGnom(XSDataResult):
     parseFile = staticmethod( parseFile )
 # end class XSDataResultGnom
 
+
 class XSDataResultSaxsAnalysis(XSDataResult):
     """AutoRg -> Gnom -> Prod pipeline"""
     def __init__(self, status=None, volume=None, gnom=None, autoRg=None):
         XSDataResult.__init__(self, status)
-    
-    
-        checkType("XSDataResultSaxsAnalysis", "Constructor of XSDataResultSaxsAnalysis", autoRg, "XSDataAutoRg")
-        self._autoRg = autoRg
-        checkType("XSDataResultSaxsAnalysis", "Constructor of XSDataResultSaxsAnalysis", gnom, "XSDataGnom")
-        self._gnom = gnom
-        checkType("XSDataResultSaxsAnalysis", "Constructor of XSDataResultSaxsAnalysis", volume, "XSDataDoubleWithUnit")
-        self._volume = volume
+        if autoRg is None:
+            self._autoRg = None
+        elif autoRg.__class__.__name__ == "XSDataAutoRg":
+            self._autoRg = autoRg
+        else:
+            strMessage = "ERROR! XSDataResultSaxsAnalysis constructor argument 'autoRg' is not XSDataAutoRg but %s" % self._autoRg.__class__.__name__
+            raise BaseException(strMessage)
+        if gnom is None:
+            self._gnom = None
+        elif gnom.__class__.__name__ == "XSDataGnom":
+            self._gnom = gnom
+        else:
+            strMessage = "ERROR! XSDataResultSaxsAnalysis constructor argument 'gnom' is not XSDataGnom but %s" % self._gnom.__class__.__name__
+            raise BaseException(strMessage)
+        if volume is None:
+            self._volume = None
+        elif volume.__class__.__name__ == "XSDataDoubleWithUnit":
+            self._volume = volume
+        else:
+            strMessage = "ERROR! XSDataResultSaxsAnalysis constructor argument 'volume' is not XSDataDoubleWithUnit but %s" % self._volume.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'autoRg' attribute
     def getAutoRg(self): return self._autoRg
     def setAutoRg(self, autoRg):
-        checkType("XSDataResultSaxsAnalysis", "setAutoRg", autoRg, "XSDataAutoRg")
-        self._autoRg = autoRg
+        if autoRg is None:
+            self._autoRg = None
+        elif autoRg.__class__.__name__ == "XSDataAutoRg":
+            self._autoRg = autoRg
+        else:
+            strMessage = "ERROR! XSDataResultSaxsAnalysis.setAutoRg argument is not XSDataAutoRg but %s" % autoRg.__class__.__name__
+            raise BaseException(strMessage)
     def delAutoRg(self): self._autoRg = None
-    # Properties
     autoRg = property(getAutoRg, setAutoRg, delAutoRg, "Property for autoRg")
+    # Methods and properties for the 'gnom' attribute
     def getGnom(self): return self._gnom
     def setGnom(self, gnom):
-        checkType("XSDataResultSaxsAnalysis", "setGnom", gnom, "XSDataGnom")
-        self._gnom = gnom
+        if gnom is None:
+            self._gnom = None
+        elif gnom.__class__.__name__ == "XSDataGnom":
+            self._gnom = gnom
+        else:
+            strMessage = "ERROR! XSDataResultSaxsAnalysis.setGnom argument is not XSDataGnom but %s" % gnom.__class__.__name__
+            raise BaseException(strMessage)
     def delGnom(self): self._gnom = None
-    # Properties
     gnom = property(getGnom, setGnom, delGnom, "Property for gnom")
+    # Methods and properties for the 'volume' attribute
     def getVolume(self): return self._volume
     def setVolume(self, volume):
-        checkType("XSDataResultSaxsAnalysis", "setVolume", volume, "XSDataDoubleWithUnit")
-        self._volume = volume
+        if volume is None:
+            self._volume = None
+        elif volume.__class__.__name__ == "XSDataDoubleWithUnit":
+            self._volume = volume
+        else:
+            strMessage = "ERROR! XSDataResultSaxsAnalysis.setVolume argument is not XSDataDoubleWithUnit but %s" % volume.__class__.__name__
+            raise BaseException(strMessage)
     def delVolume(self): self._volume = None
-    # Properties
     volume = property(getVolume, setVolume, delVolume, "Property for volume")
     def export(self, outfile, level, name_='XSDataResultSaxsAnalysis'):
         showIndent(outfile, level)
@@ -5788,29 +7795,50 @@ class XSDataResultSaxsAnalysis(XSDataResult):
     parseFile = staticmethod( parseFile )
 # end class XSDataResultSaxsAnalysis
 
+
 class XSDataResultSaxsPipeline(XSDataResult):
     def __init__(self, status=None, autoRgOut=None):
         XSDataResult.__init__(self, status)
-    
-    
         if autoRgOut is None:
             self._autoRgOut = []
-        else:
-            checkType("XSDataResultSaxsPipeline", "Constructor of XSDataResultSaxsPipeline", autoRgOut, "list")
+        elif autoRgOut.__class__.__name__ == "list":
             self._autoRgOut = autoRgOut
+        else:
+            strMessage = "ERROR! XSDataResultSaxsPipeline constructor argument 'autoRgOut' is not list but %s" % self._autoRgOut.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'autoRgOut' attribute
     def getAutoRgOut(self): return self._autoRgOut
     def setAutoRgOut(self, autoRgOut):
-        checkType("XSDataResultSaxsPipeline", "setAutoRgOut", autoRgOut, "list")
-        self._autoRgOut = autoRgOut
+        if autoRgOut is None:
+            self._autoRgOut = []
+        elif autoRgOut.__class__.__name__ == "list":
+            self._autoRgOut = autoRgOut
+        else:
+            strMessage = "ERROR! XSDataResultSaxsPipeline.setAutoRgOut argument is not list but %s" % autoRgOut.__class__.__name__
+            raise BaseException(strMessage)
     def delAutoRgOut(self): self._autoRgOut = None
-    # Properties
     autoRgOut = property(getAutoRgOut, setAutoRgOut, delAutoRgOut, "Property for autoRgOut")
     def addAutoRgOut(self, value):
-        checkType("XSDataResultSaxsPipeline", "setAutoRgOut", value, "XSDataAutoRg")
-        self._autoRgOut.append(value)
+        if value is None:
+            strMessage = "ERROR! XSDataResultSaxsPipeline.addAutoRgOut argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataAutoRg":
+            self._autoRgOut.append(value)
+        else:
+            strMessage = "ERROR! XSDataResultSaxsPipeline.addAutoRgOut argument is not XSDataAutoRg but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
     def insertAutoRgOut(self, index, value):
-        checkType("XSDataResultSaxsPipeline", "setAutoRgOut", value, "XSDataAutoRg")
-        self._autoRgOut[index] = value
+        if index is None:
+            strMessage = "ERROR! XSDataResultSaxsPipeline.insertAutoRgOut argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataResultSaxsPipeline.insertAutoRgOut argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataAutoRg":
+            self._autoRgOut[index] = value
+        else:
+            strMessage = "ERROR! XSDataResultSaxsPipeline.addAutoRgOut argument is not XSDataAutoRg but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
     def export(self, outfile, level, name_='XSDataResultSaxsPipeline'):
         showIndent(outfile, level)
         outfile.write(unicode('<%s>\n' % name_))
@@ -5877,46 +7905,85 @@ class XSDataResultSaxsPipeline(XSDataResult):
     parseFile = staticmethod( parseFile )
 # end class XSDataResultSaxsPipeline
 
+
 class XSDataResultSupcomb(XSDataResult):
     def __init__(self, status=None, NSD=None, trns=None, rot=None, outputFilename=None):
         XSDataResult.__init__(self, status)
-    
-    
-        checkType("XSDataResultSupcomb", "Constructor of XSDataResultSupcomb", outputFilename, "XSDataFile")
-        self._outputFilename = outputFilename
-        checkType("XSDataResultSupcomb", "Constructor of XSDataResultSupcomb", rot, "XSDataRotation")
-        self._rot = rot
-        checkType("XSDataResultSupcomb", "Constructor of XSDataResultSupcomb", trns, "XSDataVectorDouble")
-        self._trns = trns
-        checkType("XSDataResultSupcomb", "Constructor of XSDataResultSupcomb", NSD, "XSDataDouble")
-        self._NSD = NSD
+        if outputFilename is None:
+            self._outputFilename = None
+        elif outputFilename.__class__.__name__ == "XSDataFile":
+            self._outputFilename = outputFilename
+        else:
+            strMessage = "ERROR! XSDataResultSupcomb constructor argument 'outputFilename' is not XSDataFile but %s" % self._outputFilename.__class__.__name__
+            raise BaseException(strMessage)
+        if rot is None:
+            self._rot = None
+        elif rot.__class__.__name__ == "XSDataRotation":
+            self._rot = rot
+        else:
+            strMessage = "ERROR! XSDataResultSupcomb constructor argument 'rot' is not XSDataRotation but %s" % self._rot.__class__.__name__
+            raise BaseException(strMessage)
+        if trns is None:
+            self._trns = None
+        elif trns.__class__.__name__ == "XSDataVectorDouble":
+            self._trns = trns
+        else:
+            strMessage = "ERROR! XSDataResultSupcomb constructor argument 'trns' is not XSDataVectorDouble but %s" % self._trns.__class__.__name__
+            raise BaseException(strMessage)
+        if NSD is None:
+            self._NSD = None
+        elif NSD.__class__.__name__ == "XSDataDouble":
+            self._NSD = NSD
+        else:
+            strMessage = "ERROR! XSDataResultSupcomb constructor argument 'NSD' is not XSDataDouble but %s" % self._NSD.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'outputFilename' attribute
     def getOutputFilename(self): return self._outputFilename
     def setOutputFilename(self, outputFilename):
-        checkType("XSDataResultSupcomb", "setOutputFilename", outputFilename, "XSDataFile")
-        self._outputFilename = outputFilename
+        if outputFilename is None:
+            self._outputFilename = None
+        elif outputFilename.__class__.__name__ == "XSDataFile":
+            self._outputFilename = outputFilename
+        else:
+            strMessage = "ERROR! XSDataResultSupcomb.setOutputFilename argument is not XSDataFile but %s" % outputFilename.__class__.__name__
+            raise BaseException(strMessage)
     def delOutputFilename(self): self._outputFilename = None
-    # Properties
     outputFilename = property(getOutputFilename, setOutputFilename, delOutputFilename, "Property for outputFilename")
+    # Methods and properties for the 'rot' attribute
     def getRot(self): return self._rot
     def setRot(self, rot):
-        checkType("XSDataResultSupcomb", "setRot", rot, "XSDataRotation")
-        self._rot = rot
+        if rot is None:
+            self._rot = None
+        elif rot.__class__.__name__ == "XSDataRotation":
+            self._rot = rot
+        else:
+            strMessage = "ERROR! XSDataResultSupcomb.setRot argument is not XSDataRotation but %s" % rot.__class__.__name__
+            raise BaseException(strMessage)
     def delRot(self): self._rot = None
-    # Properties
     rot = property(getRot, setRot, delRot, "Property for rot")
+    # Methods and properties for the 'trns' attribute
     def getTrns(self): return self._trns
     def setTrns(self, trns):
-        checkType("XSDataResultSupcomb", "setTrns", trns, "XSDataVectorDouble")
-        self._trns = trns
+        if trns is None:
+            self._trns = None
+        elif trns.__class__.__name__ == "XSDataVectorDouble":
+            self._trns = trns
+        else:
+            strMessage = "ERROR! XSDataResultSupcomb.setTrns argument is not XSDataVectorDouble but %s" % trns.__class__.__name__
+            raise BaseException(strMessage)
     def delTrns(self): self._trns = None
-    # Properties
     trns = property(getTrns, setTrns, delTrns, "Property for trns")
+    # Methods and properties for the 'NSD' attribute
     def getNSD(self): return self._NSD
     def setNSD(self, NSD):
-        checkType("XSDataResultSupcomb", "setNSD", NSD, "XSDataDouble")
-        self._NSD = NSD
+        if NSD is None:
+            self._NSD = None
+        elif NSD.__class__.__name__ == "XSDataDouble":
+            self._NSD = NSD
+        else:
+            strMessage = "ERROR! XSDataResultSupcomb.setNSD argument is not XSDataDouble but %s" % NSD.__class__.__name__
+            raise BaseException(strMessage)
     def delNSD(self): self._NSD = None
-    # Properties
     NSD = property(getNSD, setNSD, delNSD, "Property for NSD")
     def export(self, outfile, level, name_='XSDataResultSupcomb'):
         showIndent(outfile, level)

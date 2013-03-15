@@ -33,15 +33,15 @@ __date__ = "20130124"
 import os, shutil
 from EDPluginControl        import EDPluginControl
 from EDFactoryPlugin        import edFactoryPlugin
-#from EDConfiguration        import EDConfiguration
-from suds.client            import Client 
+# from EDConfiguration        import EDConfiguration
+from suds.client            import Client
 from suds.transport.http    import HttpAuthenticated
 edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
 from XSDataBioSaxsv1_0      import XSDataInputBioSaxsISPyBv1_0, XSDataResultBioSaxsISPyBv1_0
-#, XSDataBioSaxsSample, XSDataGnom
-#from XSDataEdnaSaxs         import XSDataAutoRg
+# , XSDataBioSaxsSample, XSDataGnom
+# from XSDataEdnaSaxs         import XSDataAutoRg
 from XSDataCommon           import  XSDataString, XSDataStatus
-#XSDataInteger, XSDataDouble, XSDataString, XSDataFile, XSPluginItem, XSDataLength, XSDataBoolean, XSDataStatus
+# XSDataInteger, XSDataDouble, XSDataString, XSDataFile, XSPluginItem, XSDataLength, XSDataBoolean, XSDataStatus
 
 
 class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
@@ -82,6 +82,7 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
         self.total = None
         self.pyarchfiles = []
         self.lstError = []
+        self.bestBuffer = None
 
 
     def checkParameters(self):
@@ -131,7 +132,8 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
 
         self.dataAutoRg = self.dataInput.autoRg
         self.dataGnom = self.dataInput.gnom
-
+        if self.dataInput.bestBuffer is not None:
+            self.bestBuffer = self.dataInput.bestBuffer.path.value
         # Params to be sent and I dont know them
         if self.dataInput.volume:
             self.volume = self.dataInput.volume.value
@@ -155,7 +157,7 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
                 self.firstPointUsed = autoRg.firstPointUsed.value
             if autoRg.lastPointUsed:
                 self.lastPointUsed = autoRg.lastPointUsed.value
-            if autoRg.quality: 
+            if autoRg.quality:
                 self.quality = autoRg.quality.value
             if autoRg.isagregated:
                 self.isagregated = autoRg.isagregated.value
@@ -214,7 +216,7 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
                                     self.framesMerged,
                                     ", ".join(self.pyarchfiles),
                                     collectionOrder,
-                                    "param3",
+                                    self.bestBuffer,
                                     "param4"
                                     )
         except Exception, error:
@@ -243,13 +245,22 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
                 self.WARNING(ermsg)
             for xsdfile in self.dataInput.curves:
                 if xsdfile:
-                    afile = xsdfile.path.value
-                    if os.path.exists(afile):
-                        try:
-                            shutil.copy(afile, pyarch)
-                        except IOError as error:
-                            ermsg = "Error while copying %s to pyarch: %s " % (afile, error)
-                            self.lstError.append(ermsg)
-                            self.WARNING(ermsg)
-                        else:
-                            self.pyarchfiles.append(os.path.join(pyarch, os.path.basename(afile)))
+                    self.copyfile(xsdfile.path.value, pyarch)
+            if self.filename and os.path.exists(self.filename):
+                self.copyfile(self.filename, pyarch)
+            if self.gnomFile and os.path.exists(self.gnomFile):
+                self.copyfile(self.gnomFile, pyarch)
+            if self.bestBuffer and os.path.exists(self.bestBuffer):
+                self.copyfile(self.bestBuffer, pyarch)
+
+    def copyfile(self, afile, pyarch):
+        afile = self.filename
+        try:
+            shutil.copy(afile, pyarch)
+        except IOError as error:
+            ermsg = "Error while copying %s to pyarch: %s " % (afile, error)
+            self.lstError.append(ermsg)
+            self.WARNING(ermsg)
+        else:
+            self.pyarchfiles.append(os.path.join(pyarch, os.path.basename(afile)))
+

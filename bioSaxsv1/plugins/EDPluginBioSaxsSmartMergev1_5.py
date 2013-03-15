@@ -114,6 +114,7 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
         self.strSubFile = None
         self.fConcentration = None
         self.xsDataResult = XSDataResultBioSaxsSmartMergev1_0()
+        self.xsBestBuffer = None
 
     def checkParameters(self):
         """
@@ -167,11 +168,11 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
             inp = self.lstInput[0].path.value
             dst = self.dataInput.mergedCurve.path.value
             if not os.path.isdir(os.path.dirname(dst)):
-                 self.error("Output directory for %s does not exist" % dst)
-                 os.makedirs(os.path.dirname(dst))
+                self.error("Output directory for %s does not exist" % dst)
+                os.makedirs(os.path.dirname(dst))
             if not os.path.exists(inp):
-                 self.warning("Input %s does not (yet?) exist" % inp)
-                 time.sleep(1.0)
+                self.warning("Input %s does not (yet?) exist" % inp)
+                time.sleep(1.0)
             shutil.copyfile(inp, dst)
             self.lstSummary.append("Got only one frame ... nothing to merge !!!")
         else:
@@ -308,6 +309,7 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
                                                      frameAverage=frameAverage,
                                                      frameMerged=frameMerged,
                                                      curves=self.curves,
+                                                     bestBuffer=self.xsBestBuffer
 #                                                     destination=self.dataInput.sample.ispybDestination #duplicate, already in sample
                                                )
             self.__edPluginSaxsISPyB.dataInput = xsdin
@@ -480,9 +482,9 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
             lstIdx.reverse()
             self.dictSimilarities[tuple(lstIdx)] = fidelity
             if fidelity == 0:
-               logFid = "infinity"
+                logFid = "infinity"
             else:
-               logFid = "%.2f" % (-log(fidelity, 10))
+                logFid = "%.2f" % (-log(fidelity, 10))
             self.lstSummary.append("-log(Fidelity) between %s and %s is %s" % (os.path.basename(file0), os.path.basename(file1), logFid))
 
 
@@ -498,9 +500,10 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
         self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsSmartMergev1_5.doSuccessExecAutoSub")
         self.autoRg = _edPlugin.dataOutput.autoRg
         if _edPlugin.dataOutput.subtractedCurve is not None:
-             subcurve = _edPlugin.dataOutput.subtractedCurve
-             if os.path.exists(subcurve.path.value):
-                 self.strSubFile = subcurve.path.value
+            subcurve = _edPlugin.dataOutput.subtractedCurve
+            if os.path.exists(subcurve.path.value):
+                self.strSubFile = subcurve.path.value
+        self.xsBestBuffer = _edPlugin.dataOutput.bestBuffer
         self.lstSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
 
 

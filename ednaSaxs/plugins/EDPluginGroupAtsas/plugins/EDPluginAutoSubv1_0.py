@@ -193,6 +193,8 @@ class EDPluginAutoSubv1_0(EDPluginControl):
 
         self.xsDataResult.status = XSDataStatus(executiveSummary=XSDataString(os.linesep.join(self.lstProcessLog)))
         self.xsDataResult.subtractedCurve = XSDataFile(XSDataString(self.subtractedCurve))        
+        if self.actualBestBuffer:
+            self.xsDataResult.bestBuffer = XSDataFile(XSDataString(self.actualBestBuffer))
         self.dataOutput = self.xsDataResult
 
 
@@ -280,8 +282,8 @@ class EDPluginAutoSubv1_0(EDPluginControl):
         @return: headers as a dictionary 
         """
         headers = {}
-        Code = Concentration = None
-        frameMax = exposureTime = measurementTemperature = storageTemperature = None
+#         Code = Concentration = None
+#         frameMax = exposureTime = measurementTemperature = storageTemperature = None
 
         headLines = [line.strip() for line in open(infile) if line.startswith(hdr)]
         headers["Comments"] = headLines[0][1:].strip()
