@@ -33,13 +33,15 @@ __date__ = "20130124"
 import os, shutil
 from EDPluginControl        import EDPluginControl
 from EDFactoryPlugin        import edFactoryPlugin
-from EDConfiguration        import EDConfiguration
-from suds.client            import Client
+#from EDConfiguration        import EDConfiguration
+from suds.client            import Client 
 from suds.transport.http    import HttpAuthenticated
 edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
-from XSDataBioSaxsv1_0      import XSDataInputBioSaxsISPyBv1_0, XSDataResultBioSaxsISPyBv1_0, XSDataBioSaxsSample, XSDataGnom
-from XSDataEdnaSaxs         import XSDataAutoRg
-from XSDataCommon           import XSDataInteger, XSDataDouble, XSDataString, XSDataFile, XSPluginItem, XSDataLength, XSDataBoolean, XSDataStatus
+from XSDataBioSaxsv1_0      import XSDataInputBioSaxsISPyBv1_0, XSDataResultBioSaxsISPyBv1_0
+#, XSDataBioSaxsSample, XSDataGnom
+#from XSDataEdnaSaxs         import XSDataAutoRg
+from XSDataCommon           import  XSDataString, XSDataStatus
+#XSDataInteger, XSDataDouble, XSDataString, XSDataFile, XSPluginItem, XSDataLength, XSDataBoolean, XSDataStatus
 
 
 class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
@@ -137,25 +139,25 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
             self.framesAverage = self.dataInput.frameAverage.value
         if self.dataInput.frameMerged:
             self.framesMerged = self.dataInput.frameMerged.value
-	if self.dataAutoRg:
-           autoRg = self.dataAutoRg
-           if autoRg.filename and autoRg.filename.path:
-		self.filename = autoRg.filename.path.value
-           if autoRg.rg:
+        if self.dataAutoRg:
+            autoRg = self.dataAutoRg
+            if autoRg.filename and autoRg.filename.path:
+                self.filename = autoRg.filename.path.value
+            if autoRg.rg:
                 self.rg = autoRg.rg.value
-           if autoRg.rgStdev:
+            if autoRg.rgStdev:
                 self.rgStdev = autoRg.rgStdev.value
-           if autoRg.i0:
+            if autoRg.i0:
                 self.i0 = autoRg.i0.value
-           if autoRg.i0Stdev:
+            if autoRg.i0Stdev:
                 self.i0Stdev = autoRg.i0Stdev.value
-           if autoRg.firstPointUsed:
+            if autoRg.firstPointUsed:
                 self.firstPointUsed = autoRg.firstPointUsed.value
-           if autoRg.lastPointUsed:
+            if autoRg.lastPointUsed:
                 self.lastPointUsed = autoRg.lastPointUsed.value
-           if autoRg.quality:
+            if autoRg.quality: 
                 self.quality = autoRg.quality.value
-           if autoRg.isagregated:
+            if autoRg.isagregated:
                 self.isagregated = autoRg.isagregated.value
         if self.dataBioSaxsSample:
             if self.dataBioSaxsSample.code:
@@ -164,15 +166,15 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
                 self.concentration = self.dataBioSaxsSample.concentration.value
         if self.dataGnom:
             if self.dataGnom.gnomFile:
-               self.gnomFile = self.dataGnom.gnomFile.path.value
+                self.gnomFile = self.dataGnom.gnomFile.path.value
             if self.dataGnom.rgGuinier:
-               self.rgGuinier = self.dataGnom.rgGuinier.value
+                self.rgGuinier = self.dataGnom.rgGuinier.value
             if self.dataGnom.rgGnom:
-               self.rgGnom = self.dataGnom.rgGnom.value
+                self.rgGnom = self.dataGnom.rgGnom.value
             if self.dataGnom.dmax:
-               self.dmax = self.dataGnom.dmax.value
+                self.dmax = self.dataGnom.dmax.value
             if self.dataGnom.total:
-               self.total = self.dataGnom.total.value
+                self.total = self.dataGnom.total.value
 
 
     def process(self, _edObject=None):
@@ -238,7 +240,7 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
             except IOError as error:
                 ermsg = "Error while directory creation in pyarch: %s " % error
                 self.lstError.append(ermsg)
-                self.WARNING(errmsg)
+                self.WARNING(ermsg)
             for xsdfile in self.dataInput.curves:
                 if xsdfile:
                     afile = xsdfile.path.value
@@ -248,6 +250,6 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
                         except IOError as error:
                             ermsg = "Error while copying %s to pyarch: %s " % (afile, error)
                             self.lstError.append(ermsg)
-                            self.WARNING(errmsg)
+                            self.WARNING(ermsg)
                         else:
                             self.pyarchfiles.append(os.path.join(pyarch, os.path.basename(afile)))
