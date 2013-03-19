@@ -182,13 +182,12 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
     def process(self, _edObject=None):
         EDPluginControl.process(self)
         self.DEBUG("EDPluginBioSaxsISPyBv1_0.process")
-#         try:
-        if 1:
+        try:
             self.copy_to_pyarch()
-#         except Exception as error:
-#             strErrorMessage = "Error while copying to pyarch: %s" % error
-#             self.ERROR(strErrorMessage)
-#             self.lstError.append(strErrorMessage)
+        except Exception as error:
+            strErrorMessage = "Error while copying to pyarch: %s" % error
+            self.ERROR(strErrorMessage)
+            self.lstError.append(strErrorMessage)
         if self.dataInput.sample.collectionOrder is not None:
             collectionOrder = str(self.dataInput.sample.collectionOrder.value)
         else:
@@ -245,14 +244,12 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
                 self.lstError.append(ermsg)
                 self.ERROR(ermsg)
             for xsdfile in self.dataInput.curves:
-                self.ERROR("Copy file %s" % xsdfile.path.value)
                 self.copyfile(xsdfile.path.value, pyarch)
             self.copyfile(self.filename, pyarch)
             self.copyfile(self.gnomFile, pyarch)
             self.copyfile(self.bestBuffer, pyarch)
 
     def copyfile(self, afile, pyarch):
-        afile = self.filename
         if not pyarch:
             self.ERROR("pyArch is %s" % pyarch)
         if afile and os.path.exists(afile) and os.path.isdir(pyarch):
