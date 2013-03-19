@@ -481,7 +481,7 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
             self.dictSimilarities[tuple(lstIdx)] = fidelity
             lstIdx.reverse()
             self.dictSimilarities[tuple(lstIdx)] = fidelity
-            if fidelity == 0:
+            if fidelity <= 0:
                 logFid = "infinity"
             else:
                 logFid = "%.2f" % (-log(fidelity, 10))
