@@ -182,12 +182,13 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
     def process(self, _edObject=None):
         EDPluginControl.process(self)
         self.DEBUG("EDPluginBioSaxsISPyBv1_0.process")
-        try:
+#         try:
+        if 1:
             self.copy_to_pyarch()
-        except Exception as error:
-            strErrorMessage = "Error while copying to pyarch: %s" % error
-            self.ERROR(strErrorMessage)
-            self.lstError.append(strErrorMessage)
+#         except Exception as error:
+#             strErrorMessage = "Error while copying to pyarch: %s" % error
+#             self.ERROR(strErrorMessage)
+#             self.lstError.append(strErrorMessage)
         if self.dataInput.sample.collectionOrder is not None:
             collectionOrder = str(self.dataInput.sample.collectionOrder.value)
         else:
