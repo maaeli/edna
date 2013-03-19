@@ -26,7 +26,6 @@
 #
 
 from __future__ import with_statement
-from EDUtilsArray import EDUtilsArray
 
 __authors__ = ["irakli", "Jérôme Kieffer"]
 __license__ = "GPLv3+"
@@ -41,6 +40,7 @@ from XSDataEdnaSaxs            import XSDataInputGnom, XSDataResultGnom
 from XSDataCommon              import XSDataFile, XSDataString, XSDataDouble
 from EDUtilsPlatform           import  EDUtilsPlatform
 from EDUtilsPath               import EDUtilsPath
+from EDUtilsArray import EDUtilsArray
 from EDFactoryPlugin import edFactoryPlugin as EDFactoryPluginStatic
 architecture = EDUtilsPlatform.architecture
 numpyPath = os.path.join(EDUtilsPath.EDNA_HOME, "libraries", "20090405-Numpy-1.3", architecture)
