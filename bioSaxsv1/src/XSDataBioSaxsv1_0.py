@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Fri Mar 15 04:10::40 2013 by EDGenerateDS.
+# Generated Tue Mar 19 02:01::41 2013 by EDGenerateDS.
 #
 
 import os, sys
@@ -3075,6 +3075,299 @@ class XSDataInputBioSaxsSmartMergev1_0(XSDataInput):
 # end class XSDataInputBioSaxsSmartMergev1_0
 
 
+class XSDataInputBioSaxsSolutionScatteringISPyBv1_0(XSDataInput):
+    """Input class for populating ISPyB"""
+    def __init__(self, configuration=None, kratkyPlotFile=None, guinierPlotFile=None, scatterPlotFile=None, dammifJobs=None, dammifStart=None, dammifFilter=None, dammifAvg=None, sample=None):
+        XSDataInput.__init__(self, configuration)
+        if sample is None:
+            self._sample = None
+        elif sample.__class__.__name__ == "XSDataBioSaxsSample":
+            self._sample = sample
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsSolutionScatteringISPyBv1_0 constructor argument 'sample' is not XSDataBioSaxsSample but %s" % self._sample.__class__.__name__
+            raise BaseException(strMessage)
+        if dammifAvg is None:
+            self._dammifAvg = None
+        elif dammifAvg.__class__.__name__ == "XSDataString":
+            self._dammifAvg = dammifAvg
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsSolutionScatteringISPyBv1_0 constructor argument 'dammifAvg' is not XSDataString but %s" % self._dammifAvg.__class__.__name__
+            raise BaseException(strMessage)
+        if dammifFilter is None:
+            self._dammifFilter = None
+        elif dammifFilter.__class__.__name__ == "XSDataString":
+            self._dammifFilter = dammifFilter
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsSolutionScatteringISPyBv1_0 constructor argument 'dammifFilter' is not XSDataString but %s" % self._dammifFilter.__class__.__name__
+            raise BaseException(strMessage)
+        if dammifStart is None:
+            self._dammifStart = None
+        elif dammifStart.__class__.__name__ == "XSDataString":
+            self._dammifStart = dammifStart
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsSolutionScatteringISPyBv1_0 constructor argument 'dammifStart' is not XSDataString but %s" % self._dammifStart.__class__.__name__
+            raise BaseException(strMessage)
+        if dammifJobs is None:
+            self._dammifJobs = []
+        elif dammifJobs.__class__.__name__ == "list":
+            self._dammifJobs = dammifJobs
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsSolutionScatteringISPyBv1_0 constructor argument 'dammifJobs' is not list but %s" % self._dammifJobs.__class__.__name__
+            raise BaseException(strMessage)
+        if scatterPlotFile is None:
+            self._scatterPlotFile = None
+        elif scatterPlotFile.__class__.__name__ == "XSDataFile":
+            self._scatterPlotFile = scatterPlotFile
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsSolutionScatteringISPyBv1_0 constructor argument 'scatterPlotFile' is not XSDataFile but %s" % self._scatterPlotFile.__class__.__name__
+            raise BaseException(strMessage)
+        if guinierPlotFile is None:
+            self._guinierPlotFile = None
+        elif guinierPlotFile.__class__.__name__ == "XSDataFile":
+            self._guinierPlotFile = guinierPlotFile
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsSolutionScatteringISPyBv1_0 constructor argument 'guinierPlotFile' is not XSDataFile but %s" % self._guinierPlotFile.__class__.__name__
+            raise BaseException(strMessage)
+        if kratkyPlotFile is None:
+            self._kratkyPlotFile = None
+        elif kratkyPlotFile.__class__.__name__ == "XSDataFile":
+            self._kratkyPlotFile = kratkyPlotFile
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsSolutionScatteringISPyBv1_0 constructor argument 'kratkyPlotFile' is not XSDataFile but %s" % self._kratkyPlotFile.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'sample' attribute
+    def getSample(self): return self._sample
+    def setSample(self, sample):
+        if sample is None:
+            self._sample = None
+        elif sample.__class__.__name__ == "XSDataBioSaxsSample":
+            self._sample = sample
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsSolutionScatteringISPyBv1_0.setSample argument is not XSDataBioSaxsSample but %s" % sample.__class__.__name__
+            raise BaseException(strMessage)
+    def delSample(self): self._sample = None
+    sample = property(getSample, setSample, delSample, "Property for sample")
+    # Methods and properties for the 'dammifAvg' attribute
+    def getDammifAvg(self): return self._dammifAvg
+    def setDammifAvg(self, dammifAvg):
+        if dammifAvg is None:
+            self._dammifAvg = None
+        elif dammifAvg.__class__.__name__ == "XSDataString":
+            self._dammifAvg = dammifAvg
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsSolutionScatteringISPyBv1_0.setDammifAvg argument is not XSDataString but %s" % dammifAvg.__class__.__name__
+            raise BaseException(strMessage)
+    def delDammifAvg(self): self._dammifAvg = None
+    dammifAvg = property(getDammifAvg, setDammifAvg, delDammifAvg, "Property for dammifAvg")
+    # Methods and properties for the 'dammifFilter' attribute
+    def getDammifFilter(self): return self._dammifFilter
+    def setDammifFilter(self, dammifFilter):
+        if dammifFilter is None:
+            self._dammifFilter = None
+        elif dammifFilter.__class__.__name__ == "XSDataString":
+            self._dammifFilter = dammifFilter
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsSolutionScatteringISPyBv1_0.setDammifFilter argument is not XSDataString but %s" % dammifFilter.__class__.__name__
+            raise BaseException(strMessage)
+    def delDammifFilter(self): self._dammifFilter = None
+    dammifFilter = property(getDammifFilter, setDammifFilter, delDammifFilter, "Property for dammifFilter")
+    # Methods and properties for the 'dammifStart' attribute
+    def getDammifStart(self): return self._dammifStart
+    def setDammifStart(self, dammifStart):
+        if dammifStart is None:
+            self._dammifStart = None
+        elif dammifStart.__class__.__name__ == "XSDataString":
+            self._dammifStart = dammifStart
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsSolutionScatteringISPyBv1_0.setDammifStart argument is not XSDataString but %s" % dammifStart.__class__.__name__
+            raise BaseException(strMessage)
+    def delDammifStart(self): self._dammifStart = None
+    dammifStart = property(getDammifStart, setDammifStart, delDammifStart, "Property for dammifStart")
+    # Methods and properties for the 'dammifJobs' attribute
+    def getDammifJobs(self): return self._dammifJobs
+    def setDammifJobs(self, dammifJobs):
+        if dammifJobs is None:
+            self._dammifJobs = []
+        elif dammifJobs.__class__.__name__ == "list":
+            self._dammifJobs = dammifJobs
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsSolutionScatteringISPyBv1_0.setDammifJobs argument is not list but %s" % dammifJobs.__class__.__name__
+            raise BaseException(strMessage)
+    def delDammifJobs(self): self._dammifJobs = None
+    dammifJobs = property(getDammifJobs, setDammifJobs, delDammifJobs, "Property for dammifJobs")
+    def addDammifJobs(self, value):
+        if value is None:
+            strMessage = "ERROR! XSDataInputBioSaxsSolutionScatteringISPyBv1_0.addDammifJobs argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataString":
+            self._dammifJobs.append(value)
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsSolutionScatteringISPyBv1_0.addDammifJobs argument is not XSDataString but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    def insertDammifJobs(self, index, value):
+        if index is None:
+            strMessage = "ERROR! XSDataInputBioSaxsSolutionScatteringISPyBv1_0.insertDammifJobs argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataInputBioSaxsSolutionScatteringISPyBv1_0.insertDammifJobs argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataString":
+            self._dammifJobs[index] = value
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsSolutionScatteringISPyBv1_0.addDammifJobs argument is not XSDataString but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'scatterPlotFile' attribute
+    def getScatterPlotFile(self): return self._scatterPlotFile
+    def setScatterPlotFile(self, scatterPlotFile):
+        if scatterPlotFile is None:
+            self._scatterPlotFile = None
+        elif scatterPlotFile.__class__.__name__ == "XSDataFile":
+            self._scatterPlotFile = scatterPlotFile
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsSolutionScatteringISPyBv1_0.setScatterPlotFile argument is not XSDataFile but %s" % scatterPlotFile.__class__.__name__
+            raise BaseException(strMessage)
+    def delScatterPlotFile(self): self._scatterPlotFile = None
+    scatterPlotFile = property(getScatterPlotFile, setScatterPlotFile, delScatterPlotFile, "Property for scatterPlotFile")
+    # Methods and properties for the 'guinierPlotFile' attribute
+    def getGuinierPlotFile(self): return self._guinierPlotFile
+    def setGuinierPlotFile(self, guinierPlotFile):
+        if guinierPlotFile is None:
+            self._guinierPlotFile = None
+        elif guinierPlotFile.__class__.__name__ == "XSDataFile":
+            self._guinierPlotFile = guinierPlotFile
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsSolutionScatteringISPyBv1_0.setGuinierPlotFile argument is not XSDataFile but %s" % guinierPlotFile.__class__.__name__
+            raise BaseException(strMessage)
+    def delGuinierPlotFile(self): self._guinierPlotFile = None
+    guinierPlotFile = property(getGuinierPlotFile, setGuinierPlotFile, delGuinierPlotFile, "Property for guinierPlotFile")
+    # Methods and properties for the 'kratkyPlotFile' attribute
+    def getKratkyPlotFile(self): return self._kratkyPlotFile
+    def setKratkyPlotFile(self, kratkyPlotFile):
+        if kratkyPlotFile is None:
+            self._kratkyPlotFile = None
+        elif kratkyPlotFile.__class__.__name__ == "XSDataFile":
+            self._kratkyPlotFile = kratkyPlotFile
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsSolutionScatteringISPyBv1_0.setKratkyPlotFile argument is not XSDataFile but %s" % kratkyPlotFile.__class__.__name__
+            raise BaseException(strMessage)
+    def delKratkyPlotFile(self): self._kratkyPlotFile = None
+    kratkyPlotFile = property(getKratkyPlotFile, setKratkyPlotFile, delKratkyPlotFile, "Property for kratkyPlotFile")
+    def export(self, outfile, level, name_='XSDataInputBioSaxsSolutionScatteringISPyBv1_0'):
+        showIndent(outfile, level)
+        outfile.write(unicode('<%s>\n' % name_))
+        self.exportChildren(outfile, level + 1, name_)
+        showIndent(outfile, level)
+        outfile.write(unicode('</%s>\n' % name_))
+    def exportChildren(self, outfile, level, name_='XSDataInputBioSaxsSolutionScatteringISPyBv1_0'):
+        XSDataInput.exportChildren(self, outfile, level, name_)
+        if self._sample is not None:
+            self.sample.export(outfile, level, name_='sample')
+        else:
+            warnEmptyAttribute("sample", "XSDataBioSaxsSample")
+        if self._dammifAvg is not None:
+            self.dammifAvg.export(outfile, level, name_='dammifAvg')
+        if self._dammifFilter is not None:
+            self.dammifFilter.export(outfile, level, name_='dammifFilter')
+        if self._dammifStart is not None:
+            self.dammifStart.export(outfile, level, name_='dammifStart')
+        for dammifJobs_ in self.getDammifJobs():
+            dammifJobs_.export(outfile, level, name_='dammifJobs')
+        if self._scatterPlotFile is not None:
+            self.scatterPlotFile.export(outfile, level, name_='scatterPlotFile')
+        if self._guinierPlotFile is not None:
+            self.guinierPlotFile.export(outfile, level, name_='guinierPlotFile')
+        if self._kratkyPlotFile is not None:
+            self.kratkyPlotFile.export(outfile, level, name_='kratkyPlotFile')
+    def build(self, node_):
+        for child_ in node_.childNodes:
+            nodeName_ = child_.nodeName.split(':')[-1]
+            self.buildChildren(child_, nodeName_)
+    def buildChildren(self, child_, nodeName_):
+        if child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'sample':
+            obj_ = XSDataBioSaxsSample()
+            obj_.build(child_)
+            self.setSample(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'dammifAvg':
+            obj_ = XSDataString()
+            obj_.build(child_)
+            self.setDammifAvg(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'dammifFilter':
+            obj_ = XSDataString()
+            obj_.build(child_)
+            self.setDammifFilter(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'dammifStart':
+            obj_ = XSDataString()
+            obj_.build(child_)
+            self.setDammifStart(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'dammifJobs':
+            obj_ = XSDataString()
+            obj_.build(child_)
+            self.dammifJobs.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'scatterPlotFile':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setScatterPlotFile(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'guinierPlotFile':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setGuinierPlotFile(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'kratkyPlotFile':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setKratkyPlotFile(obj_)
+        XSDataInput.buildChildren(self, child_, nodeName_)
+    #Method for marshalling an object
+    def marshal( self ):
+        oStreamString = StringIO()
+        oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
+        self.export( oStreamString, 0, name_="XSDataInputBioSaxsSolutionScatteringISPyBv1_0" )
+        oStringXML = oStreamString.getvalue()
+        oStreamString.close()
+        return oStringXML
+    #Only to export the entire XML tree to a file stream on disk
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
+        outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
+        self.export( outfile, 0, name_='XSDataInputBioSaxsSolutionScatteringISPyBv1_0' )
+        outfile.close()
+    #Deprecated method, replaced by exportToFile
+    def outputFile( self, _outfileName ):
+        print("WARNING: Method outputFile in class XSDataInputBioSaxsSolutionScatteringISPyBv1_0 is deprecated, please use instead exportToFile!")
+        self.exportToFile(_outfileName)
+    #Method for making a copy in a new instance
+    def copy( self ):
+        return XSDataInputBioSaxsSolutionScatteringISPyBv1_0.parseString(self.marshal())
+    #Static method for parsing a string
+    def parseString( _inString ):
+        doc = minidom.parseString(_inString)
+        rootNode = doc.documentElement
+        rootObj = XSDataInputBioSaxsSolutionScatteringISPyBv1_0()
+        rootObj.build(rootNode)
+        # Check that all minOccurs are obeyed by marshalling the created object
+        oStreamString = StringIO()
+        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsSolutionScatteringISPyBv1_0" )
+        oStreamString.close()
+        return rootObj
+    parseString = staticmethod( parseString )
+    #Static method for parsing a file
+    def parseFile( _inFilePath ):
+        doc = minidom.parse(_inFilePath)
+        rootNode = doc.documentElement
+        rootObj = XSDataInputBioSaxsSolutionScatteringISPyBv1_0()
+        rootObj.build(rootNode)
+        return rootObj
+    parseFile = staticmethod( parseFile )
+# end class XSDataInputBioSaxsSolutionScatteringISPyBv1_0
+
+
 class XSDataInputBioSaxsSubtractv1_0(XSDataInput):
     """Runs sequentially subtraction of buffer and SaxsAnalysis"""
     def __init__(self, configuration=None, gnomFile=None, subtractedCurve=None, sample=None, bufferCurves=None, sampleCurve=None):
@@ -5021,6 +5314,68 @@ class XSDataResultBioSaxsSmartMergev1_0(XSDataResult):
         return rootObj
     parseFile = staticmethod( parseFile )
 # end class XSDataResultBioSaxsSmartMergev1_0
+
+
+class XSDataResultBioSaxsSolutionScatteringISPyBv1_0(XSDataResult):
+    def __init__(self, status=None):
+        XSDataResult.__init__(self, status)
+    def export(self, outfile, level, name_='XSDataResultBioSaxsSolutionScatteringISPyBv1_0'):
+        showIndent(outfile, level)
+        outfile.write(unicode('<%s>\n' % name_))
+        self.exportChildren(outfile, level + 1, name_)
+        showIndent(outfile, level)
+        outfile.write(unicode('</%s>\n' % name_))
+    def exportChildren(self, outfile, level, name_='XSDataResultBioSaxsSolutionScatteringISPyBv1_0'):
+        XSDataResult.exportChildren(self, outfile, level, name_)
+    def build(self, node_):
+        for child_ in node_.childNodes:
+            nodeName_ = child_.nodeName.split(':')[-1]
+            self.buildChildren(child_, nodeName_)
+    def buildChildren(self, child_, nodeName_):
+        pass
+        XSDataResult.buildChildren(self, child_, nodeName_)
+    #Method for marshalling an object
+    def marshal( self ):
+        oStreamString = StringIO()
+        oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
+        self.export( oStreamString, 0, name_="XSDataResultBioSaxsSolutionScatteringISPyBv1_0" )
+        oStringXML = oStreamString.getvalue()
+        oStreamString.close()
+        return oStringXML
+    #Only to export the entire XML tree to a file stream on disk
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
+        outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
+        self.export( outfile, 0, name_='XSDataResultBioSaxsSolutionScatteringISPyBv1_0' )
+        outfile.close()
+    #Deprecated method, replaced by exportToFile
+    def outputFile( self, _outfileName ):
+        print("WARNING: Method outputFile in class XSDataResultBioSaxsSolutionScatteringISPyBv1_0 is deprecated, please use instead exportToFile!")
+        self.exportToFile(_outfileName)
+    #Method for making a copy in a new instance
+    def copy( self ):
+        return XSDataResultBioSaxsSolutionScatteringISPyBv1_0.parseString(self.marshal())
+    #Static method for parsing a string
+    def parseString( _inString ):
+        doc = minidom.parseString(_inString)
+        rootNode = doc.documentElement
+        rootObj = XSDataResultBioSaxsSolutionScatteringISPyBv1_0()
+        rootObj.build(rootNode)
+        # Check that all minOccurs are obeyed by marshalling the created object
+        oStreamString = StringIO()
+        rootObj.export( oStreamString, 0, name_="XSDataResultBioSaxsSolutionScatteringISPyBv1_0" )
+        oStreamString.close()
+        return rootObj
+    parseString = staticmethod( parseString )
+    #Static method for parsing a file
+    def parseFile( _inFilePath ):
+        doc = minidom.parse(_inFilePath)
+        rootNode = doc.documentElement
+        rootObj = XSDataResultBioSaxsSolutionScatteringISPyBv1_0()
+        rootObj.build(rootNode)
+        return rootObj
+    parseFile = staticmethod( parseFile )
+# end class XSDataResultBioSaxsSolutionScatteringISPyBv1_0
 
 
 class XSDataResultBioSaxsSubtractv1_0(XSDataResult):
