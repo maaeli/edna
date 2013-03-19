@@ -243,8 +243,9 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
             except IOError as error:
                 ermsg = "Error while directory creation in pyarch: %s " % error
                 self.lstError.append(ermsg)
-                self.WARNING(ermsg)
+                self.ERROR(ermsg)
             for xsdfile in self.dataInput.curves:
+                self.ERROR("Copy file %s" % xsdfile.path.value)
                 self.copyfile(xsdfile.path.value, pyarch)
             self.copyfile(self.filename, pyarch)
             self.copyfile(self.gnomFile, pyarch)
