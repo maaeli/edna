@@ -25,12 +25,15 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+from __future__ import with_statement
+
 __authors__ = ["Jérôme Kieffer"]
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
 __date__ = "20130124"
 __status__ = "Development"
 __version__ = "0.1"
+
 import os, sys, time, logging
 from optparse import OptionParser
 import numpy
@@ -89,10 +92,10 @@ def load_saxs(filename):
 
     def loadGnomFile(filename):
         """
-        
+
         @param filename: path of the Gnom output File
         @return: dict with many parameters: gnomRg, gnomRg_err, gnomI0, gnomI0_err, q_fit, I_fit, r, P(r), P(r)_err
-        
+
         """
         pr = StringIO("")
         reg = StringIO("")
@@ -127,10 +130,10 @@ def load_saxs(filename):
         return out
 
 
-def scatterPlot(curve_file, first_point=None, last_point=None, filename=None, format="png", unit="nm"):
+def scatterPlot(curve_file, first_point=None, last_point=None, filename=None, format="png", unit="nm", gnomfile=None):
     """
     Generate a scattering plot I = f(q) in semi log.
-    
+
     @param curve_file: name of the saxs curve file
     @param: first_point,last point: integers, by default 0 and -1
     @param  filename: name of the file where the cuve should be saved
@@ -163,7 +166,14 @@ def scatterPlot(curve_file, first_point=None, last_point=None, filename=None, fo
         ax1.errorbar(q, I, std, label="Experimental curve")
     else:
         ax1.plot(q, I, label="Experimental curve")
-
+    if first_point is not None:
+        if std is not None:
+            ax1.errorbar(q[first_point:], I[first_point:], std[first_point:], label="Experimental curve (cropped)")
+        else:
+            ax1.plot(q[first_point:], I[first_point:], label="Experimental curve (cropped)")
+    if gnomfile:
+        gnom = loadGnomFile(gnomfile)
+        ax1.plot(gnom["q_fit"], gnom["I_fit"], label="GNOM fitted curve")
     ax1.set_ylabel('$I(q)$')
     ax1.set_xlabel('$q$ (%s$^{-1}$)' % unit)
     ax1.set_title("Scattering curve")

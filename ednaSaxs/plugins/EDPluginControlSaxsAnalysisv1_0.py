@@ -101,7 +101,7 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
         self.edPluginDatGnom.dataInput = XSDataInputDatGnom(inputCurve=self.dataInput.scatterCurve,
                                              output=XSDataFile(XSDataString(self.gnomFile)),
                                              rg=self.autoRg.rg,
-                                            skip=XSDataInteger(self.autoRg.firstPointUsed.value - 1))
+                                             skip=XSDataInteger(self.autoRg.firstPointUsed.value - 1))
         self.edPluginDatGnom.connectSUCCESS(self.doSuccessGnom)
         self.edPluginDatGnom.connectFAILURE(self.doFailureGnom)
         self.edPluginDatGnom.executeSynchronous()
@@ -150,9 +150,9 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
         EDPluginControl.postProcess(self)
         self.DEBUG("EDPluginControlSaxsAnalysisv1_0.postProcess")
         # Create some output data
-        strLog = """Rg   =   %.2f +/- %2f 
+        strLog = """Rg   =   %.2f +/- %2f
 I(0) =   %.2e +/- %.2e
-Points   %i to %i 
+Points   %i to %i
 Quality: %4.2f%%     Aggregated: %s""" % (self.autoRg.rg.value, self.autoRg.rgStdev.value,
                         self.autoRg.i0.value, self.autoRg.i0Stdev.value,
                         self.autoRg.firstPointUsed.value, self.autoRg.lastPointUsed.value,
@@ -162,7 +162,7 @@ Quality: %4.2f%%     Aggregated: %s""" % (self.autoRg.rg.value, self.autoRg.rgSt
 datGnom failed"""
         else:
             strLog += """
-Dmax    =    %12.2f       Total =   %12.2f     
+Dmax    =    %12.2f       Total =   %12.2f
 Guinier =    %12.2f       Gnom =    %12.2f""" % (self.gnom.dmax.value, self.gnom.total.value,
                         self.gnom.rgGuinier.value, self.gnom.rgGnom.value)
         if self.xVolume is None:
