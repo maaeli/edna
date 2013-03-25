@@ -36,8 +36,11 @@ from optparse import OptionParser
 import numpy
 from scipy import stats
 import matplotlib
-# matplotlib.use('Agg')
-matplotlib.use('Qt4Agg')
+exe = sys.argv[0].lower()
+if "autorg" in exe  or "testall" in exe:
+    matplotlib.use('Qt4Agg')
+else:
+    matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import scipy.optimize
 import scipy.ndimage
@@ -250,7 +253,7 @@ def kartkyPlot(curve_file, filename=None, format="png", unit="nm"):
     ax1 = fig1.add_subplot(1, 1, 1)
     ax1.plot(q, q2I, label="Experimental curve")
     ax1.set_ylabel('$q^2I (%s^2)$' % unit)
-    ax1.set_xlabel('$q$ (%s)' % unit)
+    ax1.set_xlabel('$q$ (%s$^{-1}$)' % unit)
     ax1.set_title("Kratky plot")
     ax1.legend(loc=0)
     if filename:
@@ -488,7 +491,7 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
 
 
 if __name__ == "__main__":
-    if "autorg" in sys.argv[0].lower():
+    if "autorg" in exe:
             usage = """autorg.py [OPTIONS] <DATAFILE(S)>
 
 Estimation of radius of gyration from SAS data by Guinier approximation.
@@ -547,7 +550,7 @@ Points   %i to %i (%i total)""" % (r["Rg"], r["deltaRg"], 100.0 * r["deltaRg"] /
                 else:
                     print("No such file %s" % afile)
 #            plt.show()
-    elif "testall" in sys.argv[0].lower():
+    elif "testall" in exe:
         for afile in sys.argv[1:]:
             for line in open(afile):
                 if "# AutoRg: Points" in line:

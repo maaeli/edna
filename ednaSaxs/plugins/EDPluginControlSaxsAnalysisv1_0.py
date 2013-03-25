@@ -7,8 +7,8 @@
 #
 #    Copyright (C) 2012 ESRF
 #
-#    Principal author: Jerome Kieffer        
-#                            
+#    Principal author: Jerome Kieffer
+#
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ from EDPluginControl import EDPluginControl
 from XSDataEdnaSaxs import XSDataInputSaxsAnalysis, XSDataResultSaxsAnalysis, \
                            XSDataInputAutoRg, XSDataInputDatGnom, XSDataInputDatPorod
 from XSDataCommon import XSDataString, XSDataLength, XSDataFile, XSDataInteger, XSDataStatus
-
+from saxs_plotting import scatterPlot, guinierPlot, kartkyPlot
 
 
 class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
@@ -62,7 +62,7 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
         self.autoRg = None
         self.gnom = None
         self.xVolume = None
-
+        self.xsDataResult = XSDataResultSaxsAnalysis()
 
     def checkParameters(self):
         """
@@ -113,10 +113,39 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
         self.edPluginDatPorod.dataInput = XSDataInputDatPorod(gnomFile=XSDataFile(XSDataString(self.gnomFile)))
         self.edPluginDatPorod.connectSUCCESS(self.doSuccessPorod)
         self.edPluginDatPorod.connectFAILURE(self.doFailurePorod)
-        self.edPluginDatPorod.executeSynchronous()
+        self.edPluginDatPorod.execute()
 
+        if self.dataInput.graphFormat:
+            ext = self.dataInput.graphFormat.value
+            if not ext.startswith("."):
+                ext = "." + ext
+            try:
+                guinierfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-Guinier" + ext)
+                guinierplot = guinierPlot(self.scatterFile, unit="nm",
+                                       filename=guinierfile)
+            except Exception as error:
+                self.ERROR(error)
+            else:
+                self.xsDataResult.guinierPlot = XSDataFile(XSDataString(guinierfile))
 
+            try:
+                kratkyfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-Kratky" + ext)
+                kratkyplot = kartkyPlot(self.scatterFile, unit="nm",
+                                           filename=kratkyfile)
+            except Exception as error:
+                self.ERROR(error)
+            else:
+                self.xsDataResult.kratkyPlot = XSDataFile(XSDataString(kratkyfile))
+            try:
+                scatterplotfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-scattering" + ext)
+                scatterplot = scatterPlot(self.scatterFile, unit="nm",
+                                           filename=scatterplotfile)
+            except Exception as error:
+                self.ERROR(error)
+            else:
+                self.xsDataResult.scatterPlot = XSDataFile(XSDataString(scatterplotfile))
 
+        self.synchronizePlugins()
     def postProcess(self, _edObject=None):
         EDPluginControl.postProcess(self)
         self.DEBUG("EDPluginControlSaxsAnalysisv1_0.postProcess")
@@ -143,11 +172,11 @@ datPorod failed"""
             strLog += """
 Volume  =    %12.2f""" % (self.xVolume.value)
 
-        xsDataResult = XSDataResultSaxsAnalysis(autoRg=self.autoRg,
-                                                gnom=self.gnom,
-                                                volume=self.xVolume,
-                                                status=XSDataStatus(executiveSummary=XSDataString(strLog)))
-        self.setDataOutput(xsDataResult)
+        self.xsDataResult.autoRg = self.autoRg
+        self.xsDataResult.gnom = self.gnom
+        self.xsDataResult.volume = self.xVolume,
+        self.xsDataResult.status = XSDataStatus(executiveSummary=XSDataString(strLog))
+        self.setDataOutput(self.xsDataResult)
 
 
     def doSuccessRg(self, _edPlugin=None):
