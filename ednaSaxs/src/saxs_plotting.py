@@ -159,7 +159,7 @@ def scatterPlot(curve_file, first_point=None, last_point=None, filename=None, fo
 
     fig1 = plt.figure(figsize=(6, 5))
     ax1 = fig1.add_subplot(1, 1, 1)
-    if std:
+    if std is not None:
         ax1.errorbar(q, I, std, label="Experimental curve")
     else:
         ax1.plot(q, I, label="Experimental curve")

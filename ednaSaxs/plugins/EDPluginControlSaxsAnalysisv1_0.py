@@ -122,7 +122,7 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
             try:
                 guinierfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-Guinier" + ext)
                 guinierplot = guinierPlot(self.scatterFile, unit="nm",
-                                       filename=guinierfile)
+                                       filename=guinierfile, format=ext[1:])
             except Exception as error:
                 self.ERROR(error)
             else:
@@ -131,7 +131,7 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
             try:
                 kratkyfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-Kratky" + ext)
                 kratkyplot = kartkyPlot(self.scatterFile, unit="nm",
-                                           filename=kratkyfile)
+                                           filename=kratkyfile, format=ext[1:])
             except Exception as error:
                 self.ERROR(error)
             else:
@@ -139,13 +139,13 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
             try:
                 scatterplotfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-scattering" + ext)
                 scatterplot = scatterPlot(self.scatterFile, unit="nm",
-                                           filename=scatterplotfile)
+                                           filename=scatterplotfile, format=ext[1:])
             except Exception as error:
                 self.ERROR(error)
             else:
                 self.xsDataResult.scatterPlot = XSDataFile(XSDataString(scatterplotfile))
-
         self.synchronizePlugins()
+
     def postProcess(self, _edObject=None):
         EDPluginControl.postProcess(self)
         self.DEBUG("EDPluginControlSaxsAnalysisv1_0.postProcess")
@@ -174,7 +174,7 @@ Volume  =    %12.2f""" % (self.xVolume.value)
 
         self.xsDataResult.autoRg = self.autoRg
         self.xsDataResult.gnom = self.gnom
-        self.xsDataResult.volume = self.xVolume,
+        self.xsDataResult.volume = self.xVolume
         self.xsDataResult.status = XSDataStatus(executiveSummary=XSDataString(strLog))
         self.setDataOutput(self.xsDataResult)
 
