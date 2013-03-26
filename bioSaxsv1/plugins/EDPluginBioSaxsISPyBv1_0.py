@@ -254,33 +254,27 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
             except IOError as error:
                 ermsg = "Error while directory creation in pyarch: %s " % error
                 self.lstError.append(ermsg)
-                self.WARNING(ermsg)
-            for xsdfile in self.dataInput.curves:
-                if xsdfile:
-                    self.copyfile(xsdfile.path.value, pyarch)
-            if self.filename and os.path.exists(self.filename):
-                self.copyfile(self.filename, pyarch)
-            if self.gnomFile and os.path.exists(self.gnomFile):
-                self.copyfile(self.gnomFile, pyarch)
-            if self.bestBuffer and os.path.exists(self.bestBuffer):
-                self.copyfile(self.bestBuffer, pyarch)
-            if self.scatterPlot and os.path.exists(self.scatterPlot):
-                self.copyfile(self.scatterPlot, pyarch)
-            if self.guinierPlot and os.path.exists(self.guinierPlot):
-                self.copyfile(self.guinierPlot, pyarch)
-            if self.kratkyPlot and os.path.exists(self.kratkyPlot):
-                self.copyfile(self.kratkyPlot, pyarch)
-            if self.densityPlot and os.path.exists(self.densityPlot):
-                self.copyfile(self.densityPlot, pyarch)
+                self.ERROR(ermsg)
+            if xsdfile:
+                self.copyfile(xsdfile.path.value, pyarch)
+            self.copyfile(self.filename, pyarch)
+            self.copyfile(self.gnomFile, pyarch)
+            self.copyfile(self.bestBuffer, pyarch)
+            self.copyfile(self.scatterPlot, pyarch)
+            self.copyfile(self.guinierPlot, pyarch)
+            self.copyfile(self.kratkyPlot, pyarch)
+            self.copyfile(self.densityPlot, pyarch)
 
     def copyfile(self, afile, pyarch):
-        afile = self.filename
-        try:
-            shutil.copy(afile, pyarch)
-        except IOError as error:
-            ermsg = "Error while copying %s to pyarch: %s " % (afile, error)
-            self.lstError.append(ermsg)
-            self.WARNING(ermsg)
-        else:
-            self.pyarchfiles.append(os.path.join(pyarch, os.path.basename(afile)))
+        if not pyarch:
+            self.ERROR("pyArch is %s" % pyarch)
+        if afile and os.path.exists(afile) and os.path.isdir(pyarch):
+            try:
+                shutil.copy(afile, pyarch)
+            except IOError as error:
+                ermsg = "Error while copying %s to pyarch %s: %s " % (afile, pyarch, error)
+                self.lstError.append(ermsg)
+                self.WARNING(ermsg)
+            else:
+                self.pyarchfiles.append(os.path.join(pyarch, os.path.basename(afile)))
 

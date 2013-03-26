@@ -31,7 +31,6 @@ from EDVerbose                  import EDVerbose
 from EDPluginExecProcessScript  import EDPluginExecProcessScript
 from XSDataCommon               import XSDataFile
 from XSDataCommon               import XSDataString
-from XSDataCommon               import XSPluginItem
 from XSDataExecCommandLine      import XSDataInputExecCommandLine
 from XSDataExecCommandLine      import XSDataResultExecCommandLine
 
@@ -130,8 +129,6 @@ class EDPluginExecCommandLinev10(EDPluginExecProcessScript):
         else:
             strOptions = self.dataInput.inputFileName.path
         self.setScriptCommandline(strOptions)
-        xsPluginItem = XSPluginItem()
-        self.setConfiguration(xsPluginItem)
 
         if self.dataInput.getOutfileFromStdout() is not None:
             if self.dataInput.getOutfileFromStdout().value :
