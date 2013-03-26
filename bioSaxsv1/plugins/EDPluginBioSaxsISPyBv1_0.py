@@ -83,6 +83,11 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
         self.pyarchfiles = []
         self.lstError = []
         self.bestBuffer = None
+        self.scatterPlot = None
+        self.guinierPlot = None
+        self.kratkyPlot = None
+        self.densityPlot = None
+
 
 
     def checkParameters(self):
@@ -177,7 +182,14 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
                 self.dmax = self.dataGnom.dmax.value
             if self.dataGnom.total:
                 self.total = self.dataGnom.total.value
-
+        if self.dataInput.scatterPlot:
+            self.scatterPlot = self.dataInput.scatterPlot.path.value
+        if self.dataInput.guinierPlot:
+            self.guinierPlot = self.dataInput.guinierPlot.path.value
+        if self.dataInput.kratkyPlot:
+            self.kratkyPlot = self.dataInput.kratkyPlot.path.value
+        if self.dataInput.densityPlot:
+            self.densityPlot = self.dataInput.densityPlot.path.value
 
     def process(self, _edObject=None):
         EDPluginControl.process(self)
@@ -248,6 +260,15 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
             self.copyfile(self.filename, pyarch)
             self.copyfile(self.gnomFile, pyarch)
             self.copyfile(self.bestBuffer, pyarch)
+            if xsdfile:
+                self.copyfile(xsdfile.path.value, pyarch)
+            self.copyfile(self.filename, pyarch)
+            self.copyfile(self.gnomFile, pyarch)
+            self.copyfile(self.bestBuffer, pyarch)
+            self.copyfile(self.scatterPlot, pyarch)
+            self.copyfile(self.guinierPlot, pyarch)
+            self.copyfile(self.kratkyPlot, pyarch)
+            self.copyfile(self.densityPlot, pyarch)
 
     def copyfile(self, afile, pyarch):
         if not pyarch:
