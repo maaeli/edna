@@ -79,5 +79,10 @@ Volume  =      106.701000</value>
             <value>${EDNA_WORKING_DIR}/autosubtracted-Kratky.svg</value>
         </path>
     </kratkyPlot>
+    <densityPlot>
+        <path>
+            <value>${EDNA_WORKING_DIR}/autosubtracted-density.svg</value>
+        </path>
+    </densityPlot>
     
 </XSDataResultSaxsAnalysis>
