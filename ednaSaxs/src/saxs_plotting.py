@@ -35,6 +35,7 @@ __status__ = "Development"
 __version__ = "0.1"
 
 import os, sys, time, logging
+from StringIO import  StringIO
 from optparse import OptionParser
 import numpy
 from scipy import stats
@@ -90,44 +91,45 @@ def load_saxs(filename):
         raise RuntimeError("Unable to find columns in data file")
     return q, I, std
 
-    def loadGnomFile(filename):
-        """
+def loadGnomFile(filename):
+    """
 
-        @param filename: path of the Gnom output File
-        @return: dict with many parameters: gnomRg, gnomRg_err, gnomI0, gnomI0_err, q_fit, I_fit, r, P(r), P(r)_err
+    @param filename: path of the Gnom output File
+    @return: dict with many parameters: gnomRg, gnomRg_err, gnomI0, gnomI0_err, q_fit, I_fit, r, P(r), P(r)_err
 
-        """
-        pr = StringIO("")
-        reg = StringIO("")
-        do_pr = False
-        do_reg = False
-        with open(logFile, "r") as logLines:
-            for idx, line in enumerate(logLines):
-                words = line.split()
-                if "Total  estimate" in line:
-                    self.fFitQuality = float(words[3])
-                if "Reciprocal space:" in line:
-                    do_pr = False
-                if "Distance distribution" in line :
-                    do_reg = False
-                if words:
-                    if do_reg:
-                        reg.write("%s %s\n" % (words[0], words[-1]))
-                    if do_pr:
-                        pr.write(line)
-                if "I REG" in line:
-                    do_reg = True
-                if "P(R)" in line:
-                    do_pr = True
-        out = {"gnomRg": float(words[4]),
-               "gnomRg_err": float(words[6]),
-               "gnomI0":float(words[9]),
-               "gnomI0_err": float(words[11])}
-        reg.seek(0)
-        pr.seek(0)
-        out["q_fit"], out["I_fit"] = numpy.loadtxt(reg, unpack=True, dtype="float32")
-        out["r"], out["P(r)"], out["P(r)_err"] = numpy.loadtxt(pr, unpack=True, dtype="float32")
-        return out
+    """
+    pr = StringIO("")
+    reg = StringIO("")
+    do_pr = False
+    do_reg = False
+    out = {}
+    with open(filename, "r") as logLines:
+        for idx, line in enumerate(logLines):
+            words = line.split()
+            if "Total  estimate" in line:
+                out["fit_quality"] = float(words[3])
+            if "Reciprocal space:" in line:
+                do_pr = False
+            if "Distance distribution" in line :
+                do_reg = False
+            if words:
+                if do_reg:
+                    reg.write("%s %s\n" % (words[0], words[-1]))
+                if do_pr:
+                    pr.write(line)
+            if "I REG" in line:
+                do_reg = True
+            if "P(R)" in line:
+                do_pr = True
+    out["gnomRg"] = float(words[4])
+    out["gnomRg_err"] = float(words[6])
+    out["gnomI0"] = float(words[9])
+    out["gnomI0_err"] = float(words[11])
+    reg.seek(0)
+    pr.seek(0)
+    out["q_fit"], out["I_fit"] = numpy.loadtxt(reg, unpack=True, dtype="float32")
+    out["r"], out["P(r)"], out["P(r)_err"] = numpy.loadtxt(pr, unpack=True, dtype="float32")
+    return out
 
 
 def scatterPlot(curve_file, first_point=None, last_point=None, filename=None, format="png", unit="nm", gnomfile=None):

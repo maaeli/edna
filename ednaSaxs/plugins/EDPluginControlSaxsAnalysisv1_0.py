@@ -138,7 +138,7 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
                 self.xsDataResult.kratkyPlot = XSDataFile(XSDataString(kratkyfile))
             try:
                 scatterplotfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-scattering" + ext)
-                scatterplot = scatterPlot(self.scatterFile, unit="nm",
+                scatterplot = scatterPlot(self.scatterFile, unit="nm", gnomfile=self.gnomFile,
                                            filename=scatterplotfile, format=ext[1:])
             except Exception as error:
                 self.ERROR(error)
