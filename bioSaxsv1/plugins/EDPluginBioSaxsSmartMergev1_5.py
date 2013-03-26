@@ -280,7 +280,8 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
 
                 self.__edPluginSaxsAnalysis = self.loadPlugin(self.__strControlledPluginSaxsAnalysis)
                 self.__edPluginSaxsAnalysis.dataInput = XSDataInputSaxsAnalysis(scatterCurve=xsdSubtractedCurve,
-                                                                                autoRg=self.autoRg)
+                                                                                autoRg=self.autoRg,
+                                                                                graphFormat=XSDataString("svg"))
                 self.__edPluginSaxsAnalysis.connectSUCCESS(self.doSuccessSaxsAnalysis)
                 self.__edPluginSaxsAnalysis.connectFAILURE(self.doFailureSaxsAnalysis)
                 self.__edPluginSaxsAnalysis.executeSynchronous()

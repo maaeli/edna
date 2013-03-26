@@ -357,6 +357,10 @@ complex type XSDataInputBioSaxsISPyBv1_0 extends XSDataInput  {
 	frameMerged : XSDataInteger optional
 	curves: XSDataFile [] optional
 	bestBuffer: XSDataFile optional
+	scatterPlot: XSDataFile optional
+	guinierPlot: XSDataFile optional
+	kratkyPlot: XSDataFile optional
+	densityPlot: XSDataFile optional	
 }
 
 complex type XSDataResultBioSaxsISPyBv1_0 extends XSDataResult {
