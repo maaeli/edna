@@ -1,0 +1,78 @@
+{
+    "EDPluginExecGnomv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/usr/bin/gnom", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 60
+    }, 
+    "EDPluginExecDataverv1_0": {
+        "execProcessScriptExecutable": "/usr/bin/dataver", 
+        "execProcessScriptShell": "python"
+    }, 
+    "EDPluginExecSupcombv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/usr/bin/supcomb20", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 60
+    }, 
+    "EDPluginExecDatGnomv1_0": {
+        "execProcessScriptExecutable": "/usr/bin/datgnom", 
+        "execProcessScriptShell": "python", 
+        "timeOut": 200
+    }, 
+    "EDPluginExecGnomv0_2": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/usr/bin/gnom", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 60
+    }, 
+    "EDPluginExecDatcmpv1_0": {
+        "execProcessScriptExecutable": "/usr/bin/datcmp", 
+        "execProcessScriptShell": "python"
+    }, 
+    "EDPluginExecAutoRgv1_0": {
+        "execProcessScriptExecutable": "/usr/bin/autorg", 
+        "execProcessScriptShell": "python", 
+        "timeOut": 60
+    }, 
+    "EDPluginExecDammifv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/usr/bin/dammif", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 600
+    }, 
+    "EDPluginExecDatopv1_0": {
+        "execProcessScriptExecutable": "/usr/bin/datop", 
+        "execProcessScriptShell": "python"
+    }, 
+    "EDPluginExecDamstartv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/usr/bin/damstart", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 60
+    }, 
+    "EDPluginExecDamaverv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/usr/bin/damaver", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 600
+    }, 
+    "__extend__": [], 
+    "EDPluginExecDamminv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/usr/bin/dammin", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 1000
+    }, 
+    "EDPluginExecDatPorodv1_0": {
+        "execProcessScriptExecutable": "/usr/bin/datporod", 
+        "execProcessScriptShell": "python", 
+        "timeOut": 60
+    }, 
+    "EDPluginExecDamfiltv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/usr/bin/damfilt", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 60
+    }
+}
