@@ -52,6 +52,9 @@ from scipy.cluster.vq import kmeans, vq
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("saxs")
 timelog = logging.getLogger("timeit")
+import collections
+import functools
+from threading import Semaphore
 
 def timeit(func):
     def wrapper(*arg, **kw):
@@ -65,6 +68,42 @@ def timeit(func):
     wrapper.__doc__ = func.__doc__
     return wrapper
 
+class memoized(object):
+    '''Decorator. Caches a function's return value each time it is called.
+    If called later with the same arguments, the cached value is returned
+    (not reevaluated).
+    '''
+    def __init__(self, func):
+        self.func = func
+        self.cache = {}
+        self.args = []
+        self.sem = Semaphore()
+    def __call__(self, *args):
+        if not isinstance(args, collections.Hashable):
+           # uncacheable. a list, for instance.
+           # better to not cache than blow up.
+           return self.func(*args)
+        if args in self.cache:
+            value = self.cache[args]
+        else:
+            value = self.func(*args)
+        with self.sem:
+            self.cache[args] = value
+            if args in self.args:
+                self.args.remove(args)
+            self.args.append(args)
+            if len(args) > 100: # Keep only the
+                rm = self.args.pop(0)
+                self.cache.pop(rm)
+            return value
+    def __repr__(self):
+       '''Return the function's docstring.'''
+       return self.func.__doc__
+    def __get__(self, obj, objtype):
+       '''Support instance methods.'''
+       return functools.partial(self.__call__, obj)
+
+@memoized
 def load_saxs(filename):
     """
     return q, I, stderr
@@ -91,6 +130,7 @@ def load_saxs(filename):
         raise RuntimeError("Unable to find columns in data file")
     return q, I, std
 
+@memoized
 def loadGnomFile(filename):
     """
 
