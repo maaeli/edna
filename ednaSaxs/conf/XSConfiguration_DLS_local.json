@@ -1,0 +1,45 @@
+{
+    "EDPluginExecDamaverv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/dls_sw/apps/ATSAS/2_3/bin/damaver", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 600
+    }, 
+    "EDPluginExecSupcombv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/dls_sw/apps/ATSAS/2_3/bin/supcomb20", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 60
+    }, 
+    "EDPluginExecDammifv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/dls_sw/apps/ATSAS/2.3/bin/dammif", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 600
+    }, 
+    "EDPluginExecDamstartv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/dls_sw/apps/ATSAS/2_3/bin/damstart", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 60
+    }, 
+    "EDPluginExecGnomv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/dls_sw/apps/ATSAS/2.3/bin/gnom", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 60
+    }, 
+    "__extend__": [], 
+    "EDPluginExecDamminv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/dls_sw/apps/ATSAS/2.3/bin/dammin", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 600
+    }, 
+    "EDPluginExecDamfiltv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/dls_sw/apps/ATSAS/2_3/bin/damfilt", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 60
+    }
+}
