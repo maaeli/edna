@@ -65,7 +65,7 @@ class EDTestCasePluginExecuteControlSaxsAnalysisv1_0(EDTestCasePluginExecute):
 # Compare XSDataResults
 ################################################################################
 
-        strExpectedOutput = self.readAndParseFile (self.getReferenceDataOutputFile())
+        strExpectedOutput = self.readAndParseFile(self.getReferenceDataOutputFile())
         EDVerbose.DEBUG("Checking obtained result...")
         xsDataResultReference = XSDataResult.parseString(strExpectedOutput)
         xsDataResultObtained = plugin.getDataOutput()

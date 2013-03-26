@@ -25,26 +25,36 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+from __future__ import with_statement
+
 __authors__ = ["Jérôme Kieffer"]
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
 __date__ = "20130124"
 __status__ = "Development"
 __version__ = "0.1"
+
 import os, sys, time, logging
+from StringIO import  StringIO
 from optparse import OptionParser
 import numpy
 from scipy import stats
 import matplotlib
-# matplotlib.use('Agg')
-matplotlib.use('gtk')
+exe = sys.argv[0].lower()
+if "autorg" in exe  or "testall" in exe:
+    matplotlib.use('Qt4Agg')
+else:
+    matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import scipy.optimize
 import scipy.ndimage
 from scipy.cluster.vq import kmeans, vq
-logging.basicConfig()
+logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger("saxs")
 timelog = logging.getLogger("timeit")
+import collections
+import functools
+from threading import Semaphore
 
 def timeit(func):
     def wrapper(*arg, **kw):
@@ -58,6 +68,42 @@ def timeit(func):
     wrapper.__doc__ = func.__doc__
     return wrapper
 
+class memoized(object):
+    '''Decorator. Caches a function's return value each time it is called.
+    If called later with the same arguments, the cached value is returned
+    (not reevaluated).
+    '''
+    def __init__(self, func):
+        self.func = func
+        self.cache = {}
+        self.args = []
+        self.sem = Semaphore()
+    def __call__(self, *args):
+        if not isinstance(args, collections.Hashable):
+           # uncacheable. a list, for instance.
+           # better to not cache than blow up.
+           return self.func(*args)
+        if args in self.cache:
+            value = self.cache[args]
+        else:
+            value = self.func(*args)
+        with self.sem:
+            self.cache[args] = value
+            if args in self.args:
+                self.args.remove(args)
+            self.args.append(args)
+            if len(args) > 100: # Keep only the
+                rm = self.args.pop(0)
+                self.cache.pop(rm)
+            return value
+    def __repr__(self):
+       '''Return the function's docstring.'''
+       return self.func.__doc__
+    def __get__(self, obj, objtype):
+       '''Support instance methods.'''
+       return functools.partial(self.__call__, obj)
+
+@memoized
 def load_saxs(filename):
     """
     return q, I, stderr
@@ -83,6 +129,130 @@ def load_saxs(filename):
     else:
         raise RuntimeError("Unable to find columns in data file")
     return q, I, std
+
+@memoized
+def loadGnomFile(filename):
+    """
+
+    @param filename: path of the Gnom output File
+    @return: dict with many parameters: gnomRg, gnomRg_err, gnomI0, gnomI0_err, q_fit, I_fit, r, P(r), P(r)_err
+
+    """
+    pr = StringIO("")
+    reg = StringIO("")
+    do_pr = False
+    do_reg = False
+    out = {}
+    with open(filename, "r") as logLines:
+        for idx, line in enumerate(logLines):
+            words = line.split()
+            if "Total  estimate" in line:
+                out["fit_quality"] = float(words[3])
+            if "Reciprocal space:" in line:
+                do_pr = False
+            if "Distance distribution" in line :
+                do_reg = False
+            if words:
+                if do_reg:
+                    reg.write("%s %s\n" % (words[0], words[-1]))
+                if do_pr:
+                    pr.write(line)
+            if "I REG" in line:
+                do_reg = True
+            if "P(R)" in line:
+                do_pr = True
+    out["gnomRg"] = float(words[4])
+    out["gnomRg_err"] = float(words[6])
+    out["gnomI0"] = float(words[9])
+    out["gnomI0_err"] = float(words[11])
+    reg.seek(0)
+    pr.seek(0)
+    out["q_fit"], out["I_fit"] = numpy.loadtxt(reg, unpack=True, dtype="float32")
+    out["r"], out["P(r)"], out["P(r)_err"] = numpy.loadtxt(pr, unpack=True, dtype="float32")
+    return out
+
+def densityPlot(gnomfile, filename=None, format="png", unit="nm"):
+    """
+    Generate a density plot P = f(r) 
+
+    @param gnomfile: name of the GNOM output file
+    @return: the matplotlib figure
+    """
+    out = loadGnomFile(gnomfile)
+    fig1 = plt.figure(figsize=(12, 10))
+    ax1 = fig1.add_subplot(1, 1, 1)
+    ax1.errorbar(out["r"], out["P(r)"], out["P(r)_err"], label="Density")
+    ax1.set_ylabel('$\\rho (r)$')
+    ax1.set_xlabel('$r$ (%s)' % unit)
+    ax1.set_title("Density curve")
+#    ax1.set_yscale("log")
+    ax1.legend()
+#    ax1.legend(loc=3)
+    if filename:
+        if format:
+            fig1.savefig(filename, format=format)
+        else:
+            fig1.savefig(filename)
+    return fig1
+
+
+def scatterPlot(curve_file, first_point=None, last_point=None, filename=None, format="png", unit="nm", gnomfile=None):
+    """
+    Generate a scattering plot I = f(q) in semi log.
+
+    @param curve_file: name of the saxs curve file
+    @param: first_point,last point: integers, by default 0 and -1
+    @param  filename: name of the file where the cuve should be saved
+    @param format: image format
+    @return: the matplotlib figure
+    """
+    data = numpy.loadtxt(curve_file)
+    q = data[:, 0]
+    I = data[:, 1]
+    if data.shape[1] == 3:
+        std = data[:, 2]
+    else:
+        std = None
+    if (first_point is None) and (last_point is None):
+        for line in open(curve_file):
+            if "# AutoRg: Points" in line:
+                d = [int(i) for i in line.split() if i.isdigit()]
+                if len(d) >= 2:
+                    first_point = d[0]
+                    last_point = d[1] + 1
+    if first_point is None:
+        first_point = 0
+    if last_point is None:
+        last_point = -1
+    rng = numpy.arange(len(q))
+
+    fig1 = plt.figure(figsize=(12, 10))
+    ax1 = fig1.add_subplot(1, 1, 1)
+    if std is not None:
+        ax1.errorbar(q, I, std, label="Experimental curve")
+    else:
+        ax1.plot(q, I, label="Experimental curve")
+    if first_point is not None:
+        if std is not None:
+            ax1.errorbar(q[first_point:], I[first_point:], std[first_point:], label="Experimental curve (cropped)")
+        else:
+            ax1.plot(q[first_point:], I[first_point:], label="Experimental curve (cropped)")
+    if gnomfile:
+        gnom = loadGnomFile(gnomfile)
+        ax1.plot(gnom["q_fit"], gnom["I_fit"], label="GNOM fitted curve")
+    ax1.set_ylabel('$I(q)$')
+    ax1.set_xlabel('$q$ (%s$^{-1}$)' % unit)
+    ax1.set_title("Scattering curve")
+    ax1.set_yscale("log")
+    ax1.legend()
+#    ax1.legend(loc=3)
+    if filename:
+        if format:
+            fig1.savefig(filename, format=format)
+        else:
+            fig1.savefig(filename)
+    return fig1
+
 
 
 def guinierPlot(curve_file, first_point=None, last_point=None, filename=None, format="png", unit="nm"):
@@ -122,7 +292,7 @@ def guinierPlot(curve_file, first_point=None, last_point=None, filename=None, fo
     logI = logI[:end]
 
 
-    fig1 = plt.figure(figsize=(6, 5))
+    fig1 = plt.figure(figsize=(12, 10))
     ax1 = fig1.add_subplot(1, 1, 1)
     ax1.plot(q2, logI, label="Experimental curve")
     ax1.plot(q2[first_point:last_point], logI[first_point:last_point], marker='D', markersize=5, label="Guinier region")
@@ -156,11 +326,11 @@ def kartkyPlot(curve_file, filename=None, format="png", unit="nm"):
     q = data[:, 0]
     I = data[:, 1]
     q2I = q * q * I
-    fig1 = plt.figure(figsize=(6, 5))
+    fig1 = plt.figure(figsize=(12, 10))
     ax1 = fig1.add_subplot(1, 1, 1)
     ax1.plot(q, q2I, label="Experimental curve")
     ax1.set_ylabel('$q^2I (%s^2)$' % unit)
-    ax1.set_xlabel('$q$ (%s)' % unit)
+    ax1.set_xlabel('$q$ (%s$^{-1}$)' % unit)
     ax1.set_title("Kratky plot")
     ax1.legend(loc=0)
     if filename:
@@ -205,6 +375,8 @@ class AutoRg(object):
         self.sterrest = None
         self.best = None
         self.big_dim = None
+        self.dI0 = None
+        self.dRg = None
 
     @timeit
     def select_range(self):
@@ -291,6 +463,7 @@ class AutoRg(object):
 
         Calculate Rg, I0 and the linear regression quality fit.
         """
+
         self.slope = (self.Sw * self.Sxy - self.Sx * self.Sy) / (self.Sw * self.Sxx - self.Sx * self.Sx)
         self.Rg = numpy.sqrt(-self.slope * 3)
         valid = numpy.logical_and((self.Rg * self.q[self.start] <= self.qminRg) , (self.Rg * self.q[self.stop - 1] <= self.qmaxRg))
@@ -311,53 +484,67 @@ class AutoRg(object):
             self.correlationR[self.correlationR > 1.0] = 1.0  # Numerical errors
             self.correlationR[self.correlationR < -1.0] = -1.0  # Numerical errors
             self.sterrest = numpy.sqrt((1.0 - self.correlationR * self.correlationR) * ssym / ssxm / df)
+            var_slope = self.Sw / ssxm
+            var_intercept = self.Sxx / ssxm
+            self.dI0 = numpy.sqrt(var_intercept) * self.I0
+            self.dRg = 1.5 * numpy.sqrt(var_slope) / self.Rg
+#            valid2 = (self.sterrest < (10 * self.sterrest.min()))
+#            if valid2.sum() > 10:
+#                logger.info("Cut off std_max = 4*std_min")
+#                for ds in ("start", "stop", "n", "slope", "Rg", "Sx", "Sy", "Sw", "Sxx", "Sxy", "Syy", "sterrest", "dI0", "dRg", "intercept", "I0", "correlationR"):
+#                    setattr(self, ds, getattr(self, ds)[valid2])
+
 
     @timeit
     def cluster(self):
+#        ratio = self.Rg.std() / self.Rg.mean()
+#        logger.warning("Rg.std: %s ratio %s" % (self.Rg.std(), ratio))
         features = numpy.hstack((self.Rg.reshape(-1, 1), self.I0.reshape(-1, 1)))
         centroids, variance = kmeans(features, 2)
         code, distance = vq(features, centroids)
-
-        fig = matplotlib.pyplot.figure()
-        ax = fig.add_subplot(111)
-        code0 = numpy.where(code == 0)
-        code1 = numpy.where(code == 1)
-        ax.plot(self.Rg[code0], self.I0[code0], 'b*')
-        ax.plot(self.Rg[code1], self.I0[code1], 'r*')
-        ax.plot([p[0] for p in centroids], [p[1] for p in centroids], 'go')
-        fig.show()
-        raw_input()
-        code_max_rg = numpy.array(centroids[:, 0]).argmax()  # code with largest Rg
-        valid = numpy.where(code == code_max_rg)
-        for ds in ("start", "stop", "n", "slope", "Rg", "Sx", "Sy", "Sw", "Sxx", "Sxy", "Syy", "sterrest"):
+        if logger.level <= logging.INFO:
+            fig = matplotlib.pyplot.figure()
+            ax = fig.add_subplot(111)
+            code0 = numpy.where(code == 0)
+            code1 = numpy.where(code == 1)
+            ax.plot(self.Rg[code0], self.I0[code0], 'b*')
+            ax.plot(self.Rg[code1], self.I0[code1], 'r*')
+            ax.plot([p[0] for p in centroids], [p[1] for p in centroids], 'go')
+            fig.show()
+        code_min_start = numpy.array(centroids[:, 0]).argmin()  # code with largest Rg
+        valid = numpy.where(code == code_min_start)
+        for ds in ("start", "stop", "n", "slope", "Rg", "Sx", "Sy", "Sw", "Sxx", "Sxy", "Syy", "sterrest", "dI0", "dRg", "intercept", "I0", "correlationR"):
             setattr(self, ds, getattr(self, ds)[valid])
+
+
 
 
     @timeit
     def finish(self):
         if self.sterrest is not None:
-            self.best = self.sterrest.argmin()
-            sta = self.start[self.best]
-            sto = self.stop[self.best]
+            best = self.best = self.sterrest.argmin()
+            sta = self.start[best]
+            sto = self.stop[best]
             res = {"start":sta, "end":sto,
-                   "Rg":self.Rg[self.best], "logI0":self.I0[self.best],
-                   "R":self.correlationR[self.best], "stderr":self.sterrest[self.best],
+                   "Rg":self.Rg[best], "logI0":self.I0[best],
+                   "R":self.correlationR[best], "stderr":self.sterrest[best],
                    "len":sto - sta,
-                   "I0":self.I0[self.best],
-                   "qminRg":self.Rg[self.best] * self.q[sta],
-                   "qmaxRg":self.Rg[self.best] * self.q[sto - 1]}
-            if (sto - sta) > self.mininterval:
-                shift = numpy.where(numpy.logical_and(self.start >= (sta), self.stop <= (sto)))[0]
-            else:
-                shift = numpy.where(numpy.logical_and(self.start >= (sta - 1), self.stop <= (sto + 1)))[0]
-            res["deltaRg"] = self.Rg[shift].std()
-            res["deltaI0"] = self.I0[shift].std()
+                   "I0":self.I0[best],
+                   "qminRg":self.Rg[best] * self.q[sta],
+                   "qmaxRg":self.Rg[best] * self.q[sto - 1],
+                   }
+#            if (sto - sta) > self.mininterval:
+#                shift = numpy.where(numpy.logical_and(self.start >= (sta), self.stop <= (sto)))[0]
+#            else:
+#                shift = numpy.where(numpy.logical_and(self.start >= (sta - 1), self.stop <= (sto + 1)))[0]
+            res["deltaRg"] = self.dRg[best]
+            res["deltaI0"] = self.dI0[best]
             res["start_search"] = self.start_search
             res["stop_search"] = self.start_search + self.len_search
             res["intervals"] = self.big_dim
 
             parab = lambda p, x, y: p[0] * x * x + p[1] * x + p[2] - y
-            out = scipy.optimize.leastsq(parab, [0, self.slope[self.best], self.intercept[self.best]], (self.q[sta:sto] * self.q[sta:sto], numpy.log(self.I[sta:sto])))
+            out = scipy.optimize.leastsq(parab, [0, self.slope[best], self.intercept[best]], (self.q[sta:sto] * self.q[sta:sto], numpy.log(self.I[sta:sto])))
             if out[0][0] > 0:
                 res["Aggregated"] = True
             else:
@@ -371,130 +558,17 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
     ag.select_range()
     ag.allocate()
     ag.refine()
-#    ag.cluster()
+    ag.cluster()
+    if logger.level <= logging.INFO:
+            raw_input("Enter to quit")
+
 #    fig.show()
 
     return ag.finish()
-#    if (q is None) or (I is None) and datfile:
-#        q, I, std = load_saxs(datfile)
-#
-#    out = {}
-#    start_search = I.argmax()
-#    Imax = I[start_search]
-#    keep = (I > Imax / 10)
-#    keep[:start_search] = 0
-#    len_search = keep.sum()
-#    q2 = q * q
-#    logI = numpy.log(I)
-#    if std is None:
-#        I_over_std = numpy.ones_like(I)
-#    else:
-#        I_over_std = I / std
-#    allres = []
-#    res = []
-#    t0 = time.time()
-#    big_dim = (len_search - mininterval + 1) * (len_search - mininterval) / 2  # + len_search * mininterval
-#    array_size = big_dim * len_search * 8 / 1e6
-#    if array_size > 1000:
-#        print("Allocating large array!!!! expect to fail")
-#    x = numpy.zeros((big_dim, len_search), dtype="float64")
-#    y = numpy.zeros((big_dim, len_search), dtype="float64")
-#    w = numpy.zeros((big_dim, len_search), dtype="float64")  # (1/dy = 1/(d(logI)=I/std)
-#    n = numpy.zeros(big_dim, dtype="int16")
-#    start = numpy.zeros(big_dim, dtype="int16")
-#    stop = numpy.zeros(big_dim, dtype="int16")
-#    idx = 0
-#    for sta in range(start_search, start_search + len_search - mininterval):
-#        for sto in range(sta + mininterval, start_search + len_search):
-#            x[idx, sta - start_search:sto - start_search] = q2[sta :sto]
-#            y[idx, sta - start_search:sto - start_search] = logI[sta :sto]
-#            w[idx, sta - start_search:sto - start_search] = I_over_std[sta :sto]
-#            n[idx] = sto - sta
-#            start[idx] = sta
-#            stop[idx] = sto
-#            idx += 1
-#    Sx = (w * x).sum(axis= -1)
-#    Sy = (w * y).sum(axis= -1)
-#    Sxx = (w * x * x).sum(axis= -1)
-#    Sxy = (w * y * x).sum(axis= -1)
-#    Sw = w.sum(axis= -1)
-#    slope = (Sw * Sxy - Sx * Sy) / (Sw * Sxx - Sx * Sx)
-#    Rg = numpy.sqrt(-slope * 3)
-#    valid = numpy.logical_and((Rg * q[start] <= qminRg) , (Rg * q[stop - 1] <= qmaxRg))
-#    nvalid = valid.sum()
-#    if nvalid > 0:
-#        t3 = time.time()
-#        start = start[valid]
-#        stop = stop[valid]
-#        valid2D = numpy.outer(valid, numpy.ones(y.shape[1]))
-#        valid2 = numpy.where(valid2D)
-#        x = x[valid2]
-#        y = y[valid2]
-#        w = w[valid2]
-#        x.shape = y.shape = w.shape = nvalid, len_search
-#        n = n[valid]
-#        slope = slope[valid]
-#        Rg = Rg[valid]
-#        Sx = Sx[valid]
-#        Sy = Sy[valid]
-#        Sw = Sw[valid]
-#        Sxx = Sxx[valid]
-#        Sxy = Sxy[valid]
-#        Syy = (w * y * y).sum(axis= -1)
-#        intercept = (Sy - Sx * slope) / Sw
-#        I0 = numpy.exp(intercept)
-#        df = n - 2
-#        r_num = ssxym = (Sw * Sxy) - (Sx * Sy)
-#        ssxm = Sw * Sxx - Sx * Sx
-#        ssym = Sw * Syy - Sy * Sy
-#        r_den = numpy.sqrt(ssxm * ssym)
-#        correlationR = r_num / r_den
-# #        print correlationR
-#        correlationR[r_den == 0] = 0.0
-#        correlationR[correlationR > 1.0] = 1.0  # Numerical errors
-#        correlationR[correlationR < -1.0] = -1.0  # Numerical errors
-#        sterrest = numpy.sqrt((1.0 - correlationR * correlationR) * ssym / ssxm / df)
-# #        print sterrest
-# #        import pylab
-# #        pylab.plot(Rg, I0, "o")
-# #        pylab.show()
-# #        raw_input()
-#        best = sterrest.argmin()
-#        sta = start[best]
-#        sto = stop[best]
-#        res = {"start":sta, "end":sto,
-#               "Rg":Rg[best], "logI0":I0[best], "R":correlationR[best], "stderr":sterrest[best], "len":sto - sta,
-#               "I0":I0[best],
-#               "qminRg":Rg[best] * q[sta],
-#               "qmaxRg":Rg[best] * q[sto - 1]}
-#        if (sto - sta) > mininterval:
-#            shift = numpy.where(numpy.logical_and(start >= (sta), stop <= (sto)))[0]
-#        else:
-#            shift = numpy.where(numpy.logical_and(start >= (sta - 1), stop <= (sto + 1)))[0]
-#        res["deltaRg"] = Rg[shift].std()
-#        res["deltaI0"] = I0[shift].std()
-#        res["start_search"] = start_search
-#        res["stop_search"] = start_search + len_search
-#        res["intervals"] = big_dim
-#
-# #        logIopt = logI[sta:sto]
-# #        q2opt = q2[sta:sto]
-#        parab = lambda p, x, y: p[0] * x * x + p[1] * x + p[2] - y
-#        out = scipy.optimize.leastsq(parab, [0, slope[best], intercept[best]], (q2[sta:sto], logI[sta:sto]))
-#        if out[0][0] > 0:
-#            res["Aggregated"] = True
-#        else:
-#            res["Aggregated"] = False
-#        return res
-#    else:
-#        print("No valid region found")
-#        return
-
-
 
 
 if __name__ == "__main__":
-    if "autorg" in sys.argv[0].lower():
+    if "autorg" in exe:
             usage = """autorg.py [OPTIONS] <DATAFILE(S)>
 
 Estimation of radius of gyration from SAS data by Guinier approximation.
@@ -540,7 +614,7 @@ Report bugs to <jerome.kieffer@esrf.fr>.
                     if r:
                         print """Rg   =  %5.2f  +/- %.2f (%i%%)
 I(0) =  %5.1f +/- %.2f
-Points   %i to %i (%i total)""" % (r["Rg"], r["deltaRg"], 100 * r["deltaRg"] / r["Rg"], r["I0"], r["deltaI0"], r["start"] + 1, r["end"] , r["len"])
+Points   %i to %i (%i total)""" % (r["Rg"], r["deltaRg"], 100.0 * r["deltaRg"] / r["Rg"], r["I0"], r["deltaI0"], r["start"] + 1, r["end"] , r["len"])
                         if r.get("Aggregated", None):
                             print "Aggregated."
                         print """(Searched from point %i to %i, %i intervals analysed)""" % (r["start_search"] + 1, r["stop_search"], r["intervals"])
@@ -553,7 +627,7 @@ Points   %i to %i (%i total)""" % (r["Rg"], r["deltaRg"], 100 * r["deltaRg"] / r
                 else:
                     print("No such file %s" % afile)
 #            plt.show()
-    elif "testall" in sys.argv[0].lower():
+    elif "testall" in exe:
         for afile in sys.argv[1:]:
             for line in open(afile):
                 if "# AutoRg: Points" in line:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Fri Mar 15 04:01::44 2013 by EDGenerateDS.
+# Generated Mon Mar 25 02:47::54 2013 by EDGenerateDS.
 #
 
 import os, sys
@@ -11,8 +11,7 @@ from xml.dom import Node
 
 strEdnaHome = os.environ.get("EDNA_HOME", None)
 
-dictLocation = { \
- "XSDataCommon": "kernel/datamodel"
+dictLocation = { "XSDataCommon": "kernel/datamodel",
 }
 
 try:
@@ -4919,7 +4918,7 @@ class XSDataInputGnom(XSDataInput):
 
 class XSDataInputSaxsAnalysis(XSDataInput):
     """AutoRg -> Gnom -> Prod pipeline"""
-    def __init__(self, configuration=None, gnomFile=None, autoRg=None, scatterCurve=None):
+    def __init__(self, configuration=None, graphFormat=None, gnomFile=None, autoRg=None, scatterCurve=None):
         XSDataInput.__init__(self, configuration)
         if scatterCurve is None:
             self._scatterCurve = None
@@ -4941,6 +4940,13 @@ class XSDataInputSaxsAnalysis(XSDataInput):
             self._gnomFile = gnomFile
         else:
             strMessage = "ERROR! XSDataInputSaxsAnalysis constructor argument 'gnomFile' is not XSDataFile but %s" % self._gnomFile.__class__.__name__
+            raise BaseException(strMessage)
+        if graphFormat is None:
+            self._graphFormat = None
+        elif graphFormat.__class__.__name__ == "XSDataString":
+            self._graphFormat = graphFormat
+        else:
+            strMessage = "ERROR! XSDataInputSaxsAnalysis constructor argument 'graphFormat' is not XSDataString but %s" % self._graphFormat.__class__.__name__
             raise BaseException(strMessage)
     # Methods and properties for the 'scatterCurve' attribute
     def getScatterCurve(self): return self._scatterCurve
@@ -4978,6 +4984,18 @@ class XSDataInputSaxsAnalysis(XSDataInput):
             raise BaseException(strMessage)
     def delGnomFile(self): self._gnomFile = None
     gnomFile = property(getGnomFile, setGnomFile, delGnomFile, "Property for gnomFile")
+    # Methods and properties for the 'graphFormat' attribute
+    def getGraphFormat(self): return self._graphFormat
+    def setGraphFormat(self, graphFormat):
+        if graphFormat is None:
+            self._graphFormat = None
+        elif graphFormat.__class__.__name__ == "XSDataString":
+            self._graphFormat = graphFormat
+        else:
+            strMessage = "ERROR! XSDataInputSaxsAnalysis.setGraphFormat argument is not XSDataString but %s" % graphFormat.__class__.__name__
+            raise BaseException(strMessage)
+    def delGraphFormat(self): self._graphFormat = None
+    graphFormat = property(getGraphFormat, setGraphFormat, delGraphFormat, "Property for graphFormat")
     def export(self, outfile, level, name_='XSDataInputSaxsAnalysis'):
         showIndent(outfile, level)
         outfile.write(unicode('<%s>\n' % name_))
@@ -4994,6 +5012,8 @@ class XSDataInputSaxsAnalysis(XSDataInput):
             self.autoRg.export(outfile, level, name_='autoRg')
         if self._gnomFile is not None:
             self.gnomFile.export(outfile, level, name_='gnomFile')
+        if self._graphFormat is not None:
+            self.graphFormat.export(outfile, level, name_='graphFormat')
     def build(self, node_):
         for child_ in node_.childNodes:
             nodeName_ = child_.nodeName.split(':')[-1]
@@ -5014,6 +5034,11 @@ class XSDataInputSaxsAnalysis(XSDataInput):
             obj_ = XSDataFile()
             obj_.build(child_)
             self.setGnomFile(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'graphFormat':
+            obj_ = XSDataString()
+            obj_.build(child_)
+            self.setGraphFormat(obj_)
         XSDataInput.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
     def marshal( self ):
@@ -7652,7 +7677,7 @@ class XSDataResultGnom(XSDataResult):
 
 class XSDataResultSaxsAnalysis(XSDataResult):
     """AutoRg -> Gnom -> Prod pipeline"""
-    def __init__(self, status=None, volume=None, gnom=None, autoRg=None):
+    def __init__(self, status=None, densityPlot=None, kratkyPlot=None, guinierPlot=None, scatterPlot=None, volume=None, gnom=None, autoRg=None):
         XSDataResult.__init__(self, status)
         if autoRg is None:
             self._autoRg = None
@@ -7674,6 +7699,34 @@ class XSDataResultSaxsAnalysis(XSDataResult):
             self._volume = volume
         else:
             strMessage = "ERROR! XSDataResultSaxsAnalysis constructor argument 'volume' is not XSDataDoubleWithUnit but %s" % self._volume.__class__.__name__
+            raise BaseException(strMessage)
+        if scatterPlot is None:
+            self._scatterPlot = None
+        elif scatterPlot.__class__.__name__ == "XSDataFile":
+            self._scatterPlot = scatterPlot
+        else:
+            strMessage = "ERROR! XSDataResultSaxsAnalysis constructor argument 'scatterPlot' is not XSDataFile but %s" % self._scatterPlot.__class__.__name__
+            raise BaseException(strMessage)
+        if guinierPlot is None:
+            self._guinierPlot = None
+        elif guinierPlot.__class__.__name__ == "XSDataFile":
+            self._guinierPlot = guinierPlot
+        else:
+            strMessage = "ERROR! XSDataResultSaxsAnalysis constructor argument 'guinierPlot' is not XSDataFile but %s" % self._guinierPlot.__class__.__name__
+            raise BaseException(strMessage)
+        if kratkyPlot is None:
+            self._kratkyPlot = None
+        elif kratkyPlot.__class__.__name__ == "XSDataFile":
+            self._kratkyPlot = kratkyPlot
+        else:
+            strMessage = "ERROR! XSDataResultSaxsAnalysis constructor argument 'kratkyPlot' is not XSDataFile but %s" % self._kratkyPlot.__class__.__name__
+            raise BaseException(strMessage)
+        if densityPlot is None:
+            self._densityPlot = None
+        elif densityPlot.__class__.__name__ == "XSDataFile":
+            self._densityPlot = densityPlot
+        else:
+            strMessage = "ERROR! XSDataResultSaxsAnalysis constructor argument 'densityPlot' is not XSDataFile but %s" % self._densityPlot.__class__.__name__
             raise BaseException(strMessage)
     # Methods and properties for the 'autoRg' attribute
     def getAutoRg(self): return self._autoRg
@@ -7711,6 +7764,54 @@ class XSDataResultSaxsAnalysis(XSDataResult):
             raise BaseException(strMessage)
     def delVolume(self): self._volume = None
     volume = property(getVolume, setVolume, delVolume, "Property for volume")
+    # Methods and properties for the 'scatterPlot' attribute
+    def getScatterPlot(self): return self._scatterPlot
+    def setScatterPlot(self, scatterPlot):
+        if scatterPlot is None:
+            self._scatterPlot = None
+        elif scatterPlot.__class__.__name__ == "XSDataFile":
+            self._scatterPlot = scatterPlot
+        else:
+            strMessage = "ERROR! XSDataResultSaxsAnalysis.setScatterPlot argument is not XSDataFile but %s" % scatterPlot.__class__.__name__
+            raise BaseException(strMessage)
+    def delScatterPlot(self): self._scatterPlot = None
+    scatterPlot = property(getScatterPlot, setScatterPlot, delScatterPlot, "Property for scatterPlot")
+    # Methods and properties for the 'guinierPlot' attribute
+    def getGuinierPlot(self): return self._guinierPlot
+    def setGuinierPlot(self, guinierPlot):
+        if guinierPlot is None:
+            self._guinierPlot = None
+        elif guinierPlot.__class__.__name__ == "XSDataFile":
+            self._guinierPlot = guinierPlot
+        else:
+            strMessage = "ERROR! XSDataResultSaxsAnalysis.setGuinierPlot argument is not XSDataFile but %s" % guinierPlot.__class__.__name__
+            raise BaseException(strMessage)
+    def delGuinierPlot(self): self._guinierPlot = None
+    guinierPlot = property(getGuinierPlot, setGuinierPlot, delGuinierPlot, "Property for guinierPlot")
+    # Methods and properties for the 'kratkyPlot' attribute
+    def getKratkyPlot(self): return self._kratkyPlot
+    def setKratkyPlot(self, kratkyPlot):
+        if kratkyPlot is None:
+            self._kratkyPlot = None
+        elif kratkyPlot.__class__.__name__ == "XSDataFile":
+            self._kratkyPlot = kratkyPlot
+        else:
+            strMessage = "ERROR! XSDataResultSaxsAnalysis.setKratkyPlot argument is not XSDataFile but %s" % kratkyPlot.__class__.__name__
+            raise BaseException(strMessage)
+    def delKratkyPlot(self): self._kratkyPlot = None
+    kratkyPlot = property(getKratkyPlot, setKratkyPlot, delKratkyPlot, "Property for kratkyPlot")
+    # Methods and properties for the 'densityPlot' attribute
+    def getDensityPlot(self): return self._densityPlot
+    def setDensityPlot(self, densityPlot):
+        if densityPlot is None:
+            self._densityPlot = None
+        elif densityPlot.__class__.__name__ == "XSDataFile":
+            self._densityPlot = densityPlot
+        else:
+            strMessage = "ERROR! XSDataResultSaxsAnalysis.setDensityPlot argument is not XSDataFile but %s" % densityPlot.__class__.__name__
+            raise BaseException(strMessage)
+    def delDensityPlot(self): self._densityPlot = None
+    densityPlot = property(getDensityPlot, setDensityPlot, delDensityPlot, "Property for densityPlot")
     def export(self, outfile, level, name_='XSDataResultSaxsAnalysis'):
         showIndent(outfile, level)
         outfile.write(unicode('<%s>\n' % name_))
@@ -7731,6 +7832,14 @@ class XSDataResultSaxsAnalysis(XSDataResult):
             self.volume.export(outfile, level, name_='volume')
         else:
             warnEmptyAttribute("volume", "XSDataDoubleWithUnit")
+        if self._scatterPlot is not None:
+            self.scatterPlot.export(outfile, level, name_='scatterPlot')
+        if self._guinierPlot is not None:
+            self.guinierPlot.export(outfile, level, name_='guinierPlot')
+        if self._kratkyPlot is not None:
+            self.kratkyPlot.export(outfile, level, name_='kratkyPlot')
+        if self._densityPlot is not None:
+            self.densityPlot.export(outfile, level, name_='densityPlot')
     def build(self, node_):
         for child_ in node_.childNodes:
             nodeName_ = child_.nodeName.split(':')[-1]
@@ -7751,6 +7860,26 @@ class XSDataResultSaxsAnalysis(XSDataResult):
             obj_ = XSDataDoubleWithUnit()
             obj_.build(child_)
             self.setVolume(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'scatterPlot':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setScatterPlot(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'guinierPlot':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setGuinierPlot(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'kratkyPlot':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setKratkyPlot(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'densityPlot':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setDensityPlot(obj_)
         XSDataResult.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
     def marshal( self ):

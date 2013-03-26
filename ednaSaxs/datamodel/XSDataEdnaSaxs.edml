@@ -156,12 +156,17 @@ complex type XSDataInputSaxsAnalysis extends XSDataInput{
 	scatterCurve: XSDataFile
 	autoRg: XSDataAutoRg optional
 	gnomFile: XSDataFile optional
+	graphFormat: XSDataString optional
 }
 complex type XSDataResultSaxsAnalysis extends XSDataResult{
 	"AutoRg -> Gnom -> Prod pipeline"
 	autoRg: XSDataAutoRg
 	gnom: XSDataGnom
 	volume: XSDataDoubleWithUnit
+	scatterPlot: XSDataFile optional
+	guinierPlot: XSDataFile optional
+	kratkyPlot: XSDataFile optional
+	densityPlot: XSDataFile optional
 }
 
 

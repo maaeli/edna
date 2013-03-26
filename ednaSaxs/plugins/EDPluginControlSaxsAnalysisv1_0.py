@@ -7,8 +7,8 @@
 #
 #    Copyright (C) 2012 ESRF
 #
-#    Principal author: Jerome Kieffer        
-#                            
+#    Principal author: Jerome Kieffer
+#
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ from EDPluginControl import EDPluginControl
 from XSDataEdnaSaxs import XSDataInputSaxsAnalysis, XSDataResultSaxsAnalysis, \
                            XSDataInputAutoRg, XSDataInputDatGnom, XSDataInputDatPorod
 from XSDataCommon import XSDataString, XSDataLength, XSDataFile, XSDataInteger, XSDataStatus
-
+from saxs_plotting import scatterPlot, guinierPlot, kartkyPlot, densityPlot
 
 
 class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
@@ -62,7 +62,7 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
         self.autoRg = None
         self.gnom = None
         self.xVolume = None
-
+        self.xsDataResult = XSDataResultSaxsAnalysis()
 
     def checkParameters(self):
         """
@@ -101,7 +101,7 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
         self.edPluginDatGnom.dataInput = XSDataInputDatGnom(inputCurve=self.dataInput.scatterCurve,
                                              output=XSDataFile(XSDataString(self.gnomFile)),
                                              rg=self.autoRg.rg,
-                                            skip=XSDataInteger(self.autoRg.firstPointUsed.value - 1))
+                                             skip=XSDataInteger(self.autoRg.firstPointUsed.value - 1))
         self.edPluginDatGnom.connectSUCCESS(self.doSuccessGnom)
         self.edPluginDatGnom.connectFAILURE(self.doFailureGnom)
         self.edPluginDatGnom.executeSynchronous()
@@ -113,17 +113,58 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
         self.edPluginDatPorod.dataInput = XSDataInputDatPorod(gnomFile=XSDataFile(XSDataString(self.gnomFile)))
         self.edPluginDatPorod.connectSUCCESS(self.doSuccessPorod)
         self.edPluginDatPorod.connectFAILURE(self.doFailurePorod)
-        self.edPluginDatPorod.executeSynchronous()
+        self.edPluginDatPorod.execute()
+
+        if self.dataInput.graphFormat:
+            ext = self.dataInput.graphFormat.value
+            if not ext.startswith("."):
+                ext = "." + ext
+            try:
+                guinierfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-Guinier" + ext)
+                guinierplot = guinierPlot(self.scatterFile, unit="nm",
+                                       filename=guinierfile, format=ext[1:])
+            except Exception as error:
+                self.ERROR(error)
+            else:
+                self.xsDataResult.guinierPlot = XSDataFile(XSDataString(guinierfile))
+
+            try:
+                kratkyfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-Kratky" + ext)
+                kratkyplot = kartkyPlot(self.scatterFile, unit="nm",
+                                           filename=kratkyfile, format=ext[1:])
+            except Exception as error:
+                self.ERROR(error)
+            else:
+                self.xsDataResult.kratkyPlot = XSDataFile(XSDataString(kratkyfile))
+            try:
+                scatterplotfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-scattering" + ext)
+                scatterplot = scatterPlot(self.scatterFile, unit="nm", gnomfile=self.gnomFile,
+                                           filename=scatterplotfile, format=ext[1:])
+            except Exception as error:
+                self.ERROR(error)
+            else:
+                self.xsDataResult.scatterPlot = XSDataFile(XSDataString(scatterplotfile))
+
+            try:
+                densityplotfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-density" + ext)
+                densityplot = densityPlot(gnomfile=self.gnomFile, unit="nm",
+                                           filename=densityplotfile, format=ext[1:])
+            except Exception as error:
+                self.ERROR(error)
+            else:
+                self.xsDataResult.densityPlot = XSDataFile(XSDataString(densityplotfile))
 
 
+
+        self.synchronizePlugins()
 
     def postProcess(self, _edObject=None):
         EDPluginControl.postProcess(self)
         self.DEBUG("EDPluginControlSaxsAnalysisv1_0.postProcess")
         # Create some output data
-        strLog = """Rg   =   %.2f +/- %2f 
+        strLog = """Rg   =   %.2f +/- %2f
 I(0) =   %.2e +/- %.2e
-Points   %i to %i 
+Points   %i to %i
 Quality: %4.2f%%     Aggregated: %s""" % (self.autoRg.rg.value, self.autoRg.rgStdev.value,
                         self.autoRg.i0.value, self.autoRg.i0Stdev.value,
                         self.autoRg.firstPointUsed.value, self.autoRg.lastPointUsed.value,
@@ -133,7 +174,7 @@ Quality: %4.2f%%     Aggregated: %s""" % (self.autoRg.rg.value, self.autoRg.rgSt
 datGnom failed"""
         else:
             strLog += """
-Dmax    =    %12.2f       Total =   %12.2f     
+Dmax    =    %12.2f       Total =   %12.2f
 Guinier =    %12.2f       Gnom =    %12.2f""" % (self.gnom.dmax.value, self.gnom.total.value,
                         self.gnom.rgGuinier.value, self.gnom.rgGnom.value)
         if self.xVolume is None:
@@ -143,11 +184,11 @@ datPorod failed"""
             strLog += """
 Volume  =    %12.2f""" % (self.xVolume.value)
 
-        xsDataResult = XSDataResultSaxsAnalysis(autoRg=self.autoRg,
-                                                gnom=self.gnom,
-                                                volume=self.xVolume,
-                                                status=XSDataStatus(executiveSummary=XSDataString(strLog)))
-        self.setDataOutput(xsDataResult)
+        self.xsDataResult.autoRg = self.autoRg
+        self.xsDataResult.gnom = self.gnom
+        self.xsDataResult.volume = self.xVolume
+        self.xsDataResult.status = XSDataStatus(executiveSummary=XSDataString(strLog))
+        self.setDataOutput(self.xsDataResult)
 
 
     def doSuccessRg(self, _edPlugin=None):

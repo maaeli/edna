@@ -11,6 +11,8 @@ import XSDataCommon.XSDataRotation
 import XSDataCommon.XSDataString
 import XSDataCommon.XSDataVectorDouble
 import XSDataCommon.XSDataArray
+import XSDataEdnaSaxs.XSDataAutoRg
+import XSDataEdnaSaxs.XSDataGnom
 
 complex type XSDataInputSolutionScattering extends XSDataInput {
 	title : XSDataString optional
@@ -30,6 +32,8 @@ complex type XSDataInputSolutionScattering extends XSDataInput {
 	plotFit : XSDataBoolean optional
 	qMin: XSDataDouble  optional
 	qMax: XSDataDouble  optional
+	autorg: XSDataAutoRg optional
+	gnom: XSDataGnom optional
 }
 
 
@@ -47,6 +51,10 @@ complex type XSDataResultSolutionScattering extends XSDataResult {
 	scatteringFitIarray : XSDataArray optional
 	meanNSD : XSDataDouble optional
 	variationNSD : XSDataDouble optional
+	scatterPlot: XSDataFile optional
+	guinierPlot: XSDataFile optional
+	kratkyPlot: XSDataFile optional
+	
 }
 
 
