@@ -6,4 +6,7 @@
             <value>/tmp/edna-${USER}/autosubtracted.out</value>
         </path>
     </gnomFile>
+    <graphFormat>
+            <value>svg</value>
+    </graphFormat>
 </XSDataInputSaxsAnalysis>

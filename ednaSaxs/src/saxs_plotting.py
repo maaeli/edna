@@ -160,7 +160,7 @@ def scatterPlot(curve_file, first_point=None, last_point=None, filename=None, fo
         last_point = -1
     rng = numpy.arange(len(q))
 
-    fig1 = plt.figure(figsize=(6, 5))
+    fig1 = plt.figure(figsize=(12, 10))
     ax1 = fig1.add_subplot(1, 1, 1)
     if std is not None:
         ax1.errorbar(q, I, std, label="Experimental curve")
@@ -178,6 +178,7 @@ def scatterPlot(curve_file, first_point=None, last_point=None, filename=None, fo
     ax1.set_xlabel('$q$ (%s$^{-1}$)' % unit)
     ax1.set_title("Scattering curve")
     ax1.set_yscale("log")
+    ax1.legend()
 #    ax1.legend(loc=3)
     if filename:
         if format:
@@ -225,7 +226,7 @@ def guinierPlot(curve_file, first_point=None, last_point=None, filename=None, fo
     logI = logI[:end]
 
 
-    fig1 = plt.figure(figsize=(6, 5))
+    fig1 = plt.figure(figsize=(12, 10))
     ax1 = fig1.add_subplot(1, 1, 1)
     ax1.plot(q2, logI, label="Experimental curve")
     ax1.plot(q2[first_point:last_point], logI[first_point:last_point], marker='D', markersize=5, label="Guinier region")
@@ -259,7 +260,7 @@ def kartkyPlot(curve_file, filename=None, format="png", unit="nm"):
     q = data[:, 0]
     I = data[:, 1]
     q2I = q * q * I
-    fig1 = plt.figure(figsize=(6, 5))
+    fig1 = plt.figure(figsize=(12, 10))
     ax1 = fig1.add_subplot(1, 1, 1)
     ax1.plot(q, q2I, label="Experimental curve")
     ax1.set_ylabel('$q^2I (%s^2)$' % unit)
