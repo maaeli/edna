@@ -115,6 +115,11 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
         self.fConcentration = None
         self.xsDataResult = XSDataResultBioSaxsSmartMergev1_0()
         self.xsBestBuffer = None
+        self.xsScatterPlot = None
+        self.xsGuinierPlot = None
+        self.xsKratkyPlot = None
+        self.xsDensityPlot = None
+
 
     def checkParameters(self):
         """
@@ -310,7 +315,11 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
                                                      frameAverage=frameAverage,
                                                      frameMerged=frameMerged,
                                                      curves=self.curves,
-                                                     bestBuffer=self.xsBestBuffer
+                                                     bestBuffer=self.xsBestBuffer,
+                                                     scatterPlot=self.xsScatterPlot,
+                                                     guinierPlot=self.xsGuinierPlot,
+                                                     kratkyPlot=self.xsKratkyPlot ,
+                                                     densityPlot=self.xsDensityPlot
 #                                                     destination=self.dataInput.sample.ispybDestination #duplicate, already in sample
                                                )
             self.__edPluginSaxsISPyB.dataInput = xsdin
@@ -521,6 +530,10 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
         self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsSmartMergev1_5.doSuccessSaxsAnalysis")
         self.gnom = _edPlugin.dataOutput.gnom
         self.volume = _edPlugin.dataOutput.volume
+        self.xsScatterPlot = _edPlugin.dataOutput.scatterPlot
+        self.xsGuinierPlot = _edPlugin.dataOutput.guinierPlot
+        self.xsKratkyPlot = _edPlugin.dataOutput.kratkyPlot
+        self.xsDensityPlot = _edPlugin.dataOutput.densityPlot
         self.lstSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
 
     def doFailureSaxsAnalysis(self, _edPlugin=None):
