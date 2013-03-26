@@ -35,7 +35,7 @@ from EDPluginControl import EDPluginControl
 from XSDataEdnaSaxs import XSDataInputSaxsAnalysis, XSDataResultSaxsAnalysis, \
                            XSDataInputAutoRg, XSDataInputDatGnom, XSDataInputDatPorod
 from XSDataCommon import XSDataString, XSDataLength, XSDataFile, XSDataInteger, XSDataStatus
-from saxs_plotting import scatterPlot, guinierPlot, kartkyPlot
+from saxs_plotting import scatterPlot, guinierPlot, kartkyPlot, densityPlot
 
 
 class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
@@ -144,6 +144,18 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
                 self.ERROR(error)
             else:
                 self.xsDataResult.scatterPlot = XSDataFile(XSDataString(scatterplotfile))
+
+            try:
+                densityplotfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-density" + ext)
+                densityplot = densityPlot(gnomfile=self.gnomFile, unit="nm",
+                                           filename=densityplotfile, format=ext[1:])
+            except Exception as error:
+                self.ERROR(error)
+            else:
+                self.xsDataResult.densityPlot = XSDataFile(XSDataString(densityplotfile))
+
+
+
         self.synchronizePlugins()
 
     def postProcess(self, _edObject=None):

@@ -171,6 +171,30 @@ def loadGnomFile(filename):
     out["r"], out["P(r)"], out["P(r)_err"] = numpy.loadtxt(pr, unpack=True, dtype="float32")
     return out
 
+def densityPlot(gnomfile, filename=None, format="png", unit="nm"):
+    """
+    Generate a density plot P = f(r) 
+
+    @param gnomfile: name of the GNOM output file
+    @return: the matplotlib figure
+    """
+    out = loadGnomFile(gnomfile)
+    fig1 = plt.figure(figsize=(12, 10))
+    ax1 = fig1.add_subplot(1, 1, 1)
+    ax1.errorbar(out["r"], out["P(r)"], out["P(r)_err"], label="Density")
+    ax1.set_ylabel('$\\rho (r)$')
+    ax1.set_xlabel('$r$ (%s)' % unit)
+    ax1.set_title("Density curve")
+#    ax1.set_yscale("log")
+    ax1.legend()
+#    ax1.legend(loc=3)
+    if filename:
+        if format:
+            fig1.savefig(filename, format=format)
+        else:
+            fig1.savefig(filename)
+    return fig1
+
 
 def scatterPlot(curve_file, first_point=None, last_point=None, filename=None, format="png", unit="nm", gnomfile=None):
     """
