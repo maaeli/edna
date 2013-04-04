@@ -30,7 +30,7 @@ __copyright__ = "ESRF"
 __date__ = "2012-09-17"
 __status__ = "Development"
 
-import os
+import os, gc
 from EDPluginControl import EDPluginControl
 from XSDataEdnaSaxs import XSDataInputSaxsAnalysis, XSDataResultSaxsAnalysis, \
                            XSDataInputAutoRg, XSDataInputDatGnom, XSDataInputDatPorod
@@ -123,6 +123,8 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
                 guinierfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-Guinier" + ext)
                 guinierplot = guinierPlot(self.scatterFile, unit="nm",
                                        filename=guinierfile, format=ext[1:])
+                guinierplot.clf()
+                guinierplot.close()
             except Exception as error:
                 self.ERROR(error)
             else:
@@ -132,6 +134,8 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
                 kratkyfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-Kratky" + ext)
                 kratkyplot = kartkyPlot(self.scatterFile, unit="nm",
                                            filename=kratkyfile, format=ext[1:])
+                kratkyplot.clf()
+                kratkyplot.close()
             except Exception as error:
                 self.ERROR(error)
             else:
@@ -140,21 +144,23 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
                 scatterplotfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-scattering" + ext)
                 scatterplot = scatterPlot(self.scatterFile, unit="nm", gnomfile=self.gnomFile,
                                            filename=scatterplotfile, format=ext[1:])
+                scatterplot.clf()
+                scatterplot.close()
             except Exception as error:
                 self.ERROR(error)
             else:
                 self.xsDataResult.scatterPlot = XSDataFile(XSDataString(scatterplotfile))
-
             try:
                 densityplotfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-density" + ext)
                 densityplot = densityPlot(gnomfile=self.gnomFile, unit="nm",
                                            filename=densityplotfile, format=ext[1:])
+                densityplot.clf()
+                densityplot.close()
             except Exception as error:
                 self.ERROR(error)
             else:
                 self.xsDataResult.densityPlot = XSDataFile(XSDataString(densityplotfile))
-
-
+            gc.collect()
 
         self.synchronizePlugins()
 
