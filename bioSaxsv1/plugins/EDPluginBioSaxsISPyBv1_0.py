@@ -230,7 +230,7 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
                                     ", ".join(self.pyarchcurves),
                                     collectionOrder,
                                     self.bestBuffer,
-                                    self.pyarchgraph.get("scatterPlot","")
+                                    self.pyarchgraph.get("scatterPlot",""),
                                     self.pyarchgraph.get("guinierPlot",""),
                                     self.pyarchgraph.get("kratkyPlot",""),
                                     self.pyarchgraph.get("densityPlot",""),
