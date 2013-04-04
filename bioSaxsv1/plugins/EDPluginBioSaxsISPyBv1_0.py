@@ -80,7 +80,8 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
         self.rgGnom = None
         self.dmax = None
         self.total = None
-        self.pyarchfiles = []
+        self.pyarchcurves = []
+        self.pyarchgraph = {}
         self.lstError = []
         self.bestBuffer = None
         self.scatterPlot = None
@@ -226,10 +227,13 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
                                     self.volume,
                                     self.framesAverage,
                                     self.framesMerged,
-                                    ", ".join(self.pyarchfiles),
+                                    ", ".join(self.pyarchcurves),
                                     collectionOrder,
                                     self.bestBuffer,
-                                    "param4"
+                                    self.pyarchgraph.get("scatterPlot","")
+                                    self.pyarchgraph.get("guinierPlot",""),
+                                    self.pyarchgraph.get("kratkyPlot",""),
+                                    self.pyarchgraph.get("densityPlot",""),
                                     )
         except Exception, error:
             strError = "ISPyB error: %s" % error
@@ -255,17 +259,18 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
                 ermsg = "Error while directory creation in pyarch: %s " % error
                 self.lstError.append(ermsg)
                 self.ERROR(ermsg)
-            if xsdfile:
-                self.copyfile(xsdfile.path.value, pyarch)
+            for xsdfile in self.dataInput.curves:
+                if xsdfile:
+                    self.copyfile(xsdfile.path.value, pyarch)
             self.copyfile(self.filename, pyarch)
             self.copyfile(self.gnomFile, pyarch)
             self.copyfile(self.bestBuffer, pyarch)
-            self.copyfile(self.scatterPlot, pyarch)
-            self.copyfile(self.guinierPlot, pyarch)
-            self.copyfile(self.kratkyPlot, pyarch)
-            self.copyfile(self.densityPlot, pyarch)
+            self.copyfile(self.scatterPlot, pyarch,"scatterPlot")
+            self.copyfile(self.guinierPlot, pyarch,"guinierPlot")
+            self.copyfile(self.kratkyPlot, pyarch,"kratkyPlot")
+            self.copyfile(self.densityPlot, pyarch,"densityPlot")
 
-    def copyfile(self, afile, pyarch):
+    def copyfile(self, afile, pyarch, dest="curve"):
         if not pyarch:
             self.ERROR("pyArch is %s" % pyarch)
         if afile and os.path.exists(afile) and os.path.isdir(pyarch):
@@ -276,5 +281,8 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
                 self.lstError.append(ermsg)
                 self.WARNING(ermsg)
             else:
-                self.pyarchfiles.append(os.path.join(pyarch, os.path.basename(afile)))
+                if dest=="curve":
+                    self.pyarchcurves.append(os.path.join(pyarch, os.path.basename(afile)))
+                else:
+                    self.pyarchgraph[dest]=os.path.join(pyarch, os.path.basename(afile))
 
