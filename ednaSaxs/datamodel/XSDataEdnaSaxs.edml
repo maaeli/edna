@@ -159,7 +159,24 @@ complex type XSDataInputSaxsAnalysis extends XSDataInput{
 	graphFormat: XSDataString optional
 }
 complex type XSDataResultSaxsAnalysis extends XSDataResult{
-	"AutoRg -> Gnom -> Prod pipeline"
+	"AutoRg -> Gnom -> Porod pipeline"
+	autoRg: XSDataAutoRg
+	gnom: XSDataGnom
+	volume: XSDataDoubleWithUnit
+	scatterPlot: XSDataFile optional
+	guinierPlot: XSDataFile optional
+	kratkyPlot: XSDataFile optional
+	densityPlot: XSDataFile optional
+}
+
+complex type XSDataInputSaxsModeling extends XSDataInput{
+	"Damif -> Supcomb -> Damaver -> Damfilt -> Damstart pipeline"
+	gnomFile: XSDataFile 
+	graphFormat: XSDataString optional
+}
+
+complex type XSDataResultSaxsModeling extends XSDataResult{
+	""Damif -> Supcomb -> Damaver -> Damfilt -> Damstart pipeline"
 	autoRg: XSDataAutoRg
 	gnom: XSDataGnom
 	volume: XSDataDoubleWithUnit
