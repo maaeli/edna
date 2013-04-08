@@ -7,7 +7,7 @@
 #    Copyright (C) 2008-2009 European Synchrotron Radiation Facility
 #                            Grenoble, France
 #
-#    Principal authors: Olof Svensson (svensson@esrf.fr) 
+#    Principal authors: Olof Svensson (svensson@esrf.fr)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Lesser General Public License as published
@@ -20,15 +20,17 @@
 #    GNU Lesser General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
-#    and the GNU Lesser General Public License  along with this program.  
+#    and the GNU Lesser General Public License  along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 
 #
-# This class has been inspired by the corresponding AALib class 
-# (20090518-PyAALib-JyAALib-111) and modified according to the needs 
+# This class has been inspired by the corresponding AALib class
+# (20090518-PyAALib-JyAALib-111) and modified according to the needs
 # for the EDNA project.
 #
+
+from __future__ import with_statement
 
 __authors__ = ["Olof Svensson", "Jerome Kieffer"]
 __contact__ = "svensson@esrf.fr"
@@ -66,14 +68,14 @@ class EDLogging(EDObject):
 
     def setTestOn(self):
         """
-        turn on the test mode: all assertions become verbose (->screen) 
+        turn on the test mode: all assertions become verbose (->screen)
         """
         self.edLogging.setTestOn()
 
 
     def setTestOff(self):
         """
-        turn off the test mode: all assertions become silent (->screen) 
+        turn off the test mode: all assertions become silent (->screen)
         """
         self.edLogging.setTestOff()
 
@@ -109,7 +111,7 @@ class EDLogging(EDObject):
     def isVerboseDebug(self):
         """
         This method returns the current status of debugging
-        
+
         @return: if debug output to standard output and log file is enabled.
         @type: boolean
         """
@@ -119,7 +121,7 @@ class EDLogging(EDObject):
     def log(self, _strMessage=""):
         """
         This method writes a message only to the log file.
-        
+
         @param _strMessage: The string to be written to the log file
         @type _strMessage: python string
         """
@@ -128,7 +130,7 @@ class EDLogging(EDObject):
     def screen(self, _strMessage=""):
         """
         This method writes a message to standard output and to the log file.
-        
+
         @param _strMessage: The string to be written to the log file
         @type _strMessage: python string
         """
@@ -139,7 +141,7 @@ class EDLogging(EDObject):
         """
         This method writes a debug message to standard output and to the log file
         if debugging is enabled. The message will be written with the prefix [DEBUG]
-        
+
         @param _strDebugMessage: The debug message to be written to standard output and log file
         @type _strDebugMessage: python string
         """
@@ -148,9 +150,9 @@ class EDLogging(EDObject):
 
     def unitTest(self, _strMessage=""):
         """
-        This method is meant to be used by the testing framework. The message will be written 
+        This method is meant to be used by the testing framework. The message will be written
         to standard output and the log file with the prefix [UnitTest]
-        
+
         @param _strMessage: The message to be written to standard output and log file
         @type _strMessage: python string
         """
@@ -160,7 +162,7 @@ class EDLogging(EDObject):
     def error(self, _strMessage=""):
         """
         This method writes a message to standard error and the log file with the prefix [ERROR].
-        
+
         @param _strMessage: The error message to be written to standard output and log file
         @type _strMessage: python string
         """
@@ -172,7 +174,7 @@ class EDLogging(EDObject):
     def warning(self, _strMessage=""):
         """
         This method writes a warning message to standard output and the log file with the prefix [Warning].
-        
+
         @param _strMessage: The error message to be written to standard output and log file
         @type _strMessage: python string
         """
@@ -185,13 +187,13 @@ class EDLogging(EDObject):
         """
         return a XSDataMessage with:
         Error:   tototo
-        Warning: blabla 
+        Warning: blabla
         """
         if self.__messages:
             return XSDataMessage(text=XSDataString(os.linesep.join(self.__messages)))
         #else return None
 
-        
+
     def retrieveMessages(self, _edPlugin):
         """
         Propagates error/warning messages from a plugin
@@ -203,13 +205,13 @@ class EDLogging(EDObject):
                 self.__messages.append("%s-%08i:" % (_edPlugin.getClassName(), _edPlugin.getId()))
                 for i in _edPlugin.dataOutput.message.text.value.split(os.linesep):
                     self.__messages.append("    " + i)
-                
-            
+
+
 
     def ASSERT(self, _strMessage):
         """
         This method writes an assert message to standard output and the log file with the prefix [ASSERT].
-        
+
         @param _strMessage: The error message to be written to standard output and log file
         @type _strMessage: python string
         """
@@ -219,7 +221,7 @@ class EDLogging(EDObject):
         """
         This method writes an error trace to standard output and the log file. The error trace has
         the same formatting as normal Python error traces.
-        
+
         @param _strPrefix: A prefix which can be customized, e.g. the testing framework uses '  [UnitTest]'
         @type _strPrefix: python string
         """
@@ -229,7 +231,7 @@ class EDLogging(EDObject):
     def setLogFileName(self, _strLogFileName):
         """
         This method can be used for customising the file name of the log file.
-        
+
         @param _strLogFileName: A file name for the log file.
         @type _strLogFileName: python string
         """
