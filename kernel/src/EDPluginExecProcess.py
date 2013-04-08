@@ -37,11 +37,8 @@ import threading, shlex, sys, time, subprocess
 from EDVerbose          import EDVerbose
 from EDPlugin           import EDPlugin
 from EDPluginExec       import EDPluginExec
-from EDConfiguration    import EDConfiguration
 from EDMessage          import EDMessage
 from EDUtilsPlatform    import EDUtilsPlatform
-
-from XSDataCommon       import XSPluginItem
 
 OAR_POLL_COMMAND = 'oarstat -s -j {0:d}'
 DEFAULT_OAR_POLL_INTERVAL = 10
@@ -72,7 +69,11 @@ class EDPluginExecProcess(EDPluginExec):
         self.__iPID = None
         self.__strCWD = None
         self.__strExecutionStatus = ""
-
+        self._start_time = None
+        self._oar_job_id = None
+        self._timer = None
+        self._oar_options = None
+        self._oar_poll_interval = None
 
     def process_locally(self, _edObject=None):
         """
