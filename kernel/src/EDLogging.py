@@ -35,10 +35,11 @@ __contact__ = "svensson@esrf.fr"
 __license__ = "LGPLv3+"
 __copyright__ = "European Synchrotron Radiation Facility, Grenoble, France"
 
-
+import os
 from EDObject import EDObject
 from EDLoggingVerbose import EDLoggingVerbose
 from EDLoggingPyLogging import EDLoggingPyLogging
+from XSDataCommon import XSDataMessage, XSDataString
 
 
 class EDLogging(EDObject):
@@ -53,7 +54,7 @@ class EDLogging(EDObject):
             self.edLogging = EDLoggingPyLogging()
         else:
             self.edLogging = EDLoggingVerbose()
-
+        self.__messages = []
 
     def setLogLevel(self, _logLevel):
         self.edLogging.setLogLevel(_logLevel)
@@ -156,16 +157,6 @@ class EDLogging(EDObject):
         self.edLogging.unitTest(_strMessage)
 
 
-    def ERROR(self, _strMessage=""):
-        """
-        This method writes a message to standard error and the log file with the prefix [ERROR].
-        
-        @param _strMessage: The error message to be written to standard output and log file
-        @type _strMessage: python string
-        """
-        self.edLogging.ERROR(_strMessage)
-
-
     def error(self, _strMessage=""):
         """
         This method writes a message to standard error and the log file with the prefix [ERROR].
@@ -174,17 +165,8 @@ class EDLogging(EDObject):
         @type _strMessage: python string
         """
         self.edLogging.error(_strMessage)
-
-
-    def WARNING(self, _strMessage=""):
-        """
-        This method writes a warning message to standard output and the log file with the prefix [Warning].
-        
-        @param _strMessage: The error message to be written to standard output and log file
-        @type _strMessage: python string
-        """
-        self.edLogging.WARNING(_strMessage)
-
+        self.__messages.append("Error:   %s" % _strMessage)
+    ERROR = error
 
 
     def warning(self, _strMessage=""):
@@ -195,7 +177,34 @@ class EDLogging(EDObject):
         @type _strMessage: python string
         """
         self.edLogging.warning(_strMessage)
+        self.__messages.append("Warning: %s" % _strMessage)
+    WARNING = warning
 
+
+    def getXSDataMessage(self):
+        """
+        return a XSDataMessage with:
+        Error:   tototo
+        Warning: blabla 
+        """
+        if self.__messages:
+            return XSDataMessage(text=XSDataString(os.linesep.join(self.__messages)))
+        #else return None
+
+        
+    def retrieveMessages(self, _edPlugin):
+        """
+        Propagates error/warning messages from a plugin
+        if _bFailure is true, this method has been called from retrieveFailureMessages
+        in this case, checks for potential unexpected errors coming from the EDPluginExec
+        """
+        if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.message and  _edPlugin.dataOutput.message.text:
+            with self.locked():
+                self.__messages.append("%s-%08i:" % (_edPlugin.getClassName(), _edPlugin.getId()))
+                for i in _edPlugin.dataOutput.message.text.value.split(os.linesep):
+                    self.__messages.append("    " + i)
+                
+            
 
     def ASSERT(self, _strMessage):
         """
