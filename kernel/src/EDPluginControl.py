@@ -8,7 +8,7 @@
 #                            Grenoble, France
 #
 #    Principal authors: Marie-Francoise Incardona (incardon@esrf.fr)
-#                       Olof Svensson (svensson@esrf.fr) 
+#                       Olof Svensson (svensson@esrf.fr)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Lesser General Public License as published
@@ -21,7 +21,7 @@
 #    GNU Lesser General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
-#    and the GNU Lesser General Public License  along with this program.  
+#    and the GNU Lesser General Public License  along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 
@@ -38,7 +38,6 @@ import os, time, gc
 from EDVerbose import EDVerbose
 from EDPlugin import EDPlugin
 from EDSlot import EDSlot
-from EDConfiguration import EDConfiguration
 from EDActionCluster import EDActionCluster
 from EDFactoryPluginStatic import EDFactoryPluginStatic
 
@@ -87,7 +86,7 @@ class EDPluginControl(EDPlugin):
                     EDVerbose.DEBUG("EDPluginControl.configure: setting controlled plugin %s to specific plugin %s" % (strControlledPlugin, strControlledPluginName))
         clusterSize = self.config.get("clusterSize", None)
         if (clusterSize != None):
-            self.__iClusterSize = int(strClusterSize)
+            self.__iClusterSize = int(clusterSize)
             EDVerbose.DEBUG("EDPluginControl.configure: setting cluster size to %d" % self.__iClusterSize)
 
 
@@ -128,7 +127,7 @@ class EDPluginControl(EDPlugin):
                 if edPlugin.isStarted() and (not edPlugin.isEnded()):
                     edPlugin.synchronize()
                 elif not edPlugin.isStarted():
-                    time.sleep(0.01) #release GIL to let plugin start 
+                    time.sleep(0.01)  # release GIL to let plugin start
                     continue
             time.sleep(0.01)
             with self.locked():
@@ -138,13 +137,13 @@ class EDPluginControl(EDPlugin):
     def loadPlugins(self):
         """
         This method loads and returns a list of references to the plugins to be controlled.
-        
-        The name of the plugin to be controlled is set set before calling this method using the 
-        "setControlledPluginName" method. 
-        
+
+        The name of the plugin to be controlled is set set before calling this method using the
+        "setControlledPluginName" method.
+
         The base name of the plugin to be controlled is used as the working
-        directory name of the plugin in question. The name of the plugin is used as 
-        base name. 
+        directory name of the plugin in question. The name of the plugin is used as
+        base name.
         """
         EDVerbose.DEBUG("EDPluginControl.loadPlugins")
         listKeys = self.__dictControlledPlugins.keys()
@@ -161,11 +160,11 @@ class EDPluginControl(EDPlugin):
     def loadPlugin(self, _strPluginToBeControlledName=None, _strBaseName=None):
         """
         This method loads and returns a reference to the plugin to be controlled.
-        
+
         The name of the plugin to be controlled can either be passed as an
-        argument, or bet set before calling this method using the 
-        "setPluginToBeControlledName". 
-        
+        argument, or bet set before calling this method using the
+        "setPluginToBeControlledName".
+
         The base name of the plugin to be controlled is used as the working
         directory name of the plugin in question. If no argument is supplied
         the name of the plugin is used as base name. In the case of creation of
@@ -287,6 +286,7 @@ class EDPluginControl(EDPlugin):
         if (_bAddSeparator):
             self.addExecutiveSummarySeparator()
         if _edPlugin:
+            strLine = ""
             for strLine in _edPlugin.getListExecutiveSummaryLines():
                 if strLine == self.getExecutiveSummarySeparator() and _strPrefix != "":
                     strLine = strLine[ :-len(_strPrefix) ]
@@ -341,7 +341,7 @@ class EDPluginControl(EDPlugin):
     def setClusterSize(self, _iClusterSize):
         """
         This method sets the size of the action cluster, i.e. the number of threads
-        that will be executed simultaneously. 
+        that will be executed simultaneously.
         """
         self.__iClusterSize = _iClusterSize
 
