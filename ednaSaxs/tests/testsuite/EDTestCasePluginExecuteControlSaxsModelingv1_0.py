@@ -33,7 +33,7 @@ from EDVerbose                           import EDVerbose
 from EDAssert                            import EDAssert
 from EDTestCasePluginExecute             import EDTestCasePluginExecute
 from XSDataEdnaSaxs 					 import XSDataInputSaxsModeling as XSDataInput
-from XSDataEdnaSaxs                     import XSDataResultSaxsModeling as XSDataResult
+from XSDataEdnaSaxs                      import XSDataResultSaxsModeling as XSDataResult
 
 class EDTestCasePluginExecuteControlSaxsModelingv1_0(EDTestCasePluginExecute):
 

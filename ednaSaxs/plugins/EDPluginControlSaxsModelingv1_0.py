@@ -127,6 +127,14 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
             self.damif_plugins.append(damif)
         self.executeActionCluster()
         self.synchronizeActionCluster()
+        for plugin in self.damif_plugins:
+            if plugin.isFailure():
+                self.setFailure()
+            self.retrieveMessages(plugin)
+        if self.isFailure():
+            return
+        damif = self.bestDammif()
+        print damif.dataOutput.marshal()
 
 
     def postProcess(self, _edObject=None):
@@ -164,3 +172,13 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
 #        self.DEBUG("EDPluginControlSaxsModelingv1_0.doFailureAutoRg")
 #        self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureAutoRg")
 #        self.setFailure()
+
+    def bestDammif(self):
+        """
+        Find DAMMIF run with best chi-square value
+        """
+        fitResultDict = dict([(plg.dataOutput.chiSqrt.value, plg) for plg in self.damif_plugins])
+        fitResultList = fitResultDict.keys()
+        fitResultList.sort()
+
+        return fitResultDict[fitResultList[0]]

@@ -200,7 +200,8 @@ class EDLogging(EDObject):
         if _bFailure is true, this method has been called from retrieveFailureMessages
         in this case, checks for potential unexpected errors coming from the EDPluginExec
         """
-        if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.message and  _edPlugin.dataOutput.message.text:
+        if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.status and \
+            _edPlugin.dataOutput.status.message and  _edPlugin.dataOutput.message.text:
             with self.locked():
                 self.__messages.append("%s-%08i:" % (_edPlugin.getClassName(), _edPlugin.getId()))
                 for i in _edPlugin.dataOutput.message.text.value.split(os.linesep):
