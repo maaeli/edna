@@ -33,7 +33,7 @@ import os
 from EDThreading import Semaphore
 from EDPluginControl import EDPluginControl
 from XSDataCommon import XSDataStatus, XSDataString
-from XSDataEdnaSaxs import XSDataInputSaxsModeling, XSDataResultSaxsModeling
+from XSDataEdnaSaxs import XSDataInputSaxsModeling, XSDataResultSaxsModeling, XSDataInputDammif
 #from EDFactoryPlugin import edFactoryPlugin
 #edFactoryPlugin.loadModule('XSDataBioSaxsv1_0')
 #from XSDataBioSaxsv1_0 import XSDataInputBioSaxsReduceFileSeriev1_0
@@ -41,7 +41,7 @@ from XSDataEdnaSaxs import XSDataInputSaxsModeling, XSDataResultSaxsModeling
 
 class EDPluginControlSaxsModelingv1_0(EDPluginControl):
     """
-    Basically this is a re-implementation of EDPluginControlSolutionScattering starting after Gnom and withou web page generation 
+    Basically this is a re-implementation of EDPluginControlSolutionScattering starting after Gnom and withou web page generation
     """
     classlock = Semaphore()
     configured = False
@@ -64,7 +64,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.edPlugin = None
         self.edPlugin = None
         self.xsGnomFile = None
-        self.results = XSDataResultSaxsModeling()
+        self.result = XSDataResultSaxsModeling()
         self.summary = []
         self.graph_format = "png"
         self.damif_plugins = []
@@ -86,19 +86,19 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
                     dammif_jobs = self.config.get("dammifJobs", None)
                     if (dammif_jobs != None):
                         self.__class__.dammif_jobs = int(dammif_jobs)
-                        EDVerbose.DEBUG("EDPluginControlSaxsModelingv1_0.configure: setting number of dammif jobs to %d" % self.dammif_jobs)
+                        self.DEBUG("EDPluginControlSaxsModelingv1_0.configure: setting number of dammif jobs to %d" % self.dammif_jobs)
                     unit = self.config.get("unit", None)
                     if (unit != None):
                         self.__class__.unit = unit.upper()
-                        EDVerbose.DEBUG("EDPluginControlSaxsModelingv1_0.configure: setting input units to %s" % self.unit)
+                        self.DEBUG("EDPluginControlSaxsModelingv1_0.configure: setting input units to %s" % self.unit)
                     symmetry = self.config.get("symmetry", None)
                     if (symmetry != None):
                         self.__class__.symmetry = symmetry
-                        EDVerbose.DEBUG("EDPluginControlSaxsModelingv1_0.configure: setting symmetry to %s" % self.symmetry)
+                        self.DEBUG("EDPluginControlSaxsModelingv1_0.configure: setting symmetry to %s" % self.symmetry)
                     mode = self.config.get("mode", None)
                     if (mode != None):
                         self.__class__.mode = mode
-                        EDVerbose.DEBUG("EDPluginControlSaxsModelingv1_0.configure: setting dammif mode to %s" % self.mode)
+                        self.DEBUG("EDPluginControlSaxsModelingv1_0.configure: setting dammif mode to %s" % self.mode)
 
                     self.__class__.configured = True
 
@@ -122,7 +122,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
                                               mode=XSDataString(self.mode))
         for i in range(self.dammif_jobs):
             damif = self.loadPlugin(self.strPluginExecDammif)
-            damif.datainput = xsDataInputDammif
+            damif.setDataInput(xsDataInputDammif)
             self.addPluginToActionCluster(damif)
             self.damif_plugins.append(damif)
         self.executeActionCluster()
@@ -139,7 +139,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
 
     def finallyProcess(self, _edObject=None):
         EDPluginControl.finallyProcess(self, _edObject=_edObject)
-        self.result.status = XSDataStatus(messages=self.getXSDataMessage(),
+        self.result.status = XSDataStatus(message=self.getXSDataMessage(),
                                           executiveSummary=XSDataString(os.linesep.join(self.summary)))
         self.setDataOutput(self.result)
 

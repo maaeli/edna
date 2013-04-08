@@ -77,7 +77,7 @@ class EDPluginExecDammifv0_1(EDPluginExecProcessScript):
             if self.getDataInput().getMode().getValue().lower() in ['fast', 'slow']:
                 self.__strMode = self.getDataInput().getMode().getValue().lower()
         except Exception:
-            EDVerbose.WARNING("Running DAMMIF in fast mode by default")
+            EDVerbose.DEBUG("Running DAMMIF in fast mode by default")
 
     def checkDammifUnitInput(self):
         EDVerbose.DEBUG("EDPluginExecDammifv0_1.checkDammifUnit")
@@ -85,12 +85,12 @@ class EDPluginExecDammifv0_1(EDPluginExecProcessScript):
             if self.getDataInput().getUnit().getValue().lower() in ['angstrom', 'nanometer']:
                 self.__strUnit = self.getDataInput().getUnit().getValue().upper()
         except Exception:
-            EDVerbose.WARNING("Using A-1 units for q-axis values by default")
+            EDVerbose.DEBUG("Using A-1 units for q-axis values by default")
 
     def checkDammifSymmetryInput(self):
         EDVerbose.DEBUG("EDPluginExecDammifv0_1.checkDammifSymmetryInput")
         _knownSymmetry = []
-        # Should be able to go up to P19, but DAMMIF only seems to work for symmetries up to P12 
+        # Should be able to go up to P19, but DAMMIF only seems to work for symmetries up to P12
         _knownSymmetry.extend(itertools.imap(lambda i: 'P' + str(i), range(1, 13)))
         _knownSymmetry.extend(itertools.imap(lambda i: 'P' + str(i) + '2', range(2, 13)))
 
@@ -98,7 +98,7 @@ class EDPluginExecDammifv0_1(EDPluginExecProcessScript):
             if self.getDataInput().getSymmetry().getValue() in _knownSymmetry:
                 self.__strSymmetry = self.getDataInput().getSymmetry().getValue()
         except Exception:
-            EDVerbose.WARNING("Symmetry wasn't specified. Setting symmetry to P1")
+            EDVerbose.DEBUG("Symmetry wasn't specified. Setting symmetry to P1")
 
     def checkDammifParticleShapeInput(self):
         particleShape = ['PROLATE', 'OBLATE', 'UNKNOWN']
@@ -106,20 +106,20 @@ class EDPluginExecDammifv0_1(EDPluginExecProcessScript):
             if self.getDataInput().getExpectedParticleShape().getValue() in range(3):
                 self.__strParticleShape = particleShape[self.getDataInput().getExpectedParticleShape().getValue()]
         except Exception:
-            EDVerbose.WARNING("Using Unknown particle shape")
+            EDVerbose.DEBUG("Using Unknown particle shape")
 
     def checkDammifConstant(self):
         try:
             self.__strConstant = '--constant=' + str(self.getDataInput().getConstant().getValue())
         except Exception:
-            EDVerbose.WARNING("Constant to subtract will be defined automatically")
+            EDVerbose.DEBUG("Constant to subtract will be defined automatically")
 
     def checkDammifChained(self):
         try:
             if self.getDataInput().getChained().getValue():
                 self.__strChained = '--chained'
         except Exception:
-            EDVerbose.WARNING("Atoms in the output model are not chained")
+            EDVerbose.DEBUG("Atoms in the output model are not chained")
 
     def preProcess(self, _edObject=None):
         EDPluginExecProcessScript.preProcess(self)
@@ -172,7 +172,7 @@ class EDPluginExecDammifv0_1(EDPluginExecProcessScript):
         os.symlink(tmpInputFileName, os.path.join(self.getWorkingDirectory(), "dammif.out"))
 
         commandLine = ['--mode', self.__strMode, \
-                       #'--unit', self.__strUnit, \
+                       '--unit', self.__strUnit, \
                        '--symmetry', self.__strSymmetry, \
                        '--anisometry', self.__strParticleShape, \
                        self.__strConstant, self.__strChained, 'dammif.out']
