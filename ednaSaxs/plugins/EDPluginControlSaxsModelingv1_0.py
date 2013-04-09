@@ -81,6 +81,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.valid = None #index of valid damif models
         self.mask2d = None
         self.arrayNSD = None
+        self.ref = None
 
     def checkParameters(self):
         """
@@ -187,6 +188,12 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.makeNSDarray("nsd.png")
         print self.arrayNSD
 
+        self.result.setMeanNSD(XSDataDouble(self.__meanNSD))
+        self.result.setVariationNSD(XSDataDouble(self.__varNSD))
+
+        resultsNSD = sorted(self.__dammifRefNSD.iteritems(), key=operator.itemgetter(1))
+
+        return resultsNSD[0][0]
 
 
 
@@ -270,6 +277,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.valid = (chi2 < chi2max) * (R < Rmax)
         self.mask2d = (1 - numpy.identity(len(self.dammif_plugins))) * numpy.outer(self.valid, self.valid)
         print self.valid
+
         if filename:
             filename = os.path.join(self.getWorkingDirectory(), filename)
             self.WARNING("Wrote %s" % filename)
@@ -300,7 +308,14 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         lnsd = numpy.array(lnsd)
         print lnsd
         print lnsd.mean() , lnsd.std(), lnsd.mean() + 2 * lnsd.std()
-        nsd_max = lnsd.mean() + 2 * lnsd.std()
+        nsd_max = lnsd.mean() + lnsd.std()
+        data = self.arrayNSD.sum(axis= -1) / self.mask2d.sum(axis= -1)
+        best_val = data[data > 0].min()
+        print data
+        print best_val
+        print numpy.where(data == best_val)
+        self.ref = int(numpy.where(data == best_val)[0][-1])
+        print self.ref
         ax1.imshow(self.arrayNSD, interpolation="nearest", origin="upper")
         ax1.set_title(u"NSD correlation table")
         ax1.set_xticks(range(self.dammif_jobs))
@@ -312,16 +327,22 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         ax1.set_xlabel(u"Model number")
         ax1.set_ylabel(u"Model number")
         ax2 = fig.add_subplot(1, 2, 2)
-        data = self.arrayNSD.sum(axis= -1) / self.mask2d.sum(axis= -1)
         ax2.bar(xticks - 0.5, data)
-        ax2.plot([0.5, len(self.dammif_plugins) + 0.5], [nsd_max, nsd_max], "-r", label=u"NSD$_{max}$ = %.3f" % nsd_max)
+        ax2.plot([0.5, len(self.dammif_plugins) + 0.5], [nsd_max, nsd_max], "-r", label=u"NSD$_{max}$ = %.2f" % nsd_max)
         ax2.set_title(u"NSD between any model and all others")
         ax2.set_ylabel("Normalized Spatial Discrepancy")
         ax2.set_xlabel(u"Model number")
         ax2.set_xticks(xticks)
+        bbox_props = dict(boxstyle="rarrow,pad=0.3", fc="cyan", ec="b", lw=1)
+        ax2.text(self.ref + 1, data[self.ref] / 2, "Reference", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)
         ax2.legend(loc=8)
         self.valid *= (data < nsd_max)
+        bbox_props = dict(boxstyle="larrow,pad=0.3", fc="pink", ec="r", lw=1)
+        for i in range(self.dammif_jobs):
+            if not self.valid[i]:
+                ax2.text(i + 1, data[self.ref] / 2, "Discarded", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)
         print self.valid
+        print self.ref
         if filename:
             filename = os.path.join(self.getWorkingDirectory(), filename)
             self.WARNING("Wrote %s" % filename)
