@@ -74,5 +74,13 @@
         "execProcessScriptExecutable": "/usr/bin/damfilt", 
         "execProcessScriptShell": "/bin/bash", 
         "timeOut": 60
+    },
+    "EDPluginControlSaxsModelingv1_0":{
+    	"dammifJobs": 16,
+    	"timeOut": 600,
+    	"clusterSize": 8,
+    	"unit": "nanometer",
+		"symmetry": "P1",
+		"mode": "fast"
     }
 }

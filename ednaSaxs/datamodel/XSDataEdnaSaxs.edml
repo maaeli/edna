@@ -20,11 +20,11 @@ import XSDataCommon.XSDataDoubleWithUnit
 /*******************************************
   *  Common types used only in EdnaSaxs
   ********************************************/
-  
-  
+
+
 complex type XSDataSaxsSeries extends XSData {
 	"Basical"
-	curve : XSDataFile 
+	curve : XSDataFile
 	concentration: XSDataDouble optional
 }
 
@@ -33,7 +33,7 @@ complex type XSDataSaxsSample extends XSData {
 	name: XSDataString optional
 	comment: XSDataString optional
 	code: XSDataString optional
-	
+
 }
 
 complex type XSDataInputDatcmp extends XSDataInput {
@@ -46,7 +46,7 @@ complex type XSDataResultDatcmp extends XSDataResult {
 	"Higher chi-values indicate dis-similarities in the input.\n
 	 Fidelity gives the likelihood of the two data sets being identical.
 	"
-	chi: XSDataDouble 
+	chi: XSDataDouble
 	fidelity: XSDataDouble
 }
 
@@ -135,7 +135,7 @@ complex type XSDataBioSaxsSample extends XSData {
 }
 
 complex type XSDataInputSaxsPipeline extends XSDataInput{
-	"Run ProcessOneFile on each file of a time time serie until autorg "	
+	"Run ProcessOneFile on each file of a time time serie until autorg "
 	fileSerie: XSDataFileSeries
 	sample: XSDataBioSaxsSample
 	experimentSetup: XSDataBioSaxsExperimentSetup
@@ -143,7 +143,7 @@ complex type XSDataInputSaxsPipeline extends XSDataInput{
 	directory2D: XSDataFile
 	directoryMisc : XSDataFile
 	forceReprocess: XSDataBoolean optional "if not present or False, just return the existing file, else force reprocessing in different folders"
-	absoluteFidelity: XSDataDouble optional 
+	absoluteFidelity: XSDataDouble optional
 	relativeFidelity: XSDataDouble optional
 	rawImageSize: XSDataInteger optional
 }
@@ -159,7 +159,24 @@ complex type XSDataInputSaxsAnalysis extends XSDataInput{
 	graphFormat: XSDataString optional
 }
 complex type XSDataResultSaxsAnalysis extends XSDataResult{
-	"AutoRg -> Gnom -> Prod pipeline"
+	"AutoRg -> Gnom -> Porod pipeline"
+	autoRg: XSDataAutoRg
+	gnom: XSDataGnom
+	volume: XSDataDoubleWithUnit
+	scatterPlot: XSDataFile optional
+	guinierPlot: XSDataFile optional
+	kratkyPlot: XSDataFile optional
+	densityPlot: XSDataFile optional
+}
+
+complex type XSDataInputSaxsModeling extends XSDataInput{
+	"Damif -> Supcomb -> Damaver -> Damfilt -> Damstart pipeline"
+	gnomFile: XSDataFile
+	graphFormat: XSDataString optional
+}
+
+complex type XSDataResultSaxsModeling extends XSDataResult{
+	"Damif -> Supcomb -> Damaver -> Damfilt -> Damstart pipeline"
 	autoRg: XSDataAutoRg
 	gnom: XSDataGnom
 	volume: XSDataDoubleWithUnit

@@ -27,10 +27,10 @@
 __authors__ = ["Jérôme Kieffer"]
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
-__date__ = "2012-09-17"
+__date__ = "2013-04-04"
 __status__ = "Development"
 
-import os, gc
+import os, gc, sys
 from EDPluginControl import EDPluginControl
 from XSDataEdnaSaxs import XSDataInputSaxsAnalysis, XSDataResultSaxsAnalysis, \
                            XSDataInputAutoRg, XSDataInputDatGnom, XSDataInputDatPorod
@@ -119,14 +119,16 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
             ext = self.dataInput.graphFormat.value
             if not ext.startswith("."):
                 ext = "." + ext
+            plt = sys.modules.get("matplotlib.pyplot")
             try:
                 guinierfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-Guinier" + ext)
                 guinierplot = guinierPlot(self.scatterFile, unit="nm",
                                        filename=guinierfile, format=ext[1:])
                 guinierplot.clf()
-                guinierplot.close()
+                if plt:
+                    plt.close(guinierplot)
             except Exception as error:
-                self.ERROR(error)
+                self.ERROR("EDPluginControlSaxsAnalysisv1_0 in guinierplot: %s"%error)
             else:
                 self.xsDataResult.guinierPlot = XSDataFile(XSDataString(guinierfile))
 
@@ -135,9 +137,10 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
                 kratkyplot = kartkyPlot(self.scatterFile, unit="nm",
                                            filename=kratkyfile, format=ext[1:])
                 kratkyplot.clf()
-                kratkyplot.close()
+                if plt:
+                    plt.close(kratkyplot)
             except Exception as error:
-                self.ERROR(error)
+                self.ERROR("EDPluginControlSaxsAnalysisv1_0 in kratkyplot: %s"%error)
             else:
                 self.xsDataResult.kratkyPlot = XSDataFile(XSDataString(kratkyfile))
             try:
@@ -145,9 +148,10 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
                 scatterplot = scatterPlot(self.scatterFile, unit="nm", gnomfile=self.gnomFile,
                                            filename=scatterplotfile, format=ext[1:])
                 scatterplot.clf()
-                scatterplot.close()
+                if plt:
+                    plt.close(scatterplot)
             except Exception as error:
-                self.ERROR(error)
+                self.ERROR("EDPluginControlSaxsAnalysisv1_0 in scatterplot: %s"%error)
             else:
                 self.xsDataResult.scatterPlot = XSDataFile(XSDataString(scatterplotfile))
             try:
@@ -155,13 +159,13 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
                 densityplot = densityPlot(gnomfile=self.gnomFile, unit="nm",
                                            filename=densityplotfile, format=ext[1:])
                 densityplot.clf()
-                densityplot.close()
+                if plt:
+                    plt.close(densityplot)
             except Exception as error:
-                self.ERROR(error)
+                self.ERROR("EDPluginControlSaxsAnalysisv1_0 in scatterplot: %s"%error)
             else:
                 self.xsDataResult.densityPlot = XSDataFile(XSDataString(densityplotfile))
             gc.collect()
-
         self.synchronizePlugins()
 
     def postProcess(self, _edObject=None):

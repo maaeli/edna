@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<XSDataInput>
+    <gnomFile>
+        <path>
+            <value>${EDNA_TESTIMAGES}/bsa_013_08.out</value>
+        </path>
+    </gnomFile>
+</XSDataInput>
