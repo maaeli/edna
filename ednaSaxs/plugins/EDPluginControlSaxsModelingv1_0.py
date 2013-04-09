@@ -153,7 +153,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         #retrieve results from best dammif
         self.dammif = self.bestDammif()
         self.chi2plot("chi2_R.png")
-        
+
         self.result.fitFile = self.dammif.dataOutput.fitFile
         self.result.logFile = self.dammif.dataOutput.logFile
         self.result.pdbMoleculeFile = self.dammif.dataOutput.pdbMoleculeFile
@@ -247,7 +247,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
 
         chi2 = numpy.array([ plg.dataOutput.chiSqrt.value for plg in self.dammif_plugins])
         chi2max = chi2.mean() + 2 * chi2.std()
-        
+
         xticks = 1 + numpy.arange(len(self.dammif_plugins))
         fig = plt.figure(figsize=(15, 10))
         ax1 = fig.add_subplot(1, 2, 1)
@@ -284,6 +284,9 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.arrayNSD = numpy.zeros(self.mask2d.shape, numpy.float32)
         fig = plt.figure(figsize=(15, 10))
         ax1 = fig.add_subplot(1, 2, 1)
+        # for now just an empty figure but a placeholder
+        ax1.imshow(self.arrayNSD, interpolation="nearest", origin="upper")
+
         xticks = 1 + numpy.arange(len(self.dammif_plugins))
         lnsd = []
         for key, plugin in self.supcomb_plugins.items():
@@ -292,9 +295,11 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
             self.arrayNSD[i0, i1] = nsd
             self.arrayNSD[i1, i0] = nsd
             lnsd.append(nsd)
-            ax1.annotate("%.2f" % nsd, (i0 - .3, i1))
-            ax1.annotate("%.2f" % nsd, (i1 - .3, i0))
+            ax1.text(i0, i1, "%.2f" % nsd, ha="center", va="center", size=12 * 8 // self.dammif_jobs)
+            ax1.text(i1, i0, "%.2f" % nsd, ha="center", va="center", size=12 * 8 // self.dammif_jobs)
         lnsd = numpy.array(lnsd)
+        print lnsd
+        print lnsd.mean() , lnsd.std(), lnsd.mean() + 2 * lnsd.std()
         nsd_max = lnsd.mean() + 2 * lnsd.std()
         ax1.imshow(self.arrayNSD, interpolation="nearest", origin="upper")
         ax1.set_title(u"NSD correlation table")
