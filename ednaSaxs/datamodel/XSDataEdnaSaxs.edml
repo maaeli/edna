@@ -177,13 +177,20 @@ complex type XSDataInputSaxsModeling extends XSDataInput{
 
 complex type XSDataResultSaxsModeling extends XSDataResult{
 	"Damif -> Supcomb -> Damaver -> Damfilt -> Damstart pipeline"
-	autoRg: XSDataAutoRg
-	gnom: XSDataGnom
-	volume: XSDataDoubleWithUnit
-	scatterPlot: XSDataFile optional
-	guinierPlot: XSDataFile optional
-	kratkyPlot: XSDataFile optional
-	densityPlot: XSDataFile optional
+
+	fitFile: XSDataFile
+	logFile: XSDataFile
+	pdbMoleculeFile: XSDataFile
+	pdbSolventFile: XSDataFile
+
+//	corelationFitValues: XSDataDouble [] optional
+//	lineProfileFitQuality: XSDataDouble
+//	scatteringFitQ: XSDataDouble [] optional
+//	scatteringFitValues: XSDataDouble [] optional
+//	scatteringFitQArray: XSDataArray optional
+//	scatteringFitIarray: XSDataArray optional
+//	meanNSD: XSDataDouble optional
+//	variationNSD: XSDataDouble optional
 }
 
 

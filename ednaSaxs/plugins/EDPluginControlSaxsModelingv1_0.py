@@ -29,11 +29,17 @@ __license__ = "GPLv3+"
 __copyright__ = "ESRF"
 __status__ = "developement"
 
-import os
+import os, gc
+import numpy
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
 from EDThreading import Semaphore
 from EDPluginControl import EDPluginControl
+from EDActionCluster import EDActionCluster
 from XSDataCommon import XSDataStatus, XSDataString
-from XSDataEdnaSaxs import XSDataInputSaxsModeling, XSDataResultSaxsModeling, XSDataInputDammif
+from XSDataEdnaSaxs import XSDataInputSaxsModeling, XSDataResultSaxsModeling, XSDataInputDammif, XSDataInputSupcomb
 #from EDFactoryPlugin import edFactoryPlugin
 #edFactoryPlugin.loadModule('XSDataBioSaxsv1_0')
 #from XSDataBioSaxsv1_0 import XSDataInputBioSaxsReduceFileSeriev1_0
@@ -45,6 +51,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
     """
     classlock = Semaphore()
     configured = False
+    cluster_size = 2     # duplicate from ControlPlugin
     dammif_jobs = 10     # number of dammif job to run
     unit = "NANOMETER"   # unit of the GNOM file
     symmetry = "P1"      #
@@ -67,8 +74,13 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.result = XSDataResultSaxsModeling()
         self.summary = []
         self.graph_format = "png"
-        self.damif_plugins = []
-
+        self.dammif_plugins = []
+        self.dammif = None
+        self.supcomb_plugins = {}
+        self.actclust_supcomb = None
+        self.valid = None #index of valid damif models
+        self.mask2d = None
+        self.arrayNSD = None
 
     def checkParameters(self):
         """
@@ -99,7 +111,10 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
                     if (mode != None):
                         self.__class__.mode = mode
                         self.DEBUG("EDPluginControlSaxsModelingv1_0.configure: setting dammif mode to %s" % self.mode)
-
+                    clusterSize = self.config.get("clusterSize", None)
+                    if (clusterSize != None):
+                        self.__class__.cluster_size = int(clusterSize)
+                        self.DEBUG("EDPluginControl.configure: setting cluster size to %d" % self.cluster_size)
                     self.__class__.configured = True
 
     def preProcess(self, _edObject=None):
@@ -121,27 +136,72 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
                                               symmetry=XSDataString(self.symmetry),
                                               mode=XSDataString(self.mode))
         for i in range(self.dammif_jobs):
-            damif = self.loadPlugin(self.strPluginExecDammif)
-            damif.setDataInput(xsDataInputDammif)
-            self.addPluginToActionCluster(damif)
-            self.damif_plugins.append(damif)
+            dammif = self.loadPlugin(self.strPluginExecDammif)
+            dammif.setDataInput(xsDataInputDammif)
+            self.addPluginToActionCluster(dammif)
+            self.dammif_plugins.append(dammif)
         self.executeActionCluster()
         self.synchronizeActionCluster()
-        for plugin in self.damif_plugins:
+        for plugin in self.dammif_plugins:
             if plugin.isFailure():
+                self.ERROR("dammif plugin %s-%08i failed" % (plugin.getName(), plugin.getId()))
                 self.setFailure()
             self.retrieveMessages(plugin)
         if self.isFailure():
             return
-        damif = self.bestDammif()
-        print damif.dataOutput.marshal()
+
+        #retrieve results from best dammif
+        self.dammif = self.bestDammif()
+        self.chi2plot("chi2_R.png")
+        
+        self.result.fitFile = self.dammif.dataOutput.fitFile
+        self.result.logFile = self.dammif.dataOutput.logFile
+        self.result.pdbMoleculeFile = self.dammif.dataOutput.pdbMoleculeFile
+        self.result.pdbSolventFile = self.dammif.dataOutput.pdbSolventFile
+
+        #prepare an action cluster with all supcomb plugins
+        self.actclust_supcomb = EDActionCluster(self.cluster_size)
+        for idx in range(self.dammif_jobs):
+            if self.valid[idx]:
+                for ser in range(idx):
+                    if self.valid[ser]:
+                        supcomb = self.loadPlugin(self.strPluginExecSupcomb)
+                        supcomb.dataInput = XSDataInputSupcomb(templateFile=self.dammif_plugins[idx].dataOutput.pdbMoleculeFile,
+                                                               superimposeFile=self.dammif_plugins[ser].dataOutput.pdbMoleculeFile,)
+                        self.supcomb_plugins[(idx, ser)] = supcomb
+                        self.actclust_supcomb.addAction(supcomb)
+        self.actclust_supcomb.executeSynchronous()
+#        self.__xsSupcombJobs = EDParallelJobLauncher(self, self.__strPluginExecSupcomb, dictDataInputSupcomb, self.__iNbThreads)
+#        self.__xsSupcombJobs.connectSUCCESS(self.doSuccessExecSupcomb)
+#        self.__xsSupcombJobs.connectFAILURE(self.doFailureExecSupcomb)
+#        self.executePluginSynchronous(self.__xsSupcombJobs)
+
+        for key, plugin in self.supcomb_plugins.items():
+            if plugin.isFailure():
+                self.ERROR("supcomb plugin for model pair (%i,%i) %s-%08i failed" % (key[0] + 1, key[1] + 1, plugin.getName(), plugin.getId()))
+                self.setFailure()
+            self.retrieveMessages(plugin)
+        if self.isFailure():
+            return
+
+        self.makeNSDarray("nsd.png")
+        print self.arrayNSD
+
+
+
+
 
 
     def postProcess(self, _edObject=None):
         EDPluginControl.postProcess(self)
         self.DEBUG("EDPluginControlSaxsModelingv1_0.postProcess")
         # clean up memory
-        self.damif_plugins = []
+        self.dammif_plugins = []
+        self.dammif = None
+        self.emptyListOfLoadedPlugin()
+        self.supcomb_plugins = {}
+        self.actclust_supcomb = None
+        gc.collect()
         # Create some output data
 
 
@@ -177,8 +237,92 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         """
         Find DAMMIF run with best chi-square value
         """
-        fitResultDict = dict([(plg.dataOutput.chiSqrt.value, plg) for plg in self.damif_plugins])
+        fitResultDict = dict([(plg.dataOutput.chiSqrt.value, plg) for plg in self.dammif_plugins])
         fitResultList = fitResultDict.keys()
         fitResultList.sort()
 
         return fitResultDict[fitResultList[0]]
+
+    def chi2plot(self, filename=None, close=True):
+
+        chi2 = numpy.array([ plg.dataOutput.chiSqrt.value for plg in self.dammif_plugins])
+        chi2max = chi2.mean() + 2 * chi2.std()
+        
+        xticks = 1 + numpy.arange(len(self.dammif_plugins))
+        fig = plt.figure(figsize=(15, 10))
+        ax1 = fig.add_subplot(1, 2, 1)
+        ax1.bar(xticks - 0.5, chi2)
+        ax1.set_ylabel(u"\u03C7$^2$")
+        ax1.set_xlabel(u"Model number")
+        ax1.plot([0.5, len(self.dammif_plugins) + 0.5], [chi2max, chi2max], "-r", label=u"\u03C7$^2$$_{max}$ = %.3f" % chi2max)
+        ax1.set_xticks(xticks)
+        ax1.legend(loc=8)
+        R = numpy.array([ plg.dataOutput.rfactor.value for plg in self.dammif_plugins])
+        Rmax = R.mean() + 2 * R.std()
+        ax2 = fig.add_subplot(1, 2, 2)
+        ax2.bar(xticks - 0.5, R)
+        ax2.plot([0.5, len(self.dammif_plugins) + 0.5], [Rmax, Rmax], "-r", label=u"R$_{max}$ = %.3f" % Rmax)
+        ax2.set_ylabel(u"R factor")
+        ax2.set_xlabel(u"Model number")
+        ax2.set_xticks(xticks)
+        ax2.legend(loc=8)
+#        fig.set_title("Selection of dammif models based on \u03C7$^2$")
+        self.valid = (chi2 < chi2max) * (R < Rmax)
+        self.mask2d = (1 - numpy.identity(len(self.dammif_plugins))) * numpy.outer(self.valid, self.valid)
+        print self.valid
+        if filename:
+            filename = os.path.join(self.getWorkingDirectory(), filename)
+            self.WARNING("Wrote %s" % filename)
+            fig.savefig(filename)
+        if close:
+            fig.clf()
+            plt.close(fig)
+        else:
+            return fig
+
+    def makeNSDarray(self, filename=None, close=True):
+        self.arrayNSD = numpy.zeros(self.mask2d.shape, numpy.float32)
+        fig = plt.figure(figsize=(15, 10))
+        ax1 = fig.add_subplot(1, 2, 1)
+        xticks = 1 + numpy.arange(len(self.dammif_plugins))
+        lnsd = []
+        for key, plugin in self.supcomb_plugins.items():
+            i0, i1 = key
+            nsd = plugin.dataOutput.NSD.value
+            self.arrayNSD[i0, i1] = nsd
+            self.arrayNSD[i1, i0] = nsd
+            lnsd.append(nsd)
+            ax1.annotate("%.2f" % nsd, (i0 - .3, i1))
+            ax1.annotate("%.2f" % nsd, (i1 - .3, i0))
+        lnsd = numpy.array(lnsd)
+        nsd_max = lnsd.mean() + 2 * lnsd.std()
+        ax1.imshow(self.arrayNSD, interpolation="nearest", origin="upper")
+        ax1.set_title(u"NSD correlation table")
+        ax1.set_xticks(range(self.dammif_jobs))
+        ax1.set_xticklabels([str(i) for i in range(1, 1 + self.dammif_jobs)])
+        ax1.set_xlim(-0.5, self.dammif_jobs - 0.5)
+        ax1.set_ylim(-0.5, self.dammif_jobs - 0.5)
+        ax1.set_yticks(range(self.dammif_jobs))
+        ax1.set_yticklabels([str(i) for i in range(1, 1 + self.dammif_jobs)])
+        ax1.set_xlabel(u"Model number")
+        ax1.set_ylabel(u"Model number")
+        ax2 = fig.add_subplot(1, 2, 2)
+        data = self.arrayNSD.sum(axis= -1) / self.mask2d.sum(axis= -1)
+        ax2.bar(xticks - 0.5, data)
+        ax2.plot([0.5, len(self.dammif_plugins) + 0.5], [nsd_max, nsd_max], "-r", label=u"NSD$_{max}$ = %.3f" % nsd_max)
+        ax2.set_title(u"NSD between any model and all others")
+        ax2.set_ylabel("Normalized Spatial Discrepancy")
+        ax2.set_xlabel(u"Model number")
+        ax2.set_xticks(xticks)
+        ax2.legend(loc=8)
+        self.valid *= (data < nsd_max)
+        print self.valid
+        if filename:
+            filename = os.path.join(self.getWorkingDirectory(), filename)
+            self.WARNING("Wrote %s" % filename)
+            fig.savefig(filename)
+        if close:
+            fig.clf()
+            plt.close(fig)
+        else:
+            return fig
