@@ -81,7 +81,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.valid = None #index of valid damif models
         self.mask2d = None
         self.arrayNSD = None
-        self.ref = None
+        self.ref = None   # reference frame number (starting ar 0)
 
     def checkParameters(self):
         """
@@ -172,10 +172,6 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
                         self.supcomb_plugins[(idx, ser)] = supcomb
                         self.actclust_supcomb.addAction(supcomb)
         self.actclust_supcomb.executeSynchronous()
-#        self.__xsSupcombJobs = EDParallelJobLauncher(self, self.__strPluginExecSupcomb, dictDataInputSupcomb, self.__iNbThreads)
-#        self.__xsSupcombJobs.connectSUCCESS(self.doSuccessExecSupcomb)
-#        self.__xsSupcombJobs.connectFAILURE(self.doFailureExecSupcomb)
-#        self.executePluginSynchronous(self.__xsSupcombJobs)
 
         for key, plugin in self.supcomb_plugins.items():
             if plugin.isFailure():
@@ -186,14 +182,27 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
             return
 
         self.makeNSDarray("nsd.png")
-        print self.arrayNSD
 
-        self.result.setMeanNSD(XSDataDouble(self.__meanNSD))
-        self.result.setVariationNSD(XSDataDouble(self.__varNSD))
+        idx = self.ref
+        self.actclust_supcomb = EDActionCluster(self.cluster_size)
+        for ser in range(self.ref + 1, self.dammif_jobs):
+            if self.valid[ser]:
+                supcomb = self.loadPlugin(self.strPluginExecSupcomb)
+                supcomb.dataInput = XSDataInputSupcomb(templateFile=self.dammif_plugins[self.ref].dataOutput.pdbMoleculeFile,
+                                                       superimposeFile=self.dammif_plugins[ser].dataOutput.pdbMoleculeFile,)
+                self.supcomb_plugins[(self.ref, ser)] = supcomb
+                self.actclust_supcomb.addAction(supcomb)
+        self.actclust_supcomb.executeSynchronous()
 
-        resultsNSD = sorted(self.__dammifRefNSD.iteritems(), key=operator.itemgetter(1))
-
-        return resultsNSD[0][0]
+        for ser in range(self.ref + 1, self.dammif_jobs):
+            if self.valid[ser]:
+                plugin = self.supcomb_plugins[(self.ref, ser)]
+                if plugin.isFailure():
+                    self.ERROR("supcomb plugin for model pair (%i,%i) %s-%08i failed" % (self.ref + 1, ser + 1, plugin.getName(), plugin.getId()))
+                    self.setFailure()
+                self.retrieveMessages(plugin)
+        if self.isFailure():
+            return
 
 
 
@@ -255,29 +264,33 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         chi2 = numpy.array([ plg.dataOutput.chiSqrt.value for plg in self.dammif_plugins])
         chi2max = chi2.mean() + 2 * chi2.std()
 
-        xticks = 1 + numpy.arange(len(self.dammif_plugins))
+        xticks = 1 + numpy.arange(self.dammif_jobs)
         fig = plt.figure(figsize=(15, 10))
         ax1 = fig.add_subplot(1, 2, 1)
         ax1.bar(xticks - 0.5, chi2)
         ax1.set_ylabel(u"\u03C7$^2$")
         ax1.set_xlabel(u"Model number")
-        ax1.plot([0.5, len(self.dammif_plugins) + 0.5], [chi2max, chi2max], "-r", label=u"\u03C7$^2$$_{max}$ = %.3f" % chi2max)
+        ax1.plot([0.5, self.dammif_jobs + 0.5], [chi2max, chi2max], "-r", label=u"\u03C7$^2$$_{max}$ = %.3f" % chi2max)
         ax1.set_xticks(xticks)
         ax1.legend(loc=8)
         R = numpy.array([ plg.dataOutput.rfactor.value for plg in self.dammif_plugins])
         Rmax = R.mean() + 2 * R.std()
         ax2 = fig.add_subplot(1, 2, 2)
         ax2.bar(xticks - 0.5, R)
-        ax2.plot([0.5, len(self.dammif_plugins) + 0.5], [Rmax, Rmax], "-r", label=u"R$_{max}$ = %.3f" % Rmax)
+        ax2.plot([0.5, self.dammif_jobs + 0.5], [Rmax, Rmax], "-r", label=u"R$_{max}$ = %.3f" % Rmax)
         ax2.set_ylabel(u"R factor")
         ax2.set_xlabel(u"Model number")
         ax2.set_xticks(xticks)
         ax2.legend(loc=8)
 #        fig.set_title("Selection of dammif models based on \u03C7$^2$")
         self.valid = (chi2 < chi2max) * (R < Rmax)
-        self.mask2d = (1 - numpy.identity(len(self.dammif_plugins))) * numpy.outer(self.valid, self.valid)
+        self.mask2d = (1 - numpy.identity(self.dammif_jobs)) * numpy.outer(self.valid, self.valid)
         print self.valid
-
+        bbox_props = dict(boxstyle="larrow,pad=0.3", fc="pink", ec="r", lw=1)
+        for i in range(self.dammif_jobs):
+            if not self.valid[i]:
+                ax1.text(i + 0.95, chi2max / 2, "Discarded", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)
+                ax2.text(i + 0.95, Rmax / 2, "Discarded", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)
         if filename:
             filename = os.path.join(self.getWorkingDirectory(), filename)
             self.WARNING("Wrote %s" % filename)
@@ -295,7 +308,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         # for now just an empty figure but a placeholder
         ax1.imshow(self.arrayNSD, interpolation="nearest", origin="upper")
 
-        xticks = 1 + numpy.arange(len(self.dammif_plugins))
+        xticks = 1 + numpy.arange(self.dammif_jobs)
         lnsd = []
         for key, plugin in self.supcomb_plugins.items():
             i0, i1 = key
@@ -328,19 +341,19 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         ax1.set_ylabel(u"Model number")
         ax2 = fig.add_subplot(1, 2, 2)
         ax2.bar(xticks - 0.5, data)
-        ax2.plot([0.5, len(self.dammif_plugins) + 0.5], [nsd_max, nsd_max], "-r", label=u"NSD$_{max}$ = %.2f" % nsd_max)
+        ax2.plot([0.5, self.dammif_jobs + 0.5], [nsd_max, nsd_max], "-r", label=u"NSD$_{max}$ = %.2f" % nsd_max)
         ax2.set_title(u"NSD between any model and all others")
         ax2.set_ylabel("Normalized Spatial Discrepancy")
         ax2.set_xlabel(u"Model number")
         ax2.set_xticks(xticks)
         bbox_props = dict(boxstyle="rarrow,pad=0.3", fc="cyan", ec="b", lw=1)
-        ax2.text(self.ref + 1, data[self.ref] / 2, "Reference", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)
+        ax2.text(self.ref + 0.95, data[self.ref] / 2, "Reference", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)
         ax2.legend(loc=8)
         self.valid *= (data < nsd_max)
         bbox_props = dict(boxstyle="larrow,pad=0.3", fc="pink", ec="r", lw=1)
         for i in range(self.dammif_jobs):
             if not self.valid[i]:
-                ax2.text(i + 1, data[self.ref] / 2, "Discarded", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)
+                ax2.text(i + 0.95, data[self.ref] / 2, "Discarded", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)
         print self.valid
         print self.ref
         if filename:
