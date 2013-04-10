@@ -1,6 +1,6 @@
 # coding: utf8
 #
-#    Project: PROJECT
+#    Project: BioSaxs PROJECT
 #             http://www.edna-site.org
 #
 #    File: "$Id$"
@@ -27,7 +27,7 @@ from __future__ import with_statement
 __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
-__status__ = "developement"
+__status__ = "development"
 
 import os, gc
 import numpy
@@ -38,11 +38,10 @@ import matplotlib.pyplot as plt
 from EDThreading import Semaphore
 from EDPluginControl import EDPluginControl
 from EDActionCluster import EDActionCluster
-from XSDataCommon import XSDataStatus, XSDataString
-from XSDataEdnaSaxs import XSDataInputSaxsModeling, XSDataResultSaxsModeling, XSDataInputDammif, XSDataInputSupcomb
-#from EDFactoryPlugin import edFactoryPlugin
-#edFactoryPlugin.loadModule('XSDataBioSaxsv1_0')
-#from XSDataBioSaxsv1_0 import XSDataInputBioSaxsReduceFileSeriev1_0
+from XSDataCommon import XSDataStatus, XSDataString, XSDataBoolean
+from XSDataEdnaSaxs import XSDataInputSaxsModeling, XSDataResultSaxsModeling, \
+                            XSDataInputDammif, XSDataInputSupcomb, XSDataInputDamaver, \
+                            XSDataInputDamstart
 
 
 class EDPluginControlSaxsModelingv1_0(EDPluginControl):
@@ -204,9 +203,41 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         if self.isFailure():
             return
 
+#        Now that all (valid) models are aligned we can combine them using damaver 
 
+        pdbFiles = [self.dammif_plugins[self.ref].dataOutput.pdbMoleculeFile]
 
+        for idx in range(self.dammif_jobs):
+            if self.valid[idx] and idx != self.ref:
+                pdbFiles.append(self.supcomb_plugins[(self.ref, idx)].dataOutput.outputFilename)
 
+        damaver = self.loadPlugin(self.__strPluginExecDamaver)
+        damaver.dataInput = XSDataInputDamaver(pdbInputFiles=pdbFiles,
+                                                automatic=XSDataBoolean(False))
+        damaver.connectSUCCESS(self.doSuccessExecDamaver)
+        damaver.connectFAILURE(self.doFailureExecDamaver)
+        damaver.executeSynchronous()
+
+        if self.isFailure():
+            return
+
+        damfilt = self.loadPlugin(self.strPluginExecDamfilt)
+        damfilt.dataInput = XSDataInputDamfilt(pdbFile=damaver.dataOutput.damaverPdbFile)
+        damfilt.connectSUCCESS(self.doSuccessExecDamfilt)
+        damfilt.connectFAILURE(self.doFailureExecDamfilt)
+        self.executePluginSynchronous(damfilt)
+
+        if self.isFailure():
+            return
+
+        damstart = self.loadPlugin(self.strPluginExecDamstart)
+        damstart.dataInput = XSDataInputDamstart(inputPdbFile=damaver.dataOutput.damaverPdbFile)
+        damstart.connectSUCCESS(self.doSuccessExecDamstart)
+        damstart.connectFAILURE(self.doFailureExecDamstart)
+        self.executePluginSynchronous(damstart)
+
+        if self.isFailure():
+            return
 
     def postProcess(self, _edObject=None):
         EDPluginControl.postProcess(self)
@@ -227,27 +258,44 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
                                           executiveSummary=XSDataString(os.linesep.join(self.summary)))
         self.setDataOutput(self.result)
 
-#    def doSuccessReduce(self, _edPlugin=None):
-#        self.DEBUG("EDPluginControlSaxsModelingv1_0.doSuccessReduce")
-#        self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doSuccessReduce")
-#        self.inputautorg = XSDataInputAutoRg(inputCurve=[_edPlugin.dataOutput.mergedCurve])
-#        self.inputautorg.sample = self.dataInput.sample
-#
-#
-#    def doFailureReduce(self, _edPlugin=None):
-#        self.DEBUG("EDPluginControlSaxsModelingv1_0.doFailureReduce")
-#        self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureReduce")
-#        self.setFailure()
-#
-#    def doSuccessAutoRg(self, _edPlugin=None):
-#        self.DEBUG("EDPluginControlSaxsModelingv1_0.doSuccessAutoRg")
-#        self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doSuccessAutoRg")
-#
-#
-#    def doFailureAutoRg(self, _edPlugin=None):
-#        self.DEBUG("EDPluginControlSaxsModelingv1_0.doFailureAutoRg")
-#        self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureAutoRg")
-#        self.setFailure()
+    def doSuccessExecDamaver(self, _edPlugin=None):
+        self.DEBUG("EDPluginControlSaxsModelingv1_0.doSuccessExecDamaver")
+        self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doSuccessExecDamaver")
+        self.retrieveMessages(_edPlugin)
+
+
+    def doFailureExecDamaver(self, _edPlugin=None):
+        self.DEBUG("EDPluginControlSaxsModelingv1_0.doFailureExecDamaver")
+        self.retrieveMessages(_edPlugin)
+        self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureExecDamaver")
+        self.setFailure()
+
+
+    def doSuccessExecDamfilt(self, _edPlugin=None):
+        self.DEBUG("EDPluginControlSaxsModelingv1_0.doSuccessExecDamfilt")
+        self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doSuccessExecDamfilt")
+        self.retrieveMessages(_edPlugin)
+
+
+    def doFailureExecDamfilt(self, _edPlugin=None):
+        self.DEBUG("EDPluginControlSaxsModelingv1_0.doFailureExecDamfilt")
+        self.retrieveMessages(_edPlugin)
+        self.retrieveFailureMessages(self.__edPluginExecDamfilt, "EDPluginControlSaxsModelingv1_0.doFailureExecDamfilt")
+        self.setFailure()
+
+
+    def doSuccessExecDamstart(self, _edPlugin=None):
+        self.DEBUG("EDPluginControlSaxsModelingv1_0.doSuccessExecDamstart")
+        self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doSuccessExecDamstart")
+        self.retrieveMessages(_edPlugin)
+
+
+    def doFailureExecDamstart(self, _edPlugin=None):
+        self.DEBUG("EDPluginControlSaxsModelingv1_0.doFailureExecDamstart")
+        self.retrieveMessages(_edPlugin)
+        self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureExecDamstart")
+        self.setFailure()
+
 
     def bestDammif(self):
         """
