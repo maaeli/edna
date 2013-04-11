@@ -41,7 +41,7 @@ from EDActionCluster import EDActionCluster
 from XSDataCommon import XSDataStatus, XSDataString, XSDataBoolean
 from XSDataEdnaSaxs import XSDataInputSaxsModeling, XSDataResultSaxsModeling, \
                             XSDataInputDammif, XSDataInputSupcomb, XSDataInputDamaver, \
-                            XSDataInputDamstart
+                            XSDataInputDamstart, XSDataInputDamfilt
 
 
 class EDPluginControlSaxsModelingv1_0(EDPluginControl):
