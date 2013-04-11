@@ -223,7 +223,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
             return
 
         damfilt = self.loadPlugin(self.strPluginExecDamfilt)
-        damfilt.dataInput = XSDataInputDamfilt(pdbFile=damaver.dataOutput.damaverPdbFile)
+        damfilt.dataInput = XSDataInputDamfilt(inputPdbFile=damaver.dataOutput.damaverPdbFile)
         damfilt.connectSUCCESS(self.doSuccessExecDamfilt)
         damfilt.connectFAILURE(self.doFailureExecDamfilt)
         damfilt.execute()
