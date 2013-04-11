@@ -249,9 +249,15 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         dammin = self.loadPlugin(self.strPluginExecDammin)
         dammin.dataInput = XSDataInputDammin(inputPdbFile=damstart.dataOutput.outputPdbFile,
                                              gnomOutputFile=self.xsGnomFile,
-                                             unit=XSDataString(self.unit),
+#                                             unit=XSDataString(self.unit),
                                              symmetry=XSDataString(self.symmetry),
                                              mode=XSDataString(self.mode))
+#    expectedParticleShape : XSDataInteger
+#    gnomOutputFile : XSDataFile
+#    initialDummyAtomModel : XSDataInteger
+#    pdbInputFile : XSDataFile
+#    symmetry : XSDataString
+#    mode : XSDataString optional
         dammin.connectSUCCESS(self.doSuccessExecDammin)
         dammin.connectFAILURE(self.doFailureExecDammin)
         dammin.execute()
