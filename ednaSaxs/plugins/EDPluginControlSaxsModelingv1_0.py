@@ -61,6 +61,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
     strPluginExecDamaver = "EDPluginExecDamaverv0_1"
     strPluginExecDamfilt = "EDPluginExecDamfiltv0_1"
     strPluginExecDamstart = "EDPluginExecDamstartv0_1"
+    strPluginExecDammin = "EDPluginExecDamminv0_1"
 
     def __init__(self):
         """
@@ -211,7 +212,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
             if self.valid[idx] and idx != self.ref:
                 pdbFiles.append(self.supcomb_plugins[(self.ref, idx)].dataOutput.outputFilename)
 
-        damaver = self.loadPlugin(self.__strPluginExecDamaver)
+        damaver = self.loadPlugin(self.strPluginExecDamaver)
         damaver.dataInput = XSDataInputDamaver(pdbInputFiles=pdbFiles,
                                                 automatic=XSDataBoolean(False))
         damaver.connectSUCCESS(self.doSuccessExecDamaver)
@@ -262,7 +263,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
 
         self.synchronizePlugins()
         # Create some output data
-        self.result...
+#        self.result.
 
     def finallyProcess(self, _edObject=None):
         EDPluginControl.finallyProcess(self, _edObject=_edObject)
@@ -320,7 +321,13 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.DEBUG("EDPluginControlSaxsModelingv1_0.doSuccessExecDammin")
         self.retrieveMessages(_edPlugin)
         self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureExecDammin")
-
+        try:
+            self.result.pdbMoleculeFile = _edObject.dataOutput.pdbMoleculeFile
+            self.result.pdbSolventFile = _edObject.dataOutput.pdbSolventFile
+            self.result.fitFile = _edObject.dataOutput.fitFile
+            self.result.logFile = _edObject.dataOutput.logFile
+        except Exception, error:
+            self.ERROR("Error in doSuccessExecDammin: %s" % error)
 #complex type XSDataResultDammin extends XSDataResult {
 #    fitFile : XSDataFile
 #    logFile : XSDataFile
