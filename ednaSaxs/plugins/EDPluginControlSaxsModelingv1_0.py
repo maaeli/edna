@@ -247,7 +247,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         ########################################################################
 
         dammin = self.loadPlugin(self.strPluginExecDammin)
-        dammin.dataInput = XSDataInputDammin(inputPdbFile=damstart.dataOutput.outputPdbFile,
+        dammin.dataInput = XSDataInputDammin(pdbInputFile=damstart.dataOutput.outputPdbFile,
                                              gnomOutputFile=self.xsGnomFile,
 #                                             unit=XSDataString(self.unit),
                                              symmetry=XSDataString(self.symmetry),
