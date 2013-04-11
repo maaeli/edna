@@ -52,7 +52,7 @@ class EDTestCasePluginExecuteControlSaxsModelingv1_0(EDTestCasePluginExecute):
         Download reference files
         """
         EDTestCasePluginExecute.preProcess(self)
-        self.loadTestImage(["bsa_013_08.out"])
+        self.loadTestImage(["gnom.out"])
 
     def testExecute(self):
         """
