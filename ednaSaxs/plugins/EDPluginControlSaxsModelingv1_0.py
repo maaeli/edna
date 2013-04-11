@@ -252,16 +252,10 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
 #                                             unit=XSDataString(self.unit),
                                              symmetry=XSDataString(self.symmetry),
                                              mode=XSDataString(self.mode))
-#    expectedParticleShape : XSDataInteger
-#    gnomOutputFile : XSDataFile
-#    initialDummyAtomModel : XSDataInteger
-#    pdbInputFile : XSDataFile
-#    symmetry : XSDataString
-#    mode : XSDataString optional
         dammin.connectSUCCESS(self.doSuccessExecDammin)
         dammin.connectFAILURE(self.doFailureExecDammin)
-        dammin.execute()
-
+        dammin.executeSynchronous()
+        #Dammin takes as lot of time ... wait here for completion
 
     def postProcess(self, _edObject=None):
         EDPluginControl.postProcess(self)
