@@ -323,27 +323,21 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureExecDamstart")
         self.setFailure()
 
-    def doSuccessExecDammin(self, _edObject=None):
+
+    def doSuccessExecDammin(self, _edPlugin=None):
         self.DEBUG("EDPluginControlSaxsModelingv1_0.doSuccessExecDammin")
         self.retrieveMessages(_edPlugin)
         self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureExecDammin")
         try:
-            self.result.pdbMoleculeFile = _edObject.dataOutput.pdbMoleculeFile
-            self.result.pdbSolventFile = _edObject.dataOutput.pdbSolventFile
-            self.result.fitFile = _edObject.dataOutput.fitFile
-            self.result.logFile = _edObject.dataOutput.logFile
+            self.result.pdbMoleculeFile = _edPlugin.dataOutput.pdbMoleculeFile
+            self.result.pdbSolventFile = _edPlugin.dataOutput.pdbSolventFile
+            self.result.fitFile = _edPlugin.dataOutput.fitFile
+            self.result.logFile = _edPlugin.dataOutput.logFile
         except Exception, error:
             self.ERROR("Error in doSuccessExecDammin: %s" % error)
-#complex type XSDataResultDammin extends XSDataResult {
-#    fitFile : XSDataFile
-#    logFile : XSDataFile
-#    pdbMoleculeFile : XSDataFile
-#    pdbSolventFile : XSDataFile
-#    rfactor : XSDataDouble optional
-#    chiSqrt : XSDataDouble optional
-#}
 
-    def doFailureExecDammin(self, _edObject=None):
+
+    def doFailureExecDammin(self, _edPlugin=None):
         self.DEBUG("EDPluginControlSaxsModelingv1_0.doFailureExecDammin")
         self.retrieveMessages(_edPlugin)
         self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureExecDammin")
@@ -369,9 +363,9 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         fig = plt.figure(figsize=(15, 10))
         ax1 = fig.add_subplot(1, 2, 1)
         ax1.bar(xticks - 0.5, chi2)
-        ax1.set_ylabel(u"\u03C7$^2$")
+        ax1.set_ylabel(u"$\sqrt{\u03C7}$")
         ax1.set_xlabel(u"Model number")
-        ax1.plot([0.5, self.dammif_jobs + 0.5], [chi2max, chi2max], "-r", label=u"\u03C7$^2$$_{max}$ = %.3f" % chi2max)
+        ax1.plot([0.5, self.dammif_jobs + 0.5], [chi2max, chi2max], "-r", label=u"$\sqrt{\u03C7}$$_{max}$ = %.3f" % chi2max)
         ax1.set_xticks(xticks)
         ax1.legend(loc=8)
         R = numpy.array([ plg.dataOutput.rfactor.value for plg in self.dammif_plugins])
@@ -387,7 +381,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.valid = (chi2 < chi2max) * (R < Rmax)
         self.mask2d = (1 - numpy.identity(self.dammif_jobs)) * numpy.outer(self.valid, self.valid)
         print self.valid
-        bbox_props = dict(boxstyle="larrow,pad=0.3", fc="pink", ec="r", lw=1)
+        bbox_props = dict(boxstyle="pad=0.3", fc="pink", ec="r", lw=1)
         for i in range(self.dammif_jobs):
             if not self.valid[i]:
                 ax1.text(i + 0.95, chi2max / 2, "Discarded", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)
@@ -447,11 +441,11 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         ax2.set_ylabel("Normalized Spatial Discrepancy")
         ax2.set_xlabel(u"Model number")
         ax2.set_xticks(xticks)
-        bbox_props = dict(boxstyle="rarrow,pad=0.3", fc="cyan", ec="b", lw=1)
+        bbox_props = dict(boxstyle="pad=0.3", fc="cyan", ec="b", lw=1)
         ax2.text(self.ref + 0.95, data[self.ref] / 2, "Reference", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)
         ax2.legend(loc=8)
         self.valid *= (data < nsd_max)
-        bbox_props = dict(boxstyle="larrow,pad=0.3", fc="pink", ec="r", lw=1)
+        bbox_props = dict(boxstyle="pad=0.3", fc="pink", ec="r", lw=1)
         for i in range(self.dammif_jobs):
             if not self.valid[i]:
                 ax2.text(i + 0.95, data[self.ref] / 2, "Discarded", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)

@@ -41,6 +41,12 @@
         "execProcessScriptShell": "/bin/bash", 
         "timeOut": 600
     }, 
+    "EDPluginExecDammifv0_2": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/usr/bin/dammif", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 600
+    }, 
     "EDPluginExecDatopv1_0": {
         "execProcessScriptExecutable": "/usr/bin/datop", 
         "execProcessScriptShell": "python"
