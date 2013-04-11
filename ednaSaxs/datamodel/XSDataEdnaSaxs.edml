@@ -21,6 +21,19 @@ import XSDataCommon.XSDataDoubleWithUnit
   *  Common types used only in EdnaSaxs
   ********************************************/
 
+complex type XSDataSaxsModel extends XSData {
+	"3D model with useful metadata"
+	name: XSDataString
+	pdbFile : XSDataFile
+	fitFile : XSDataFile optional
+	firFile : XSDataFile optional
+	logFile : XSDataFile optional
+	rfactor : XSDataDouble optional
+	chiSqrt : XSDataDouble optional
+	volume: XSDataDouble optional
+	rg: XSDataDouble optional
+	dmax: XSDataDouble optional
+}
 
 complex type XSDataSaxsSeries extends XSData {
 	"Basical"
@@ -178,6 +191,11 @@ complex type XSDataInputSaxsModeling extends XSDataInput{
 complex type XSDataResultSaxsModeling extends XSDataResult{
 	"Damif -> Supcomb -> Damaver -> Damfilt -> Damstart pipeline"
 
+	dammifModels = XSDataSaxsModel [] optional
+	damaverModel = XSDataSaxsModel  optional
+	damfiltModel = XSDataSaxsModel  optional
+	damminModel = XSDataSaxsModel  optional
+
 	fitFile: XSDataFile
 	logFile: XSDataFile
 	pdbMoleculeFile: XSDataFile
@@ -332,6 +350,7 @@ complex type XSDataInputDammif extends XSDataInput {
 	mode : XSDataString optional
 	chained : XSDataBoolean optional
 	constant : XSDataDouble optional
+	order: XSDataInteger optional
 }
 complex type XSDataResultDammif extends XSDataResult {
 	fitFile : XSDataFile
@@ -340,6 +359,7 @@ complex type XSDataResultDammif extends XSDataResult {
 	pdbSolventFile : XSDataFile
 	rfactor : XSDataDouble optional
 	chiSqrt : XSDataDouble optional
+	model: XSDataSaxsModel
 }
 
 complex type XSDataInputDammin extends XSDataInput {
