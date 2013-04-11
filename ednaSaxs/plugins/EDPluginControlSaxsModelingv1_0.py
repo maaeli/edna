@@ -41,7 +41,7 @@ from EDActionCluster import EDActionCluster
 from XSDataCommon import XSDataStatus, XSDataString, XSDataBoolean
 from XSDataEdnaSaxs import XSDataInputSaxsModeling, XSDataResultSaxsModeling, \
                             XSDataInputDammif, XSDataInputSupcomb, XSDataInputDamaver, \
-                            XSDataInputDamstart, XSDataInputDamfilt
+                            XSDataInputDamstart, XSDataInputDamfilt, XSDataInputDammin
 
 
 class EDPluginControlSaxsModelingv1_0(EDPluginControl):
@@ -247,11 +247,11 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         ########################################################################
 
         dammin = self.loadPlugin(self.strPluginExecDammin)
-        dammin.dataInput = XSDataInputDamstart(inputPdbFile=damstart.dataOutput.outputPdbFile,
-                                               gnomOutputFile=self.xsGnomFile,
-                                               unit=XSDataString(self.unit),
-                                               symmetry=XSDataString(self.symmetry),
-                                               mode=XSDataString(self.mode))
+        dammin.dataInput = XSDataInputDammin(inputPdbFile=damstart.dataOutput.outputPdbFile,
+                                             gnomOutputFile=self.xsGnomFile,
+                                             unit=XSDataString(self.unit),
+                                             symmetry=XSDataString(self.symmetry),
+                                             mode=XSDataString(self.mode))
         dammin.connectSUCCESS(self.doSuccessExecDammin)
         dammin.connectFAILURE(self.doFailureExecDammin)
         dammin.execute()
