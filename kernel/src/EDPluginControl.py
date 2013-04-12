@@ -58,7 +58,7 @@ class EDPluginControl(EDPlugin):
           number of processors available on the computer, but this value can be changed either by
           calling the method "setClusterSize" or by using the configuration parameter "clusterSize".
     """
-
+    __iClusterSize = None
     def __init__ (self):
         """
         """
@@ -66,7 +66,6 @@ class EDPluginControl(EDPlugin):
         self.__strPluginToBeControlledName = None
         self.__dictControlledPlugins = {}
         self.__edActionCluster = None
-        self.__iClusterSize = None
         self.__listOfLoadedPlugins = []
 
 
@@ -86,7 +85,7 @@ class EDPluginControl(EDPlugin):
                     EDVerbose.DEBUG("EDPluginControl.configure: setting controlled plugin %s to specific plugin %s" % (strControlledPlugin, strControlledPluginName))
         clusterSize = self.config.get("clusterSize", None)
         if (clusterSize != None):
-            self.__iClusterSize = int(clusterSize)
+            self.__class__.__iClusterSize = int(clusterSize)
             EDVerbose.DEBUG("EDPluginControl.configure: setting cluster size to %d" % self.__iClusterSize)
 
 

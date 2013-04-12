@@ -38,7 +38,7 @@ import matplotlib.pyplot as plt
 from EDThreading import Semaphore
 from EDPluginControl import EDPluginControl
 from EDActionCluster import EDActionCluster
-from XSDataCommon import XSDataStatus, XSDataString, XSDataBoolean
+from XSDataCommon import XSDataStatus, XSDataString, XSDataBoolean, XSDataInteger
 from XSDataEdnaSaxs import XSDataInputSaxsModeling, XSDataResultSaxsModeling, \
                             XSDataInputDammif, XSDataInputSupcomb, XSDataInputDamaver, \
                             XSDataInputDamstart, XSDataInputDamfilt, XSDataInputDammin
@@ -56,7 +56,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
     symmetry = "P1"      #
     mode = "fast"        #
     # constants:  plugin names
-    strPluginExecDammif = "EDPluginExecDammifv0_1"
+    strPluginExecDammif = "EDPluginExecDammifv0_2"
     strPluginExecSupcomb = "EDPluginExecSupcombv0_1"
     strPluginExecDamaver = "EDPluginExecDamaverv0_1"
     strPluginExecDamfilt = "EDPluginExecDamfiltv0_1"
@@ -72,6 +72,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.edPlugin = None
         self.xsGnomFile = None
         self.result = XSDataResultSaxsModeling()
+        self.result.dammifModels = []
         self.summary = []
         self.graph_format = "png"
         self.dammif_plugins = []
@@ -136,8 +137,12 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
                                               unit=XSDataString(self.unit),
                                               symmetry=XSDataString(self.symmetry),
                                               mode=XSDataString(self.mode))
+        print xsDataInputDammif.marshal()
         for i in range(self.dammif_jobs):
             dammif = self.loadPlugin(self.strPluginExecDammif)
+            dammif.connectSUCCESS(self.doSuccessExecDammif)
+            dammif.connectFAILURE(self.doFailureExecDammif)
+            xsDataInputDammif.order = XSDataInteger(i + 1)
             dammif.setDataInput(xsDataInputDammif)
             self.addPluginToActionCluster(dammif)
             self.dammif_plugins.append(dammif)
@@ -284,6 +289,34 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.actclust_supcomb = None
         gc.collect()
 
+    def doSuccessExecDammif(self, _edPlugin=None):
+        """
+        Locked as dammif is called many times in parallel
+        """
+        with self.locked():
+            self.DEBUG("EDPluginControlSaxsModelingv1_0.doSuccessExecDammif")
+            self.retrieveMessages(_edPlugin)
+            self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureExecDammif")
+            try:
+                self.result.dammifModels.append(_edPlugin.dataOutput.model)
+                self.result.pdbMoleculeFile = _edPlugin.dataOutput.pdbMoleculeFile
+                self.result.pdbSolventFile = _edPlugin.dataOutput.pdbSolventFile
+                self.result.fitFile = _edPlugin.dataOutput.fitFile
+                self.result.logFile = _edPlugin.dataOutput.logFile
+            except Exception, error:
+                self.ERROR("Error in doSuccessExecDammif: %s" % error)
+
+    def doFailureExecDammif(self, _edPlugin=None):
+        """
+        Locked as dammif is called many times in parallel
+        """
+
+        with self.locked():
+            self.DEBUG("EDPluginControlSaxsModelingv1_0.doFailureExecDammif")
+            self.retrieveMessages(_edPlugin)
+            self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureExecDammif")
+            self.setFailure()
+
 
     def doSuccessExecDamaver(self, _edPlugin=None):
         self.DEBUG("EDPluginControlSaxsModelingv1_0.doSuccessExecDamaver")
@@ -381,7 +414,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.valid = (chi2 < chi2max) * (R < Rmax)
         self.mask2d = (1 - numpy.identity(self.dammif_jobs)) * numpy.outer(self.valid, self.valid)
         print self.valid
-        bbox_props = dict(boxstyle="pad=0.3", fc="pink", ec="r", lw=1)
+        bbox_props = dict(fc="pink", ec="r", lw=1)
         for i in range(self.dammif_jobs):
             if not self.valid[i]:
                 ax1.text(i + 0.95, chi2max / 2, "Discarded", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)
@@ -441,11 +474,11 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         ax2.set_ylabel("Normalized Spatial Discrepancy")
         ax2.set_xlabel(u"Model number")
         ax2.set_xticks(xticks)
-        bbox_props = dict(boxstyle="pad=0.3", fc="cyan", ec="b", lw=1)
+        bbox_props = dict(fc="cyan", ec="b", lw=1)
         ax2.text(self.ref + 0.95, data[self.ref] / 2, "Reference", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)
         ax2.legend(loc=8)
         self.valid *= (data < nsd_max)
-        bbox_props = dict(boxstyle="pad=0.3", fc="pink", ec="r", lw=1)
+        bbox_props = dict(fc="pink", ec="r", lw=1)
         for i in range(self.dammif_jobs):
             if not self.valid[i]:
                 ax2.text(i + 0.95, data[self.ref] / 2, "Discarded", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)

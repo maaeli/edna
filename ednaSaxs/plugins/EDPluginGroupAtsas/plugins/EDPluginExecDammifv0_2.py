@@ -59,6 +59,7 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
         self.Dmax = None
         self.name = "dammif"
 
+
     def checkParameters(self):
         """
         Checks the mandatory parameters.
@@ -74,50 +75,64 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
         self.checkDammifConstant()
         self.checkDammifChained()
 
+
     def checkDammifModeInput(self):
-        self.DEBUG("EDPluginExecDammifv0_2.checkDammifMode")
-        try:
-            if self.dataInput.mode.value.lower() in ['fast', 'slow']:
-                self.mode = self.dataInput.mode.value.lower()
-        except Exception:
-            self.WARNING("Running DAMMIF in fast mode by default")
+        if self.dataInput.mode:
+            self.DEBUG("EDPluginExecDammifv0_2.checkDammifMode")
+            try:
+                if self.dataInput.mode.value.lower() in ['fast', 'slow']:
+                    self.mode = self.dataInput.mode.value.lower()
+            except Exception as error:
+                self.ERROR("Running DAMMIF in fast mode by default (%s)" % error)
+
 
     def checkDammifUnitInput(self):
-        self.DEBUG("EDPluginExecDammifv0_2.checkDammifUnit")
-        try:
-            if self.dataInput.unit.value.lower() in ['angstrom', 'nanometer']:
-                self.unit = self.dataInput.unit.value.upper()
-        except Exception:
-            self.WARNING("Using A-1 units for q-axis values by default")
+        if self.dataInput.unit:
+            self.DEBUG("EDPluginExecDammifv0_2.checkDammifUnit")
+            try:
+                if self.dataInput.unit.value.lower() in ['angstrom', 'nanometer']:
+                    self.unit = self.dataInput.unit.value.upper()
+            except Exception as error:
+                self.ERROR("Using A-1 units for q-axis values by default (%s)" % error)
+
 
     def checkDammifSymmetryInput(self):
-        self.DEBUG("EDPluginExecDammifv0_2.checkDammifSymmetryInput")
-        try:
-            if self.dataInput.getSymmetry().value in _knownSymmetry:
-                self.symmetry = self.dataInput.getSymmetry().value
-        except Exception:
-            self.WARNING("Symmetry wasn't specified. Setting symmetry to P1")
+        if self.dataInput.symmetry:
+            self.DEBUG("EDPluginExecDammifv0_2.checkDammifSymmetryInput")
+            try:
+                if self.dataInput.symmetry.value in self.knownSymmetry:
+                    self.symmetry = self.dataInput.symmetry.value
+            except Exception as error:
+                self.ERROR("Symmetry wasn't specified. Setting symmetry to P1 (%s)" % error)
+
 
     def checkDammifParticleShapeInput(self):
-        particleShape = ['PROLATE', 'OBLATE', 'UNKNOWN']
-        try:
-            if self.dataInput.getExpectedParticleShape().value in range(3):
-                self.particleShape = particleShape[self.dataInput.getExpectedParticleShape().value]
-        except Exception:
-            self.WARNING("Using Unknown particle shape")
+        if self.dataInput.expectedParticleShape:
+            particleShape = ['PROLATE', 'OBLATE', 'UNKNOWN']
+            if self.dataInput.expectedParticleShape:
+                try:
+                    if self.dataInput.expectedParticleShape.value in range(3):
+                        self.particleShape = particleShape[self.dataInput.expectedParticleShape.value]
+                except Exception as error:
+                    self.ERROR("Using Unknown particle shape (%s)" % error)
+
 
     def checkDammifConstant(self):
-        try:
-            self.constant = '--constant=' + str(self.dataInput.getConstant().value)
-        except Exception:
-            self.DEBUG("Constant to subtract will be defined automatically")
+        if self.dataInput.constant:
+            try:
+                self.constant = '--constant=' + str(self.dataInput.constant.value)
+            except Exception as error:
+                self.ERROR("Constant to subtract will be defined automatically (%s)" % error)
+
 
     def checkDammifChained(self):
-        try:
-            if self.dataInput.chained.value:
-                self.chained = '--chained'
-        except Exception:
-            self.DEBUG("Atoms in the output model are not chained")
+        if  self.dataInput.chained:
+            try:
+                if self.dataInput.chained.value:
+                    self.chained = '--chained'
+            except Exception as error:
+                self.ERROR("Atoms in the output model are not chained (%s)" % error)
+
 
     def preProcess(self, _edObject=None):
         EDPluginExecProcessScript.preProcess(self)
@@ -178,6 +193,7 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
                                           executiveSummary=XSDataString(os.linesep.join(self.getListExecutiveSummaryLines())))
         self.dataOutput = xsDataResult
 
+
     def generateDammifScript(self):
         self.DEBUG("EDPluginExecDammifv0_2.generateDammifScript")
 
@@ -203,15 +219,7 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
             return
         else:
             return XSDataDouble(self.sqrtChi)
-#
-#    def returnDammifRFactor(self):
-#        try:
-#            self.Rfactor = parse_atsas.RFactor( os.path.join(self.getWorkingDirectory(), "dammif.log"))
-#        except Exception as error:
-#            self.ERROR("EDPluginExecDammifv0_2:returnDammifRFactor: %s" % error)
-#            return
-#        else:
-#            return XSDataDouble(self.Rfactor)
+
 
     def generateExecutiveSummary(self, __edPlugin=None):
         tmpDammif = "Results of %s: " % self.name

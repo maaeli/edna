@@ -83,7 +83,7 @@
     },
     "EDPluginControlSaxsModelingv1_0":{
     	"dammifJobs": 16,
-    	"timeOut": 600,
+    	"timeOut": 1000,
     	"clusterSize": 8,
     	"unit": "nanometer",
 		"symmetry": "P1",
