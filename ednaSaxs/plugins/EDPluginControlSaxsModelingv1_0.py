@@ -73,7 +73,6 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.xsGnomFile = None
         self.result = XSDataResultSaxsModeling()
         self.result.dammifModels = []
-        self.summary = []
         self.graph_format = "png"
         self.dammif_plugins = []
         self.dammif = None
@@ -119,15 +118,13 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
                         self.DEBUG("EDPluginControl.configure: setting cluster size to %d" % self.cluster_size)
                     self.__class__.configured = True
 
+
     def preProcess(self, _edObject=None):
         EDPluginControl.preProcess(self)
         self.DEBUG("EDPluginControlSaxsModelingv1_0.preProcess")
         self.xsGnomFile = self.dataInput.gnomFile
         if self.dataInput.graphFormat:
             self.graph_format = self.dataInput.graphFormat.value
-        # Load the execution plugin
-#        self.__edPluginBioSaxsReduce = self.loadPlugin(self.__strControlledPluginReduce)
-#        self.__edPluginExecAutoRg = self.loadPlugin(self.__strControlledPluginAutoRg)
 
 
     def process(self, _edObject=None):
@@ -137,13 +134,13 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
                                               unit=XSDataString(self.unit),
                                               symmetry=XSDataString(self.symmetry),
                                               mode=XSDataString(self.mode))
-        print xsDataInputDammif.marshal()
         for i in range(self.dammif_jobs):
             dammif = self.loadPlugin(self.strPluginExecDammif)
             dammif.connectSUCCESS(self.doSuccessExecDammif)
             dammif.connectFAILURE(self.doFailureExecDammif)
-            xsDataInputDammif.order = XSDataInteger(i + 1)
-            dammif.setDataInput(xsDataInputDammif)
+            xsd = xsDataInputDammif.copyViaDict()
+            xsd.order = XSDataInteger(i + 1)
+            dammif.dataInput = xsd
             self.addPluginToActionCluster(dammif)
             self.dammif_plugins.append(dammif)
         self.executeActionCluster()
@@ -160,6 +157,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.dammif = self.bestDammif()
         self.chi2plot("chi2_R.png")
 
+        #temporary results: use best dammif
         self.result.fitFile = self.dammif.dataOutput.fitFile
         self.result.logFile = self.dammif.dataOutput.logFile
         self.result.pdbMoleculeFile = self.dammif.dataOutput.pdbMoleculeFile
@@ -209,7 +207,11 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         if self.isFailure():
             return
 
-#        Now that all (valid) models are aligned we can combine them using damaver 
+#        TODO: Register all aligned models for output
+#        TODO: create symlinks to local directory with PDB models either from dammif (best & discared models) or supcomb
+
+
+#        Now that all (valid) models are aligned we can combine them using damaver
 
         pdbFiles = [self.dammif_plugins[self.ref].dataOutput.pdbMoleculeFile]
 
@@ -257,15 +259,9 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
 #                                             unit=XSDataString(self.unit),
                                              symmetry=XSDataString(self.symmetry),
                                              mode=XSDataString(self.mode))
-#    expectedParticleShape : XSDataInteger
-#    gnomOutputFile : XSDataFile
-#    initialDummyAtomModel : XSDataInteger
-#    pdbInputFile : XSDataFile
-#    symmetry : XSDataString
-#    mode : XSDataString optional
         dammin.connectSUCCESS(self.doSuccessExecDammin)
         dammin.connectFAILURE(self.doFailureExecDammin)
-        dammin.execute()
+        dammin.executeSynchronous()
 
 
     def postProcess(self, _edObject=None):
@@ -279,7 +275,8 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
     def finallyProcess(self, _edObject=None):
         EDPluginControl.finallyProcess(self, _edObject=_edObject)
         self.result.status = XSDataStatus(message=self.getXSDataMessage(),
-                                          executiveSummary=XSDataString(os.linesep.join(self.summary)))
+                                          executiveSummary=XSDataString(os.linesep.join(self.getListExecutiveSummaryLines())))
+
         self.setDataOutput(self.result)
         # clean up memory
         self.dammif_plugins = []
@@ -299,11 +296,12 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
             self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureExecDammif")
             try:
                 self.result.dammifModels.append(_edPlugin.dataOutput.model)
-                self.result.pdbMoleculeFile = _edPlugin.dataOutput.pdbMoleculeFile
-                self.result.pdbSolventFile = _edPlugin.dataOutput.pdbSolventFile
-                self.result.fitFile = _edPlugin.dataOutput.fitFile
-                self.result.logFile = _edPlugin.dataOutput.logFile
-            except Exception, error:
+                #this has to be done only for the best model (once determined) !
+#                self.result.pdbMoleculeFile = _edPlugin.dataOutput.pdbMoleculeFile
+#                self.result.pdbSolventFile = _edPlugin.dataOutput.pdbSolventFile
+#                self.result.fitFile = _edPlugin.dataOutput.fitFile
+#                self.result.logFile = _edPlugin.dataOutput.logFile
+            except Exception as error:
                 self.ERROR("Error in doSuccessExecDammif: %s" % error)
 
     def doFailureExecDammif(self, _edPlugin=None):
@@ -366,7 +364,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
             self.result.pdbSolventFile = _edPlugin.dataOutput.pdbSolventFile
             self.result.fitFile = _edPlugin.dataOutput.fitFile
             self.result.logFile = _edPlugin.dataOutput.logFile
-        except Exception, error:
+        except Exception as error:
             self.ERROR("Error in doSuccessExecDammin: %s" % error)
 
 
