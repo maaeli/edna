@@ -66,7 +66,7 @@ def parsePDB(pdbFile=None):
     parse PDB file for Rfactor, Dmax, Volume and Rg 
     """
     res = {}
-    if not logFile or not os.path.exists(pdbFile):
+    if not pdbFile or not os.path.exists(pdbFile):
         raise(RuntimeError("In parse PDB: file %s does not exist" % pdbFile))
     with open(pdbFile) as ff:
         for line in ff:

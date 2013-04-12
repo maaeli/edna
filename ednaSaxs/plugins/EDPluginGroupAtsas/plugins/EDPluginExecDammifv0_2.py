@@ -30,7 +30,7 @@ __copyright__ = "2010 DLS, 2013 ESRF"
 import os
 from EDPluginExecProcessScript import EDPluginExecProcessScript
 from XSDataEdnaSaxs import XSDataInputDammif, XSDataResultDammif, XSDataSaxsModel
-from XSDataCommon import XSDataString, XSDataFile, XSDataDouble
+from XSDataCommon import XSDataString, XSDataFile, XSDataDouble, XSDataStatus
 import parse_atsas
 
 class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
@@ -150,10 +150,6 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
             for k in res:
                 self.__setattr__(k, res[k])
 
-        xsFitFile = XSDataFile(XSDataString(pathFitFile))
-
-        xsSolventFile = XSDataFile(XSDataString(pathSolventFile))
-
         if os.path.exists(pathLogFile):
             xsDataResult.logFile = model.logFile = XSDataFile(XSDataString(pathLogFile))
             if self.Rfactor:
@@ -163,10 +159,19 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
         if os.path.exists(pathFirFile):
             model.firfile = XSDataFile(XSDataString(pathFirFile))
             xsDataResult.chiSqrt = model.chiSqrt = self.returnDammifChiSqrt()
-        if os.path.exists(pathMoleculeFile.value):
-            xsDataResult.pdbMoleculeFile = model.pdbFile = XSDataFile(XSDataString(pathMoleculeFile))
-        if os.path.exists(pathSolventFile.value):
-            xsDataResult.setPdbSolventFile(xsSolventFile)
+        if os.path.exists(pathMoleculeFile):
+            xsDataResult.pdbMoleculeFile = model.pdbFile = XSDataFile(XSDataString(pathMoleculeFile))    
+        if os.path.exists(pathSolventFile):
+            xsDataResult.pdbSolventFile = XSDataFile(XSDataString(pathSolventFile))
+        if os.path.exists(pathFirFile):
+            model.firFile = XSDataFile(XSDataString(pathFirFile))
+        
+        if self.volume:
+            model.volume = XSDataDouble(self.volume)
+        if self.Rg:
+            model.rg= XSDataDouble(self.Rg)
+        if self.Dmax:
+            model.dmax = XSDataDouble(self.Dmax)
 
         self.generateExecutiveSummary()
         xsDataResult.status = XSDataStatus(message=self.getXSDataMessage(),
@@ -213,7 +218,7 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
         tmpRFactor = "RFactor = %s" % self.Rfactor
         tmpChiSqrt = "Sqrt(Chi) = %s" % self.sqrtChi
         tmpVolume = "Volume = %s" % self.volume
-        tmpDmax = "Volume = %s" % self.Dmax
-        tmpRg = "Rg = %s" % self.Dmax
+        tmpDmax = "Dmax = %s" % self.Dmax
+        tmpRg = "Rg = %s" % self.Rg
         tmpStrLine = "\t".join([tmpDammif, tmpChiSqrt, tmpRFactor, tmpVolume, tmpDmax, tmpRg])
         self.addExecutiveSummaryLine(tmpStrLine)
