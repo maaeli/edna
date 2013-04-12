@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Thu Apr 11 04:33::24 2013 by EDGenerateDS.
+# Generated Fri Apr 12 08:45::37 2013 by EDGenerateDS.
 #
 
 import os, sys
@@ -11,22 +11,7 @@ from xml.dom import Node
 
 strEdnaHome = os.environ.get("EDNA_HOME", None)
 
-dictLocation = { \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
+dictLocation = {  "XSDataCommon": "workspace/edna/kernel/datamodel",
 }
 
 try:
@@ -2397,7 +2382,7 @@ class XSDataGnom(XSData):
 
 class XSDataSaxsModel(XSData):
     """3D model with useful metadata"""
-    def __init__(self, dmax=None, rg=None, volume=None, chiSqrt=None, rfactor=None, logFile=None, fitFile=None, pdbFile=None, name=None):
+    def __init__(self, dmax=None, rg=None, volume=None, chiSqrt=None, rfactor=None, logFile=None, firFile=None, fitFile=None, pdbFile=None, name=None):
         XSData.__init__(self, )
         if name is None:
             self._name = None
@@ -2419,6 +2404,13 @@ class XSDataSaxsModel(XSData):
             self._fitFile = fitFile
         else:
             strMessage = "ERROR! XSDataSaxsModel constructor argument 'fitFile' is not XSDataFile but %s" % self._fitFile.__class__.__name__
+            raise BaseException(strMessage)
+        if firFile is None:
+            self._firFile = None
+        elif firFile.__class__.__name__ == "XSDataFile":
+            self._firFile = firFile
+        else:
+            strMessage = "ERROR! XSDataSaxsModel constructor argument 'firFile' is not XSDataFile but %s" % self._firFile.__class__.__name__
             raise BaseException(strMessage)
         if logFile is None:
             self._logFile = None
@@ -2498,6 +2490,18 @@ class XSDataSaxsModel(XSData):
             raise BaseException(strMessage)
     def delFitFile(self): self._fitFile = None
     fitFile = property(getFitFile, setFitFile, delFitFile, "Property for fitFile")
+    # Methods and properties for the 'firFile' attribute
+    def getFirFile(self): return self._firFile
+    def setFirFile(self, firFile):
+        if firFile is None:
+            self._firFile = None
+        elif firFile.__class__.__name__ == "XSDataFile":
+            self._firFile = firFile
+        else:
+            strMessage = "ERROR! XSDataSaxsModel.setFirFile argument is not XSDataFile but %s" % firFile.__class__.__name__
+            raise BaseException(strMessage)
+    def delFirFile(self): self._firFile = None
+    firFile = property(getFirFile, setFirFile, delFirFile, "Property for firFile")
     # Methods and properties for the 'logFile' attribute
     def getLogFile(self): return self._logFile
     def setLogFile(self, logFile):
@@ -2588,6 +2592,8 @@ class XSDataSaxsModel(XSData):
             warnEmptyAttribute("pdbFile", "XSDataFile")
         if self._fitFile is not None:
             self.fitFile.export(outfile, level, name_='fitFile')
+        if self._firFile is not None:
+            self.firFile.export(outfile, level, name_='firFile')
         if self._logFile is not None:
             self.logFile.export(outfile, level, name_='logFile')
         if self._rfactor is not None:
@@ -2620,6 +2626,11 @@ class XSDataSaxsModel(XSData):
             obj_ = XSDataFile()
             obj_.build(child_)
             self.setFitFile(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'firFile':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setFirFile(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'logFile':
             obj_ = XSDataFile()
@@ -3582,7 +3593,7 @@ class XSDataInputDamfilt(XSDataInput):
 
 
 class XSDataInputDammif(XSDataInput):
-    def __init__(self, configuration=None, constant=None, chained=None, mode=None, symmetry=None, unit=None, gnomOutputFile=None, expectedParticleShape=None):
+    def __init__(self, configuration=None, order=None, constant=None, chained=None, mode=None, symmetry=None, unit=None, gnomOutputFile=None, expectedParticleShape=None):
         XSDataInput.__init__(self, configuration)
         if expectedParticleShape is None:
             self._expectedParticleShape = None
@@ -3632,6 +3643,13 @@ class XSDataInputDammif(XSDataInput):
             self._constant = constant
         else:
             strMessage = "ERROR! XSDataInputDammif constructor argument 'constant' is not XSDataDouble but %s" % self._constant.__class__.__name__
+            raise BaseException(strMessage)
+        if order is None:
+            self._order = None
+        elif order.__class__.__name__ == "XSDataInteger":
+            self._order = order
+        else:
+            strMessage = "ERROR! XSDataInputDammif constructor argument 'order' is not XSDataInteger but %s" % self._order.__class__.__name__
             raise BaseException(strMessage)
     # Methods and properties for the 'expectedParticleShape' attribute
     def getExpectedParticleShape(self): return self._expectedParticleShape
@@ -3717,6 +3735,18 @@ class XSDataInputDammif(XSDataInput):
             raise BaseException(strMessage)
     def delConstant(self): self._constant = None
     constant = property(getConstant, setConstant, delConstant, "Property for constant")
+    # Methods and properties for the 'order' attribute
+    def getOrder(self): return self._order
+    def setOrder(self, order):
+        if order is None:
+            self._order = None
+        elif order.__class__.__name__ == "XSDataInteger":
+            self._order = order
+        else:
+            strMessage = "ERROR! XSDataInputDammif.setOrder argument is not XSDataInteger but %s" % order.__class__.__name__
+            raise BaseException(strMessage)
+    def delOrder(self): self._order = None
+    order = property(getOrder, setOrder, delOrder, "Property for order")
     def export(self, outfile, level, name_='XSDataInputDammif'):
         showIndent(outfile, level)
         outfile.write(unicode('<%s>\n' % name_))
@@ -3745,6 +3775,8 @@ class XSDataInputDammif(XSDataInput):
             self.chained.export(outfile, level, name_='chained')
         if self._constant is not None:
             self.constant.export(outfile, level, name_='constant')
+        if self._order is not None:
+            self.order.export(outfile, level, name_='order')
     def build(self, node_):
         for child_ in node_.childNodes:
             nodeName_ = child_.nodeName.split(':')[-1]
@@ -3785,6 +3817,11 @@ class XSDataInputDammif(XSDataInput):
             obj_ = XSDataDouble()
             obj_.build(child_)
             self.setConstant(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'order':
+            obj_ = XSDataInteger()
+            obj_.build(child_)
+            self.setOrder(obj_)
         XSDataInput.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
     def marshal( self ):
@@ -6553,7 +6590,7 @@ class XSDataResultDamfilt(XSDataResult):
 
 
 class XSDataResultDammif(XSDataResult):
-    def __init__(self, status=None, chiSqrt=None, rfactor=None, pdbSolventFile=None, pdbMoleculeFile=None, logFile=None, fitFile=None):
+    def __init__(self, status=None, model=None, chiSqrt=None, rfactor=None, pdbSolventFile=None, pdbMoleculeFile=None, logFile=None, fitFile=None):
         XSDataResult.__init__(self, status)
         if fitFile is None:
             self._fitFile = None
@@ -6596,6 +6633,13 @@ class XSDataResultDammif(XSDataResult):
             self._chiSqrt = chiSqrt
         else:
             strMessage = "ERROR! XSDataResultDammif constructor argument 'chiSqrt' is not XSDataDouble but %s" % self._chiSqrt.__class__.__name__
+            raise BaseException(strMessage)
+        if model is None:
+            self._model = None
+        elif model.__class__.__name__ == "XSDataSaxsModel":
+            self._model = model
+        else:
+            strMessage = "ERROR! XSDataResultDammif constructor argument 'model' is not XSDataSaxsModel but %s" % self._model.__class__.__name__
             raise BaseException(strMessage)
     # Methods and properties for the 'fitFile' attribute
     def getFitFile(self): return self._fitFile
@@ -6669,6 +6713,18 @@ class XSDataResultDammif(XSDataResult):
             raise BaseException(strMessage)
     def delChiSqrt(self): self._chiSqrt = None
     chiSqrt = property(getChiSqrt, setChiSqrt, delChiSqrt, "Property for chiSqrt")
+    # Methods and properties for the 'model' attribute
+    def getModel(self): return self._model
+    def setModel(self, model):
+        if model is None:
+            self._model = None
+        elif model.__class__.__name__ == "XSDataSaxsModel":
+            self._model = model
+        else:
+            strMessage = "ERROR! XSDataResultDammif.setModel argument is not XSDataSaxsModel but %s" % model.__class__.__name__
+            raise BaseException(strMessage)
+    def delModel(self): self._model = None
+    model = property(getModel, setModel, delModel, "Property for model")
     def export(self, outfile, level, name_='XSDataResultDammif'):
         showIndent(outfile, level)
         outfile.write(unicode('<%s>\n' % name_))
@@ -6697,6 +6753,10 @@ class XSDataResultDammif(XSDataResult):
             self.rfactor.export(outfile, level, name_='rfactor')
         if self._chiSqrt is not None:
             self.chiSqrt.export(outfile, level, name_='chiSqrt')
+        if self._model is not None:
+            self.model.export(outfile, level, name_='model')
+        else:
+            warnEmptyAttribute("model", "XSDataSaxsModel")
     def build(self, node_):
         for child_ in node_.childNodes:
             nodeName_ = child_.nodeName.split(':')[-1]
@@ -6732,6 +6792,11 @@ class XSDataResultDammif(XSDataResult):
             obj_ = XSDataDouble()
             obj_.build(child_)
             self.setChiSqrt(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'model':
+            obj_ = XSDataSaxsModel()
+            obj_.build(child_)
+            self.setModel(obj_)
         XSDataResult.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
     def marshal( self ):
@@ -8358,8 +8423,36 @@ class XSDataResultSaxsAnalysis(XSDataResult):
 
 class XSDataResultSaxsModeling(XSDataResult):
     """Damif -> Supcomb -> Damaver -> Damfilt -> Damstart pipeline"""
-    def __init__(self, status=None, pdbSolventFile=None, pdbMoleculeFile=None, logFile=None, fitFile=None):
+    def __init__(self, status=None, pdbSolventFile=None, pdbMoleculeFile=None, logFile=None, fitFile=None, damminModel=None, damfiltModel=None, damaverModel=None, dammifModels=None):
         XSDataResult.__init__(self, status)
+        if dammifModels is None:
+            self._dammifModels = []
+        elif dammifModels.__class__.__name__ == "list":
+            self._dammifModels = dammifModels
+        else:
+            strMessage = "ERROR! XSDataResultSaxsModeling constructor argument 'dammifModels' is not list but %s" % self._dammifModels.__class__.__name__
+            raise BaseException(strMessage)
+        if damaverModel is None:
+            self._damaverModel = None
+        elif damaverModel.__class__.__name__ == "XSDataSaxsModel":
+            self._damaverModel = damaverModel
+        else:
+            strMessage = "ERROR! XSDataResultSaxsModeling constructor argument 'damaverModel' is not XSDataSaxsModel but %s" % self._damaverModel.__class__.__name__
+            raise BaseException(strMessage)
+        if damfiltModel is None:
+            self._damfiltModel = None
+        elif damfiltModel.__class__.__name__ == "XSDataSaxsModel":
+            self._damfiltModel = damfiltModel
+        else:
+            strMessage = "ERROR! XSDataResultSaxsModeling constructor argument 'damfiltModel' is not XSDataSaxsModel but %s" % self._damfiltModel.__class__.__name__
+            raise BaseException(strMessage)
+        if damminModel is None:
+            self._damminModel = None
+        elif damminModel.__class__.__name__ == "XSDataSaxsModel":
+            self._damminModel = damminModel
+        else:
+            strMessage = "ERROR! XSDataResultSaxsModeling constructor argument 'damminModel' is not XSDataSaxsModel but %s" % self._damminModel.__class__.__name__
+            raise BaseException(strMessage)
         if fitFile is None:
             self._fitFile = None
         elif fitFile.__class__.__name__ == "XSDataFile":
@@ -8388,6 +8481,75 @@ class XSDataResultSaxsModeling(XSDataResult):
         else:
             strMessage = "ERROR! XSDataResultSaxsModeling constructor argument 'pdbSolventFile' is not XSDataFile but %s" % self._pdbSolventFile.__class__.__name__
             raise BaseException(strMessage)
+    # Methods and properties for the 'dammifModels' attribute
+    def getDammifModels(self): return self._dammifModels
+    def setDammifModels(self, dammifModels):
+        if dammifModels is None:
+            self._dammifModels = []
+        elif dammifModels.__class__.__name__ == "list":
+            self._dammifModels = dammifModels
+        else:
+            strMessage = "ERROR! XSDataResultSaxsModeling.setDammifModels argument is not list but %s" % dammifModels.__class__.__name__
+            raise BaseException(strMessage)
+    def delDammifModels(self): self._dammifModels = None
+    dammifModels = property(getDammifModels, setDammifModels, delDammifModels, "Property for dammifModels")
+    def addDammifModels(self, value):
+        if value is None:
+            strMessage = "ERROR! XSDataResultSaxsModeling.addDammifModels argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataSaxsModel":
+            self._dammifModels.append(value)
+        else:
+            strMessage = "ERROR! XSDataResultSaxsModeling.addDammifModels argument is not XSDataSaxsModel but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    def insertDammifModels(self, index, value):
+        if index is None:
+            strMessage = "ERROR! XSDataResultSaxsModeling.insertDammifModels argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataResultSaxsModeling.insertDammifModels argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataSaxsModel":
+            self._dammifModels[index] = value
+        else:
+            strMessage = "ERROR! XSDataResultSaxsModeling.addDammifModels argument is not XSDataSaxsModel but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'damaverModel' attribute
+    def getDamaverModel(self): return self._damaverModel
+    def setDamaverModel(self, damaverModel):
+        if damaverModel is None:
+            self._damaverModel = None
+        elif damaverModel.__class__.__name__ == "XSDataSaxsModel":
+            self._damaverModel = damaverModel
+        else:
+            strMessage = "ERROR! XSDataResultSaxsModeling.setDamaverModel argument is not XSDataSaxsModel but %s" % damaverModel.__class__.__name__
+            raise BaseException(strMessage)
+    def delDamaverModel(self): self._damaverModel = None
+    damaverModel = property(getDamaverModel, setDamaverModel, delDamaverModel, "Property for damaverModel")
+    # Methods and properties for the 'damfiltModel' attribute
+    def getDamfiltModel(self): return self._damfiltModel
+    def setDamfiltModel(self, damfiltModel):
+        if damfiltModel is None:
+            self._damfiltModel = None
+        elif damfiltModel.__class__.__name__ == "XSDataSaxsModel":
+            self._damfiltModel = damfiltModel
+        else:
+            strMessage = "ERROR! XSDataResultSaxsModeling.setDamfiltModel argument is not XSDataSaxsModel but %s" % damfiltModel.__class__.__name__
+            raise BaseException(strMessage)
+    def delDamfiltModel(self): self._damfiltModel = None
+    damfiltModel = property(getDamfiltModel, setDamfiltModel, delDamfiltModel, "Property for damfiltModel")
+    # Methods and properties for the 'damminModel' attribute
+    def getDamminModel(self): return self._damminModel
+    def setDamminModel(self, damminModel):
+        if damminModel is None:
+            self._damminModel = None
+        elif damminModel.__class__.__name__ == "XSDataSaxsModel":
+            self._damminModel = damminModel
+        else:
+            strMessage = "ERROR! XSDataResultSaxsModeling.setDamminModel argument is not XSDataSaxsModel but %s" % damminModel.__class__.__name__
+            raise BaseException(strMessage)
+    def delDamminModel(self): self._damminModel = None
+    damminModel = property(getDamminModel, setDamminModel, delDamminModel, "Property for damminModel")
     # Methods and properties for the 'fitFile' attribute
     def getFitFile(self): return self._fitFile
     def setFitFile(self, fitFile):
@@ -8444,6 +8606,14 @@ class XSDataResultSaxsModeling(XSDataResult):
         outfile.write(unicode('</%s>\n' % name_))
     def exportChildren(self, outfile, level, name_='XSDataResultSaxsModeling'):
         XSDataResult.exportChildren(self, outfile, level, name_)
+        for dammifModels_ in self.getDammifModels():
+            dammifModels_.export(outfile, level, name_='dammifModels')
+        if self._damaverModel is not None:
+            self.damaverModel.export(outfile, level, name_='damaverModel')
+        if self._damfiltModel is not None:
+            self.damfiltModel.export(outfile, level, name_='damfiltModel')
+        if self._damminModel is not None:
+            self.damminModel.export(outfile, level, name_='damminModel')
         if self._fitFile is not None:
             self.fitFile.export(outfile, level, name_='fitFile')
         else:
@@ -8466,6 +8636,26 @@ class XSDataResultSaxsModeling(XSDataResult):
             self.buildChildren(child_, nodeName_)
     def buildChildren(self, child_, nodeName_):
         if child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'dammifModels':
+            obj_ = XSDataSaxsModel()
+            obj_.build(child_)
+            self.dammifModels.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'damaverModel':
+            obj_ = XSDataSaxsModel()
+            obj_.build(child_)
+            self.setDamaverModel(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'damfiltModel':
+            obj_ = XSDataSaxsModel()
+            obj_.build(child_)
+            self.setDamfiltModel(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'damminModel':
+            obj_ = XSDataSaxsModel()
+            obj_.build(child_)
+            self.setDamminModel(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'fitFile':
             obj_ = XSDataFile()
             obj_.build(child_)

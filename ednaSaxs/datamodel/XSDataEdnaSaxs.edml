@@ -191,10 +191,10 @@ complex type XSDataInputSaxsModeling extends XSDataInput{
 complex type XSDataResultSaxsModeling extends XSDataResult{
 	"Damif -> Supcomb -> Damaver -> Damfilt -> Damstart pipeline"
 
-	dammifModels = XSDataSaxsModel [] optional
-	damaverModel = XSDataSaxsModel  optional
-	damfiltModel = XSDataSaxsModel  optional
-	damminModel = XSDataSaxsModel  optional
+	dammifModels: XSDataSaxsModel [] optional
+	damaverModel: XSDataSaxsModel  optional
+	damfiltModel: XSDataSaxsModel  optional
+	damminModel: XSDataSaxsModel  optional
 
 	fitFile: XSDataFile
 	logFile: XSDataFile

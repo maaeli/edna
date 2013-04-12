@@ -31,7 +31,7 @@ import os
 from EDPluginExecProcessScript import EDPluginExecProcessScript
 from XSDataEdnaSaxs import XSDataInputDammif, XSDataResultDammif, XSDataSaxsModel
 from XSDataCommon import XSDataString, XSDataFile, XSDataDouble
-
+import parse_atsas
 
 class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
     """
@@ -133,7 +133,7 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
         self.DEBUG("EDPluginExecDammifv0_2.postProcess")
         # Create some output data
         cwd = self.getWorkingDirectory()
-        model = XSDataSaxsModel(name=XSDataString(name))
+        model = XSDataSaxsModel(name=XSDataString(self.name))
 
         xsDataResult = XSDataResultDammif(model=model)
         pathLogFile = os.path.join(cwd, "dammif.log")
@@ -142,18 +142,27 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
         pathMoleculeFile = os.path.join(cwd, "dammif-1.pdb")
         pathSolventFile = os.path.join(cwd, "dammif-0.pdb")
 
+        try:
+            res = parse_atsas.parsePDB(pathMoleculeFile)
+        except Exception as error:
+            self.ERROR("EDPluginExecDammifv0_2:parsePDB: %s" % error)
+        else:
+            for k in res:
+                self.__setattr__(k, res[k])
+
         xsFitFile = XSDataFile(XSDataString(pathFitFile))
 
         xsSolventFile = XSDataFile(XSDataString(pathSolventFile))
 
         if os.path.exists(pathLogFile):
             xsDataResult.logFile = model.logFile = XSDataFile(XSDataString(pathLogFile))
-            xsDataResult.rfactor = model.rfactor = returnDammifRFactor()
+            if self.Rfactor:
+                xsDataResult.rfactor = model.rfactor = XSDataDouble(self.Rfactor)
         if os.path.exists(pathFitFile):
             xsDataResult.fitFile = model.fitfile = XSDataFile(XSDataString(pathFitFile))
         if os.path.exists(pathFirFile):
             model.firfile = XSDataFile(XSDataString(pathFirFile))
-            xsDataResult.chiSqrt = model.chiSqrt = returnDammifChiSqrt()
+            xsDataResult.chiSqrt = model.chiSqrt = self.returnDammifChiSqrt()
         if os.path.exists(pathMoleculeFile.value):
             xsDataResult.pdbMoleculeFile = model.pdbFile = XSDataFile(XSDataString(pathMoleculeFile))
         if os.path.exists(pathSolventFile.value):
@@ -182,19 +191,22 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
 
 
     def returnDammifChiSqrt(self):
-        logFile = open(os.path.join(self.getWorkingDirectory(), "dammif.fir"))
-        self.sqrtChi = float(logFile.readline().split('=')[-1])
-        return XSDataDouble(self.sqrtChi)
-
-    def returnDammifRFactor(self):
-        logFile = open(os.path.join(self.getWorkingDirectory(), "dammif.log"))
-        tmpRfactor = None
-        for line in logFile:
-            wordsLine = [tmpStr for tmpStr in line.split(' ') if tmpStr is not '']
-            if wordsLine[0] == "Rf:":
-                tmpRfactor = float(wordsLine[1][:-1])
-        self.Rfactor = tmpRfactor
-        return XSDataDouble(tmpRfactor)
+        try:
+            self.sqrtChi = parse_atsas.SqrtChi(os.path.join(self.getWorkingDirectory(), "dammif.fir"))
+        except Exception as error:
+            self.ERROR("EDPluginExecDammifv0_2:returnDammifChiSqrt: %s"%error)
+            return
+        else:
+            return XSDataDouble(self.sqrtChi)
+#
+#    def returnDammifRFactor(self):
+#        try:
+#            self.Rfactor = parse_atsas.RFactor( os.path.join(self.getWorkingDirectory(), "dammif.log"))
+#        except Exception as error:
+#            self.ERROR("EDPluginExecDammifv0_2:returnDammifRFactor: %s" % error)
+#            return
+#        else:
+#            return XSDataDouble(self.Rfactor)
 
     def generateExecutiveSummary(self, __edPlugin=None):
         tmpDammif = "Results of %s: " % self.name
