@@ -38,6 +38,7 @@ class EDTestSuiteExecuteAtsas(EDTestSuite):
     def process(self):
         tests = ['EDTestCasePluginExecuteExecDataverv1_0',
                  'EDTestCasePluginExecuteExecSupcombv0_1',
+                 'EDTestCasePluginExecuteExecSupcombv0_2',
                  'EDTestCasePluginExecuteExecDamminv0_1',
                  'EDTestCasePluginExecuteExecDatopv1_0',
                  'EDTestCasePluginExecuteExecDatcmpv1_0',
