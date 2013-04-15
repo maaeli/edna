@@ -30,12 +30,38 @@ from __future__ import with_statement
 __authors__ = ["Jérôme Kieffer"]
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
-__date__ = "20130412"
+__date__ = "20130415"
 __status__ = "Development"
 __version__ = "0.1"
 __doc__ = "parse some of the atsas files"
 import os, sys, time, logging
-from StringIO import  StringIO
+#from StringIO import  StringIO
+
+PDB_Keywords = ['HEADER', 'TITLE', 'COMPND', 'SOURCE',
+                'KEYWDS', 'EXPDTA', 'AUTHOR', 'REVDAT',
+                'JRNL', 'REMARK', 'DBREF', 'SEQADV',
+                'SEQRES', 'MODRES', 'HET', 'HETNAM',
+                'FORMUL', 'HELIX', 'SHEET', 'CRYST1',
+                'ORIGX1', 'ORIGX2', 'ORIGX3', 'SCALE1',
+                'SCALE2', 'SCALE3', 'ATOM', 'TER',
+                'HETATM', 'CONECT', 'MASTER', 'END']
+
+def filterPDBFile(inputPDB, outputPDB=None):
+    """
+    Put REMARK keyword in front of the comment lines
+    """
+    linesOutput = []
+    with  open(inputPDB) as fileread:
+        for line in fileread:
+            data = line.split()
+            if data and data[0] in PDB_Keywords:
+                linesOutput.append(line)
+            else:
+                linesOutput.append('REMARK ' + line)
+    if outputPDB:
+        with open(outputPDB, "w") as filewrite:
+            filewrite.writelines(linesOutput)
+    return linesOutput
 
 ################################################################################
 # #Those functions should be in try/except to be able to properly report bugs
@@ -61,15 +87,22 @@ def RFactor(logFile=None):
                 tmpRfactor = float(wordsLine[1][:-1])
     return tmpRfactor
 
-def parsePDB(pdbFile=None):
+
+def parsePDB(pdbFile=None, outPDB=None):
     """
-    parse PDB file for Rfactor, Dmax, Volume and Rg 
+    parse PDB file for Rfactor, Dmax, Volume and Rg.
+    
+    @param  pdbFile: input  PDB file
+    @param outPDB: Optional pdb file to be written with sanitized comments
     """
     res = {}
     if not pdbFile or not os.path.exists(pdbFile):
         raise(RuntimeError("In parse PDB: file %s does not exist" % pdbFile))
-    with open(pdbFile) as ff:
-        for line in ff:
+    if outPDB is None:
+        pdb_content = open(pdbFile).readlines()
+    else:
+         pdb_content = filterPDBFile(pdbFile, outPDB)
+    for line in pdb_content:
             if line.startswith("REMARK 265"):
                 if "Final R-factor" in line:
                     res["Rfactor"] = float(line.split(":")[-1])
@@ -79,4 +112,6 @@ def parsePDB(pdbFile=None):
                     res["Rg"] = float(line.split(":")[-1])
                 elif "Maximum phase diameter" in line:
                     res["Dmax"] = float(line.split(":")[-1])
+            if not line.startswith("REMARK"):
+                break
     return res

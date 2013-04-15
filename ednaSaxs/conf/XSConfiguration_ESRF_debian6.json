@@ -15,6 +15,13 @@
         "execProcessScriptShell": "/bin/bash", 
         "timeOut": 60
     }, 
+    "EDPluginExecSupcombv0_2": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/usr/bin/supcomb20", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 60
+    }, 
+
     "EDPluginExecDatGnomv1_0": {
         "execProcessScriptExecutable": "/usr/bin/datgnom", 
         "execProcessScriptShell": "python", 

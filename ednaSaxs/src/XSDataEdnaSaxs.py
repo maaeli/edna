@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Fri Apr 12 08:45::37 2013 by EDGenerateDS.
+# Generated Mon Apr 15 10:13::30 2013 by EDGenerateDS.
 #
 
 import os, sys
@@ -11,7 +11,22 @@ from xml.dom import Node
 
 strEdnaHome = os.environ.get("EDNA_HOME", None)
 
-dictLocation = {  "XSDataCommon": "workspace/edna/kernel/datamodel",
+dictLocation = { \
+ "XSDataCommon": "workspace/edna/kernel/datamodel", \
+ "XSDataCommon": "workspace/edna/kernel/datamodel", \
+ "XSDataCommon": "workspace/edna/kernel/datamodel", \
+ "XSDataCommon": "workspace/edna/kernel/datamodel", \
+ "XSDataCommon": "workspace/edna/kernel/datamodel", \
+ "XSDataCommon": "workspace/edna/kernel/datamodel", \
+ "XSDataCommon": "workspace/edna/kernel/datamodel", \
+ "XSDataCommon": "workspace/edna/kernel/datamodel", \
+ "XSDataCommon": "workspace/edna/kernel/datamodel", \
+ "XSDataCommon": "workspace/edna/kernel/datamodel", \
+ "XSDataCommon": "workspace/edna/kernel/datamodel", \
+ "XSDataCommon": "workspace/edna/kernel/datamodel", \
+ "XSDataCommon": "workspace/edna/kernel/datamodel", \
+ "XSDataCommon": "workspace/edna/kernel/datamodel", \
+ "XSDataCommon": "workspace/edna/kernel/datamodel", \
 }
 
 try:
@@ -5887,7 +5902,8 @@ class XSDataInputSaxsPipeline(XSDataInput):
 
 
 class XSDataInputSupcomb(XSDataInput):
-    def __init__(self, configuration=None, backbone=None, enantiomorphs=None, superimposeFile=None, templateFile=None):
+    """name is the name to be given to the model"""
+    def __init__(self, configuration=None, name=None, backbone=None, enantiomorphs=None, superimposeFile=None, templateFile=None):
         XSDataInput.__init__(self, configuration)
         if templateFile is None:
             self._templateFile = None
@@ -5916,6 +5932,13 @@ class XSDataInputSupcomb(XSDataInput):
             self._backbone = backbone
         else:
             strMessage = "ERROR! XSDataInputSupcomb constructor argument 'backbone' is not XSDataBoolean but %s" % self._backbone.__class__.__name__
+            raise BaseException(strMessage)
+        if name is None:
+            self._name = None
+        elif name.__class__.__name__ == "XSDataString":
+            self._name = name
+        else:
+            strMessage = "ERROR! XSDataInputSupcomb constructor argument 'name' is not XSDataString but %s" % self._name.__class__.__name__
             raise BaseException(strMessage)
     # Methods and properties for the 'templateFile' attribute
     def getTemplateFile(self): return self._templateFile
@@ -5965,6 +5988,18 @@ class XSDataInputSupcomb(XSDataInput):
             raise BaseException(strMessage)
     def delBackbone(self): self._backbone = None
     backbone = property(getBackbone, setBackbone, delBackbone, "Property for backbone")
+    # Methods and properties for the 'name' attribute
+    def getName(self): return self._name
+    def setName(self, name):
+        if name is None:
+            self._name = None
+        elif name.__class__.__name__ == "XSDataString":
+            self._name = name
+        else:
+            strMessage = "ERROR! XSDataInputSupcomb.setName argument is not XSDataString but %s" % name.__class__.__name__
+            raise BaseException(strMessage)
+    def delName(self): self._name = None
+    name = property(getName, setName, delName, "Property for name")
     def export(self, outfile, level, name_='XSDataInputSupcomb'):
         showIndent(outfile, level)
         outfile.write(unicode('<%s>\n' % name_))
@@ -5985,6 +6020,8 @@ class XSDataInputSupcomb(XSDataInput):
             self.enantiomorphs.export(outfile, level, name_='enantiomorphs')
         if self._backbone is not None:
             self.backbone.export(outfile, level, name_='backbone')
+        if self._name is not None:
+            self.name.export(outfile, level, name_='name')
     def build(self, node_):
         for child_ in node_.childNodes:
             nodeName_ = child_.nodeName.split(':')[-1]
@@ -6010,6 +6047,11 @@ class XSDataInputSupcomb(XSDataInput):
             obj_ = XSDataBoolean()
             obj_.build(child_)
             self.setBackbone(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'name':
+            obj_ = XSDataString()
+            obj_.build(child_)
+            self.setName(obj_)
         XSDataInput.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
     def marshal( self ):
@@ -8831,7 +8873,8 @@ class XSDataResultSaxsPipeline(XSDataResult):
 
 
 class XSDataResultSupcomb(XSDataResult):
-    def __init__(self, status=None, NSD=None, trns=None, rot=None, outputFilename=None):
+    """model is new unified container for the saxs model"""
+    def __init__(self, status=None, model=None, NSD=None, trns=None, rot=None, outputFilename=None):
         XSDataResult.__init__(self, status)
         if outputFilename is None:
             self._outputFilename = None
@@ -8860,6 +8903,13 @@ class XSDataResultSupcomb(XSDataResult):
             self._NSD = NSD
         else:
             strMessage = "ERROR! XSDataResultSupcomb constructor argument 'NSD' is not XSDataDouble but %s" % self._NSD.__class__.__name__
+            raise BaseException(strMessage)
+        if model is None:
+            self._model = None
+        elif model.__class__.__name__ == "XSDataSaxsModel":
+            self._model = model
+        else:
+            strMessage = "ERROR! XSDataResultSupcomb constructor argument 'model' is not XSDataSaxsModel but %s" % self._model.__class__.__name__
             raise BaseException(strMessage)
     # Methods and properties for the 'outputFilename' attribute
     def getOutputFilename(self): return self._outputFilename
@@ -8909,6 +8959,18 @@ class XSDataResultSupcomb(XSDataResult):
             raise BaseException(strMessage)
     def delNSD(self): self._NSD = None
     NSD = property(getNSD, setNSD, delNSD, "Property for NSD")
+    # Methods and properties for the 'model' attribute
+    def getModel(self): return self._model
+    def setModel(self, model):
+        if model is None:
+            self._model = None
+        elif model.__class__.__name__ == "XSDataSaxsModel":
+            self._model = model
+        else:
+            strMessage = "ERROR! XSDataResultSupcomb.setModel argument is not XSDataSaxsModel but %s" % model.__class__.__name__
+            raise BaseException(strMessage)
+    def delModel(self): self._model = None
+    model = property(getModel, setModel, delModel, "Property for model")
     def export(self, outfile, level, name_='XSDataResultSupcomb'):
         showIndent(outfile, level)
         outfile.write(unicode('<%s>\n' % name_))
@@ -8933,6 +8995,8 @@ class XSDataResultSupcomb(XSDataResult):
             self.NSD.export(outfile, level, name_='NSD')
         else:
             warnEmptyAttribute("NSD", "XSDataDouble")
+        if self._model is not None:
+            self.model.export(outfile, level, name_='model')
     def build(self, node_):
         for child_ in node_.childNodes:
             nodeName_ = child_.nodeName.split(':')[-1]
@@ -8958,6 +9022,11 @@ class XSDataResultSupcomb(XSDataResult):
             obj_ = XSDataDouble()
             obj_.build(child_)
             self.setNSD(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'model':
+            obj_ = XSDataSaxsModel()
+            obj_.build(child_)
+            self.setModel(obj_)
         XSDataResult.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
     def marshal( self ):

@@ -39,6 +39,7 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
     """
     # Should be able to go up to P19, but DAMMIF only seems to work for symmetries up to P12
     knownSymmetry = ["P%i" % i for i in range(1, 13)] + ["P%i2" % i for i in range(2, 13)]
+    name = "dammif"
 
     def __init__(self):
         """
@@ -57,7 +58,6 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
         self.volume = None
         self.Rg = None
         self.Dmax = None
-        self.name = "dammif"
 
 
     def checkParameters(self):
@@ -138,7 +138,7 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
         EDPluginExecProcessScript.preProcess(self)
         self.DEBUG("EDPluginExecDammifv0_2.preProcess")
         if self.dataInput.order:
-            self.name = "dammif-%s" % self.dataInput.order.value
+            self.name = "dammif-%s" % self.dataInput.order.value #I know I only modify the instance variable, not the class one
 
         self.generateDammifScript()
  

@@ -388,14 +388,18 @@ complex type XSDataResultDamstart extends XSDataResult {
 
 
 complex type XSDataInputSupcomb extends XSDataInput {
+	"name is the name to be given to the model"
 	templateFile : XSDataFile
 	superimposeFile : XSDataFile
 	enantiomorphs : XSDataBoolean optional
 	backbone : XSDataBoolean optional
+	name: XSDataString optional
 }
 complex type XSDataResultSupcomb extends XSDataResult {
+	"model is new unified container for the saxs model"
 	outputFilename : XSDataFile
 	rot : XSDataRotation
 	trns : XSDataVectorDouble
 	NSD : XSDataDouble
+	model: XSDataSaxsModel optional
 }
