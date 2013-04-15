@@ -244,5 +244,7 @@ class EDPluginExecSupcombv0_2(EDPluginExecProcessScript):
                                            trns=xsTrns,
                                            model=model)
         xsDataResult.outputFilename = model.pdbFile = XSDataFile(XSDataString(pdb))
+        xsDataResult.status = XSDataStatus(message=self.getXSDataMessage(),
+                                          executiveSummary=XSDataString(os.linesep.join(self.getListExecutiveSummaryLines())))
         return xsDataResult
 
