@@ -57,11 +57,11 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
     mode = "fast"        #
     # constants:  plugin names
     strPluginExecDammif = "EDPluginExecDammifv0_2"
-    strPluginExecSupcomb = "EDPluginExecSupcombv0_1"
-    strPluginExecDamaver = "EDPluginExecDamaverv0_1"
-    strPluginExecDamfilt = "EDPluginExecDamfiltv0_1"
-    strPluginExecDamstart = "EDPluginExecDamstartv0_1"
-    strPluginExecDammin = "EDPluginExecDamminv0_1"
+    strPluginExecSupcomb = "EDPluginExecSupcombv0_2"
+    strPluginExecDamaver = "EDPluginExecDamaverv0_2"
+    strPluginExecDamfilt = "EDPluginExecDamfiltv0_2"
+    strPluginExecDamstart = "EDPluginExecDamstartv0_2"
+    strPluginExecDammin = "EDPluginExecDamminv0_2"
 
     def __init__(self):
         """
@@ -171,7 +171,8 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
                     if self.valid[ser]:
                         supcomb = self.loadPlugin(self.strPluginExecSupcomb)
                         supcomb.dataInput = XSDataInputSupcomb(templateFile=self.dammif_plugins[idx].dataOutput.pdbMoleculeFile,
-                                                               superimposeFile=self.dammif_plugins[ser].dataOutput.pdbMoleculeFile,)
+                                                               superimposeFile=self.dammif_plugins[ser].dataOutput.pdbMoleculeFile,
+                                                               name=self.dammif_plugins[ser].dataOutput.model.name)
                         self.supcomb_plugins[(idx, ser)] = supcomb
                         self.actclust_supcomb.addAction(supcomb)
         self.actclust_supcomb.executeSynchronous()
@@ -181,6 +182,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
                 self.ERROR("supcomb plugin for model pair (%i,%i) %s-%08i failed" % (key[0] + 1, key[1] + 1, plugin.getName(), plugin.getId()))
                 self.setFailure()
             self.retrieveMessages(plugin)
+
         if self.isFailure():
             return
 
@@ -192,7 +194,8 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
             if self.valid[ser]:
                 supcomb = self.loadPlugin(self.strPluginExecSupcomb)
                 supcomb.dataInput = XSDataInputSupcomb(templateFile=self.dammif_plugins[self.ref].dataOutput.pdbMoleculeFile,
-                                                       superimposeFile=self.dammif_plugins[ser].dataOutput.pdbMoleculeFile,)
+                                                       superimposeFile=self.dammif_plugins[ser].dataOutput.pdbMoleculeFile,
+                                                       name=self.dammif_plugins[ser].dataOutput.model.name)
                 self.supcomb_plugins[(self.ref, ser)] = supcomb
                 self.actclust_supcomb.addAction(supcomb)
         self.actclust_supcomb.executeSynchronous()
@@ -207,12 +210,18 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         if self.isFailure():
             return
 
-#        TODO: Register all aligned models for output
-#        TODO: create symlinks to local directory with PDB models either from dammif (best & discared models) or supcomb
+        for i in range(self.dammif_jobs):
+            if i == self.ref or not self.valid[i]:
+                model = self.dammif_plugins[i].dataOutput.model
+            else:
+                model = self.supcomb_plugins[(self.ref, i)].dataOutput.model
+                model.chiSqrt = self.dammif_plugins[i].dataOutput.model.chiSqrt
+#                model.chiSqrt =  self.dammif_plugins[i].dataOutput.model.chiSqrt
+            os.symlink(model.pdbFile.path.value, os.path.join(self.getWorkingDirectory(), "model-%02i.pdb" % (i + 1)))
+            self.result.dammifModels[i] = model
 
 
 #        Now that all (valid) models are aligned we can combine them using damaver
-
         pdbFiles = [self.dammif_plugins[self.ref].dataOutput.pdbMoleculeFile]
 
         for idx in range(self.dammif_jobs):
@@ -256,7 +265,6 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         dammin = self.loadPlugin(self.strPluginExecDammin)
         dammin.dataInput = XSDataInputDammin(pdbInputFile=damstart.dataOutput.outputPdbFile,
                                              gnomOutputFile=self.xsGnomFile,
-#                                             unit=XSDataString(self.unit),
                                              symmetry=XSDataString(self.symmetry),
                                              mode=XSDataString(self.mode))
         dammin.connectSUCCESS(self.doSuccessExecDammin)

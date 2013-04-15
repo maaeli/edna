@@ -1,4 +1,4 @@
-{
+{    "__extend__": [], 
     "EDPluginExecGnomv0_1": {
         "execProcessScriptVersionString": "", 
         "execProcessScriptExecutable": "/usr/bin/gnom", 
@@ -64,14 +64,31 @@
         "execProcessScriptShell": "/bin/bash", 
         "timeOut": 60
     }, 
+    "EDPluginExecDamstartv0_2": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/usr/bin/damstart", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 60
+    }, 
     "EDPluginExecDamaverv0_1": {
         "execProcessScriptVersionString": "", 
         "execProcessScriptExecutable": "/usr/bin/damaver", 
         "execProcessScriptShell": "/bin/bash", 
         "timeOut": 600
     }, 
-    "__extend__": [], 
+    "EDPluginExecDamaverv0_2": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/usr/bin/damaver", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 600
+    }, 
     "EDPluginExecDamminv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/usr/bin/dammin", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 1000
+    }, 
+    "EDPluginExecDamminv0_2": {
         "execProcessScriptVersionString": "", 
         "execProcessScriptExecutable": "/usr/bin/dammin", 
         "execProcessScriptShell": "/bin/bash", 
@@ -83,6 +100,12 @@
         "timeOut": 60
     }, 
     "EDPluginExecDamfiltv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/usr/bin/damfilt", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 60
+    },
+    "EDPluginExecDamfiltv0_2": {
         "execProcessScriptVersionString": "", 
         "execProcessScriptExecutable": "/usr/bin/damfilt", 
         "execProcessScriptShell": "/bin/bash", 

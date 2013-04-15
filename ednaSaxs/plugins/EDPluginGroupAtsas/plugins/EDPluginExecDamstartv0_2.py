@@ -30,14 +30,10 @@ __copyright__ = "2010 DLS; 2013 ESRF"
 
 
 import os
-
 from EDVerbose import EDVerbose
 from EDPluginExecProcessScript import EDPluginExecProcessScript
-
-from XSDataEdnaSaxs import XSDataInputDamstart
-from XSDataEdnaSaxs import XSDataResultDamstart
-
-from XSDataCommon import XSDataFile, XSDataString
+from XSDataEdnaSaxs import XSDataInputDamstart, XSDataSaxsModel, XSDataResultDamstart
+from XSDataCommon import XSDataFile, XSDataString, XSDataStatus, XSDataMessage
 
 
 class EDPluginExecDamstartv0_2(EDPluginExecProcessScript):

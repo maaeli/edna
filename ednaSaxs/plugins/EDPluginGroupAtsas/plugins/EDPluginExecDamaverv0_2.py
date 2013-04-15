@@ -29,12 +29,9 @@ __license__ = "GPLv3+"
 __copyright__ = "2010 DLS; 2013 ESRF"
 
 import os
-
-from EDVerbose import EDVerbose
 from EDPluginExecProcessScript import EDPluginExecProcessScript
-from XSDataEdnaSaxs import XSDataInputDamaver, XSDataResultDamaver
-
-from XSDataCommon import XSDataString, XSDataFile, XSDataDouble
+from XSDataEdnaSaxs import XSDataInputDamaver, XSDataResultDamaver, XSDataSaxsModel
+from XSDataCommon import XSDataString, XSDataFile, XSDataDouble, XSDataMessage, XSDataStatus
 
 class EDPluginExecDamaverv0_2(EDPluginExecProcessScript):
     """
