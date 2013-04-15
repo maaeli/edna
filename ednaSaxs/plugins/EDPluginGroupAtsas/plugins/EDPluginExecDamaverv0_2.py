@@ -58,7 +58,7 @@ class EDPluginExecDamaverv0_2(EDPluginExecProcessScript):
         """
         self.DEBUG("EDPluginExecDamaverv0_2.checkParameters")
         self.checkMandatoryParameters(self.dataInput, "Data Input is None")
-        self.checkMandatoryParameters(self.dataInputpdbInputFiles, "PDB input files are missing")
+        self.checkMandatoryParameters(self.dataInput.pdbInputFiles, "PDB input files are missing")
 
 
     def preProcess(self, _edObject=None):
@@ -77,19 +77,20 @@ class EDPluginExecDamaverv0_2(EDPluginExecProcessScript):
     def checkDamaverAutomaticInput(self):
         if self.dataInput.automatic:
             try:
-                if self.dataInput.getAutomatic():
-                    self.__bAutomatic = self.dataInput.getAutomatic().value
+                if self.dataInput.automatic:
+                    self.__bAutomatic = self.dataInput.automatic.value
             except Exception as error:
-                self.WARNING("Running Damaver automation pipeline by default.")
+                self.WARNING("Running Damaver automation pipeline by default: %s"%error)
+
 
     def checkDamaverSymmetryInput(self):
         self.DEBUG("EDPluginExecDammifv0_2.checkDammifSymmetryInput")
-
-        try:
-            if self.dataInput.getSymmetry().value in self.knownSymmetry:
-                self.__strSymmetry = self.dataInput.getSymmetry().value
-        except Exception as error:
-            self.WARNING("Symmetry wasn't specified. Setting symmetry to P1")
+        if self.dataInput.symmetry:
+            try:
+                if self.dataInput.symmetry.value in self.knownSymmetry:
+                    self.__strSymmetry = self.dataInput.symmetry.value
+            except Exception as error:
+                self.WARNING("Symmetry wasn't specified. Setting symmetry to P1: %s" % error)
 
 
     def process(self, _edObject=None):
@@ -105,9 +106,10 @@ class EDPluginExecDamaverv0_2(EDPluginExecProcessScript):
         self.outputDamaverPdbFiles()
         if self.__bAutomatic:
             self.parseDamselLog()
-        xsDataResult.status = XSDataStatus(message=self.getXSDataMessage(),
-                                          executiveSummary=XSDataString(os.linesep.join(self.getListExecutiveSummaryLines())))
-        self.setDataOutput(self.__xsDataResult)
+
+        self.__xsDataResult.status = XSDataStatus(message=self.getXSDataMessage(),
+                                                  executiveSummary=XSDataString(os.linesep.join(self.getListExecutiveSummaryLines())))
+        self.dataOutput = self.__xsDataResult
 
     def outputDamaverPdbFiles(self):
         pathDamaverFile = XSDataString(os.path.join(self.getWorkingDirectory(), "damaver.pdb"))
@@ -142,7 +144,7 @@ class EDPluginExecDamaverv0_2(EDPluginExecProcessScript):
         self.DEBUG("EDPluginExecDammifv0_2.generateDammifScript")
 
         dataFileNames = []
-        for idx, pdbInputFile in enumerate(self.dataInputpdbInputFiles):
+        for idx, pdbInputFile in enumerate(self.dataInput.pdbInputFiles):
             tmpInputFileName = pdbInputFile.path.value
             os.symlink(tmpInputFileName, os.path.join(self.getWorkingDirectory(), 'dammif-' + str(idx + 1) + '.pdb'))
             dataFileNames.append('dammif-' + str(idx + 1) + '.pdb')

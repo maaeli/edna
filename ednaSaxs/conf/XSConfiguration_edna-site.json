@@ -1,4 +1,4 @@
-{
+{   "__extend__": [], 
     "EDPluginExecGnomv0_1": {
         "execProcessScriptVersionString": "", 
         "execProcessScriptExecutable": "/usr/bin/gnom", 
@@ -57,7 +57,7 @@
         "execProcessScriptShell": "/bin/bash", 
         "timeOut": 600
     }, 
-    "__extend__": [], 
+
     "EDPluginExecDamminv0_1": {
         "execProcessScriptVersionString": "", 
         "execProcessScriptExecutable": "/usr/bin/dammin", 

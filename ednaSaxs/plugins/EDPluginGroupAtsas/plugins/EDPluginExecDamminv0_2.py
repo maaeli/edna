@@ -44,7 +44,8 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
           This should be accounted for to provide proper command input sequence
     """
     knownSymmetry = ["P%i" % i for i in range(1, 20)] + ["P%i2" % i for i in range(2, 13)] + ['P23', 'P432', 'PICO']
-
+    DAMModel = ['S', 'E', 'C', 'P']
+    particleShape = ['P', 'O', 'U']
 
     def __init__(self):
         """
@@ -86,18 +87,18 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
 
         if self.dataInput.symmetry:
             try:
-                if self.dataInput.symmetry.value in knownSymmetry:
+                if self.dataInput.symmetry.value in self.knownSymmetry:
                     self.__strSymmetry = self.dataInput.symmetry.value
             except Exception as error:
                 self.WARNING("Symmetry wasn't specified. Setting symmetry to P1: %s" % error)
 
     def checkDamminDAMInput(self):
 
-        DAMModel = ['S', 'E', 'C', 'P']
+
         if self.dataInput.initialDummyAtomModel:
             try:
                 if self.dataInput.initialDummyAtomModel.value in range(4):
-                    self.__strDAM = DAMModel[self.dataInput.initialDummyAtomModel.value]
+                    self.__strDAM = self.DAMModel[self.dataInput.initialDummyAtomModel.value]
                     return
             except Exception as error:
                 self.ERROR("No standard dummy atom model selected. Looking for a PDB mode file: %s" % error)
@@ -111,11 +112,11 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
 
 
     def checkParticleShapeInput(self):
-        particleShape = ['P', 'O', 'U']
+
         if self.dataInput.expectedParticleShape:
             try:
                 if self.dataInput.expectedParticleShape.value in range(3):
-                    self.__strParticleShape = particleShape[self.dataInput.expectedParticleShape.value]
+                    self.__strParticleShape = self.particleShape[self.dataInput.expectedParticleShape.value]
             except Exception as error:
                 self.ERROR("Using Unknown particle shape: %s" % error)
 
@@ -185,6 +186,7 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
 
     def returnModelDimensions(self):
         # TODO: For some symmetry groups DAMMIN asks for less dimensions
+
         if self.dataInput.initialDummyAtomModel.value in range(1, 4):
             return 3 * ['']
         if self.dataInput.initialDummyAtomModel.value is 4:
