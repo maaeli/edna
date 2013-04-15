@@ -220,15 +220,16 @@ class EDPluginExecSupcombv0_2(EDPluginExecProcessScript):
         xsRot = self.returnRotation(logLines[-3:])
         xsTrns = self.returnTranslation(logLines[-6:-3])
         xsNSD = XSDataDouble(float(logLines[-8].split()[-1]))
+        raw = os.path.join(self.getWorkingDirectory(), self.__strOutputFileNameRaw)
+        pdb = os.path.join(self.getWorkingDirectory(), self.__strOutputFileName)
+                           
         try:
-            res = parse_atsas.parsePDB(os.path.join(self.getWorkingDirectory(), self.__strOutputFileNameRaw),
-                                       os.path.join(self.getWorkingDirectory(), self.__strOutputFileName))
+            res = parse_atsas.parsePDB(raw, pdb)
         except Exception as error:
             self.ERROR("in parsePDB: %s" % error)
         model = XSDataSaxsModel(name=XSDataString(self.name),
-                                logFile=XSDataFile(XSDataString(self.getScriptLogFileName)),
-
-                                )
+                                logFile=XSDataFile(XSDataString(os.path.join(self.getWorkingDirectory(), self.getScriptLogFileName()))))
+                                
         if "Rfactor" in res:
             model.rfactor = XSDataDouble(res["Rfactor"])
         if "volume" in res:
@@ -241,7 +242,7 @@ class EDPluginExecSupcombv0_2(EDPluginExecProcessScript):
         xsDataResult = XSDataResultSupcomb(NSD=xsNSD,
                                            rot=xsRot,
                                            trns=xsTrns,
-                                           model=model,
-                                           outputFilename=XSDataFile(XSDataString(os.path.join(self.getWorkingDirectory(), self.__strOutputFileName))))
+                                           model=model)
+        xsDataResult.outputFilename = model.pdbFile = XSDataFile(XSDataString(pdb))
         return xsDataResult
 
