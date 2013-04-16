@@ -93,11 +93,6 @@ class EDPluginExecDamaverv0_2(EDPluginExecProcessScript):
                 self.WARNING("Symmetry wasn't specified. Setting symmetry to P1: %s" % error)
 
 
-    def process(self, _edObject=None):
-        EDPluginExecProcessScript.process(self)
-        self.DEBUG("EDPluginExecDamaverv0_2.process")
-
-
     def postProcess(self, _edObject=None):
         EDPluginExecProcessScript.postProcess(self)
         self.DEBUG("EDPluginExecDamaverv0_2.postProcess")
@@ -106,27 +101,27 @@ class EDPluginExecDamaverv0_2(EDPluginExecProcessScript):
         self.outputDamaverPdbFiles()
         if self.__bAutomatic:
             self.parseDamselLog()
-
+        self.generateExecutiveSummary()
         self.__xsDataResult.status = XSDataStatus(message=self.getXSDataMessage(),
                                                   executiveSummary=XSDataString(os.linesep.join(self.getListExecutiveSummaryLines())))
         self.dataOutput = self.__xsDataResult
 
+
     def outputDamaverPdbFiles(self):
-        pathDamaverFile = XSDataString(os.path.join(self.getWorkingDirectory(), "damaver.pdb"))
-        xsDamaverFile = XSDataFile(pathDamaverFile)
-        if os.path.exists(pathDamaverFile.value):
-            self.__xsDataResult.setDamaverPdbFile(xsDamaverFile)
+        cwd = self.getWorkingDirectory()
+        damaverPDB = os.path.join(cwd, "damaver.pdb")
+        if os.path.exists(damaverPDB):
+            self.__xsDataResult.model = XSDataSaxsModel(name=XSDataString("damaver"))
+            self.__xsDataResult.damaverPdbFile = self.__xsDataResult.model.pdbFile = XSDataFile(XSDataString(damaverPDB))
 
         if self.__bAutomatic:
-            pathDamfilterFile = XSDataString(os.path.join(self.getWorkingDirectory(), "damfilt.pdb"))
-            pathDamstartFile = XSDataString(os.path.join(self.getWorkingDirectory(), "damstart.pdb"))
-            xsDamfilterFile = XSDataFile(pathDamfilterFile)
-            xsDamstartFile = XSDataFile(pathDamstartFile)
+            damfilterFile = os.path.join(cwd, "damfilt.pdb")
+            if os.path.exists(damfilterFile):
+                self.__xsDataResult.damfilterPdbFile = XSDataFile(XSDataString(damfilterFile))
 
-            if os.path.exists(pathDamfilterFile.value):
-                self.__xsDataResult.setDamfilterPdbFile(xsDamfilterFile)
-            if os.path.exists(pathDamstartFile.value):
-                self.__xsDataResult.setDamstartPdbFile(xsDamstartFile)
+            damstartFile = os.path.join(cwd, "damstart.pdb")
+            if os.path.exists(damstartFile):
+                self.__xsDataResult.damstartPdbFile = XSDataFile(XSDataString(damstartFile))
 
     def parseDamselLog(self):
         damselLog = open(os.path.join(self.getWorkingDirectory(), "damsel.log"))
@@ -156,20 +151,14 @@ class EDPluginExecDamaverv0_2(EDPluginExecProcessScript):
             damsupLog.write('\n'.join(dataFileNames))
             damsupLog.close()
             commandScriptLine = ['damsup.log']
-
         self.setScriptCommandline(' '.join(commandScriptLine))
 
     def generateExecutiveSummary(self, __edPlugin=None):
-        self.addExecutiveSummaryLine("Results of model averaging using DAMAVER pipeline")
-        self.addExecutiveSummarySeparator()
         self.addExecutiveSummaryLine("DAMAVER output pdb model : %s" % os.path.join(self.getWorkingDirectory(), "damaver.pdb"))
-
         if self.__bAutomatic:
             self.addExecutiveSummaryLine("DAMFILT output pdb model : %s" % os.path.join(self.getWorkingDirectory(), "damfilt.pdb"))
             self.addExecutiveSummaryLine("DAMSTART output pdb model : %s" % os.path.join(self.getWorkingDirectory(), "damstart.pdb"))
             damselLog = open(os.path.join(self.getWorkingDirectory(), "damsel.log"))
             for line in damselLog:
                 self.addExecutiveSummaryLine(line)
-
-        self.addExecutiveSummarySeparator()
 

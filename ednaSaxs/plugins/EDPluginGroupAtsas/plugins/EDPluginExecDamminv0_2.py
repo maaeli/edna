@@ -123,6 +123,14 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
     def preProcess(self, _edObject=None):
         EDPluginExecProcessScript.preProcess(self)
         self.DEBUG("EDPluginExecDamminv0_2.preProcess")
+        if self.dataInput.name:
+            self.__strProjectDesc = self.dataInput.name.value
+        if self.dataInput.unit:
+            unit = self.dataInput.unit.value.lower()
+            if unit in ["a", "ang", "angstrom", "1", "1/a", "a^-1"]:
+                self.__strAngleUnit = "1"
+            if unit in ["nm", "nanom", "nanometer", "2", "1/nm", "nm^-1"]:
+                self.__strAngleUnit = "2"
         self.generateDamminScript()
 
 
@@ -176,23 +184,23 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
                          self.__strSymmetry]
 
         if self.__strDAM not in ['', 'S']:
-            commandString.extend(self.returnModelDimensions())
+            commandString += self.returnModelDimensions()
 
-        commandString.extend(self.__strParticleShape)
+        commandString += self.__strParticleShape
         commandString.extend(5 * [''])                  # Just in case there are more default settings
-
+        print commandString
         self.addListCommandExecution('\n'.join(commandString))
 
 
     def returnModelDimensions(self):
         # TODO: For some symmetry groups DAMMIN asks for less dimensions
-
-        if self.dataInput.initialDummyAtomModel.value in range(1, 4):
-            return 3 * ['']
-        if self.dataInput.initialDummyAtomModel.value is 4:
-            return ['']
+        if self.dataInput.initialDummyAtomModel:
+            if self.dataInput.initialDummyAtomModel.value in range(1, 4):
+                return 3 * ['']
+            if self.dataInput.initialDummyAtomModel.value is 4:
+                return ['']
         else:
-            return ''
+            return ['']
 
 
     def returnDamminChiSqrt(self):

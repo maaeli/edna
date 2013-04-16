@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Mon Apr 15 11:40::41 2013 by EDGenerateDS.
+# Generated Tue Apr 16 10:46::01 2013 by EDGenerateDS.
 #
 
 import os, sys
@@ -3883,7 +3883,8 @@ class XSDataInputDammif(XSDataInput):
 
 
 class XSDataInputDammin(XSDataInput):
-    def __init__(self, configuration=None, mode=None, symmetry=None, pdbInputFile=None, initialDummyAtomModel=None, gnomOutputFile=None, expectedParticleShape=None):
+    """name is the name to be given to the model"""
+    def __init__(self, configuration=None, name=None, unit=None, mode=None, symmetry=None, pdbInputFile=None, initialDummyAtomModel=None, gnomOutputFile=None, expectedParticleShape=None):
         XSDataInput.__init__(self, configuration)
         if expectedParticleShape is None:
             self._expectedParticleShape = None
@@ -3926,6 +3927,20 @@ class XSDataInputDammin(XSDataInput):
             self._mode = mode
         else:
             strMessage = "ERROR! XSDataInputDammin constructor argument 'mode' is not XSDataString but %s" % self._mode.__class__.__name__
+            raise BaseException(strMessage)
+        if unit is None:
+            self._unit = None
+        elif unit.__class__.__name__ == "XSDataString":
+            self._unit = unit
+        else:
+            strMessage = "ERROR! XSDataInputDammin constructor argument 'unit' is not XSDataString but %s" % self._unit.__class__.__name__
+            raise BaseException(strMessage)
+        if name is None:
+            self._name = None
+        elif name.__class__.__name__ == "XSDataString":
+            self._name = name
+        else:
+            strMessage = "ERROR! XSDataInputDammin constructor argument 'name' is not XSDataString but %s" % self._name.__class__.__name__
             raise BaseException(strMessage)
     # Methods and properties for the 'expectedParticleShape' attribute
     def getExpectedParticleShape(self): return self._expectedParticleShape
@@ -3999,6 +4014,30 @@ class XSDataInputDammin(XSDataInput):
             raise BaseException(strMessage)
     def delMode(self): self._mode = None
     mode = property(getMode, setMode, delMode, "Property for mode")
+    # Methods and properties for the 'unit' attribute
+    def getUnit(self): return self._unit
+    def setUnit(self, unit):
+        if unit is None:
+            self._unit = None
+        elif unit.__class__.__name__ == "XSDataString":
+            self._unit = unit
+        else:
+            strMessage = "ERROR! XSDataInputDammin.setUnit argument is not XSDataString but %s" % unit.__class__.__name__
+            raise BaseException(strMessage)
+    def delUnit(self): self._unit = None
+    unit = property(getUnit, setUnit, delUnit, "Property for unit")
+    # Methods and properties for the 'name' attribute
+    def getName(self): return self._name
+    def setName(self, name):
+        if name is None:
+            self._name = None
+        elif name.__class__.__name__ == "XSDataString":
+            self._name = name
+        else:
+            strMessage = "ERROR! XSDataInputDammin.setName argument is not XSDataString but %s" % name.__class__.__name__
+            raise BaseException(strMessage)
+    def delName(self): self._name = None
+    name = property(getName, setName, delName, "Property for name")
     def export(self, outfile, level, name_='XSDataInputDammin'):
         showIndent(outfile, level)
         outfile.write(unicode('<%s>\n' % name_))
@@ -4029,6 +4068,10 @@ class XSDataInputDammin(XSDataInput):
             warnEmptyAttribute("symmetry", "XSDataString")
         if self._mode is not None:
             self.mode.export(outfile, level, name_='mode')
+        if self._unit is not None:
+            self.unit.export(outfile, level, name_='unit')
+        if self._name is not None:
+            self.name.export(outfile, level, name_='name')
     def build(self, node_):
         for child_ in node_.childNodes:
             nodeName_ = child_.nodeName.split(':')[-1]
@@ -4064,6 +4107,16 @@ class XSDataInputDammin(XSDataInput):
             obj_ = XSDataString()
             obj_.build(child_)
             self.setMode(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'unit':
+            obj_ = XSDataString()
+            obj_.build(child_)
+            self.setUnit(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'name':
+            obj_ = XSDataString()
+            obj_.build(child_)
+            self.setName(obj_)
         XSDataInput.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
     def marshal( self ):

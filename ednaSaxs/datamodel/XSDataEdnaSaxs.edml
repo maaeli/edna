@@ -363,12 +363,16 @@ complex type XSDataResultDammif extends XSDataResult {
 }
 
 complex type XSDataInputDammin extends XSDataInput {
+	"name is the name to be given to the model"
 	expectedParticleShape : XSDataInteger
 	gnomOutputFile : XSDataFile
 	initialDummyAtomModel : XSDataInteger
 	pdbInputFile : XSDataFile
 	symmetry : XSDataString
 	mode : XSDataString optional
+	unit : XSDataString optional
+	name: XSDataString optional
+	
 }
 complex type XSDataResultDammin extends XSDataResult {
 	fitFile : XSDataFile
