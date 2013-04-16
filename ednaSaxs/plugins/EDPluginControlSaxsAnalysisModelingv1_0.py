@@ -53,7 +53,7 @@ class EDPluginControlSaxsAnalysisModelingv1_0(EDPluginControl):
         * Damstart
         * Dammin
     """
-    cpAnalysis = "EDPluginControlSaxsAnalysisModelingv1_0"
+    cpAnalysis = "EDPluginControlSaxsAnalysisv1_0"
     cpModeling = "EDPluginControlSaxsModelingv1_0"
 
     def __init__(self):
@@ -96,31 +96,17 @@ class EDPluginControlSaxsAnalysisModelingv1_0(EDPluginControl):
         if (self.autoRg is None) or (self.gnomFile is None):
             self.edPluginAnalysis = self.loadPlugin(self.cpAnalysis)
             self.edPluginAnalysis.dataInput = XSDataInputSaxsAnalysis(scatterCurve=self.dataInput.scatterCurve,
-                                                                    autoRg=self.dataInput.autorg,
+                                                                    autoRg=self.dataInput.autoRg,
                                                                     gnomFile=self.dataInput.gnomFile,
-                                                                    graphFormat=XSDataString("png"))
+                                                                    graphFormat=self.dataInput.graphFormat)
             self.edPluginAnalysis.connectSUCCESS(self.doSuccessAnalysis)
             self.edPluginAnalysis.connectFAILURE(self.doFailureAnalysis)
             self.edPluginAnalysis.executeSynchronous()
 
         if self.isFailure():
             return
-
-        self.edPluginModeling = self.loadPlugin(self.cpModeling)
-        self.edPluginModeling.dataInput = XSDataInputSaxsModeling(inputCurve=self.dataInput.scatterCurve,
-                                             output=XSDataFile(XSDataString(self.gnomFile)),
-                                             rg=self.autoRg.rg,
-                                             skip=XSDataInteger(self.autoRg.firstPointUsed.value - 1))
-        self.edPluginModeling.connectSUCCESS(self.doSuccessGnom)
-        self.edPluginModeling.connectFAILURE(self.doFailureGnom)
-        self.edPluginModeling.executeSynchronous()
-
-
-    def postProcess(self, _edObject=None):
-        EDPluginControl.postProcess(self)
-        self.DEBUG("EDPluginControlSaxsAnalysisModelingv1_0.postProcess")
-        # Create some output data
-        strLog = """Rg   =   %.2f +/- %2f
+        else:
+            strLog = """Rg   =   %.2f +/- %2f
 I(0) =   %.2e +/- %.2e
 Points   %i to %i
 Quality: %4.2f%%     Aggregated: %s""" % (self.autoRg.rg.value, self.autoRg.rgStdev.value,
@@ -142,10 +128,28 @@ datPorod failed"""
             strLog += """
 Volume  =    %12.2f""" % (self.xVolume.value)
 
+            self.addExecutiveSummaryLine(strLog)
+
+        self.edPluginModeling = self.loadPlugin(self.cpModeling)
+        self.edPluginModeling.dataInput = XSDataInputSaxsModeling(gnomFile=self.gnom.gnomFile,
+                                                                  graphFormat=self.dataInput.graphFormat)
+        self.edPluginModeling.connectSUCCESS(self.doSuccessModeling)
+        self.edPluginModeling.connectFAILURE(self.doFailureModeling)
+        self.edPluginModeling.executeSynchronous()
+
+
+    def postProcess(self, _edObject=None):
+        EDPluginControl.postProcess(self)
+        self.DEBUG("EDPluginControlSaxsAnalysisModelingv1_0.postProcess")
+        # Create some output data
+
         self.xsDataResult.autoRg = self.autoRg
         self.xsDataResult.gnom = self.gnom
         self.xsDataResult.volume = self.xVolume
         self.xsDataResult.status = XSDataStatus(executiveSummary=XSDataString(strLog))
+        self.xsDataResult.status = XSDataStatus(message=self.getXSDataMessage(),
+                                          executiveSummary=XSDataString(os.linesep.join(self.getListExecutiveSummaryLines())))
+
         self.setDataOutput(self.xsDataResult)
 
 
@@ -154,34 +158,27 @@ Volume  =    %12.2f""" % (self.xVolume.value)
         self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsAnalysisModelingv1_0.doSuccessAnalysis")
         self.retrieveMessages(_edPlugin)
         try:
-            self.result.damstartModel = _edPlugin.dataOutput.model
-            self.symlink(_edPlugin.dataOutput.model.pdbFile.path.value, _edPlugin.dataOutput.model.name.value + ".pdb")
+            self.autoRg = _edPlugin.dataOutput.autoRg
+            self.gnom = _edPlugin.dataOutput.gnom
+            self.gnomFile = self.gnom.gnomFile.path.value
+            self.xVolume = _edPlugin.dataOutput.volume
         except Exception as error:
-            self.ERROR("Error in doSuccessExecDamstart: %s" % error)
+            self.ERROR("Error in doSuccessAnalysis: %s" % error)
 
 
     def doFailureAnalysis(self, _edPlugin=None):
         self.DEBUG("EDPluginControlSaxsAnalysisModelingv1_0.doFailureAnalysis")
         self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsAnalysisModelingv1_0.doFailureAnalysis")
+        self.retrieveMessages(_edPlugin)
         self.setFailure()
 
-    def doSuccessGnom(self, _edPlugin=None):
-        self.DEBUG("EDPluginControlSaxsAnalysisModelingv1_0.doSuccessGnom")
-        self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsAnalysisModelingv1_0.doSuccessGnom")
-        self.gnom = _edPlugin.dataOutput.gnom
-        self.gnomFile = self.gnom.gnomFile.path.value
+    def doSuccessModeling(self, _edPlugin=None):
+        self.DEBUG("EDPluginControlSaxsAnalysisModelingv1_0.doSuccessModeling")
+        self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsAnalysisModelingv1_0.doSuccessModeling")
+        self.retrieveMessages(_edPlugin)
 
-    def doFailureGnom(self, _edPlugin=None):
-        self.DEBUG("EDPluginControlSaxsAnalysisModelingv1_0.doFailureGnom")
-        self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsAnalysisModelingv1_0.doFailureGnom")
-        #self.setFailure()
-
-    def doSuccessPorod(self, _edPlugin=None):
-        self.DEBUG("EDPluginControlSaxsAnalysisModelingv1_0.doSuccessPorod")
-        self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsAnalysisModelingv1_0.doSuccessPorod")
-        self.xVolume = _edPlugin.dataOutput.volume
-
-    def doFailurePorod(self, _edPlugin=None):
-        self.DEBUG("EDPluginControlSaxsAnalysisModelingv1_0.doFailurePorod")
-        self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsAnalysisModelingv1_0.doFailurePorod")
+    def doFailureModeling(self, _edPlugin=None):
+        self.DEBUG("EDPluginControlSaxsAnalysisModelingv1_0.doFailureModeling")
+        self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsAnalysisModelingv1_0.doFailureModeling")
+        self.retrieveMessages(_edPlugin)
         #self.setFailure()
