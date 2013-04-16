@@ -83,12 +83,12 @@ class EDPluginExecDatGnomv1_0(EDPluginExecProcessScript):
             cwd = self.getWorkingDirectory()
             nulfile = os.path.join(cwd, "NUL")
             if os.path.isfile(nulfile):
-                os.symlink(os.path.relpath(nulfile, os.path.dirname(self.outFile)), self.outFile)
+                os.rename(nulfile, self.outFile)
             else:
                 self.error("EDPluginExecDatGnomv1_0 did not produce output file %s as expected !" % self.outFile)
                 self.setFailure()
                 self.dataOutput = XSDataResultDatGnom()
-            return
+                return
 
         gnom = XSDataGnom(gnomFile=XSDataFile(XSDataString(self.outFile)))
         logfile = os.path.join(self.getWorkingDirectory(), self.getScriptLogFileName())
