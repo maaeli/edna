@@ -83,7 +83,7 @@ class EDPluginExecDatGnomv1_0(EDPluginExecProcessScript):
             cwd = self.getWorkingDirectory()
             nulfile = os.path.join(cwd, "NUL")
             if os.path.isfile(nulfile):
-                os.symlink(os.path.relpath(nulfile, cwd), self.outFile)
+                os.symlink(os.path.relpath(nulfile, os.path.dirname(self.outFile)), self.outFile)
             else:
                 self.error("EDPluginExecDatGnomv1_0 did not produce output file %s as expected !" % self.outFile)
                 self.setFailure()
@@ -108,7 +108,7 @@ class EDPluginExecDatGnomv1_0(EDPluginExecProcessScript):
         self.dataOutput.status = XSDataStatus(message=self.getXSDataMessage())
 
     def generateCommandLineOptions(self):
-        lstArg = [self.datFile, "-o", os.path.basename(self.outFile)]
+        lstArg = [self.datFile, "-o", self.outFile]
         if self.rg:
             lstArg += ["-r", str(self.rg)]
         if self.skip and self.skip > 0:
