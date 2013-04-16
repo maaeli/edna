@@ -29,6 +29,7 @@ __license__ = "GPLv3+"
 __copyright__ = "2010 DLS; 2013 ESRF"
 
 import os
+import parse_atsas
 from EDPluginExecProcessScript import EDPluginExecProcessScript
 from XSDataEdnaSaxs import XSDataInputDamfilt, XSDataSaxsModel, XSDataResultDamfilt
 from XSDataCommon import XSDataFile, XSDataString, XSDataMessage, XSDataStatus
@@ -64,10 +65,6 @@ class EDPluginExecDamfiltv0_2(EDPluginExecProcessScript):
         self.generateDamfiltScript()
 
 
-    def process(self, _edObject=None):
-        EDPluginExecProcessScript.process(self)
-        self.DEBUG("EDPluginExecDamfiltv0_2.process")
-
 
     def postProcess(self, _edObject=None):
         EDPluginExecProcessScript.postProcess(self)
@@ -75,8 +72,15 @@ class EDPluginExecDamfiltv0_2(EDPluginExecProcessScript):
 
         xsDataResult = XSDataResultDamfilt()
 
-        pathOutputFile = XSDataString(os.path.join(self.getWorkingDirectory(), self.__strOutputPdbFileName))
-        xsDataResult.setOutputPdbFile(XSDataFile(pathOutputFile))
+        pathOutputFile = os.path.join(self.getWorkingDirectory(), self.__strOutputPdbFileName)
+        if os.path.exists(pathOutputFile):
+            xsDataResult.model = XSDataSaxsModel(name=XSDataString("damfilt"))
+            xsDataResult.outputPdbFile = xsDataResult.model.pdbFile = XSDataFile(XSDataString(pathOutputFile))
+            res = parse_atsas.parsePDB(pathOutputFile)
+            if "volume" in res:
+                xsDataResult.model.volume = XSDataDouble(res["volume"])
+            if "Dmax" in res:
+                xsDataResult.model.dmax = XSDataDouble(res["Dmax"])
         xsDataResult.status = XSDataStatus(message=self.getXSDataMessage(),
                                           executiveSummary=XSDataString(os.linesep.join(self.getListExecutiveSummaryLines())))
         self.setDataOutput(xsDataResult)

@@ -34,7 +34,7 @@ from math import pi, cos, sin
 
 from EDPluginExecProcessScript import EDPluginExecProcessScript
 from XSDataEdnaSaxs import XSDataInputSupcomb, XSDataResultSupcomb, XSDataSaxsModel
-from XSDataCommon import XSDataString, XSDataFile, XSDataDouble, XSDataRotation, XSDataVectorDouble, XSDataMessage
+from XSDataCommon import XSDataString, XSDataFile, XSDataDouble, XSDataRotation, XSDataVectorDouble, XSDataMessage, XSDataStatus
 from EDFactoryPlugin import edFactoryPlugin
 import parse_atsas
 

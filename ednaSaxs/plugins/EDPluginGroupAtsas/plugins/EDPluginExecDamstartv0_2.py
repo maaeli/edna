@@ -32,7 +32,7 @@ __copyright__ = "2010 DLS; 2013 ESRF"
 import os
 from EDVerbose import EDVerbose
 from EDPluginExecProcessScript import EDPluginExecProcessScript
-from XSDataEdnaSaxs import XSDataInputDamstart, XSDataSaxsModel, XSDataResultDamstart
+from XSDataEdnaSaxs import XSDataInputDamstart, XSDataSaxsModel, XSDataResultDamstart, XSDataSaxsModel
 from XSDataCommon import XSDataFile, XSDataString, XSDataStatus, XSDataMessage
 
 
@@ -74,11 +74,10 @@ class EDPluginExecDamstartv0_2(EDPluginExecProcessScript):
     def postProcess(self, _edObject=None):
         EDPluginExecProcessScript.postProcess(self)
         self.DEBUG("EDPluginExecDamstartv0_2.postProcess")
+        model = XSDataSaxsModel(name=XSDataString("damstart"))
+        xsDataResult = XSDataResultDamstart(model=model)
 
-        xsDataResult = XSDataResultDamstart()
-
-        pathOutputFile = XSDataString(os.path.join(self.getWorkingDirectory(), self.__strOutputPdbFileName))
-        xsDataResult.setOutputPdbFile(XSDataFile(pathOutputFile))
+        xsDataResult.outputPdbFile = model.pdbFile = XSDataFile(XSDataString(os.path.join(self.getWorkingDirectory(), self.__strOutputPdbFileName)))
         xsDataResult.status = XSDataStatus(message=self.getXSDataMessage(),
                                           executiveSummary=XSDataString(os.linesep.join(self.getListExecutiveSummaryLines())))
         self.setDataOutput(xsDataResult)
@@ -94,5 +93,5 @@ class EDPluginExecDamstartv0_2(EDPluginExecProcessScript):
         self.addListCommandExecution(commandString)
         #self.setScriptCommandline(self.__strInputPdbFileName)
 
-    def generateExecutiveSummary(self, __edPlugin=None):
-            self.addExecutiveSummaryLine(self.readProcessLogFile())
+#    def generateExecutiveSummary(self, __edPlugin=None):
+#            self.addExecutiveSummaryLine(self.readProcessLogFile())

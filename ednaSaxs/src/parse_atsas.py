@@ -96,6 +96,8 @@ def parsePDB(pdbFile=None, outPDB=None):
     @param outPDB: Optional pdb file to be written with sanitized comments
     """
     res = {}
+    atomic_volume = 0
+    nr_atoms = 0
     if not pdbFile or not os.path.exists(pdbFile):
         raise(RuntimeError("In parse PDB: file %s does not exist" % pdbFile))
     if outPDB is None:
@@ -103,6 +105,7 @@ def parsePDB(pdbFile=None, outPDB=None):
     else:
          pdb_content = filterPDBFile(pdbFile, outPDB)
     for line in pdb_content:
+        if line.startswith("REMARK"):
             if line.startswith("REMARK 265"):
                 if "Final R-factor" in line:
                     res["Rfactor"] = float(line.split(":")[-1])
@@ -112,6 +115,8 @@ def parsePDB(pdbFile=None, outPDB=None):
                     res["Rg"] = float(line.split(":")[-1])
                 elif "Maximum phase diameter" in line:
                     res["Dmax"] = float(line.split(":")[-1])
-            if not line.startswith("REMARK"):
-                break
+            elif "Excluded volume" in line:
+                res["volume"] = float(line.split(":")[-1])
+            elif "Radius of the coordination sphere" in line:
+                res["Dmax"] = float(line.split(":")[-1]) * 2
     return res
