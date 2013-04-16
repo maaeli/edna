@@ -120,6 +120,6 @@
 		"mode": "fast"
     },
     "EDPluginControlSaxsAnalysisModelingv1_0": {
-    timeOut": 1000,
+    "timeOut": 1000
     }
 }
