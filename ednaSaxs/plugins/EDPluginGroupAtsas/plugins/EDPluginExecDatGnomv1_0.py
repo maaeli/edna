@@ -32,7 +32,7 @@ __status__ = "Development"
 import os
 from EDPluginExecProcessScript import EDPluginExecProcessScript
 from XSDataEdnaSaxs import XSDataInputDatGnom, XSDataResultDatGnom, XSDataGnom
-from XSDataCommon import XSDataString, XSDataDouble, XSDataFile, XSDataLength
+from XSDataCommon import XSDataString, XSDataDouble, XSDataFile, XSDataLength, XSDataStatus
 
 class EDPluginExecDatGnomv1_0(EDPluginExecProcessScript):
     """
@@ -79,6 +79,9 @@ class EDPluginExecDatGnomv1_0(EDPluginExecProcessScript):
         self.DEBUG("EDPluginExecDatGnomv1_0.postProcess")
         # Create some output data
         if not os.path.isfile(self.outFile):
+            if os.path.isfile("NUL"):
+                #Bug when the filename is too long
+                os.symlink("NULL", self.outFile)
             self.error("EDPluginExecDatGnomv1_0 did not produce output file %s as expected !" % self.outFile)
             self.setFailure()
             self.dataOutput = XSDataResultDatGnom()
@@ -99,9 +102,10 @@ class EDPluginExecDatGnomv1_0(EDPluginExecProcessScript):
                 self.error("EDPluginExecDatGnomv1_0.postProcess No key %s in file %s" % (key, logfile))
                 self.setFailure()
         self.dataOutput = XSDataResultDatGnom(gnom=gnom)
+        self.dataOutput.status = XSDataStatus(message=self.getXSDataMessage())
 
     def generateCommandLineOptions(self):
-        lstArg = [self.datFile, "-o", self.outFile]
+        lstArg = [self.datFile, "-o", os.path.basename(self.outFile)]
         if self.rg:
             lstArg += ["-r", str(self.rg)]
         if self.skip and self.skip > 0:
