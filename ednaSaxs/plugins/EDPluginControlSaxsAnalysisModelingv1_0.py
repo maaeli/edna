@@ -146,7 +146,6 @@ Volume  =    %12.2f""" % (self.xVolume.value)
         self.xsDataResult.autoRg = self.autoRg
         self.xsDataResult.gnom = self.gnom
         self.xsDataResult.volume = self.xVolume
-        self.xsDataResult.status = XSDataStatus(executiveSummary=XSDataString(strLog))
         self.xsDataResult.status = XSDataStatus(message=self.getXSDataMessage(),
                                           executiveSummary=XSDataString(os.linesep.join(self.getListExecutiveSummaryLines())))
 
@@ -162,6 +161,11 @@ Volume  =    %12.2f""" % (self.xVolume.value)
             self.gnom = _edPlugin.dataOutput.gnom
             self.gnomFile = self.gnom.gnomFile.path.value
             self.xVolume = _edPlugin.dataOutput.volume
+            self.xsDataResult.scatterPlot= _edPlugin.dataOutput.scatterPlot
+            self.xsDataResult.guinierPlot= _edPlugin.dataOutput.guinierPlot
+            self.xsDataResult.kratkyPlot= _edPlugin.dataOutput.kratkyPlot
+            self.xsDataResult.densityPlot=_edPlugin.dataOutput.densityPlot
+
         except Exception as error:
             self.ERROR("Error in doSuccessAnalysis: %s" % error)
 
@@ -176,6 +180,22 @@ Volume  =    %12.2f""" % (self.xVolume.value)
         self.DEBUG("EDPluginControlSaxsAnalysisModelingv1_0.doSuccessModeling")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsAnalysisModelingv1_0.doSuccessModeling")
         self.retrieveMessages(_edPlugin)
+        try:    
+            self.xsDataResult.dammifModels = _edPlugin.dataOutput.dammifModels
+            self.xsDataResult.damaverModel = _edPlugin.dataOutput.damaverModel
+            self.xsDataResult.damfiltModel = _edPlugin.dataOutput.damfiltModel
+            self.xsDataResult.damstartModel = _edPlugin.dataOutput.damstartModel
+            self.xsDataResult.damminModel = _edPlugin.dataOutput.damminModel
+            self.xsDataResult.chiRfactorPlot = _edPlugin.dataOutput.chiRfactorPlot
+            self.xsDataResult.nsdPlot = _edPlugin.dataOutput.nsdPlot
+
+            self.xsDataResult.fitFile = _edPlugin.dataOutput.fitFile
+            self.xsDataResult.logFile = _edPlugin.dataOutput.logFile
+            self.xsDataResult.pdbMoleculeFile = _edPlugin.dataOutput.pdbMoleculeFile
+            self.xsDataResult.pdbSolventFile = _edPlugin.dataOutput.pdbSolventFile
+
+        except Exception as error:
+            self.ERROR("Error in doSuccessModeling: %s" % error)
 
     def doFailureModeling(self, _edPlugin=None):
         self.DEBUG("EDPluginControlSaxsAnalysisModelingv1_0.doFailureModeling")
