@@ -79,12 +79,15 @@ class EDPluginExecDatGnomv1_0(EDPluginExecProcessScript):
         self.DEBUG("EDPluginExecDatGnomv1_0.postProcess")
         # Create some output data
         if not os.path.isfile(self.outFile):
-            if os.path.isfile("NUL"):
-                #Bug when the filename is too long
-                os.symlink("NULL", self.outFile)
-            self.error("EDPluginExecDatGnomv1_0 did not produce output file %s as expected !" % self.outFile)
-            self.setFailure()
-            self.dataOutput = XSDataResultDatGnom()
+            #Bug when the filename is too long:os.symlink("NULL", self.outFile)
+            cwd = self.getWorkingDirectory()
+            nulfile = os.path.join(cwd, "NUL")
+            if os.path.isfile(nulfile):
+                os.symlink(os.path.relpath(nulfile, cwd), self.outFile)
+            else:
+                self.error("EDPluginExecDatGnomv1_0 did not produce output file %s as expected !" % self.outFile)
+                self.setFailure()
+                self.dataOutput = XSDataResultDatGnom()
             return
 
         gnom = XSDataGnom(gnomFile=XSDataFile(XSDataString(self.outFile)))
