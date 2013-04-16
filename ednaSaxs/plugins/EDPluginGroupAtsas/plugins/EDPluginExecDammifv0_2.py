@@ -200,7 +200,7 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
         # Dammif doesn't accept file names longer than 64 characters.
         # Using symlink to work around this issue
         tmpInputFileName = self.dataInput.gnomOutputFile.path.value
-        os.symlink(tmpInputFileName, os.path.join(self.getWorkingDirectory(), "dammif.out"))
+        self.symlink(tmpInputFileName, "dammif.out")
 
         commandLine = ['--mode', self.mode, \
                        '--unit', self.unit, \
@@ -230,3 +230,12 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
         tmpRg = "Rg = %s" % self.Rg
         tmpStrLine = "\t".join([tmpDammif, tmpChiSqrt, tmpRFactor, tmpVolume, tmpDmax, tmpRg])
         self.addExecutiveSummaryLine(tmpStrLine)
+
+    def symlink(self, filen, link):
+        """
+        Create a symlink to CWD with relative path
+        """
+        src = os.path.abspath(filen)
+        cwd = self.getWorkingDirectory()
+        dest = os.path.join(cwd, link)
+        os.symlink(os.path.relpath(src, cwd), dest)

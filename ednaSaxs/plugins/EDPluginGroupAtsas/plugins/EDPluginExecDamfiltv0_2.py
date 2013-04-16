@@ -89,12 +89,21 @@ class EDPluginExecDamfiltv0_2(EDPluginExecProcessScript):
         self.DEBUG("EDPluginExecDamfiltv0_2.generateDamfiltScript")
 
         _tmpInputFileName = self.dataInput.getInputPdbFile().path.value
-        os.symlink(_tmpInputFileName, os.path.join(self.getWorkingDirectory(), self.__strInputPdbFileName))
+        self.symlink(_tmpInputFileName, self.__strInputPdbFileName)
 
         self.setScriptCommandline("")
         commandString = 'input.pdb' + '\n' * 5
         self.addListCommandExecution(commandString)
         #self.setScriptCommandline(self.__strInputPdbFileName)
 
-    def generateExecutiveSummary(self, __edPlugin=None):
-            self.addExecutiveSummaryLine(self.readProcessLogFile())
+#    def generateExecutiveSummary(self, __edPlugin=None):
+#            self.addExecutiveSummaryLine(self.readProcessLogFile())
+
+    def symlink(self, filen, link):
+        """
+        Create a symlink to CWD with relative path
+        """
+        src = os.path.abspath(filen)
+        cwd = self.getWorkingDirectory()
+        dest = os.path.join(cwd, link)
+        os.symlink(os.path.relpath(src, cwd), dest)

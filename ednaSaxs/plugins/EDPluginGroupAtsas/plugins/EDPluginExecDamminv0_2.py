@@ -105,7 +105,7 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
         elif self.dataInput.pdbInputFile:
             try:
                 tmpInputFileName = self.dataInput.pdbInputFile.path.value
-                os.symlink(tmpInputFileName, os.path.join(self.getWorkingDirectory(), "input.pdb"))
+                self.symlink(tmpInputFileName, "input.pdb")
                 self.__strDAM = 'input.pdb'
             except Exception as error:
                 self.ERROR("Dummy atom model PDB file not specified. Using default model: %s" % error)
@@ -138,32 +138,82 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
         EDPluginExecProcessScript.postProcess(self)
         self.DEBUG("EDPluginExecDamminv0_2.postProcess")
         # Create some output data
+        cwd = self.getWorkingDirectory()
+        model = XSDataSaxsModel(name=XSDataString("dammin"))
 
-        pathLogFile = XSDataString(os.path.join(self.getWorkingDirectory(), "dammin.log"))
-        pathFitFile = XSDataString(os.path.join(self.getWorkingDirectory(), "dammin.fit"))
-        pathMoleculeFile = XSDataString(os.path.join(self.getWorkingDirectory(), "dammin-1.pdb"))
-        pathSolventFile = XSDataString(os.path.join(self.getWorkingDirectory(), "dammin-0.pdb"))
+        xsDataResult = XSDataResultDammif(model=model)
+        pathLogFile = os.path.join(cwd, "dammin.log")
+        pathFitFile = os.path.join(cwd, "dammin.fit")
+        pathFirFile = os.path.join(cwd, "dammin.fir")
+        pathMoleculeFile = os.path.join(cwd, "dammin-1.pdb")
+        pathSolventFile = os.path.join(cwd, "dammin-0.pdb")
 
-        xsLogFile = XSDataFile(pathLogFile)
-        xsFitFile = XSDataFile(pathFitFile)
-        xsMoleculeFile = XSDataFile(pathMoleculeFile)
-        xsSolventFile = XSDataFile(pathSolventFile)
+        try:
+            res = parse_atsas.parsePDB(pathMoleculeFile)
+        except Exception as error:
+            self.ERROR("EDPluginExecDamminv0_2:parsePDB: %s" % error)
+        else:
+            for k in res:
+                self.__setattr__(k, res[k])
 
-        xsDataResult = XSDataResultDammin()
-        if os.path.exists(pathLogFile.value):
-            xsDataResult.setLogFile(xsLogFile)
-        if os.path.exists(pathFitFile.value):
-            xsDataResult.setFitFile(xsFitFile)
-        if os.path.exists(pathMoleculeFile.value):
-            xsDataResult.setPdbMoleculeFile(xsMoleculeFile)
-        if os.path.exists(pathSolventFile.value):
-            xsDataResult.setPdbSolventFile(xsSolventFile)
+        if os.path.exists(pathLogFile):
+            xsDataResult.logFile = model.logFile = XSDataFile(XSDataString(pathLogFile))
+            if self.Rfactor:
+                xsDataResult.rfactor = model.rfactor = XSDataDouble(self.Rfactor)
+        if os.path.exists(pathFitFile):
+            xsDataResult.fitFile = model.fitfile = XSDataFile(XSDataString(pathFitFile))
+        if os.path.exists(pathFirFile):
+            model.firfile = XSDataFile(XSDataString(pathFirFile))
+            xsDataResult.chiSqrt = model.chiSqrt = self.returnDammifChiSqrt()
+        if os.path.exists(pathMoleculeFile):
+            xsDataResult.pdbMoleculeFile = model.pdbFile = XSDataFile(XSDataString(pathMoleculeFile))
+        if os.path.exists(pathSolventFile):
+            xsDataResult.pdbSolventFile = XSDataFile(XSDataString(pathSolventFile))
+        if os.path.exists(pathFirFile):
+            model.firFile = XSDataFile(XSDataString(pathFirFile))
 
-        xsDataResult.setChiSqrt(self.returnDamminChiSqrt())
-        xsDataResult.setRfactor(self.returnDamminRFactor())
+        if self.volume:
+            model.volume = XSDataDouble(self.volume)
+        if self.Rg:
+            model.rg = XSDataDouble(self.Rg)
+        if self.Dmax:
+            model.dmax = XSDataDouble(self.Dmax)
+
+        self.generateExecutiveSummary()
         xsDataResult.status = XSDataStatus(message=self.getXSDataMessage(),
                                           executiveSummary=XSDataString(os.linesep.join(self.getListExecutiveSummaryLines())))
-        self.setDataOutput(xsDataResult)
+        self.dataOutput = xsDataResult
+#
+#    def postProcess(self, _edObject=None):
+#        EDPluginExecProcessScript.postProcess(self)
+#        self.DEBUG(".postProcess")
+#        # Create some output data
+#        model = XSDataSaxsModel(name=XSDataString("dammin"))
+#        pathLogFile = os.path.join(self.getWorkingDirectory(), "dammin.log")
+#        pathFitFile = os.path.join(self.getWorkingDirectory(), "dammin.fit")
+#        pathMoleculeFile = os.path.join(self.getWorkingDirectory(), "dammin-1.pdb")
+#        pathSolventFile = os.path.join(self.getWorkingDirectory(), "dammin-0.pdb")
+#
+#        xsLogFile = XSDataFile(pathLogFile)
+#        xsFitFile = XSDataFile(pathFitFile)
+#        xsMoleculeFile = XSDataFile(pathMoleculeFile)
+#        xsSolventFile = XSDataFile(pathSolventFile)
+#
+#        xsDataResult = XSDataResultDammin()
+#        if os.path.exists(pathLogFile.value):
+#            xsDataResult.setLogFile(xsLogFile)
+#        if os.path.exists(pathFitFile.value):
+#            xsDataResult.setFitFile(xsFitFile)
+#        if os.path.exists(pathMoleculeFile.value):
+#            xsDataResult.setPdbMoleculeFile(xsMoleculeFile)
+#        if os.path.exists(pathSolventFile.value):
+#            xsDataResult.setPdbSolventFile(xsSolventFile)
+#
+#        xsDataResult.setChiSqrt(self.returnDamminChiSqrt())
+#        xsDataResult.setRfactor(self.returnDamminRFactor())
+#        xsDataResult.status = XSDataStatus(message=self.getXSDataMessage(),
+#                                          executiveSummary=XSDataString(os.linesep.join(self.getListExecutiveSummaryLines())))
+#        self.setDataOutput(xsDataResult)
 
 
     def generateDamminScript(self):
@@ -172,7 +222,7 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
         # Dammin doesn't accept file names longer than 64 characters.
         # Using symlink to work around this issue
         tmpInputFileName = self.dataInput.gnomOutputFile.path.value
-        os.symlink(tmpInputFileName, os.path.join(self.getWorkingDirectory(), "dammin.out"))
+        self.symlink(tmpInputFileName, "dammin.out")
 
         self.setScriptCommandline("")
 
@@ -218,3 +268,12 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
                 tmpRfactor = float(wordsLine[1])
 
         return XSDataDouble(tmpRfactor)
+
+    def symlink(self, filen, link):
+        """
+        Create a symlink to CWD with relative path
+        """
+        src = os.path.abspath(filen)
+        cwd = self.getWorkingDirectory()
+        dest = os.path.join(cwd, link)
+        os.symlink(os.path.relpath(src, cwd), dest)

@@ -180,8 +180,8 @@ class EDPluginExecSupcombv0_2(EDPluginExecProcessScript):
             _tmpEnantiomorphs = 'No'
         else:
             _tmpEnantiomorphs = ''
-        os.symlink(_tmpTemplateFileName, os.path.join(self.getWorkingDirectory(), "template.pdb"))
-        os.symlink(_tmpSuperimposeFileName, os.path.join(self.getWorkingDirectory(), "supimpose.pdb"))
+        self.symlink(_tmpTemplateFileName, "template.pdb")
+        self.symlink(_tmpSuperimposeFileName, "supimpose.pdb")
 
         commandLine = ['template.pdb', _tmpBackbone, \
                        'supimpose.pdb', _tmpEnantiomorphs, \
@@ -248,3 +248,11 @@ class EDPluginExecSupcombv0_2(EDPluginExecProcessScript):
                                           executiveSummary=XSDataString(os.linesep.join(self.getListExecutiveSummaryLines())))
         return xsDataResult
 
+    def symlink(self, filen, link):
+        """
+        Create a symlink to CWD with relative path
+        """
+        src = os.path.abspath(filen)
+        cwd = self.getWorkingDirectory()
+        dest = os.path.join(cwd, link)
+        os.symlink(os.path.relpath(src, cwd), dest)

@@ -141,7 +141,7 @@ class EDPluginExecDamaverv0_2(EDPluginExecProcessScript):
         dataFileNames = []
         for idx, pdbInputFile in enumerate(self.dataInput.pdbInputFiles):
             tmpInputFileName = pdbInputFile.path.value
-            os.symlink(tmpInputFileName, os.path.join(self.getWorkingDirectory(), 'dammif-' + str(idx + 1) + '.pdb'))
+            self.symlink(tmpInputFileName, 'dammif-' + str(idx + 1) + '.pdb')
             dataFileNames.append('dammif-' + str(idx + 1) + '.pdb')
 
         if self.__bAutomatic:
@@ -162,3 +162,11 @@ class EDPluginExecDamaverv0_2(EDPluginExecProcessScript):
             for line in damselLog:
                 self.addExecutiveSummaryLine(line)
 
+    def symlink(self, filen, link):
+        """
+        Create a symlink to CWD with relative path
+        """
+        src = os.path.abspath(filen)
+        cwd = self.getWorkingDirectory()
+        dest = os.path.join(cwd, link)
+        os.symlink(os.path.relpath(src, cwd), dest)

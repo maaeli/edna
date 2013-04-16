@@ -194,6 +194,7 @@ complex type XSDataResultSaxsModeling extends XSDataResult{
 	dammifModels: XSDataSaxsModel [] optional
 	damaverModel: XSDataSaxsModel  optional
 	damfiltModel: XSDataSaxsModel  optional
+	damstartModel: XSDataSaxsModel  optional
 	damminModel: XSDataSaxsModel  optional
 
 	fitFile: XSDataFile
@@ -333,6 +334,9 @@ complex type XSDataResultDamaver extends XSDataResult {
 	damaverPdbFile : XSDataFile optional
 	damfilterPdbFile : XSDataFile optional
 	damstartPdbFile : XSDataFile optional
+	model: XSDataSaxsModel optional
+	damfiltModel: XSDataSaxsModel optional
+	damstartModel: XSDataSaxsModel optional
 }
 
 complex type XSDataInputDamfilt extends XSDataInput {
@@ -340,6 +344,7 @@ complex type XSDataInputDamfilt extends XSDataInput {
 }
 complex type XSDataResultDamfilt extends XSDataResult {
 	outputPdbFile : XSDataFile optional
+	model: XSDataSaxsModel optional
 }
 
 complex type XSDataInputDammif extends XSDataInput {
@@ -381,6 +386,7 @@ complex type XSDataResultDammin extends XSDataResult {
 	pdbSolventFile : XSDataFile
 	rfactor : XSDataDouble optional
 	chiSqrt : XSDataDouble optional
+	model: XSDataSaxsModel
 }
 
 complex type XSDataInputDamstart extends XSDataInput {
@@ -388,6 +394,7 @@ complex type XSDataInputDamstart extends XSDataInput {
 }
 complex type XSDataResultDamstart extends XSDataResult {
 	outputPdbFile : XSDataFile optional
+	model: XSDataSaxsModel
 }
 
 
