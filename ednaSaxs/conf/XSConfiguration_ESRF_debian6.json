@@ -118,5 +118,8 @@
     	"unit": "nanometer",
 		"symmetry": "P1",
 		"mode": "fast"
+    },
+    "EDPluginControlSaxsAnalysisModelingv1_0": {
+    timeOut": 1000,
     }
 }
