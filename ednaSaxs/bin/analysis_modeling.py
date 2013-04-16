@@ -97,7 +97,7 @@ class Reprocess(EDLogging):
                 edJob.connectSUCCESS(self.successJobExecution)
                 edJob.connectFAILURE(self.failureJobExecution)
                 edJob.execute()
-                edJob.synchronize()
+#                edJob.synchronize()
 
     def successJobExecution(self, jobId):
         self.DEBUG("In %s.successJobExecution(%s)" % (self.__class__.__name__, jobId))
@@ -189,71 +189,6 @@ class Reprocess(EDLogging):
 
 
 
-
-def getInteger(astr):
-    try:
-        j = int(astr)
-    except ValueError, error:
-        print("%s: %s is not an integer" % (error, i))
-    else:
-        return j
-
-def getRange(astr):
-    """
-    transforms a chain like "1,5-6" in [1,5,6]
-    """
-    filerange = []
-    for i in astr.split(","):
-        if "-" in i:
-            lstLim = i.split("-")
-            minv = getInteger(lstLim[0])
-            maxv = getInteger(lstLim[1])
-            if minv and maxv:
-                filerange += range(minv, maxv + 1)
-        else:
-            j = getInteger(i)
-            if j is not None:
-                filerange.append(j)
-    filerange.sort()
-    return filerange
-
-def getCommon(str1, str2):
-    """
-    return the common part of two strings
-    """
-    out = ""
-    for i, j in zip(str1, str2):
-        if i == j:
-            out += i
-        else:
-            return out
-    return out
-
-def split_name(name):
-    """
-    return a dict with:
-    dirname
-    prefix
-    run
-    frame
-    extention
-    or None if the file does not match the pattern: dir/prefix_run_frame.dat
-    """
-    try:
-        dirname, basename = os.path.split(name)
-        root, ext = os.path.splitext(basename)
-        prefix, run, frame = root.split("_", 2)
-        run = int(run)
-        frame = int(frame)
-    except Exception:
-        print("Filename %s does not match format dir/prefix_run_frame.dat" % name)
-        return
-    return {"dirname":dirname,
-          "basename":basename,
-          "prefix":prefix,
-          "run":run,
-          "frame":frame,
-          "ext":ext}
 
 if __name__ == "__main__":
     filerange = None
