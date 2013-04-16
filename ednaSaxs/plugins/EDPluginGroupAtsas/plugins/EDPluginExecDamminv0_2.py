@@ -232,7 +232,8 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
 
     def returnDamminChiSqrt(self):
         logFile = open(os.path.join(self.getWorkingDirectory(), "dammin.fir"))
-        return XSDataDouble(float(logFile.readline().split(' ')[-1]))
+        self.sqrtChi = float(logFile.readline().split(' ')[-1])
+        return XSDataDouble(self.sqrtChi)
 
     def returnDamminRFactor(self):
         logFile = open(os.path.join(self.getWorkingDirectory(), "dammin.log"))
@@ -245,6 +246,17 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
                 tmpRfactor = float(wordsLine[1])
 
         return tmpRfactor
+
+    def generateExecutiveSummary(self, __edPlugin=None):
+        tmpDammif = "Results of dammin: "
+        tmpRFactor = "RFactor = %s" % self.Rfactor
+        tmpChiSqrt = "Sqrt(Chi) = %s" % self.sqrtChi
+        tmpVolume = "Volume = %s" % self.volume
+        tmpDmax = "Dmax = %s" % self.Dmax
+        tmpRg = "Rg = %s" % self.Rg
+        tmpStrLine = "\t".join([tmpDammif, tmpChiSqrt, tmpRFactor, tmpVolume, tmpDmax, tmpRg])
+        self.addExecutiveSummaryLine(tmpStrLine)
+
 
     def symlink(self, filen, link):
         """

@@ -183,13 +183,13 @@ complex type XSDataResultSaxsAnalysis extends XSDataResult{
 }
 
 complex type XSDataInputSaxsModeling extends XSDataInput{
-	"Damif -> Supcomb -> Damaver -> Damfilt -> Damstart pipeline"
+	"Dammif -> Supcomb -> Damaver -> Damfilt -> Damstart -> Dammin pipeline"
 	gnomFile: XSDataFile
 	graphFormat: XSDataString optional
 }
 
 complex type XSDataResultSaxsModeling extends XSDataResult{
-	"Damif -> Supcomb -> Damaver -> Damfilt -> Damstart pipeline"
+	"Dammif -> Supcomb -> Damaver -> Damfilt -> Damstart -> Dammin pipeline"
 
 	dammifModels: XSDataSaxsModel [] optional
 	damaverModel: XSDataSaxsModel  optional
@@ -202,6 +202,8 @@ complex type XSDataResultSaxsModeling extends XSDataResult{
 	pdbMoleculeFile: XSDataFile
 	pdbSolventFile: XSDataFile
 
+	chiRfactorPlot: XSDataFile
+	nsdPlot: XSDataFile
 //	corelationFitValues: XSDataDouble [] optional
 //	lineProfileFitQuality: XSDataDouble
 //	scatteringFitQ: XSDataDouble [] optional
@@ -211,6 +213,41 @@ complex type XSDataResultSaxsModeling extends XSDataResult{
 //	meanNSD: XSDataDouble optional
 //	variationNSD: XSDataDouble optional
 }
+
+complex type XSDataInputSaxsAnalysisModeling extends XSDataInput{
+	"AutoRg -> Gnom -> Prod -> Dammif -> Supcomb -> Damaver -> Damfilt -> Damstart -> Dammin pipeline"
+	scatterCurve: XSDataFile
+	autoRg: XSDataAutoRg optional
+	gnomFile: XSDataFile optional
+	graphFormat: XSDataString optional
+}
+
+complex type XSDataResultSaxsAnalysisModeling extends XSDataResult{
+	"AutoRg -> Gnom -> Prod -> Dammif -> Supcomb -> Damaver -> Damfilt -> Damstart -> Dammin pipeline"
+
+	autoRg: XSDataAutoRg
+	gnom: XSDataGnom
+	volume: XSDataDoubleWithUnit
+	scatterPlot: XSDataFile optional
+	guinierPlot: XSDataFile optional
+	kratkyPlot: XSDataFile optional
+	densityPlot: XSDataFile optional
+
+	dammifModels: XSDataSaxsModel [] optional
+	damaverModel: XSDataSaxsModel  optional
+	damfiltModel: XSDataSaxsModel  optional
+	damstartModel: XSDataSaxsModel  optional
+	damminModel: XSDataSaxsModel  optional
+
+	chiRfactorPlot: XSDataFile
+	nsdPlot: XSDataFile
+
+	fitFile: XSDataFile
+	logFile: XSDataFile
+	pdbMoleculeFile: XSDataFile
+	pdbSolventFile: XSDataFile
+}
+
 
 
 complex type XSDataFileSeries extends XSData {

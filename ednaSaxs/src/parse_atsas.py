@@ -119,4 +119,10 @@ def parsePDB(pdbFile=None, outPDB=None):
                 res["volume"] = float(line.split(":")[-1])
             elif "Radius of the coordination sphere" in line:
                 res["Dmax"] = float(line.split(":")[-1]) * 2
+            elif "Rf:" in line:
+                res["Rfactor"] = float(line.split(":")[1].split()[0])
+            elif "Radius of gyration" in line:
+                res["Rg"] = float(line.split(":")[-1])
+            elif "Maximum diameter"  in line:
+                res["Dmax"] = float(line.split(":")[-1])
     return res
