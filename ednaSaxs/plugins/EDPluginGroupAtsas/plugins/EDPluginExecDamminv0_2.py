@@ -33,7 +33,7 @@ import os
 from EDPluginExecProcessScript import EDPluginExecProcessScript
 from XSDataEdnaSaxs import XSDataInputDammin, XSDataResultDammin, XSDataSaxsModel
 from XSDataCommon import XSDataString, XSDataFile, XSDataDouble, XSDataMessage, XSDataStatus
-
+import parse_atsas
 
 class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
     """
@@ -60,6 +60,11 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
         self.__strDAM = ''
         self.__strSymmetry = 'P1'
         self.__strParticleShape = ''
+        self.Rfactor = None
+        self.sqrtChi = None
+        self.volume = None
+        self.Rg = None
+        self.Dmax = None
 
     def checkParameters(self):
         """
@@ -120,6 +125,7 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
             except Exception as error:
                 self.ERROR("Using Unknown particle shape: %s" % error)
 
+
     def preProcess(self, _edObject=None):
         EDPluginExecProcessScript.preProcess(self)
         self.DEBUG("EDPluginExecDamminv0_2.preProcess")
@@ -141,7 +147,7 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
         cwd = self.getWorkingDirectory()
         model = XSDataSaxsModel(name=XSDataString("dammin"))
 
-        xsDataResult = XSDataResultDammif(model=model)
+        xsDataResult = XSDataResultDammin(model=model)
         pathLogFile = os.path.join(cwd, "dammin.log")
         pathFitFile = os.path.join(cwd, "dammin.fit")
         pathFirFile = os.path.join(cwd, "dammin.fir")
@@ -158,13 +164,15 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
 
         if os.path.exists(pathLogFile):
             xsDataResult.logFile = model.logFile = XSDataFile(XSDataString(pathLogFile))
+            if not  self.Rfactor:
+                self.Rfactor = self.returnDamminRFactor()
             if self.Rfactor:
                 xsDataResult.rfactor = model.rfactor = XSDataDouble(self.Rfactor)
         if os.path.exists(pathFitFile):
             xsDataResult.fitFile = model.fitfile = XSDataFile(XSDataString(pathFitFile))
         if os.path.exists(pathFirFile):
             model.firfile = XSDataFile(XSDataString(pathFirFile))
-            xsDataResult.chiSqrt = model.chiSqrt = self.returnDammifChiSqrt()
+            xsDataResult.chiSqrt = model.chiSqrt = self.returnDamminChiSqrt()
         if os.path.exists(pathMoleculeFile):
             xsDataResult.pdbMoleculeFile = model.pdbFile = XSDataFile(XSDataString(pathMoleculeFile))
         if os.path.exists(pathSolventFile):
@@ -183,37 +191,6 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
         xsDataResult.status = XSDataStatus(message=self.getXSDataMessage(),
                                           executiveSummary=XSDataString(os.linesep.join(self.getListExecutiveSummaryLines())))
         self.dataOutput = xsDataResult
-#
-#    def postProcess(self, _edObject=None):
-#        EDPluginExecProcessScript.postProcess(self)
-#        self.DEBUG(".postProcess")
-#        # Create some output data
-#        model = XSDataSaxsModel(name=XSDataString("dammin"))
-#        pathLogFile = os.path.join(self.getWorkingDirectory(), "dammin.log")
-#        pathFitFile = os.path.join(self.getWorkingDirectory(), "dammin.fit")
-#        pathMoleculeFile = os.path.join(self.getWorkingDirectory(), "dammin-1.pdb")
-#        pathSolventFile = os.path.join(self.getWorkingDirectory(), "dammin-0.pdb")
-#
-#        xsLogFile = XSDataFile(pathLogFile)
-#        xsFitFile = XSDataFile(pathFitFile)
-#        xsMoleculeFile = XSDataFile(pathMoleculeFile)
-#        xsSolventFile = XSDataFile(pathSolventFile)
-#
-#        xsDataResult = XSDataResultDammin()
-#        if os.path.exists(pathLogFile.value):
-#            xsDataResult.setLogFile(xsLogFile)
-#        if os.path.exists(pathFitFile.value):
-#            xsDataResult.setFitFile(xsFitFile)
-#        if os.path.exists(pathMoleculeFile.value):
-#            xsDataResult.setPdbMoleculeFile(xsMoleculeFile)
-#        if os.path.exists(pathSolventFile.value):
-#            xsDataResult.setPdbSolventFile(xsSolventFile)
-#
-#        xsDataResult.setChiSqrt(self.returnDamminChiSqrt())
-#        xsDataResult.setRfactor(self.returnDamminRFactor())
-#        xsDataResult.status = XSDataStatus(message=self.getXSDataMessage(),
-#                                          executiveSummary=XSDataString(os.linesep.join(self.getListExecutiveSummaryLines())))
-#        self.setDataOutput(xsDataResult)
 
 
     def generateDamminScript(self):
@@ -238,7 +215,7 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
 
         commandString += self.__strParticleShape
         commandString.extend(5 * [''])                  # Just in case there are more default settings
-        print commandString
+#        print commandString
         self.addListCommandExecution('\n'.join(commandString))
 
 
@@ -267,7 +244,7 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
             if wordsLine[0] == "Rf:":
                 tmpRfactor = float(wordsLine[1])
 
-        return XSDataDouble(tmpRfactor)
+        return tmpRfactor
 
     def symlink(self, filen, link):
         """

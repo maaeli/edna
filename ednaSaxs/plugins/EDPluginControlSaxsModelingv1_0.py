@@ -217,7 +217,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
                 model = self.supcomb_plugins[(self.ref, i)].dataOutput.model
                 model.chiSqrt = self.dammif_plugins[i].dataOutput.model.chiSqrt
 #                model.chiSqrt =  self.dammif_plugins[i].dataOutput.model.chiSqrt
-            os.symlink(model.pdbFile.path.value, os.path.join(self.getWorkingDirectory(), "model-%02i.pdb" % (i + 1)))
+            self.symlink(model.pdbFile.path.value, "model-%02i.pdb" % (i + 1))
             self.result.dammifModels[i] = model
 
 
@@ -328,7 +328,11 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.DEBUG("EDPluginControlSaxsModelingv1_0.doSuccessExecDamaver")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doSuccessExecDamaver")
         self.retrieveMessages(_edPlugin)
-
+        try:
+            self.result.damaverModel = _edPlugin.dataOutput.model
+            self.symlink(_edPlugin.dataOutput.model.pdbFile.path.value, _edPlugin.dataOutput.model.name.value + ".pdb")
+        except Exception as error:
+            self.ERROR("Error in doSuccessExecDamaver: %s" % error)
 
     def doFailureExecDamaver(self, _edPlugin=None):
         self.DEBUG("EDPluginControlSaxsModelingv1_0.doFailureExecDamaver")
@@ -341,12 +345,18 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.DEBUG("EDPluginControlSaxsModelingv1_0.doSuccessExecDamfilt")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doSuccessExecDamfilt")
         self.retrieveMessages(_edPlugin)
+        try:
+            self.result.damfiltModel = _edPlugin.dataOutput.model
+            self.symlink(_edPlugin.dataOutput.model.pdbFile.path.value, _edPlugin.dataOutput.model.name.value + ".pdb")
+        except Exception as error:
+            self.ERROR("Error in doSuccessExecDamfilt: %s" % error)
+
 
 
     def doFailureExecDamfilt(self, _edPlugin=None):
         self.DEBUG("EDPluginControlSaxsModelingv1_0.doFailureExecDamfilt")
         self.retrieveMessages(_edPlugin)
-        self.retrieveFailureMessages(self.__edPluginExecDamfilt, "EDPluginControlSaxsModelingv1_0.doFailureExecDamfilt")
+        self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureExecDamfilt")
         self.setFailure()
 
 
@@ -354,6 +364,11 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.DEBUG("EDPluginControlSaxsModelingv1_0.doSuccessExecDamstart")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doSuccessExecDamstart")
         self.retrieveMessages(_edPlugin)
+        try:
+            self.result.damstartModel = _edPlugin.dataOutput.model
+            self.symlink(_edPlugin.dataOutput.model.pdbFile.path.value, _edPlugin.dataOutput.model.name.value + ".pdb")
+        except Exception as error:
+            self.ERROR("Error in doSuccessExecDamstart: %s" % error)
 
 
     def doFailureExecDamstart(self, _edPlugin=None):
@@ -372,6 +387,8 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
             self.result.pdbSolventFile = _edPlugin.dataOutput.pdbSolventFile
             self.result.fitFile = _edPlugin.dataOutput.fitFile
             self.result.logFile = _edPlugin.dataOutput.logFile
+            self.result.damminModel = _edPlugin.dataOutput.model
+            self.symlink(_edPlugin.dataOutput.model.pdbFile.path.value, _edPlugin.dataOutput.model.name.value + ".pdb")
         except Exception as error:
             self.ERROR("Error in doSuccessExecDammin: %s" % error)
 
@@ -392,6 +409,16 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         fitResultList.sort()
 
         return fitResultDict[fitResultList[0]]
+
+    def symlink(self, filen, link):
+        """
+        Create a symlink to CWD with relative path
+        """
+        src = os.path.abspath(filen)
+        cwd = self.getWorkingDirectory()
+        dest = os.path.join(cwd, link)
+        os.symlink(os.path.relpath(src, cwd), dest)
+
 
     def chi2plot(self, filename=None, close=True):
 
@@ -419,7 +446,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
 #        fig.set_title("Selection of dammif models based on \u03C7$^2$")
         self.valid = (chi2 < chi2max) * (R < Rmax)
         self.mask2d = (1 - numpy.identity(self.dammif_jobs)) * numpy.outer(self.valid, self.valid)
-        print self.valid
+#        print self.valid
         bbox_props = dict(fc="pink", ec="r", lw=1)
         for i in range(self.dammif_jobs):
             if not self.valid[i]:
@@ -427,7 +454,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
                 ax2.text(i + 0.95, Rmax / 2, "Discarded", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)
         if filename:
             filename = os.path.join(self.getWorkingDirectory(), filename)
-            self.WARNING("Wrote %s" % filename)
+            self.log("Wrote %s" % filename)
             fig.savefig(filename)
         if close:
             fig.clf()
@@ -453,16 +480,16 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
             ax1.text(i0, i1, "%.2f" % nsd, ha="center", va="center", size=12 * 8 // self.dammif_jobs)
             ax1.text(i1, i0, "%.2f" % nsd, ha="center", va="center", size=12 * 8 // self.dammif_jobs)
         lnsd = numpy.array(lnsd)
-        print lnsd
-        print lnsd.mean() , lnsd.std(), lnsd.mean() + 2 * lnsd.std()
+#        print lnsd
+#        print lnsd.mean() , lnsd.std(), lnsd.mean() + 2 * lnsd.std()
         nsd_max = lnsd.mean() + lnsd.std()
         data = self.arrayNSD.sum(axis= -1) / self.mask2d.sum(axis= -1)
         best_val = data[data > 0].min()
-        print data
-        print best_val
-        print numpy.where(data == best_val)
+#        print data
+#        print best_val
+#        print numpy.where(data == best_val)
         self.ref = int(numpy.where(data == best_val)[0][-1])
-        print self.ref
+#        print self.ref
         ax1.imshow(self.arrayNSD, interpolation="nearest", origin="upper")
         ax1.set_title(u"NSD correlation table")
         ax1.set_xticks(range(self.dammif_jobs))
@@ -488,11 +515,11 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         for i in range(self.dammif_jobs):
             if not self.valid[i]:
                 ax2.text(i + 0.95, data[self.ref] / 2, "Discarded", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)
-        print self.valid
-        print self.ref
+#        print self.valid
+#        print self.ref
         if filename:
             filename = os.path.join(self.getWorkingDirectory(), filename)
-            self.WARNING("Wrote %s" % filename)
+            self.log("Wrote %s" % filename)
             fig.savefig(filename)
         if close:
             fig.clf()
