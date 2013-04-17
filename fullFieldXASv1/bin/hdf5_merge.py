@@ -75,6 +75,7 @@ class MergeFFX(object):
         self.offsets_security = None
         self.offsets = {}
         self._shape = None
+        self.ln = logarithm
         
         if crop_region:
             self.get_offsets()
@@ -92,9 +93,10 @@ class MergeFFX(object):
             self._crop_region = (slice(start1, stop1), slice(start2, stop2))
             self.dim1 = stop1 - start1
             self.dim2 = stop2 - start2
-        self.ln = logarithm
-        self.dim1 = None
-        self.dim2 = None
+        else:
+            self._crop_region = None
+            self.dim1 = None
+            self.dim2 = None
 
 
     def validateInputs(self, inputs):
@@ -143,6 +145,10 @@ class MergeFFX(object):
         """
         Create an HDF5 file with extra option to optimize cache writing
         """
+        #ensure the file exists
+        if not os.path.isfile(filename):
+            h5py.File(filename).close()
+
         propfaid = h5py.h5p.create(h5py.h5p.FILE_ACCESS)
         cache_settings = list(propfaid.get_cache())
         if not size:
@@ -151,7 +157,7 @@ class MergeFFX(object):
             cache_settings[2] = int(size)
         if policy is not None:
             cache_settings[3] = float(policy)
-        propfaid.set_cache(*settings)
+        propfaid.set_cache(*cache_settings)
         fid = h5py.h5f.open(filename, fapl=propfaid)
         self.h5file = h5py.File(fid)
 
@@ -275,7 +281,8 @@ class MergeFFX(object):
 
 
     def merge_dataset(self):
-        print('Crop region: [%i:%i, %i:%i] ' % (self.crop_region[0].start, self.crop_region[0].stop,
+        print self.crop_region
+        print('Crop region: [%s:%s, %s:%s] ' % (self.crop_region[0].start, self.crop_region[0].stop,
                                                self.crop_region[1].start, self.crop_region[1].stop))
         ds = self.h5grp[self.STACK]
         logger.debug("Output dataset shape: (%i,%i,%i)" % ds.shape)
@@ -391,7 +398,7 @@ if __name__ == "__main__":
     print(" ")
     if options.debug:
         logger.setLevel(level=logging.DEBUG)
-    mfx = MergeFFX(args, options.h5path, crop=options.crop, check=options.recheck, normalize=options.normalize, logarithm=options.ln)
+    mfx = MergeFFX(args, options.h5path, crop=options.autocrop, check=options.recheck, normalize=options.normalize, logarithm=options.ln, crop_region=options.extracrop)
     mfx.get_crop_region()
     mfx.create_output()
 #    mfx.get_offsets()
