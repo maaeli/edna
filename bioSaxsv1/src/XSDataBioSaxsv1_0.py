@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Tue Mar 26 02:06::41 2013 by EDGenerateDS.
+# Generated Wed Apr 17 05:30::36 2013 by EDGenerateDS.
 #
 
 import os, sys
@@ -11,9 +11,9 @@ from xml.dom import Node
 
 strEdnaHome = os.environ.get("EDNA_HOME", None)
 
-dictLocation = {
- "XSDataCommon": "workspace/edna/kernel/datamodel",
- "XSDataEdnaSaxs": "workspace/edna/ednaSaxs/datamodel"
+dictLocation = {"XSDataCommon": "workspace/edna/kernel/datamodel",
+                "XSDataEdnaSaxs": "workspace/edna/ednaSaxs/datamodel",
+
 }
 
 try:
