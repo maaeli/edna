@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Wed Apr 17 05:30::36 2013 by EDGenerateDS.
+# Generated Wed Apr 17 06:15::25 2013 by EDGenerateDS.
 #
 
 import os, sys
@@ -11,10 +11,11 @@ from xml.dom import Node
 
 strEdnaHome = os.environ.get("EDNA_HOME", None)
 
-dictLocation = {"XSDataCommon": "workspace/edna/kernel/datamodel",
-                "XSDataEdnaSaxs": "workspace/edna/ednaSaxs/datamodel",
-
+dictLocation = {
+ "XSDataEdnaSaxs": "ednaSaxs/datamodel",
+ "XSDataCommon": "kernel/datamodel"
 }
+
 
 try:
     from XSDataCommon import XSData
@@ -3396,7 +3397,7 @@ class XSDataInputBioSaxsSubtractv1_0(XSDataInput):
 
 class XSDataInputBioSaxsToSASv1_0(XSDataInput):
     """This is just a wrapper for the SAS downstream pipeline"""
-    def __init__(self, configuration=None, destinationDirectory=None, qMax=None, lastPoint=None, firstPoint=None, subtractedCurve=None):
+    def __init__(self, configuration=None, destinationDirectory=None, qMax=None, lastPoint=None, firstPoint=None, gnomFile=None, subtractedCurve=None):
         XSDataInput.__init__(self, configuration)
         if subtractedCurve is None:
             self._subtractedCurve = None
@@ -3404,6 +3405,13 @@ class XSDataInputBioSaxsToSASv1_0(XSDataInput):
             self._subtractedCurve = subtractedCurve
         else:
             strMessage = "ERROR! XSDataInputBioSaxsToSASv1_0 constructor argument 'subtractedCurve' is not XSDataFile but %s" % self._subtractedCurve.__class__.__name__
+            raise BaseException(strMessage)
+        if gnomFile is None:
+            self._gnomFile = None
+        elif gnomFile.__class__.__name__ == "XSDataFile":
+            self._gnomFile = gnomFile
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsToSASv1_0 constructor argument 'gnomFile' is not XSDataFile but %s" % self._gnomFile.__class__.__name__
             raise BaseException(strMessage)
         if firstPoint is None:
             self._firstPoint = None
@@ -3445,6 +3453,18 @@ class XSDataInputBioSaxsToSASv1_0(XSDataInput):
             raise BaseException(strMessage)
     def delSubtractedCurve(self): self._subtractedCurve = None
     subtractedCurve = property(getSubtractedCurve, setSubtractedCurve, delSubtractedCurve, "Property for subtractedCurve")
+    # Methods and properties for the 'gnomFile' attribute
+    def getGnomFile(self): return self._gnomFile
+    def setGnomFile(self, gnomFile):
+        if gnomFile is None:
+            self._gnomFile = None
+        elif gnomFile.__class__.__name__ == "XSDataFile":
+            self._gnomFile = gnomFile
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsToSASv1_0.setGnomFile argument is not XSDataFile but %s" % gnomFile.__class__.__name__
+            raise BaseException(strMessage)
+    def delGnomFile(self): self._gnomFile = None
+    gnomFile = property(getGnomFile, setGnomFile, delGnomFile, "Property for gnomFile")
     # Methods and properties for the 'firstPoint' attribute
     def getFirstPoint(self): return self._firstPoint
     def setFirstPoint(self, firstPoint):
@@ -3503,8 +3523,8 @@ class XSDataInputBioSaxsToSASv1_0(XSDataInput):
         XSDataInput.exportChildren(self, outfile, level, name_)
         if self._subtractedCurve is not None:
             self.subtractedCurve.export(outfile, level, name_='subtractedCurve')
-        else:
-            warnEmptyAttribute("subtractedCurve", "XSDataFile")
+        if self._gnomFile is not None:
+            self.gnomFile.export(outfile, level, name_='gnomFile')
         if self._firstPoint is not None:
             self.firstPoint.export(outfile, level, name_='firstPoint')
         if self._lastPoint is not None:
@@ -3523,6 +3543,11 @@ class XSDataInputBioSaxsToSASv1_0(XSDataInput):
             obj_ = XSDataFile()
             obj_.build(child_)
             self.setSubtractedCurve(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'gnomFile':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setGnomFile(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'firstPoint':
             obj_ = XSDataInteger()

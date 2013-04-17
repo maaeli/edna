@@ -43,7 +43,7 @@ edFactoryPlugin.loadModule("XSDataEdnaSaxs")
 from XSDataBioSaxsv1_0      import XSDataInputBioSaxsToSASv1_0, XSDataResultBioSaxsToSASv1_0
 from XSDataWaitFilev1_0     import XSDataInputWaitFile
 from XSDataExecCommandLine  import XSDataInputRsync
-from XSDataCommon           import XSDataInteger, XSDataDouble, XSDataString, XSDataFile, XSPluginItem
+from XSDataCommon           import XSDataInteger, XSDataDouble, XSDataString, XSDataFile, XSPluginItem, XSDataStatus
 from XSDataEdnaSaxs         import XSDataInputSaxsAnalysisModeling, XSDataInputSaxsAnalysis, XSDataInputSaxsModeling
 
 architecture = EDUtilsPlatform.architecture
@@ -154,14 +154,14 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
         if self.isFailure():
             return
 
-        if os.path.exists(self.gnomFile):
+        if self.gnomFile and os.path.exists(self.gnomFile):
             self.pluginModeling = self.loadPlugin(self.cpModeling)
             self.pluginModeling.dataInput = XSDataInputSaxsModeling(graphFormat=XSDataString("png"),
                                                                     gnomFile=XSDataFile(XSDataString(self.gnomFile)))
-        elif os.path.exists(self.strSubFile):
+        elif self.strInFile and os.path.exists(self.strInFile):
             self.pluginModeling = self.loadPlugin(self.cpAnalysisModeling)
             self.pluginModeling.dataInput = XSDataInputSaxsAnalysisModeling(graphFormat=XSDataString("png"),
-                                                                            scatterCurve=XSDataFile(XSDataString(self.strSubFile)))
+                                                                            scatterCurve=XSDataFile(XSDataString(self.strInFile)))
         else:
             self.error("Neither gnomFile not subtractedCurve are present in the input datastructure")
             self.setFailure()
