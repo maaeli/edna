@@ -204,30 +204,36 @@ Volume  =    %12.2f""" % (self.xVolume.value)
     def doSuccessRg(self, _edPlugin=None):
         self.DEBUG("EDPluginControlSaxsAnalysisv1_0.doSuccessRg")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsAnalysisv1_0.doSuccessRg")
+        self.retrieveMessages(_edPlugin)
         self.autoRg = _edPlugin.dataOutput.autoRgOut[0]
 
     def doFailureRg(self, _edPlugin=None):
         self.DEBUG("EDPluginControlSaxsAnalysisv1_0.doFailureRg")
         self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsAnalysisv1_0.doFailureRg")
+        self.retrieveMessages(_edPlugin)
         self.setFailure()
 
     def doSuccessGnom(self, _edPlugin=None):
         self.DEBUG("EDPluginControlSaxsAnalysisv1_0.doSuccessGnom")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsAnalysisv1_0.doSuccessGnom")
+        self.retrieveMessages(_edPlugin)
         self.gnom = _edPlugin.dataOutput.gnom
         self.gnomFile = self.gnom.gnomFile.path.value
 
     def doFailureGnom(self, _edPlugin=None):
         self.DEBUG("EDPluginControlSaxsAnalysisv1_0.doFailureGnom")
         self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsAnalysisv1_0.doFailureGnom")
+        self.retrieveMessages(_edPlugin)
         #self.setFailure()
 
     def doSuccessPorod(self, _edPlugin=None):
         self.DEBUG("EDPluginControlSaxsAnalysisv1_0.doSuccessPorod")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsAnalysisv1_0.doSuccessPorod")
+        self.retrieveMessages(_edPlugin)
         self.xVolume = _edPlugin.dataOutput.volume
 
     def doFailurePorod(self, _edPlugin=None):
         self.DEBUG("EDPluginControlSaxsAnalysisv1_0.doFailurePorod")
         self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsAnalysisv1_0.doFailurePorod")
+        self.retrieveMessages(_edPlugin)
         #self.setFailure()
