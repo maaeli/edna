@@ -56,7 +56,7 @@ class MergeFFX(object):
     REF_FRAME = "reference_frame"
     TITLE = "Merged FullField XANES mapping"
 
-    def __init__(self, inputs, output, crop=False, check=False, normalize=False, logarithm=False):
+    def __init__(self, inputs, output, crop=False, check=False, normalize=False, logarithm=False, crop_region=None):
         """
         inputs and output are /path/to/file:internal
         """
@@ -75,7 +75,23 @@ class MergeFFX(object):
         self.offsets_security = None
         self.offsets = {}
         self._shape = None
-        self._crop_region = None
+        
+        if crop_region:
+            self.get_offsets()
+            if self.offsets_security is None:
+                self.offsets_security = 0
+            dim1,dim2=crop_region.split(",",1)
+            start1, stop1 = dim1.split(":", 1)
+            start2, stop2 = dim2.split(":", 1)
+            if not start1: start1 = "0"
+            if not start2: start2 = "0"
+            start1 = int(start1) + self.offsets_security
+            stop1 = int(stop1) + self.offsets_security
+            start2 = int(start2) + self.offsets_security
+            stop2 = int(stop2) + self.offsets_security
+            self._crop_region = (slice(start1, stop1), slice(start2, stop2))
+            self.dim1 = stop1 - start1
+            self.dim2 = stop2 - start2
         self.ln = logarithm
         self.dim1 = None
         self.dim2 = None
@@ -122,22 +138,22 @@ class MergeFFX(object):
                     logger.warning("No such group %s in file: %s" % (h5path, filepath))
         return res
 
-    @classmethod
-    def set_cache(cls, f, size=None, policy=None):
-        if hasattr(f.id, 'get_access_plist'):
-            p = f.id.get_access_plist()
-            # create a copy of the current settings
-            cache_settings = list(p.get_cache())
-            # multiply current cache by 10
-            if not size:
-                cache_settings[2] = int(10 * cache_settings[2])
-            else:
-                cache_settings[2] = int(size)
-            # if we are not going to use the read or written chunks, set the
-            # preemption policy to 0
-            if policy is not None:
-                cache_settings[3] = float(policy)
-            p.set_cache(*cache_settings)
+    
+    def open_hdf5(self, filename, size=None, policy=None):
+        """
+        Create an HDF5 file with extra option to optimize cache writing
+        """
+        propfaid = h5py.h5p.create(h5py.h5p.FILE_ACCESS)
+        cache_settings = list(propfaid.get_cache())
+        if not size:
+            cache_settings[2] = int(10 * cache_settings[2])
+        else:
+            cache_settings[2] = int(size)
+        if policy is not None:
+            cache_settings[3] = float(policy)
+        propfaid.set_cache(*settings)
+        fid = h5py.h5f.open(filename, fapl=propfaid)
+        self.h5file = h5py.File(fid)
 
 
 
@@ -146,8 +162,7 @@ class MergeFFX(object):
             logger.error("Input %s does not look like a HDF5 path: /path/to/file.h5:Aligned" % self.output)
         else:
             filepath, h5path = self.output.split(":", 1)
-            self.h5file = h5py.File(filepath)
-            self.set_cache(self.h5file, size=100e6, policy=0.0)
+            self.open_hdf5(filepath, size=100e6, policy=0.0)
             if h5path in self.h5file:
                 self.h5grp = self.h5file[h5path]
             else:
@@ -203,7 +218,10 @@ class MergeFFX(object):
 
 
     def get_offsets(self):
-        if self.crop:
+        """
+        calculate the offet for every datasets
+        """
+        if not self.offsets:
             for path, h5grp in self.inputs.items():
                 if self.OFFSETS in h5grp:
                     offsets = h5grp[self.OFFSETS]
@@ -218,6 +236,7 @@ class MergeFFX(object):
     def get_crop_region(self):
         if not self._crop_region:
             if self.crop:
+                self.get_offsets()
                 shape = numpy.array(self.shape[1:])
                 secu = self.offsets_security
                 start = numpy.ceil(numpy.array([npa.max(axis=0) for npa in self.offsets.values()]).max(axis=0) + secu).astype(int)
@@ -232,7 +251,6 @@ class MergeFFX(object):
             else:
                 self._crop_region = tuple([slice(i) for i in numpy.array(self.shape[1:])])
                 self.dim1, self.dim2 = self.shape[1:]
-
         return self._crop_region
     crop_region = property(get_crop_region)
 
@@ -339,8 +357,10 @@ if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option("-o", "--output", dest="h5path",
                       help="write result to HDF5 file with given path: path/to/file.h5:Aligned")
-    parser.add_option("-c", "--crop", dest="crop",
-                      help="Shall we crop the dataset to valid area", default=True)
+    parser.add_option("-a", "--autocrop", dest="autocrop",
+                      help="Shall we crop the dataset to valid area", default=False, action="store_true")
+    parser.add_option("-c", "--crop", dest="extracrop",
+                      help="Extra crop: force croped region: example -C 5:35,6:46 keeps an rectangle width 40 and height 30 (Y,X) ", default=None)
     parser.add_option("-k", "--check", dest="recheck",
                       help="Shall we recheck the consistency of the various frames ... very time consuming !!! (not implemented)", default=False)
     parser.add_option("-n", "--normalize", dest="normalize",
@@ -372,7 +392,6 @@ if __name__ == "__main__":
     if options.debug:
         logger.setLevel(level=logging.DEBUG)
     mfx = MergeFFX(args, options.h5path, crop=options.crop, check=options.recheck, normalize=options.normalize, logarithm=options.ln)
-    mfx.get_offsets()
     mfx.get_crop_region()
     mfx.create_output()
 #    mfx.get_offsets()
