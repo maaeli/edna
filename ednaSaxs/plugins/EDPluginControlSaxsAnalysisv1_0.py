@@ -197,7 +197,8 @@ Volume  =    %12.2f""" % (self.xVolume.value)
         self.xsDataResult.autoRg = self.autoRg
         self.xsDataResult.gnom = self.gnom
         self.xsDataResult.volume = self.xVolume
-        self.xsDataResult.status = XSDataStatus(executiveSummary=XSDataString(strLog))
+        self.xsDataResult.status = XSDataStatus(executiveSummary=XSDataString(strLog),
+                                                message=self.getXSDataMessage())
         self.setDataOutput(self.xsDataResult)
 
 
