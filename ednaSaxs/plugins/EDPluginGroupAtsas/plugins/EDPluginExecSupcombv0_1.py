@@ -76,7 +76,7 @@ class EDPluginExecSupcombv0_1(EDPluginExecProcessScript):
             if self.getDataInput().getEnantiomorphs().getValue():
                 self.__bEnantiomorphs = self.getDataInput().getEnantiomorphs().getValue()
         except Exception:
-            EDVerbose.WARNING("Enabling enantiomorphs in Supcomb by default")
+            EDVerbose.DEBUG("Enabling enantiomorphs in Supcomb by default")
 
     def checkSupcombBackboneInput(self):
         EDVerbose.DEBUG("EDPluginExecSupcombv0_1.checkBackbone")
@@ -84,7 +84,7 @@ class EDPluginExecSupcombv0_1(EDPluginExecProcessScript):
             if self.getDataInput().getBackbone().getValue():
                 self.__bBackbone = self.getDataInput().getBackbone().getValue()
         except Exception:
-            EDVerbose.WARNING("Using all atoms in Supcomb by default")
+            EDVerbose.DEBUG("Using all atoms in Supcomb by default")
 
 
     def preProcess(self, _edObject=None):

@@ -28,7 +28,7 @@ __author__ = "Jérôme Kieffer"
 __contact__ = "Jerome.Kieffer@esrf.fr"
 __license__ = "GPLv3+"
 __copyright__ = "2011, ESRF Grenoble"
-__date__ = "20130124"
+__date__ = "20130417"
 __status__ = "development"
 
 import os, shutil, time
@@ -103,7 +103,6 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
         self.absoluteFidelity = None
         self.relativeFidelity = None
         self.dictSimilarities = {}  # key: 2-tuple of images, similarities
-        self.lstSummary = []
         self.lstStrInput = []
         self.autoRg = None
         self.gnom = None
@@ -114,6 +113,12 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
         self.strSubFile = None
         self.fConcentration = None
         self.xsDataResult = XSDataResultBioSaxsSmartMergev1_0()
+        self.xsBestBuffer = None
+        self.xsScatterPlot = None
+        self.xsGuinierPlot = None
+        self.xsKratkyPlot = None
+        self.xsDensityPlot = None
+
 
     def checkParameters(self):
         """
@@ -167,13 +172,13 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
             inp = self.lstInput[0].path.value
             dst = self.dataInput.mergedCurve.path.value
             if not os.path.isdir(os.path.dirname(dst)):
-                 self.error("Output directory for %s does not exist" % dst)
-                 os.makedirs(os.path.dirname(dst))
+                self.error("Output directory for %s does not exist" % dst)
+                os.makedirs(os.path.dirname(dst))
             if not os.path.exists(inp):
-                 self.warning("Input %s does not (yet?) exist" % inp)
-                 time.sleep(1.0)
+                self.warning("Input %s does not (yet?) exist" % inp)
+                time.sleep(1.0)
             shutil.copyfile(inp, dst)
-            self.lstSummary.append("Got only one frame ... nothing to merge !!!")
+            self.addExecutiveSummaryLine("Got only one frame ... nothing to merge !!!")
         else:
             self.lstMerged = []
             if (self.absoluteFidelity is not None) or (self.relativeFidelity is not None):
@@ -246,8 +251,8 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
             if len(self.lstMerged) != len(self.lstInput):
                 self.strRadiationDamage = "Radiation damage detected, merged %i curves" % len(self.lstMerged)
                 self.WARNING(self.strRadiationDamage)
-                self.lstSummary.append("WARNING: " + self.strRadiationDamage)
-            self.lstSummary.append("Merging files: " + " ".join([os.path.basename(i.path.value) for i in self.lstMerged]))
+                self.addExecutiveSummaryLine("WARNING: " + self.strRadiationDamage)
+            self.addExecutiveSummaryLine("Merging files: " + " ".join([os.path.basename(i.path.value) for i in self.lstMerged]))
             if len(self.lstMerged) == 1:
                 self.rewriteHeader(self.lstMerged[0].path.value, self.strMergedFile)
             else:
@@ -279,7 +284,8 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
 
                 self.__edPluginSaxsAnalysis = self.loadPlugin(self.__strControlledPluginSaxsAnalysis)
                 self.__edPluginSaxsAnalysis.dataInput = XSDataInputSaxsAnalysis(scatterCurve=xsdSubtractedCurve,
-                                                                                autoRg=self.autoRg)
+                                                                                autoRg=self.autoRg,
+                                                                                graphFormat=XSDataString("png"))
                 self.__edPluginSaxsAnalysis.connectSUCCESS(self.doSuccessSaxsAnalysis)
                 self.__edPluginSaxsAnalysis.connectFAILURE(self.doFailureSaxsAnalysis)
                 self.__edPluginSaxsAnalysis.executeSynchronous()
@@ -290,8 +296,8 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
         else:
             self.__class__.lastSample = self.dataInput.mergedCurve
 
-        if self.dataInput.sample.login and self.dataInput.sample.passwd and self.dataInput.sample.measurementID:
-            self.lstSummary.append("Registering to ISPyB")
+        if self.dataInput.sample and self.dataInput.sample.login and self.dataInput.sample.passwd and self.dataInput.sample.measurementID:
+            self.addExecutiveSummaryLine("Registering to ISPyB")
             self.__edPluginSaxsISPyB = self.loadPlugin(self.__strControlledPluginSaxsISPyB)
             if len(self.lstInput) > 1:
                 frameAverage = XSDataInteger(len(self.lstInput))
@@ -308,6 +314,11 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
                                                      frameAverage=frameAverage,
                                                      frameMerged=frameMerged,
                                                      curves=self.curves,
+                                                     bestBuffer=self.xsBestBuffer,
+                                                     scatterPlot=self.xsScatterPlot,
+                                                     guinierPlot=self.xsGuinierPlot,
+                                                     kratkyPlot=self.xsKratkyPlot ,
+                                                     densityPlot=self.xsDensityPlot
 #                                                     destination=self.dataInput.sample.ispybDestination #duplicate, already in sample
                                                )
             self.__edPluginSaxsISPyB.dataInput = xsdin
@@ -320,19 +331,17 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
         self.DEBUG("EDPluginBioSaxsSmartMergev1_5.postProcess")
         # Create some output data
         self.xsDataResult.mergedCurve = self.dataInput.mergedCurve
-        if self.autoRg is not None:
-            self.xsDataResult.autoRg = self.autoRg
         if self.strSubFile is not None and os.path.isfile(self.strSubFile):
             self.xsDataResult.subtractedCurve = XSDataFile(XSDataString(self.strSubFile))
-        if self.gnom is not None:
-            self.xsDataResult.gnom = self.gnom
-        if self.volume is not None:
-            self.xsDataResult.volume = self.volume
+        self.xsDataResult.autoRg = self.autoRg
+        self.xsDataResult.gnom = self.gnom
+        self.xsDataResult.volume = self.volume
 
     def finallyProcess(self, _edObject=None):
         EDPluginControl.finallyProcess(self)
-        executiveSummary = os.linesep.join(self.lstSummary)
-        self.xsDataResult.status = XSDataStatus(executiveSummary=XSDataString(executiveSummary))
+
+        self.xsDataResult.status = XSDataStatus(message=self.getXSDataMessage(),
+                                          executiveSummary=XSDataString(os.linesep.join(self.getListExecutiveSummaryLines())))
         self.dataOutput = self.xsDataResult
 
     def resynchronize(self):
@@ -432,11 +441,12 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
     def doSuccessExecWait(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsSmartMergev1_5.doSuccessExecWait")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsSmartMergev1_5.doSuccessExecWait")
+        self.retrieveMessages(_edPlugin)
         xsdo = _edPlugin.dataOutput
         self.DEBUG("ExecWait Output:%s" % xsdo.marshal())
         if (xsdo.timedOut is not None) and  bool(xsdo.timedOut.value):
             strErr = "Error in waiting for all input files to arrive"
-            self.lstSummary.append("EDPluginBioSaxsSmartMergev1_5.doSuccessExecWait :" + strErr)
+            self.addExecutiveSummaryLine("EDPluginBioSaxsSmartMergev1_5.doSuccessExecWait :" + strErr)
             self.ERROR(strErr)
             self.setFailure()
 
@@ -444,23 +454,26 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
     def doFailureExecWait(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsSmartMergev1_5.doFailureExecWait")
         self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsSmartMergev1_5.doFailureExecWait")
+        self.retrieveMessages(_edPlugin)
         strErr = "Error in waiting for all input files to arrive"
         self.ERROR(strErr)
-        self.lstSummary.append(strErr)
+        self.addExecutiveSummaryLine(strErr)
         self.setFailure()
 
 
     def doSuccessExecDataver(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsSmartMergev1_5.doSuccessExecDataver")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsSmartMergev1_5.doSuccessExecDataver")
+        self.retrieveMessages(_edPlugin)
         self.rewriteHeader(_edPlugin.dataOutput.outputCurve.path.value, output=self.strMergedFile)
 
 
     def doFailureExecDataver(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsSmartMergev1_5.doFailureExecDataver")
         self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsSmartMergev1_5.doFailureExecDataver")
+        self.retrieveMessages(_edPlugin)
         strErr = "Error in Processing of Atsas 'dataver'"
-        self.lstSummary.append(strErr)
+        self.addExecutiveSummaryLine(strErr)
         self.ERROR(strErr)
         self.setFailure()
 
@@ -468,6 +481,7 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
     def doSuccessExecDatcmp(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsSmartMergev1_5.doSuccessExecDatcmp")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsSmartMergev1_5.doSuccessExecDatcmp")
+        self.retrieveMessages(_edPlugin)
         with self.locked():
             xsdIn = _edPlugin.dataInput
             xsdOut = _edPlugin.getDataOutput()
@@ -479,58 +493,70 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
             self.dictSimilarities[tuple(lstIdx)] = fidelity
             lstIdx.reverse()
             self.dictSimilarities[tuple(lstIdx)] = fidelity
-            if fidelity == 0:
-               logFid = "infinity"
+            if fidelity <= 0:
+                logFid = "infinity"
             else:
-               logFid = "%.2f" % (-log(fidelity, 10))
-            self.lstSummary.append("-log(Fidelity) between %s and %s is %s" % (os.path.basename(file0), os.path.basename(file1), logFid))
+                logFid = "%.2f" % (-log(fidelity, 10))
+            self.addExecutiveSummaryLine("-log(Fidelity) between %s and %s is %s" % (os.path.basename(file0), os.path.basename(file1), logFid))
 
 
     def doFailureExecDatcmp(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsSmartMergev1_5.doFailureExecDatcmp")
         self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsSmartMergev1_5.doFailureExecDatcmp")
-        self.lstSummary.append("Failure in Processing of Atsas 'datcmp'")
+        self.retrieveMessages(_edPlugin)
+        self.addExecutiveSummaryLine("Failure in Processing of Atsas 'datcmp'")
         self.setFailure()
 
 
     def doSuccessExecAutoSub(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsSmartMergev1_5.doSuccessExecAutoSub")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsSmartMergev1_5.doSuccessExecAutoSub")
+        self.retrieveMessages(_edPlugin)
         self.autoRg = _edPlugin.dataOutput.autoRg
         if _edPlugin.dataOutput.subtractedCurve is not None:
-             subcurve = _edPlugin.dataOutput.subtractedCurve
-             if os.path.exists(subcurve.path.value):
-                 self.strSubFile = subcurve.path.value
-        self.lstSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
+            subcurve = _edPlugin.dataOutput.subtractedCurve
+            if os.path.exists(subcurve.path.value):
+                self.strSubFile = subcurve.path.value
+        self.xsBestBuffer = _edPlugin.dataOutput.bestBuffer
+        self.addExecutiveSummaryLine(_edPlugin.dataOutput.status.executiveSummary.value)
 
 
     def doFailureExecAutoSub(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsSmartMergev1_5.doFailureExecAutoSub")
         self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsSmartMergev1_5.doFailureExecAutoSub")
+        self.retrieveMessages(_edPlugin)
         strErr = "Error in Processing of EDNA 'AutoSub'"
         self.ERROR(strErr)
-        self.lstSummary.append(strErr)
+        self.addExecutiveSummaryLine(strErr)
         self.setFailure()
 
     def doSuccessSaxsAnalysis(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsSmartMergev1_5.doSuccessSaxsAnalysis")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsSmartMergev1_5.doSuccessSaxsAnalysis")
+        self.retrieveMessages(_edPlugin)
         self.gnom = _edPlugin.dataOutput.gnom
         self.volume = _edPlugin.dataOutput.volume
-        self.lstSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
+        self.xsScatterPlot = _edPlugin.dataOutput.scatterPlot
+        self.xsGuinierPlot = _edPlugin.dataOutput.guinierPlot
+        self.xsKratkyPlot = _edPlugin.dataOutput.kratkyPlot
+        self.xsDensityPlot = _edPlugin.dataOutput.densityPlot
+        self.addExecutiveSummaryLine(_edPlugin.dataOutput.status.executiveSummary.value)
 
     def doFailureSaxsAnalysis(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsSmartMergev1_5.doFailureSaxsAnalysis")
         self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsSmartMergev1_5.doFailureSaxsAnalysis")
+        self.retrieveMessages(_edPlugin)
         strErr = "Error in Processing of EDNA SaxsAnalysis = AutoRg => datGnom => datPorod"
         self.ERROR(strErr)
-        self.lstSummary.append(strErr)
+        self.addExecutiveSummaryLine(strErr)
         self.setFailure()
 
     def doSuccessISPyB(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsSmartMergev1_5.doSuccessISPyB")
-        self.lstSummary.append("Registered in ISPyB")
+        self.addExecutiveSummaryLine("Registered in ISPyB")
+        self.retrieveMessages(_edPlugin)
 
     def doFailureISPyB(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsSmartMergev1_5.doFailureISPyB")
-        self.lstSummary.append("Failed to registered in ISPyB")
+        self.addExecutiveSummaryLine("Failed to registered in ISPyB")
+        self.retrieveMessages(_edPlugin)

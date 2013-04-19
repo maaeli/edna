@@ -11,48 +11,53 @@ import XSDataCommon.XSDataRotation
 import XSDataCommon.XSDataString
 import XSDataCommon.XSDataVectorDouble
 import XSDataCommon.XSDataArray
+import XSDataEdnaSaxs.XSDataAutoRg
+import XSDataEdnaSaxs.XSDataGnom
 
 complex type XSDataInputSolutionScattering extends XSDataInput {
-	title : XSDataString optional
-	experimentalDataQ : XSDataDouble [] optional
-	experimentalDataQArray : XSDataArray optional
-	experimentalDataValues : XSDataDouble [] optional
-	experimentalDataIArray : XSDataArray optional
-	experimentalDataStdDev : XSDataDouble [] optional
-	experimentalDataStdArray : XSDataArray optional
+	title: XSDataString optional
+	experimentalCurve: XSDataFile optional
+	experimentalDataQ: XSDataDouble [] optional
+	experimentalDataQArray: XSDataArray optional
+	experimentalDataValues: XSDataDouble [] optional
+	experimentalDataIArray: XSDataArray optional
+	experimentalDataStdDev: XSDataDouble [] optional
+	experimentalDataStdArray: XSDataArray optional
 	experimentalDataFile: XSDataFile optional	
-	rMaxSearchSettings : XSDataSolutionScatteringSettings optional
-	angularUnits : XSDataInteger optional
-	symmetry : XSDataString optional
-	mode : XSDataString optional
-	iNbThreads : XSDataInteger optional
-	onlyGnom : XSDataBoolean optional
-	plotFit : XSDataBoolean optional
+	rMaxSearchSettings: XSDataSolutionScatteringSettings optional
+	angularUnits: XSDataInteger optional
+	symmetry: XSDataString optional
+	mode: XSDataString optional
+	iNbThreads: XSDataInteger optional
+	onlyGnom: XSDataBoolean optional
+	plotFit: XSDataBoolean optional
 	qMin: XSDataDouble  optional
 	qMax: XSDataDouble  optional
+	autorg: XSDataAutoRg optional
+	gnom: XSDataGnom optional
 }
 
 
 
 complex type XSDataResultSolutionScattering extends XSDataResult {
-	corelationFitValues : XSDataDouble [] optional
-	fitFile : XSDataFile
-	lineProfileFitQuality : XSDataDouble
-	logFile : XSDataFile
-	pdbMoleculeFile : XSDataFile
-	pdbSolventFile : XSDataFile
-	scatteringFitQ : XSDataDouble [] optional
-	scatteringFitValues : XSDataDouble [] optional
-	scatteringFitQArray : XSDataArray optional
-	scatteringFitIarray : XSDataArray optional
-	meanNSD : XSDataDouble optional
-	variationNSD : XSDataDouble optional
+	corelationFitValues: XSDataDouble [] optional
+	fitFile: XSDataFile
+	lineProfileFitQuality: XSDataDouble
+	logFile: XSDataFile
+	pdbMoleculeFile: XSDataFile
+	pdbSolventFile: XSDataFile
+	scatteringFitQ: XSDataDouble [] optional
+	scatteringFitValues: XSDataDouble [] optional
+	scatteringFitQArray: XSDataArray optional
+	scatteringFitIarray: XSDataArray optional
+	meanNSD: XSDataDouble optional
+	variationNSD: XSDataDouble optional
 }
 
 
 complex type XSDataSolutionScatteringSettings extends XSData {
-	rMaxStart : XSDataDouble
-	rMaxStop : XSDataDouble
-	rMaxIntervals : XSDataInteger
-	rMaxAbsTol : XSDataDouble
+	rMaxStart: XSDataDouble
+	rMaxStop: XSDataDouble
+	rMaxIntervals: XSDataInteger
+	rMaxAbsTol: XSDataDouble
 }

@@ -1,0 +1,15 @@
+{    "__extend__": ["XSConfiguration_ESRF_debian6.json"], 
+    "EDPluginControlSaxsModelingv1_0":{
+    	"dammifJobs": 16,
+    	"timeOut": 2000,
+    	"clusterSize": 8,
+    	"unit": "nanometer",
+		"symmetry": "P1",
+		"mode": "fast"
+    },    
+    "EDPluginControlSaxsAnalysisModelingv1_0": {
+    	"timeOut": 2000
+    }
+    
+
+}

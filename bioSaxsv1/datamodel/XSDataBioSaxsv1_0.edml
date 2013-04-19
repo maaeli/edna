@@ -290,7 +290,8 @@ complex type XSDataResultBioSaxsHPLCv1_0 extends XSDataResultBioSaxsProcessOneFi
 
 complex type XSDataInputBioSaxsToSASv1_0 extends XSDataInput  {
 	"This is just a wrapper for the SAS downstream pipeline"
-	subtractedCurve: XSDataFile
+	subtractedCurve: XSDataFile optional
+	gnomFile: XSDataFile optional
 	firstPoint: XSDataInteger optional
 	lastPoint: XSDataInteger optional
 	qMax: XSDataDouble optional
@@ -356,6 +357,11 @@ complex type XSDataInputBioSaxsISPyBv1_0 extends XSDataInput  {
 	frameAverage: XSDataInteger optional
 	frameMerged : XSDataInteger optional
 	curves: XSDataFile [] optional
+	bestBuffer: XSDataFile optional
+	scatterPlot: XSDataFile optional
+	guinierPlot: XSDataFile optional
+	kratkyPlot: XSDataFile optional
+	densityPlot: XSDataFile optional	
 }
 
 complex type XSDataResultBioSaxsISPyBv1_0 extends XSDataResult {

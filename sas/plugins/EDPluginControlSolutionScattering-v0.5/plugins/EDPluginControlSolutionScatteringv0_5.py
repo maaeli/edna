@@ -29,7 +29,7 @@ from __future__ import with_statement
 __authors__ = ["irakli", "Jérôme Kieffer"]
 __license__ = "GPLv3+"
 __copyright__ = "2011 DLS, 2012 ESRF"
-__date__ = "20120214"
+__date__ = "20130318"
 
 import os, operator, itertools, matplotlib, distutils.dir_util
 matplotlib.use('Agg')
@@ -52,8 +52,11 @@ from XSDataSAS import XSDataInputSolutionScattering, XSDataResultSolutionScatter
                     XSDataInputDammif, XSDataInputSupcomb, XSDataInputDamaver, XSDataInputDamfilt, \
                     XSDataInputDamstart
 from XSDataCommon import XSDataDouble, XSDataInteger, XSDataString, XSDataBoolean
-
-
+from EDFactoryPlugin import edFactoryPlugin
+edFactoryPlugin.loadModule("XSDataEdnaSaxs")
+from  XSDataEdnaSaxs import XSDataGnom, XSDataAutoRg
+edFactoryPlugin.loadModule("saxs_plotting")
+from saxs_plotting import 
 def try_float(tmpStr):
     """
     Check in the input string can be converted into float
@@ -206,10 +209,12 @@ class EDPluginControlSolutionScatteringv0_5(EDPluginControl):
             self.WARNING("Using Angstrom units for q-values by default")
 
     def checkJMol(self):
-        self.__pluginConfiguration = self.getConfiguration()
-        self.__strPathToJMol = EDConfiguration.getStringParamValue(self.__pluginConfiguration, 'jMol')
-        if os.path.isdir(self.__strPathToJMol):
-            distutils.dir_util.copy_tree(self.__strPathToJMol, os.path.join(self.getWorkingDirectory(), "jmol"))
+        self.__strPathToJMol = self.config.get('jMol', None)
+        if self.__strPathToJMol and os.path.isdir(self.__strPathToJMol):
+            try:
+                os.link(self.__strPathToJMol, os.path.join(self.getWorkingDirectory(), "jmol"))
+            except Exception:
+                distutils.dir_util.copy_tree(self.__strPathToJMol, os.path.join(self.getWorkingDirectory(), "jmol"))
             self.__bUseJMol = True
 
 
@@ -289,7 +294,14 @@ class EDPluginControlSolutionScatteringv0_5(EDPluginControl):
     def process(self, _edObject=None):
         EDPluginControl.process(self)
         self.DEBUG("EDPluginControlSolutionScatteringv0_5.process")
-
+        
+        #First generate guinier plot,
+        guinierplot = saxs_plotting.guinierPlot()
+        #Then Krattky plot
+        #Process using GNOM
+        #Generate scattering curve overlaid with GNOM results
+        #plot P(r) 
+           
         #Make series of GNOM runs narrowing down the optimal value of rMax
         ser = 0
         while self.__absErr > self.__absTol:
@@ -821,7 +833,7 @@ class EDPluginControlSolutionScatteringv0_5(EDPluginControl):
 
     def __outputHTMLSummaryTable(self):
         _pdbFilter = EDPDBFilter()
-        pathDamaverFileRaw = self.__edPluginExecDamaver.dataOutput.getDamaverPdbFile().getPath().value
+        pathDamaverFileRaw = self.__edPluginExecDamaver.dataOutput.getDamaverPdbFile().path.value
         pathDamaverFile = os.path.join(self.__edPluginExecDamaver.getWorkingDirectory(), "damaver_valid.pdb")
         if os.path.isfile(pathDamaverFileRaw):
             _pdbFilter.filterPDBFile(pathDamaverFileRaw, pathDamaverFile)
@@ -966,8 +978,17 @@ class EDPluginControlSolutionScatteringv0_5(EDPluginControl):
 
     def __outputHTMLDamaverResults(self):
         _pdbFilter = EDPDBFilter()
-        pathDamfiltFileRaw = self.__edPluginExecDamfilt.dataOutput.getOutputPdbFile().getPath().value
-        pathDamstartFileRaw = self.__edPluginExecDamstart.dataOutput.getOutputPdbFile().getPath().value
+        if (self.__edPluginExecDamstart is not None) and (not self.__edPluginExecDamfilt.isFailure()):
+            pathDamfiltFileRaw = self.__edPluginExecDamfilt.dataOutput.getOutputPdbFile().path.value
+        else:
+            pathDamfiltFileRaw = None
+        if (self.__edPluginExecDamstart is not None) and (not self.__edPluginExecDamstart.isFailure()):
+            pathDamstartFileRaw = self.__edPluginExecDamstart.dataOutput.getOutputPdbFile().path.value
+        else:
+            pathDamstartFileRaw = None
+        if not(pathDamstartFileRaw and pathDamfiltFileRaw):
+            self.WARNING("Damfilt or Damstart failed !!!")
+            return ["<h2>DAMAVER pipeline Failed</h2>"]
         pathDamaverFile = os.path.join(self.__edPluginExecDamaver.getWorkingDirectory(), "damaver_valid.pdb")
         pathDamfiltFile = os.path.join(self.__edPluginExecDamfilt.getWorkingDirectory(), "damfilt_valid.pdb")
         pathDamstartFile = os.path.join(self.__edPluginExecDamstart.getWorkingDirectory(), "damstart_valid.pdb")
@@ -1122,7 +1143,8 @@ class EDPluginControlSolutionScatteringv0_5(EDPluginControl):
         if not self.__bOnlyGnom:
             self.__outputDammifJobResults()
             self.addExecutiveSummarySeparator()
-            self.appendExecutiveSummary(self.__edPluginExecDamaver)
+            if self.__edPluginExecDamaver:
+                self.appendExecutiveSummary(self.__edPluginExecDamaver)
 
         self.verboseScreenExecutiveSummary()
 

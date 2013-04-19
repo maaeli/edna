@@ -1,0 +1,62 @@
+{
+    "EDPluginExecGnomv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/opt/pxsoft/bin/gnom", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 60
+    }, 
+    "EDPluginExecDataverv1_0": {
+        "execProcessScriptExecutable": "/opt/pxsoft/bin/dataver", 
+        "execProcessScriptShell": "python"
+    }, 
+    "EDPluginExecSupcombv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/opt/pxsoft/bin/supcomb20", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 60
+    }, 
+    "EDPluginExecDatcmpv1_0": {
+        "execProcessScriptExecutable": "/opt/pxsoft/bin/datcmp", 
+        "execProcessScriptShell": "python"
+    }, 
+    "EDPluginExecAutoRgv1_0": {
+        "execProcessScriptExecutable": "/opt/pxsoft/bin/autorg", 
+        "execProcessScriptShell": "python", 
+        "timeOut": 60
+    }, 
+    "EDPluginExecDammifv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/opt/pxsoft/bin/dammif", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 600
+    }, 
+    "EDPluginExecDatopv1_0": {
+        "execProcessScriptExecutable": "/opt/pxsoft/bin/datop", 
+        "execProcessScriptShell": "python"
+    }, 
+    "EDPluginExecDamstartv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/opt/pxsoft/bin/damstart", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 60
+    }, 
+    "EDPluginExecDamaverv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/opt/pxsoft/bin/damaver", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 600
+    }, 
+    "__extend__": [], 
+    "EDPluginExecDamminv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/opt/pxsoft/bin/dammin", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 600
+    }, 
+    "EDPluginExecDamfiltv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/opt/pxsoft/bin/damfilt", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 60
+    }
+}

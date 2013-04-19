@@ -1,0 +1,20 @@
+{
+    "EDPluginExecDatcmpv1_0": {
+        "execProcessScriptExecutable": "/usr/bin/datcmp", 
+        "execProcessScriptShell": "python"
+    }, 
+    "EDPluginExecAutoRgv1_0": {
+        "execProcessScriptExecutable": "/usr/bin/autorg", 
+        "execProcessScriptShell": "python", 
+        "timeOut": 60
+    }, 
+    "__extend__": [], 
+    "EDPluginExecDatopv1_0": {
+        "execProcessScriptExecutable": "/usr/bin/datop", 
+        "execProcessScriptShell": "python"
+    }, 
+    "EDPluginExecDataverv1_0": {
+        "execProcessScriptExecutable": "/usr/bin/dataver", 
+        "execProcessScriptShell": "python"
+    }
+}

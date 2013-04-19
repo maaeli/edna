@@ -1,0 +1,52 @@
+{
+    "EDPluginExecDamaverv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/dls_sw/apps/ATSAS/2_3/bin/damaver", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 600, 
+        "execProcessScriptExecutor": "qsub -sync y -q low.q -V -cwd -N EDPluginExecDamaverv0_1"
+    }, 
+    "EDPluginExecSupcombv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/dls_sw/apps/ATSAS/2_3/bin/supcomb20", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 60, 
+        "execProcessScriptExecutor": "qsub -sync y -q low.q -V -cwd -N EDPluginExecSupcombv0_1"
+    }, 
+    "EDPluginExecDammifv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/dls_sw/apps/ATSAS/2_3/bin/dammif", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 600, 
+        "execProcessScriptExecutor": "qsub -sync y -q low.q -V -cwd -N EDPluginExecDammifv0_1"
+    }, 
+    "EDPluginExecDamstartv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/dls_sw/apps/ATSAS/2_3/bin/damstart", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 60, 
+        "execProcessScriptExecutor": "qsub -sync y -q low.q -V -cwd -N EDPluginExecDamstartv0_1"
+    }, 
+    "EDPluginExecGnomv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/dls_sw/apps/ATSAS/2_3/bin/gnom", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 60, 
+        "execProcessScriptExecutor": "qsub -sync y -q low.q -V -cwd -N EDPluginExecGnomv0_1"
+    }, 
+    "__extend__": [], 
+    "EDPluginExecDamminv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/dls_sw/apps/ATSAS/2_3/bin/dammin", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 600, 
+        "execProcessScriptExecutor": "qsub -sync y -q low.q -V -cwd -N EDPluginExecDamminv0_1"
+    }, 
+    "EDPluginExecDamfiltv0_1": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/dls_sw/apps/ATSAS/2_3/bin/damfilt", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 60, 
+        "execProcessScriptExecutor": "qsub -sync y -q low.q -V -cwd -N EDPluginExecDamfiltv0_1"
+    }
+}
