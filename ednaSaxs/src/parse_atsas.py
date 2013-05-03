@@ -46,9 +46,11 @@ PDB_Keywords = ['HEADER', 'TITLE', 'COMPND', 'SOURCE',
                 'SCALE2', 'SCALE3', 'ATOM', 'TER',
                 'HETATM', 'CONECT', 'MASTER', 'END']
 
-def filterPDBFile(inputPDB, outputPDB=None):
+def filterPDBFile(inputPDB, outputPDB=None, purge=False):
     """
     Put REMARK keyword in front of the comment lines
+    
+    @param purge: remove the input file after translating it
     """
     linesOutput = []
     with  open(inputPDB) as fileread:
@@ -61,6 +63,8 @@ def filterPDBFile(inputPDB, outputPDB=None):
     if outputPDB:
         with open(outputPDB, "w") as filewrite:
             filewrite.writelines(linesOutput)
+        if purge and outputPDB != inputPDB:
+            os.unlink(inputPDB)
     return linesOutput
 
 ################################################################################
@@ -88,12 +92,13 @@ def RFactor(logFile=None):
     return tmpRfactor
 
 
-def parsePDB(pdbFile=None, outPDB=None):
+def parsePDB(pdbFile=None, outPDB=None, purge=False):
     """
     parse PDB file for Rfactor, Dmax, Volume and Rg.
     
     @param  pdbFile: input  PDB file
     @param outPDB: Optional pdb file to be written with sanitized comments
+    @param purge: remove input PDB afer re-writing it
     """
     res = {}
     atomic_volume = 0
@@ -125,4 +130,6 @@ def parsePDB(pdbFile=None, outPDB=None):
                 res["Rg"] = float(line.split(":")[-1])
             elif "Maximum diameter"  in line:
                 res["Dmax"] = float(line.split(":")[-1])
+    if purge and pdbFile != outPDB:
+        os.unlink(pdbFile)
     return res

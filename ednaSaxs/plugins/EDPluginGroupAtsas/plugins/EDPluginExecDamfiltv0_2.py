@@ -76,7 +76,7 @@ class EDPluginExecDamfiltv0_2(EDPluginExecProcessScript):
         if os.path.exists(pathOutputFile):
             xsDataResult.model = XSDataSaxsModel(name=XSDataString("damfilt"))
             xsDataResult.outputPdbFile = xsDataResult.model.pdbFile = XSDataFile(XSDataString(pathOutputFile))
-            res = parse_atsas.parsePDB(pathOutputFile)
+            res = parse_atsas.parsePDB(pathOutputFile, pathOutputFile)
             if "volume" in res:
                 xsDataResult.model.volume = XSDataDouble(res["volume"])
             if "Dmax" in res:

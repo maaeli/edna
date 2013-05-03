@@ -155,7 +155,7 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
         pathSolventFile = os.path.join(cwd, "dammin-0.pdb")
 
         try:
-            res = parse_atsas.parsePDB(pathMoleculeFile)
+            res = parse_atsas.parsePDB(pathMoleculeFile, pathMoleculeFile)
         except Exception as error:
             self.ERROR("EDPluginExecDamminv0_2:parsePDB: %s" % error)
         else:
