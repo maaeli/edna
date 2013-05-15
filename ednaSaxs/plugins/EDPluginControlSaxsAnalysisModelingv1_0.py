@@ -30,12 +30,11 @@ __copyright__ = "ESRF"
 __date__ = "2013-04-16"
 __status__ = "Development"
 
-import os, gc, sys
+import os
 from EDPluginControl import EDPluginControl
 from XSDataEdnaSaxs import XSDataInputSaxsAnalysisModeling, XSDataResultSaxsAnalysisModeling, \
-                           XSDataInputSaxsAnalysis, XSDataInputSaxsModeling, XSDataSaxsModel
-from XSDataCommon import XSDataString, XSDataLength, XSDataFile, XSDataInteger, XSDataStatus
-from saxs_plotting import scatterPlot, guinierPlot, kartkyPlot, densityPlot
+                           XSDataInputSaxsAnalysis, XSDataInputSaxsModeling
+from XSDataCommon import XSDataString, XSDataStatus
 
 
 class EDPluginControlSaxsAnalysisModelingv1_0(EDPluginControl):
@@ -201,4 +200,4 @@ Volume  =    %12.2f""" % (self.xVolume.value)
         self.DEBUG("EDPluginControlSaxsAnalysisModelingv1_0.doFailureModeling")
         self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsAnalysisModelingv1_0.doFailureModeling")
         self.retrieveMessages(_edPlugin)
-        #self.setFailure()
+        self.setFailure()

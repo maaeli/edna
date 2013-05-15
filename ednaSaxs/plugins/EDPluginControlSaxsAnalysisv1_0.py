@@ -34,7 +34,7 @@ import os, gc, sys
 from EDPluginControl import EDPluginControl
 from XSDataEdnaSaxs import XSDataInputSaxsAnalysis, XSDataResultSaxsAnalysis, \
                            XSDataInputAutoRg, XSDataInputDatGnom, XSDataInputDatPorod
-from XSDataCommon import XSDataString, XSDataLength, XSDataFile, XSDataInteger, XSDataStatus
+from XSDataCommon import XSDataString, XSDataFile, XSDataInteger, XSDataStatus
 from saxs_plotting import scatterPlot, guinierPlot, kartkyPlot, densityPlot
 
 
