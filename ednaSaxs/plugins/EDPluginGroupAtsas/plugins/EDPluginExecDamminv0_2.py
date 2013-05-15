@@ -32,7 +32,7 @@ __copyright__ = "2010 DLS; 2013 ESRF"
 import os
 from EDPluginExecProcessScript import EDPluginExecProcessScript
 from XSDataEdnaSaxs import XSDataInputDammin, XSDataResultDammin, XSDataSaxsModel
-from XSDataCommon import XSDataString, XSDataFile, XSDataDouble, XSDataMessage, XSDataStatus
+from XSDataCommon import XSDataString, XSDataFile, XSDataDouble, XSDataStatus
 import parse_atsas
 
 class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
