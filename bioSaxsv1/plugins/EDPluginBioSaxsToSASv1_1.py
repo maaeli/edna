@@ -77,7 +77,7 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
         self.inputFile = None
         self.strInFile = None
         self.gnomFile = None
-        #self.outFile = None
+        self.outFile = None
         self.wd = None
 
 
@@ -169,8 +169,6 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
         self.pluginModeling.connectFAILURE(self.doFailureExecSAS)
         self.pluginModeling.executeSynchronous()
 
-        if self.isFailure():
-            return
         if self.dataInput.destinationDirectory is None:
             outdir = os.path.join(os.path.dirname(os.path.dirname(self.strInFile)), "ednaSAS")
         else:
@@ -178,7 +176,7 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
         outdir = os.path.join(outdir, os.path.basename(os.path.splitext(self.strInFile)[0]))
         if not os.path.isdir(outdir):
             os.makedirs(outdir)
-        #self.outFile = os.path.join(outdir, "pipelineResults.html")
+        self.outFile = os.path.join(outdir, "NoResults.html")
 
         self.pluginRsync = self.loadPlugin(self.cpRsync)
         self.pluginRsync.dataInput = XSDataInputRsync(source=XSDataFile(XSDataString(self.wd)) ,
@@ -190,7 +188,7 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
         self.pluginRsync.executeSynchronous()
 
         # if no errors up to now, clean up scratch disk
-        if not self.isFailure():        
+        if not self.isFailure():
             to_remove = self.pluginModeling.getWorkingDirectory()
             if os.path.isdir(to_remove):
                 shutil.rmtree(to_remove)
@@ -200,8 +198,8 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
         EDPluginControl.postProcess(self)
         self.DEBUG("EDPluginBioSaxsToSASv1_1.postProcess")
         # Create some output data
-        #f self.outFile:
-        #   self.dataOutput.htmlPage = XSDataFile(XSDataString(self.outFile))
+        if self.outFile:
+            self.dataOutput.htmlPage = XSDataFile(XSDataString(self.outFile))
 
 
     def finallyProcess(self, _edObject=None):
