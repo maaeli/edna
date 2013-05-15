@@ -52,10 +52,6 @@ complex type XSDataResultSolutionScattering extends XSDataResult {
 	scatteringFitIarray: XSDataArray optional
 	meanNSD: XSDataDouble optional
 	variationNSD: XSDataDouble optional
-	scatterPlot: XSDataFile optional
-	guinierPlot: XSDataFile optional
-	kratkyPlot: XSDataFile optional
-	
 }
 
 

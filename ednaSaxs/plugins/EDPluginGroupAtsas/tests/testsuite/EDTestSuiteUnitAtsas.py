@@ -39,6 +39,7 @@ class EDTestSuiteUnitAtsas(EDTestSuite):
         tests = ['EDTestCasePluginUnitExecGnomv0_1',
                  'EDTestCasePluginUnitExecDamaverv0_1',
                  'EDTestCasePluginUnitExecSupcombv0_1',
+                 'EDTestCasePluginUnitExecSupcombv0_2',
                  'EDTestCasePluginUnitExecGnomv0_2',
                  'EDTestCasePluginUnitExecAutoRgv1_0',
                  'EDTestCasePluginUnitExecDammifv0_1',

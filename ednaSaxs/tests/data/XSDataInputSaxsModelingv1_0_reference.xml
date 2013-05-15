@@ -2,7 +2,7 @@
 <XSDataInput>
     <gnomFile>
         <path>
-            <value>${EDNA_TESTIMAGES}/bsa_013_08.out</value>
+            <value>${EDNA_TESTIMAGES}/gnom.out</value>
         </path>
     </gnomFile>
 </XSDataInput>

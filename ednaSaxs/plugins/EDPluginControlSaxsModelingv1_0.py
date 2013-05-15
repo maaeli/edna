@@ -1,6 +1,6 @@
 # coding: utf8
 #
-#    Project: PROJECT
+#    Project: BioSaxs PROJECT
 #             http://www.edna-site.org
 #
 #    File: "$Id$"
@@ -27,16 +27,21 @@ from __future__ import with_statement
 __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
-__status__ = "developement"
+__status__ = "development"
 
-import os
+import os, gc
+import numpy
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
 from EDThreading import Semaphore
 from EDPluginControl import EDPluginControl
-from XSDataCommon import XSDataStatus, XSDataString
-from XSDataEdnaSaxs import XSDataInputSaxsModeling, XSDataResultSaxsModeling, XSDataInputDammif
-#from EDFactoryPlugin import edFactoryPlugin
-#edFactoryPlugin.loadModule('XSDataBioSaxsv1_0')
-#from XSDataBioSaxsv1_0 import XSDataInputBioSaxsReduceFileSeriev1_0
+from EDActionCluster import EDActionCluster
+from XSDataCommon import XSDataStatus, XSDataString, XSDataBoolean, XSDataInteger
+from XSDataEdnaSaxs import XSDataInputSaxsModeling, XSDataResultSaxsModeling, \
+                            XSDataInputDammif, XSDataInputSupcomb, XSDataInputDamaver, \
+                            XSDataInputDamstart, XSDataInputDamfilt, XSDataInputDammin
 
 
 class EDPluginControlSaxsModelingv1_0(EDPluginControl):
@@ -45,16 +50,18 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
     """
     classlock = Semaphore()
     configured = False
+    cluster_size = 2     # duplicate from ControlPlugin
     dammif_jobs = 10     # number of dammif job to run
     unit = "NANOMETER"   # unit of the GNOM file
     symmetry = "P1"      #
     mode = "fast"        #
     # constants:  plugin names
-    strPluginExecDammif = "EDPluginExecDammifv0_1"
-    strPluginExecSupcomb = "EDPluginExecSupcombv0_1"
-    strPluginExecDamaver = "EDPluginExecDamaverv0_1"
-    strPluginExecDamfilt = "EDPluginExecDamfiltv0_1"
-    strPluginExecDamstart = "EDPluginExecDamstartv0_1"
+    strPluginExecDammif = "EDPluginExecDammifv0_2"
+    strPluginExecSupcomb = "EDPluginExecSupcombv0_2"
+    strPluginExecDamaver = "EDPluginExecDamaverv0_2"
+    strPluginExecDamfilt = "EDPluginExecDamfiltv0_2"
+    strPluginExecDamstart = "EDPluginExecDamstartv0_2"
+    strPluginExecDammin = "EDPluginExecDamminv0_2"
 
     def __init__(self):
         """
@@ -65,10 +72,16 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.edPlugin = None
         self.xsGnomFile = None
         self.result = XSDataResultSaxsModeling()
-        self.summary = []
+        self.result.dammifModels = []
         self.graph_format = "png"
-        self.damif_plugins = []
-
+        self.dammif_plugins = []
+        self.dammif = None
+        self.supcomb_plugins = {}
+        self.actclust_supcomb = None
+        self.valid = None #index of valid damif models
+        self.mask2d = None
+        self.arrayNSD = None
+        self.ref = None   # reference frame number (starting ar 0)
 
     def checkParameters(self):
         """
@@ -99,8 +112,12 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
                     if (mode != None):
                         self.__class__.mode = mode
                         self.DEBUG("EDPluginControlSaxsModelingv1_0.configure: setting dammif mode to %s" % self.mode)
-
+                    clusterSize = self.config.get("clusterSize", None)
+                    if (clusterSize != None):
+                        self.__class__.cluster_size = int(clusterSize)
+                        self.DEBUG("EDPluginControl.configure: setting cluster size to %d" % self.cluster_size)
                     self.__class__.configured = True
+
 
     def preProcess(self, _edObject=None):
         EDPluginControl.preProcess(self)
@@ -108,9 +125,6 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.xsGnomFile = self.dataInput.gnomFile
         if self.dataInput.graphFormat:
             self.graph_format = self.dataInput.graphFormat.value
-        # Load the execution plugin
-#        self.__edPluginBioSaxsReduce = self.loadPlugin(self.__strControlledPluginReduce)
-#        self.__edPluginExecAutoRg = self.loadPlugin(self.__strControlledPluginAutoRg)
 
 
     def process(self, _edObject=None):
@@ -121,64 +135,394 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
                                               symmetry=XSDataString(self.symmetry),
                                               mode=XSDataString(self.mode))
         for i in range(self.dammif_jobs):
-            damif = self.loadPlugin(self.strPluginExecDammif)
-            damif.setDataInput(xsDataInputDammif)
-            self.addPluginToActionCluster(damif)
-            self.damif_plugins.append(damif)
+            dammif = self.loadPlugin(self.strPluginExecDammif)
+            dammif.connectSUCCESS(self.doSuccessExecDammif)
+            dammif.connectFAILURE(self.doFailureExecDammif)
+            xsd = xsDataInputDammif.copyViaDict()
+            xsd.order = XSDataInteger(i + 1)
+            dammif.dataInput = xsd
+            self.addPluginToActionCluster(dammif)
+            self.dammif_plugins.append(dammif)
         self.executeActionCluster()
         self.synchronizeActionCluster()
-        for plugin in self.damif_plugins:
+        for plugin in self.dammif_plugins:
             if plugin.isFailure():
+                self.ERROR("dammif plugin %s-%08i failed" % (plugin.getName(), plugin.getId()))
                 self.setFailure()
             self.retrieveMessages(plugin)
         if self.isFailure():
             return
-        damif = self.bestDammif()
-        print damif.dataOutput.marshal()
+
+        #retrieve results from best dammif
+        self.dammif = self.bestDammif()
+        self.chi2plot("chi2_R.png")
+
+        #temporary results: use best dammif
+        self.result.fitFile = self.dammif.dataOutput.fitFile
+        self.result.logFile = self.dammif.dataOutput.logFile
+        self.result.pdbMoleculeFile = self.dammif.dataOutput.pdbMoleculeFile
+        self.result.pdbSolventFile = self.dammif.dataOutput.pdbSolventFile
+
+        #prepare an action cluster with all supcomb plugins
+        self.actclust_supcomb = EDActionCluster(self.cluster_size)
+        for idx in range(self.dammif_jobs):
+            if self.valid[idx]:
+                for ser in range(idx):
+                    if self.valid[ser]:
+                        supcomb = self.loadPlugin(self.strPluginExecSupcomb)
+                        supcomb.dataInput = XSDataInputSupcomb(templateFile=self.dammif_plugins[idx].dataOutput.pdbMoleculeFile,
+                                                               superimposeFile=self.dammif_plugins[ser].dataOutput.pdbMoleculeFile,
+                                                               name=self.dammif_plugins[ser].dataOutput.model.name)
+                        self.supcomb_plugins[(idx, ser)] = supcomb
+                        self.actclust_supcomb.addAction(supcomb)
+        self.actclust_supcomb.executeSynchronous()
+
+        for key, plugin in self.supcomb_plugins.items():
+            if plugin.isFailure():
+                self.ERROR("supcomb plugin for model pair (%i,%i) %s-%08i failed" % (key[0] + 1, key[1] + 1, plugin.getName(), plugin.getId()))
+                self.setFailure()
+            self.retrieveMessages(plugin)
+
+        if self.isFailure():
+            return
+
+        self.makeNSDarray("nsd.png")
+
+        idx = self.ref
+        self.actclust_supcomb = EDActionCluster(self.cluster_size)
+        for ser in range(self.ref + 1, self.dammif_jobs):
+            if self.valid[ser]:
+                supcomb = self.loadPlugin(self.strPluginExecSupcomb)
+                supcomb.dataInput = XSDataInputSupcomb(templateFile=self.dammif_plugins[self.ref].dataOutput.pdbMoleculeFile,
+                                                       superimposeFile=self.dammif_plugins[ser].dataOutput.pdbMoleculeFile,
+                                                       name=self.dammif_plugins[ser].dataOutput.model.name)
+                self.supcomb_plugins[(self.ref, ser)] = supcomb
+                self.actclust_supcomb.addAction(supcomb)
+        self.actclust_supcomb.executeSynchronous()
+
+        for ser in range(self.ref + 1, self.dammif_jobs):
+            if self.valid[ser]:
+                plugin = self.supcomb_plugins[(self.ref, ser)]
+                if plugin.isFailure():
+                    self.ERROR("supcomb plugin for model pair (%i,%i) %s-%08i failed" % (self.ref + 1, ser + 1, plugin.getName(), plugin.getId()))
+                    self.setFailure()
+                self.retrieveMessages(plugin)
+        if self.isFailure():
+            return
+
+        for i in range(self.dammif_jobs):
+            if i == self.ref or not self.valid[i]:
+                model = self.dammif_plugins[i].dataOutput.model
+            else:
+                model = self.supcomb_plugins[(self.ref, i)].dataOutput.model
+                model.chiSqrt = self.dammif_plugins[i].dataOutput.model.chiSqrt
+#                model.chiSqrt =  self.dammif_plugins[i].dataOutput.model.chiSqrt
+            self.symlink(model.pdbFile.path.value, "model-%02i.pdb" % (i + 1))
+            self.result.dammifModels[i] = model
+
+
+#        Now that all (valid) models are aligned we can combine them using damaver
+        pdbFiles = [self.dammif_plugins[self.ref].dataOutput.pdbMoleculeFile]
+
+        for idx in range(self.dammif_jobs):
+            if self.valid[idx] and idx != self.ref:
+                pdbFiles.append(self.supcomb_plugins[(self.ref, idx)].dataOutput.outputFilename)
+
+        damaver = self.loadPlugin(self.strPluginExecDamaver)
+        damaver.dataInput = XSDataInputDamaver(pdbInputFiles=pdbFiles,
+                                                automatic=XSDataBoolean(False))
+        damaver.connectSUCCESS(self.doSuccessExecDamaver)
+        damaver.connectFAILURE(self.doFailureExecDamaver)
+        damaver.executeSynchronous()
+
+        if self.isFailure():
+            return
+
+        damfilt = self.loadPlugin(self.strPluginExecDamfilt)
+        damfilt.dataInput = XSDataInputDamfilt(inputPdbFile=damaver.dataOutput.damaverPdbFile)
+        damfilt.connectSUCCESS(self.doSuccessExecDamfilt)
+        damfilt.connectFAILURE(self.doFailureExecDamfilt)
+        damfilt.execute()
+        ########################################################################
+        # TODO: This is a dead end : do it in parallel
+        ########################################################################
+
+        if self.isFailure():
+            return
+
+        damstart = self.loadPlugin(self.strPluginExecDamstart)
+        damstart.dataInput = XSDataInputDamstart(inputPdbFile=damaver.dataOutput.damaverPdbFile)
+        damstart.connectSUCCESS(self.doSuccessExecDamstart)
+        damstart.connectFAILURE(self.doFailureExecDamstart)
+        damstart.executeSynchronous()
+
+        if self.isFailure():
+            return
+        ########################################################################
+        # Finally call dammin
+        ########################################################################
+
+        dammin = self.loadPlugin(self.strPluginExecDammin)
+        dammin.dataInput = XSDataInputDammin(pdbInputFile=damstart.dataOutput.outputPdbFile,
+                                             gnomOutputFile=self.xsGnomFile,
+                                             symmetry=XSDataString(self.symmetry),
+                                             mode=XSDataString(self.mode))
+        dammin.connectSUCCESS(self.doSuccessExecDammin)
+        dammin.connectFAILURE(self.doFailureExecDammin)
+        dammin.executeSynchronous()
 
 
     def postProcess(self, _edObject=None):
         EDPluginControl.postProcess(self)
         self.DEBUG("EDPluginControlSaxsModelingv1_0.postProcess")
-        # clean up memory
-        self.damif_plugins = []
-        # Create some output data
 
+        self.synchronizePlugins()
+        # Create some output data
+#        self.result.
 
     def finallyProcess(self, _edObject=None):
         EDPluginControl.finallyProcess(self, _edObject=_edObject)
         self.result.status = XSDataStatus(message=self.getXSDataMessage(),
-                                          executiveSummary=XSDataString(os.linesep.join(self.summary)))
-        self.setDataOutput(self.result)
+                                          executiveSummary=XSDataString(os.linesep.join(self.getListExecutiveSummaryLines())))
 
-#    def doSuccessReduce(self, _edPlugin=None):
-#        self.DEBUG("EDPluginControlSaxsModelingv1_0.doSuccessReduce")
-#        self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doSuccessReduce")
-#        self.inputautorg = XSDataInputAutoRg(inputCurve=[_edPlugin.dataOutput.mergedCurve])
-#        self.inputautorg.sample = self.dataInput.sample
-#
-#
-#    def doFailureReduce(self, _edPlugin=None):
-#        self.DEBUG("EDPluginControlSaxsModelingv1_0.doFailureReduce")
-#        self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureReduce")
-#        self.setFailure()
-#
-#    def doSuccessAutoRg(self, _edPlugin=None):
-#        self.DEBUG("EDPluginControlSaxsModelingv1_0.doSuccessAutoRg")
-#        self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doSuccessAutoRg")
-#
-#
-#    def doFailureAutoRg(self, _edPlugin=None):
-#        self.DEBUG("EDPluginControlSaxsModelingv1_0.doFailureAutoRg")
-#        self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureAutoRg")
-#        self.setFailure()
+        self.setDataOutput(self.result)
+        # clean up memory
+        self.dammif_plugins = []
+        self.dammif = None
+        self.emptyListOfLoadedPlugin()
+        self.supcomb_plugins = {}
+        self.actclust_supcomb = None
+        gc.collect()
+
+    def doSuccessExecDammif(self, _edPlugin=None):
+        """
+        Locked as dammif is called many times in parallel
+        """
+        with self.locked():
+            self.DEBUG("EDPluginControlSaxsModelingv1_0.doSuccessExecDammif")
+            self.retrieveMessages(_edPlugin)
+            self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureExecDammif")
+            try:
+                self.result.dammifModels.append(_edPlugin.dataOutput.model)
+                #this has to be done only for the best model (once determined) !
+#                self.result.pdbMoleculeFile = _edPlugin.dataOutput.pdbMoleculeFile
+#                self.result.pdbSolventFile = _edPlugin.dataOutput.pdbSolventFile
+#                self.result.fitFile = _edPlugin.dataOutput.fitFile
+#                self.result.logFile = _edPlugin.dataOutput.logFile
+            except Exception as error:
+                self.ERROR("Error in doSuccessExecDammif: %s" % error)
+
+    def doFailureExecDammif(self, _edPlugin=None):
+        """
+        Locked as dammif is called many times in parallel
+        """
+
+        with self.locked():
+            self.DEBUG("EDPluginControlSaxsModelingv1_0.doFailureExecDammif")
+            self.retrieveMessages(_edPlugin)
+            self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureExecDammif")
+            self.setFailure()
+
+
+    def doSuccessExecDamaver(self, _edPlugin=None):
+        self.DEBUG("EDPluginControlSaxsModelingv1_0.doSuccessExecDamaver")
+        self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doSuccessExecDamaver")
+        self.retrieveMessages(_edPlugin)
+        try:
+            self.result.damaverModel = _edPlugin.dataOutput.model
+            self.symlink(_edPlugin.dataOutput.model.pdbFile.path.value, _edPlugin.dataOutput.model.name.value + ".pdb")
+        except Exception as error:
+            self.ERROR("Error in doSuccessExecDamaver: %s" % error)
+
+    def doFailureExecDamaver(self, _edPlugin=None):
+        self.DEBUG("EDPluginControlSaxsModelingv1_0.doFailureExecDamaver")
+        self.retrieveMessages(_edPlugin)
+        self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureExecDamaver")
+        self.setFailure()
+
+
+    def doSuccessExecDamfilt(self, _edPlugin=None):
+        self.DEBUG("EDPluginControlSaxsModelingv1_0.doSuccessExecDamfilt")
+        self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doSuccessExecDamfilt")
+        self.retrieveMessages(_edPlugin)
+        try:
+            self.result.damfiltModel = _edPlugin.dataOutput.model
+            self.symlink(_edPlugin.dataOutput.model.pdbFile.path.value, _edPlugin.dataOutput.model.name.value + ".pdb")
+        except Exception as error:
+            self.ERROR("Error in doSuccessExecDamfilt: %s" % error)
+
+
+
+    def doFailureExecDamfilt(self, _edPlugin=None):
+        self.DEBUG("EDPluginControlSaxsModelingv1_0.doFailureExecDamfilt")
+        self.retrieveMessages(_edPlugin)
+        self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureExecDamfilt")
+        self.setFailure()
+
+
+    def doSuccessExecDamstart(self, _edPlugin=None):
+        self.DEBUG("EDPluginControlSaxsModelingv1_0.doSuccessExecDamstart")
+        self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doSuccessExecDamstart")
+        self.retrieveMessages(_edPlugin)
+        try:
+            self.result.damstartModel = _edPlugin.dataOutput.model
+            self.symlink(_edPlugin.dataOutput.model.pdbFile.path.value, _edPlugin.dataOutput.model.name.value + ".pdb")
+        except Exception as error:
+            self.ERROR("Error in doSuccessExecDamstart: %s" % error)
+
+
+    def doFailureExecDamstart(self, _edPlugin=None):
+        self.DEBUG("EDPluginControlSaxsModelingv1_0.doFailureExecDamstart")
+        self.retrieveMessages(_edPlugin)
+        self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureExecDamstart")
+        self.setFailure()
+
+
+    def doSuccessExecDammin(self, _edPlugin=None):
+        self.DEBUG("EDPluginControlSaxsModelingv1_0.doSuccessExecDammin")
+        self.retrieveMessages(_edPlugin)
+        self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureExecDammin")
+        try:
+            self.result.pdbMoleculeFile = _edPlugin.dataOutput.pdbMoleculeFile
+            self.result.pdbSolventFile = _edPlugin.dataOutput.pdbSolventFile
+            self.result.fitFile = _edPlugin.dataOutput.fitFile
+            self.result.logFile = _edPlugin.dataOutput.logFile
+            self.result.damminModel = _edPlugin.dataOutput.model
+            self.symlink(_edPlugin.dataOutput.model.pdbFile.path.value, _edPlugin.dataOutput.model.name.value + ".pdb")
+        except Exception as error:
+            self.ERROR("Error in doSuccessExecDammin: %s" % error)
+
+
+    def doFailureExecDammin(self, _edPlugin=None):
+        self.DEBUG("EDPluginControlSaxsModelingv1_0.doFailureExecDammin")
+        self.retrieveMessages(_edPlugin)
+        self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureExecDammin")
+        self.setFailure()
+
 
     def bestDammif(self):
         """
         Find DAMMIF run with best chi-square value
         """
-        fitResultDict = dict([(plg.dataOutput.chiSqrt.value, plg) for plg in self.damif_plugins])
+        fitResultDict = dict([(plg.dataOutput.chiSqrt.value, plg) for plg in self.dammif_plugins])
         fitResultList = fitResultDict.keys()
         fitResultList.sort()
 
         return fitResultDict[fitResultList[0]]
+
+    def symlink(self, filen, link):
+        """
+        Create a symlink to CWD with relative path
+        """
+        src = os.path.abspath(filen)
+        cwd = self.getWorkingDirectory()
+        dest = os.path.join(cwd, link)
+        os.symlink(os.path.relpath(src, cwd), dest)
+
+
+    def chi2plot(self, filename=None, close=True):
+
+        chi2 = numpy.array([ plg.dataOutput.chiSqrt.value for plg in self.dammif_plugins])
+        chi2max = chi2.mean() + 2 * chi2.std()
+
+        xticks = 1 + numpy.arange(self.dammif_jobs)
+        fig = plt.figure(figsize=(15, 10))
+        ax1 = fig.add_subplot(1, 2, 1)
+        ax1.bar(xticks - 0.5, chi2)
+        ax1.set_ylabel(u"$\sqrt{\u03C7}$")
+        ax1.set_xlabel(u"Model number")
+        ax1.plot([0.5, self.dammif_jobs + 0.5], [chi2max, chi2max], "-r", label=u"$\sqrt{\u03C7}$$_{max}$ = %.3f" % chi2max)
+        ax1.set_xticks(xticks)
+        ax1.legend(loc=8)
+        R = numpy.array([ plg.dataOutput.rfactor.value for plg in self.dammif_plugins])
+        Rmax = R.mean() + 2 * R.std()
+        ax2 = fig.add_subplot(1, 2, 2)
+        ax2.bar(xticks - 0.5, R)
+        ax2.plot([0.5, self.dammif_jobs + 0.5], [Rmax, Rmax], "-r", label=u"R$_{max}$ = %.3f" % Rmax)
+        ax2.set_ylabel(u"R factor")
+        ax2.set_xlabel(u"Model number")
+        ax2.set_xticks(xticks)
+        ax2.legend(loc=8)
+#        fig.set_title("Selection of dammif models based on \u03C7$^2$")
+        self.valid = (chi2 < chi2max) * (R < Rmax)
+        self.mask2d = (1 - numpy.identity(self.dammif_jobs)) * numpy.outer(self.valid, self.valid)
+#        print self.valid
+        bbox_props = dict(fc="pink", ec="r", lw=1)
+        for i in range(self.dammif_jobs):
+            if not self.valid[i]:
+                ax1.text(i + 0.95, chi2max / 2, "Discarded", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)
+                ax2.text(i + 0.95, Rmax / 2, "Discarded", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)
+        if filename:
+            filename = os.path.join(self.getWorkingDirectory(), filename)
+            self.log("Wrote %s" % filename)
+            fig.savefig(filename)
+        if close:
+            fig.clf()
+            plt.close(fig)
+        else:
+            return fig
+
+    def makeNSDarray(self, filename=None, close=True):
+        self.arrayNSD = numpy.zeros(self.mask2d.shape, numpy.float32)
+        fig = plt.figure(figsize=(15, 10))
+        ax1 = fig.add_subplot(1, 2, 1)
+        # for now just an empty figure but a placeholder
+        ax1.imshow(self.arrayNSD, interpolation="nearest", origin="upper")
+
+        xticks = 1 + numpy.arange(self.dammif_jobs)
+        lnsd = []
+        for key, plugin in self.supcomb_plugins.items():
+            i0, i1 = key
+            nsd = plugin.dataOutput.NSD.value
+            self.arrayNSD[i0, i1] = nsd
+            self.arrayNSD[i1, i0] = nsd
+            lnsd.append(nsd)
+            ax1.text(i0, i1, "%.2f" % nsd, ha="center", va="center", size=12 * 8 // self.dammif_jobs)
+            ax1.text(i1, i0, "%.2f" % nsd, ha="center", va="center", size=12 * 8 // self.dammif_jobs)
+        lnsd = numpy.array(lnsd)
+#        print lnsd
+#        print lnsd.mean() , lnsd.std(), lnsd.mean() + 2 * lnsd.std()
+        nsd_max = lnsd.mean() + lnsd.std()
+        data = self.arrayNSD.sum(axis= -1) / self.mask2d.sum(axis= -1)
+        best_val = data[data > 0].min()
+#        print data
+#        print best_val
+#        print numpy.where(data == best_val)
+        self.ref = int(numpy.where(data == best_val)[0][-1])
+#        print self.ref
+        ax1.imshow(self.arrayNSD, interpolation="nearest", origin="upper")
+        ax1.set_title(u"NSD correlation table")
+        ax1.set_xticks(range(self.dammif_jobs))
+        ax1.set_xticklabels([str(i) for i in range(1, 1 + self.dammif_jobs)])
+        ax1.set_xlim(-0.5, self.dammif_jobs - 0.5)
+        ax1.set_ylim(-0.5, self.dammif_jobs - 0.5)
+        ax1.set_yticks(range(self.dammif_jobs))
+        ax1.set_yticklabels([str(i) for i in range(1, 1 + self.dammif_jobs)])
+        ax1.set_xlabel(u"Model number")
+        ax1.set_ylabel(u"Model number")
+        ax2 = fig.add_subplot(1, 2, 2)
+        ax2.bar(xticks - 0.5, data)
+        ax2.plot([0.5, self.dammif_jobs + 0.5], [nsd_max, nsd_max], "-r", label=u"NSD$_{max}$ = %.2f" % nsd_max)
+        ax2.set_title(u"NSD between any model and all others")
+        ax2.set_ylabel("Normalized Spatial Discrepancy")
+        ax2.set_xlabel(u"Model number")
+        ax2.set_xticks(xticks)
+        bbox_props = dict(fc="cyan", ec="b", lw=1)
+        ax2.text(self.ref + 0.95, data[self.ref] / 2, "Reference", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)
+        ax2.legend(loc=8)
+        self.valid *= (data < nsd_max)
+        bbox_props = dict(fc="pink", ec="r", lw=1)
+        for i in range(self.dammif_jobs):
+            if not self.valid[i]:
+                ax2.text(i + 0.95, data[self.ref] / 2, "Discarded", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)
+#        print self.valid
+#        print self.ref
+        if filename:
+            filename = os.path.join(self.getWorkingDirectory(), filename)
+            self.log("Wrote %s" % filename)
+            fig.savefig(filename)
+        if close:
+            fig.clf()
+            plt.close(fig)
+        else:
+            return fig

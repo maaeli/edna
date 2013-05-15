@@ -1,91 +1,15 @@
-{
-    "EDPluginExecGnomv0_1": {
-        "execProcessScriptVersionString": "", 
-        "execProcessScriptExecutable": "/usr/bin/gnom", 
-        "writeXMLInputOutput": 0, 
-        "execProcessScriptShell": "/bin/dash", 
-        "timeOut": 60
-    }, 
-    "EDPluginExecDataverv1_0": {
-        "execProcessScriptExecutable": "/usr/bin/dataver", 
-        "writeXMLInputOutput": 0, 
-        "execProcessScriptShell": "/bin/dash"
-    }, 
-    "EDPluginExecSupcombv0_1": {
-        "execProcessScriptVersionString": "", 
-        "execProcessScriptExecutable": "/usr/bin/supcomb20", 
-        "writeXMLInputOutput": 0, 
-        "execProcessScriptShell": "/bin/dash", 
-        "timeOut": 60
-    }, 
-    "EDPluginExecDatGnomv1_0": {
-        "execProcessScriptExecutable": "/usr/bin/datgnom", 
-        "writeXMLInputOutput": 0, 
-        "execProcessScriptShell": "/bin/dash", 
-        "timeOut": 200
-    }, 
-    "EDPluginExecGnomv0_2": {
-        "execProcessScriptVersionString": "", 
-        "execProcessScriptExecutable": "/usr/bin/gnom", 
-        "writeXMLInputOutput": 0, 
-        "execProcessScriptShell": "/bin/dash", 
-        "timeOut": 60
-    }, 
-    "EDPluginExecDatcmpv1_0": {
-        "execProcessScriptExecutable": "/usr/bin/datcmp", 
-        "writeXMLInputOutput": 0, 
-        "execProcessScriptShell": "/bin/dash"
-    }, 
-    "EDPluginExecAutoRgv1_0": {
-        "execProcessScriptExecutable": "/usr/bin/autorg", 
-        "writeXMLInputOutput": 0, 
-        "execProcessScriptShell": "/bin/dash", 
-        "timeOut": 60
-    }, 
-    "EDPluginExecDammifv0_1": {
-        "execProcessScriptVersionString": "", 
-        "execProcessScriptExecutable": "/usr/bin/dammif", 
-        "writeXMLInputOutput": 0, 
-        "execProcessScriptShell": "/bin/dash", 
-        "timeOut": 600
-    }, 
-    "EDPluginExecDatopv1_0": {
-        "execProcessScriptExecutable": "/usr/bin/datop", 
-        "writeXMLInputOutput": 0, 
-        "execProcessScriptShell": "/bin/dash"
-    }, 
-    "EDPluginExecDamstartv0_1": {
-        "execProcessScriptVersionString": "", 
-        "execProcessScriptExecutable": "/usr/bin/damstart", 
-        "writeXMLInputOutput": 0, 
-        "execProcessScriptShell": "/bin/dash", 
-        "timeOut": 60
-    }, 
-    "EDPluginExecDamaverv0_1": {
-        "execProcessScriptVersionString": "", 
-        "execProcessScriptExecutable": "/usr/bin/damaver", 
-        "writeXMLInputOutput": 0, 
-        "execProcessScriptShell": "/bin/dash", 
-        "timeOut": 600
-    }, 
-    "__extend__": [], 
-    "EDPluginExecDamminv0_1": {
-        "execProcessScriptVersionString": "", 
-        "execProcessScriptExecutable": "/usr/bin/dammin", 
-        "writeXMLInputOutput": 0, 
-        "execProcessScriptShell": "/bin/dash", 
-        "timeOut": 1000
-    }, 
-    "EDPluginExecDatPorodv1_0": {
-        "execProcessScriptExecutable": "/usr/bin/datporod", 
-        "writeXMLInputOutput": 0, 
-        "execProcessScriptShell": "/bin/dash", 
-        "timeOut": 60
-    }, 
-    "EDPluginExecDamfiltv0_1": {
-        "execProcessScriptVersionString": "", 
-        "execProcessScriptExecutable": "/usr/bin/damfilt", 
-        "execProcessScriptShell": "/bin/dash", 
-        "timeOut": 60
+{    "__extend__": ["XSConfiguration_ESRF_debian6.json"], 
+    "EDPluginControlSaxsModelingv1_0":{
+    	"dammifJobs": 16,
+    	"timeOut": 2000,
+    	"clusterSize": 8,
+    	"unit": "nanometer",
+		"symmetry": "P1",
+		"mode": "fast"
+    },    
+    "EDPluginControlSaxsAnalysisModelingv1_0": {
+    	"timeOut": 2000
     }
+    
+
 }

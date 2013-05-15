@@ -1,11 +1,11 @@
 # coding: utf8
 #
-#    Project: edna saxs
+#    Project: <projectName>
 #             http://www.edna-site.org
 #
 #    File: "$Id$"
 #
-#    Copyright (C) 2013 ESRF
+#    Copyright (C) 2012 ESRF
 #
 #    Principal author:       Jérôme Kieffer
 #
@@ -25,50 +25,40 @@
 
 __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
-__copyright__ = "2013 ESRF"
+__copyright__ = "2012 ESRF"
 
 import os
 
 from EDVerbose                           import EDVerbose
 from EDAssert                            import EDAssert
 from EDTestCasePluginExecute             import EDTestCasePluginExecute
-from XSDataEdnaSaxs 					 import XSDataInputSaxsModeling as XSDataInput
-from XSDataEdnaSaxs                      import XSDataResultSaxsModeling as XSDataResult
 
-class EDTestCasePluginExecuteControlSaxsModelingv1_0(EDTestCasePluginExecute):
+class EDTestCasePluginExecuteBioSaxsToSASv1_1(EDTestCasePluginExecute):
 
 
-    def __init__(self, _strTestName = None):
-        EDTestCasePluginExecute.__init__(self, "EDPluginControlSaxsModelingv1_0")
+    def __init__(self, _strTestName=None):
+        EDTestCasePluginExecute.__init__(self, "EDPluginBioSaxsToSASv1_1")
 #        self.setConfigurationFile(os.path.join(self.getPluginTestsDataHome(),
 #                                               "XSConfiguration_<basePluginName>.xml"))
         self.setDataInputFile(os.path.join(self.getPluginTestsDataHome(), \
-                                           "XSDataInputSaxsModelingv1_0_reference.xml"))
+                                           "XSDataInputBioSaxsToSAS_reference.xml"))
         self.setReferenceDataOutputFile(os.path.join(self.getPluginTestsDataHome(), \
-                                                     "XSDataResultSaxsModelingv1_0_reference.xml"))
-
+                                                     "XSDataResultBioSaxsToSAS_reference.xml"))
     def preProcess(self):
         """
-        Download reference files
+        PreProcess of the execution test: download a set of images  from http://www.edna-site.org
+        and remove any existing output file 
         """
         EDTestCasePluginExecute.preProcess(self)
-        self.loadTestImage(["gnom.out"])
+        self.loadTestImage([ "autosubtracted.dat"])
+
 
     def testExecute(self):
         """
         """
         self.run()
-        plugin = self.getPlugin()
-
-################################################################################
-# Compare XSDataResults
-################################################################################
-
-        strExpectedOutput = self.readAndParseFile (self.getReferenceDataOutputFile())
-        EDVerbose.DEBUG("Checking obtained result...")
-        xsDataResultReference = XSDataResult.parseString(strExpectedOutput)
-        xsDataResultObtained = plugin.getDataOutput()
-        EDAssert.strAlmostEqual(xsDataResultReference.marshal(), xsDataResultObtained.marshal(), "XSDataResult output are the same", _strExcluded="bioSaxs")
+        webPage = self.plugin.dataOutput.htmlPage.path.value
+        EDAssert.isFile(webPage, "Webpage is generated")
 
 
 
@@ -82,5 +72,5 @@ class EDTestCasePluginExecuteControlSaxsModelingv1_0(EDTestCasePluginExecute):
 
 if __name__ == '__main__':
 
-    edTestCasePluginExecuteControlSaxsModelingv1_0 = EDTestCasePluginExecuteControlSaxsModelingv1_0("EDTestCasePluginExecuteControlSaxsModelingv1_0")
-    edTestCasePluginExecuteControlSaxsModelingv1_0.execute()
+    edTestCase = EDTestCasePluginExecuteBioSaxsToSASv1_1("EDTestCasePluginExecuteBioSaxsToSASv1_1")
+    edTestCase.execute()
