@@ -231,6 +231,7 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
         self.DEBUG("EDPluginBioSaxsToSASv1_1.doFailureExecSAS")
         self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsToSASv1_1.doFailureExecSAS")
         self.retrieveMessages(_edPlugin)
+        self.wd = os.path.join(_edPlugin.getWorkingDirectory(), "")
         self.setFailure()
 
     def doSuccessExecRsync(self, _edPlugin=None):
