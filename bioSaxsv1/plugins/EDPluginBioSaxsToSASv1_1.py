@@ -27,15 +27,13 @@ __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "2013 ESRF"
 __status__ = "Development"
-__date__ = "20130417"
+__date__ = "20130515"
 
-import os
+import os, shutil
 from EDPluginControl        import EDPluginControl
 from EDFactoryPlugin        import edFactoryPlugin
-from EDConfiguration        import EDConfiguration
 from EDUtilsPath            import EDUtilsPath
 from EDUtilsPlatform        import EDUtilsPlatform
-from EDUtilsArray           import EDUtilsArray
 edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
 edFactoryPlugin.loadModule("XSDataWaitFilev1_0")
 edFactoryPlugin.loadModule("XSDataExecCommandLine")
@@ -43,8 +41,8 @@ edFactoryPlugin.loadModule("XSDataEdnaSaxs")
 from XSDataBioSaxsv1_0      import XSDataInputBioSaxsToSASv1_0, XSDataResultBioSaxsToSASv1_0
 from XSDataWaitFilev1_0     import XSDataInputWaitFile
 from XSDataExecCommandLine  import XSDataInputRsync
-from XSDataCommon           import XSDataInteger, XSDataDouble, XSDataString, XSDataFile, XSPluginItem, XSDataStatus
-from XSDataEdnaSaxs         import XSDataInputSaxsAnalysisModeling, XSDataInputSaxsAnalysis, XSDataInputSaxsModeling
+from XSDataCommon           import XSDataInteger, XSDataString, XSDataFile, XSPluginItem, XSDataStatus
+from XSDataEdnaSaxs         import XSDataInputSaxsAnalysisModeling, XSDataInputSaxsModeling
 
 architecture = EDUtilsPlatform.architecture
 numpyPath = os.path.join(EDUtilsPath.EDNA_HOME, "libraries", "20090405-Numpy-1.3", architecture)
@@ -79,7 +77,7 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
         self.inputFile = None
         self.strInFile = None
         self.gnomFile = None
-        self.outFile = None
+        #self.outFile = None
         self.wd = None
 
 
@@ -180,7 +178,7 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
         outdir = os.path.join(outdir, os.path.basename(os.path.splitext(self.strInFile)[0]))
         if not os.path.isdir(outdir):
             os.makedirs(outdir)
-        self.outFile = os.path.join(outdir, "pipelineResults.html")
+        #self.outFile = os.path.join(outdir, "pipelineResults.html")
 
         self.pluginRsync = self.loadPlugin(self.cpRsync)
         self.pluginRsync.dataInput = XSDataInputRsync(source=XSDataFile(XSDataString(self.wd)) ,
@@ -191,13 +189,19 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
         self.pluginRsync.connectFAILURE(self.doFailureExecRsync)
         self.pluginRsync.executeSynchronous()
 
+        # if no errors up to now, clean up scratch disk
+        if not self.isFailure():        
+            to_remove = self.pluginModeling.getWorkingDirectory()
+            if os.path.isdir(to_remove):
+                shutil.rmtree(to_remove)
+
 
     def postProcess(self, _edObject=None):
         EDPluginControl.postProcess(self)
         self.DEBUG("EDPluginBioSaxsToSASv1_1.postProcess")
         # Create some output data
-        if self.outFile:
-            self.dataOutput.htmlPage = XSDataFile(XSDataString(self.outFile))
+        #f self.outFile:
+        #   self.dataOutput.htmlPage = XSDataFile(XSDataString(self.outFile))
 
 
     def finallyProcess(self, _edObject=None):
