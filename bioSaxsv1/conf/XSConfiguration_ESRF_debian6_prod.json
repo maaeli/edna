@@ -9,6 +9,10 @@
         "fileSize": 1000, 
         "timeOut": 1000
     }, 
+    "EDPluginBioSaxsToSASv1_1": {
+        "fileSize": 1000, 
+        "timeOut": 2000
+    }, 
     "EDPluginBioSaxsAzimutIntv1_0": {}, 
     "EDPluginBioSaxsReprocessv1_0": {}, 
     "EDPluginBioSaxsAzimutIntv1_2": {}, 
