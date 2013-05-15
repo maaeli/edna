@@ -92,6 +92,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.checkMandatoryParameters(self.dataInput.gnomFile, "gnom output is missing")
 
     def configure(self):
+        EDPluginControl.configure(self)
         if not self.configured:
             with self.classlock:
                 if not self.configured:
