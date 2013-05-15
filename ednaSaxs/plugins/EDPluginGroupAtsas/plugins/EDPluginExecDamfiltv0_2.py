@@ -32,7 +32,7 @@ import os
 import parse_atsas
 from EDPluginExecProcessScript import EDPluginExecProcessScript
 from XSDataEdnaSaxs import XSDataInputDamfilt, XSDataSaxsModel, XSDataResultDamfilt
-from XSDataCommon import XSDataFile, XSDataString, XSDataMessage, XSDataStatus
+from XSDataCommon import XSDataFile, XSDataString, XSDataMessage, XSDataStatus, XSDataDouble
 
 
 class EDPluginExecDamfiltv0_2(EDPluginExecProcessScript):
