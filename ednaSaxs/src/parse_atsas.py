@@ -35,7 +35,7 @@ __status__ = "Development"
 __version__ = "0.1"
 __doc__ = "parse some of the atsas files"
 import os, sys, time, logging
-#from StringIO import  StringIO
+# from StringIO import  StringIO
 
 PDB_Keywords = ['HEADER', 'TITLE', 'COMPND', 'SOURCE',
                 'KEYWDS', 'EXPDTA', 'AUTHOR', 'REVDAT',
@@ -72,18 +72,18 @@ def filterPDBFile(inputPDB, outputPDB=None, purge=False):
 ################################################################################
 
 def SqrtChi(firFile=None):
-    sqrtChi = 42 #what else ?
+    sqrtChi = 42  # what else ?
     if not firFile or not os.path.exists(firFile):
         raise(RuntimeError("In parse for sqrt(Chi): .fir file %s does not exist" % firFile))
     with open(firFile) as ff:
         sqrtChi = float(ff.readline().split('=')[-1])
     return sqrtChi
-    
+
 
 def RFactor(logFile=None):
-    tmpRfactor = 42 #what else ?
+    tmpRfactor = 42  # what else ?
     if not logFile or not os.path.exists(logFile):
-        raise(RuntimeError("In parse for RFactor: .log file %s does not exist"%logFile))
+        raise(RuntimeError("In parse for RFactor: .log file %s does not exist" % logFile))
     with open(logFile) as ff:
         for line in ff:
             wordsLine = line.split()
@@ -101,14 +101,12 @@ def parsePDB(pdbFile=None, outPDB=None, purge=False):
     @param purge: remove input PDB afer re-writing it
     """
     res = {}
-    atomic_volume = 0
-    nr_atoms = 0
     if not pdbFile or not os.path.exists(pdbFile):
         raise(RuntimeError("In parse PDB: file %s does not exist" % pdbFile))
     if outPDB is None:
         pdb_content = open(pdbFile).readlines()
     else:
-         pdb_content = filterPDBFile(pdbFile, outPDB)
+        pdb_content = filterPDBFile(pdbFile, outPDB)
     for line in pdb_content:
         if line.startswith("REMARK"):
             if line.startswith("REMARK 265"):
@@ -130,6 +128,8 @@ def parsePDB(pdbFile=None, outPDB=None, purge=False):
                 res["Rg"] = float(line.split(":")[-1])
             elif "Maximum diameter"  in line:
                 res["Dmax"] = float(line.split(":")[-1])
+            elif "Total excluded DAM volume" in line:
+                res["volume"] = float(line.split(":")[-1])
     if purge and pdbFile != outPDB:
         os.unlink(pdbFile)
     return res
