@@ -86,13 +86,13 @@
         "execProcessScriptVersionString": "", 
         "execProcessScriptExecutable": "/usr/bin/dammin", 
         "execProcessScriptShell": "/bin/bash", 
-        "timeOut": 1000
+        "timeOut": 1500
     }, 
     "EDPluginExecDamminv0_2": {
         "execProcessScriptVersionString": "", 
         "execProcessScriptExecutable": "/usr/bin/dammin", 
         "execProcessScriptShell": "/bin/bash", 
-        "timeOut": 1000
+        "timeOut": 1500
     }, 
     "EDPluginExecDatPorodv1_0": {
         "execProcessScriptExecutable": "/usr/bin/datporod", 
