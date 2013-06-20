@@ -86,7 +86,7 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
         """
         EDPluginControl.__init__(self)
         self.setXSDataInputClass(XSDataInputBioSaxsISPyBModellingv1_0)
-       
+
         # Params to be sent and I dont know them
         self.modellingResult = None
         self.models = None
@@ -95,7 +95,7 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
         self.dammin = None
         self.nsdPlot = None
         self.chi2plot = None
-
+        self.pyarchmodels = []
 
 
     def checkParameters(self):
@@ -121,7 +121,7 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
                 self.__class__.URL = url
             else:
                 self.__class__.URL = self.CONF_URL_DEFAULT
-      
+
 
 
     def preProcess(self, _edObject=None):
@@ -130,7 +130,7 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
         # Initializing webservices
         self.DEBUG("EDPluginBioSaxsISPyBModellingv1_0.preProcess")
         self.dataBioSaxsSample = self.dataInput.sample
-    
+
 
         user = None
         password = ""
@@ -148,7 +148,7 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
         self.httpAuthenticatedToolsForBiosaxsWebService = HttpAuthenticated(username=user, password=password)
         self.client = Client(self.dataBioSaxsSample.ispybURL, transport=self.httpAuthenticatedToolsForBiosaxsWebService, cache=None)
 
-       
+
     def process(self, _edObject=None):
         EDPluginControl.process(self)
         self.DEBUG("EDPluginBioSaxsISPyBModellingv1_0.process")
@@ -168,8 +168,8 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
 
         try:
             self.id = [self.dataInput.sample.measurementID]
-            return self.client.service.storeAbInitioModels(self.id, str(self.concentrations), self.models, self.damaver, self.damfilt, self.dammin, self.nsdPlot, self.chi2plot)
-           
+            return self.client.service.storeAbInitioModels(self.id, self.models, self.damaver, self.damfilt, self.dammin, self.nsdPlot, self.chi2plot)
+
         except Exception, error:
             strError = "ISPyB error: %s" % error
             self.ERROR(strError)
@@ -194,29 +194,36 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
                 ermsg = "Error while directory creation in pyarch: %s " % error
                 self.lstError.append(ermsg)
                 self.ERROR(ermsg)
-            for xsdfile in self.dataInput.curves:
-                if xsdfile:
-                    self.copyfile(xsdfile.path.value, pyarch)
-            self.copyfile(self.filename, pyarch)
-            self.copyfile(self.gnomFile, pyarch)
-            self.copyfile(self.bestBuffer, pyarch)
-            self.copyfile(self.scatterPlot, pyarch,"scatterPlot")
-            self.copyfile(self.guinierPlot, pyarch,"guinierPlot")
-            self.copyfile(self.kratkyPlot, pyarch,"kratkyPlot")
-            self.copyfile(self.densityPlot, pyarch,"densityPlot")
 
-    def copyfile(self, afile, pyarch, dest="curve"):
+            for amodel in self.models:
+                afile = amodel.get("pdbFile")
+                if afile:
+                    amodel["pdbFile"] = self.copyfile(afile, pyarch, "model")
+
+            self.damaver["pdbFile"] = self.copyfile(self.damaver.get("pdbFile"), pyarch, "damaver.pdb")
+            self.damfilt["pdbFile"] = self.copyfile(self.damfilt.get("pdbFile"), pyarch, "damfilt.pdb")
+            self.dammin["pdbFile"] = self.copyfile(self.dammin.get("pdbFile"), pyarch, "dammin.pdb")
+            self.copyfile(self.nsdPlot, pyarch)
+            self.copyfile(self.chi2plot, pyarch)
+
+
+    def copyfile(self, afile, pyarch, dest=None):
+        fullname = None
         if not pyarch:
             self.ERROR("pyArch is %s" % pyarch)
+            return
         if afile and os.path.exists(afile) and os.path.isdir(pyarch):
+            if dest == "model":
+                fullname = os.path.join(pyarch, "model_%02i.pdb" % (len(self.pyarchmodels) + 1))
+                self.pyarchmodels.append(fullname)
+            elif dest:
+                fullname = os.path.join(pyarch, dest)
+            else:
+                fullname = pyarch
             try:
-                shutil.copy(afile, pyarch)
+                shutil.copy(afile, fullname)
             except IOError as error:
                 ermsg = "Error while copying %s to pyarch %s: %s " % (afile, pyarch, error)
                 self.lstError.append(ermsg)
                 self.WARNING(ermsg)
-            else:
-                if dest=="curve":
-                    self.pyarchcurves.append(os.path.join(pyarch, os.path.basename(afile)))
-                else:
-                    self.pyarchgraph[dest]=os.path.join(pyarch, os.path.basename(afile))
+        return fullname
