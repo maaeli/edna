@@ -19,6 +19,7 @@ import XSDataEdnaSaxs.XSDataAutoRg
 import XSDataEdnaSaxs.XSDataGnom
 import XSDataEdnaSaxs.XSDataResultDatGnom
 import XSDataEdnaSaxs.XSDataResultDatPorod
+import XSDataEdnaSaxs.XSDataResultSaxsModeling
 
 /*******************************************
   *  Common types used only in BioSaxs
@@ -368,6 +369,15 @@ complex type XSDataInputBioSaxsISPyBv1_0 extends XSDataInput  {
 }
 
 complex type XSDataResultBioSaxsISPyBv1_0 extends XSDataResult {
+	
+}
+complex type XSDataInputBioSaxsISPyBModellingv1_0 extends XSDataInput  {
+	"Input class for populating ISPyB"
+	saxsModelingResult: XSDataResultSaxsModeling
+	sample: XSDataBioSaxsSample
+}
+
+complex type XSDataResultBioSaxsISPyBModellingv1_0 extends XSDataResult {
 	
 }
 

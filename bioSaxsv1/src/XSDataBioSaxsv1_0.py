@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Thu Jun 20 01:47::20 2013 by EDGenerateDS.
+# Generated Thu Jun 20 02:46::46 2013 by EDGenerateDS.
 #
 
 import os, sys
@@ -11,22 +11,25 @@ from xml.dom import Node
 
 strEdnaHome = os.environ.get("EDNA_HOME", None)
 
-dictLocation = {  "XSDataCommon": "kernel/datamodel", \
- "XSDataEdnaSaxs": "ednaSaxs/datamodel"}
+dictLocation = {
+ "XSDataCommon": "kernel/datamodel", \
+ "XSDataEdnaSaxs": "ednaSaxs/datamodel"
+ }
 
 try:
     from XSDataCommon import XSData
     from XSDataCommon import XSDataBoolean
     from XSDataCommon import XSDataDouble
-    from XSDataCommon import XSDataString
     from XSDataCommon import XSDataFile
     from XSDataCommon import XSDataInput
     from XSDataCommon import XSDataInteger
     from XSDataCommon import XSDataResult
+    from XSDataCommon import XSDataString
     from XSDataEdnaSaxs import XSDataAutoRg
     from XSDataEdnaSaxs import XSDataGnom
     from XSDataCommon import XSDataDoubleWithUnit
     from XSDataCommon import XSDataImage
+    from XSDataEdnaSaxs import XSDataResultSaxsModeling
     from XSDataCommon import XSDataLength
     from XSDataCommon import XSDataTime
     from XSDataCommon import XSDataWavelength
@@ -43,15 +46,16 @@ except ImportError as error:
 from XSDataCommon import XSData
 from XSDataCommon import XSDataBoolean
 from XSDataCommon import XSDataDouble
-from XSDataCommon import XSDataString
 from XSDataCommon import XSDataFile
 from XSDataCommon import XSDataInput
 from XSDataCommon import XSDataInteger
 from XSDataCommon import XSDataResult
+from XSDataCommon import XSDataString
 from XSDataEdnaSaxs import XSDataAutoRg
 from XSDataEdnaSaxs import XSDataGnom
 from XSDataCommon import XSDataDoubleWithUnit
 from XSDataCommon import XSDataImage
+from XSDataEdnaSaxs import XSDataResultSaxsModeling
 from XSDataCommon import XSDataLength
 from XSDataCommon import XSDataTime
 from XSDataCommon import XSDataWavelength
@@ -1460,6 +1464,124 @@ class XSDataInputBioSaxsAzimutIntv1_0(XSDataInput):
         return rootObj
     parseFile = staticmethod( parseFile )
 # end class XSDataInputBioSaxsAzimutIntv1_0
+
+
+class XSDataInputBioSaxsISPyBModellingv1_0(XSDataInput):
+    """Input class for populating ISPyB"""
+    def __init__(self, configuration=None, sample=None, saxsModelingResult=None):
+        XSDataInput.__init__(self, configuration)
+        if saxsModelingResult is None:
+            self._saxsModelingResult = None
+        elif saxsModelingResult.__class__.__name__ == "XSDataResultSaxsModeling":
+            self._saxsModelingResult = saxsModelingResult
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'saxsModelingResult' is not XSDataResultSaxsModeling but %s" % self._saxsModelingResult.__class__.__name__
+            raise BaseException(strMessage)
+        if sample is None:
+            self._sample = None
+        elif sample.__class__.__name__ == "XSDataBioSaxsSample":
+            self._sample = sample
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'sample' is not XSDataBioSaxsSample but %s" % self._sample.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'saxsModelingResult' attribute
+    def getSaxsModelingResult(self): return self._saxsModelingResult
+    def setSaxsModelingResult(self, saxsModelingResult):
+        if saxsModelingResult is None:
+            self._saxsModelingResult = None
+        elif saxsModelingResult.__class__.__name__ == "XSDataResultSaxsModeling":
+            self._saxsModelingResult = saxsModelingResult
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setSaxsModelingResult argument is not XSDataResultSaxsModeling but %s" % saxsModelingResult.__class__.__name__
+            raise BaseException(strMessage)
+    def delSaxsModelingResult(self): self._saxsModelingResult = None
+    saxsModelingResult = property(getSaxsModelingResult, setSaxsModelingResult, delSaxsModelingResult, "Property for saxsModelingResult")
+    # Methods and properties for the 'sample' attribute
+    def getSample(self): return self._sample
+    def setSample(self, sample):
+        if sample is None:
+            self._sample = None
+        elif sample.__class__.__name__ == "XSDataBioSaxsSample":
+            self._sample = sample
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setSample argument is not XSDataBioSaxsSample but %s" % sample.__class__.__name__
+            raise BaseException(strMessage)
+    def delSample(self): self._sample = None
+    sample = property(getSample, setSample, delSample, "Property for sample")
+    def export(self, outfile, level, name_='XSDataInputBioSaxsISPyBModellingv1_0'):
+        showIndent(outfile, level)
+        outfile.write(unicode('<%s>\n' % name_))
+        self.exportChildren(outfile, level + 1, name_)
+        showIndent(outfile, level)
+        outfile.write(unicode('</%s>\n' % name_))
+    def exportChildren(self, outfile, level, name_='XSDataInputBioSaxsISPyBModellingv1_0'):
+        XSDataInput.exportChildren(self, outfile, level, name_)
+        if self._saxsModelingResult is not None:
+            self.saxsModelingResult.export(outfile, level, name_='saxsModelingResult')
+        else:
+            warnEmptyAttribute("saxsModelingResult", "XSDataResultSaxsModeling")
+        if self._sample is not None:
+            self.sample.export(outfile, level, name_='sample')
+        else:
+            warnEmptyAttribute("sample", "XSDataBioSaxsSample")
+    def build(self, node_):
+        for child_ in node_.childNodes:
+            nodeName_ = child_.nodeName.split(':')[-1]
+            self.buildChildren(child_, nodeName_)
+    def buildChildren(self, child_, nodeName_):
+        if child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'saxsModelingResult':
+            obj_ = XSDataResultSaxsModeling()
+            obj_.build(child_)
+            self.setSaxsModelingResult(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'sample':
+            obj_ = XSDataBioSaxsSample()
+            obj_.build(child_)
+            self.setSample(obj_)
+        XSDataInput.buildChildren(self, child_, nodeName_)
+    #Method for marshalling an object
+    def marshal( self ):
+        oStreamString = StringIO()
+        oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
+        self.export( oStreamString, 0, name_="XSDataInputBioSaxsISPyBModellingv1_0" )
+        oStringXML = oStreamString.getvalue()
+        oStreamString.close()
+        return oStringXML
+    #Only to export the entire XML tree to a file stream on disk
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
+        outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
+        self.export( outfile, 0, name_='XSDataInputBioSaxsISPyBModellingv1_0' )
+        outfile.close()
+    #Deprecated method, replaced by exportToFile
+    def outputFile( self, _outfileName ):
+        print("WARNING: Method outputFile in class XSDataInputBioSaxsISPyBModellingv1_0 is deprecated, please use instead exportToFile!")
+        self.exportToFile(_outfileName)
+    #Method for making a copy in a new instance
+    def copy( self ):
+        return XSDataInputBioSaxsISPyBModellingv1_0.parseString(self.marshal())
+    #Static method for parsing a string
+    def parseString( _inString ):
+        doc = minidom.parseString(_inString)
+        rootNode = doc.documentElement
+        rootObj = XSDataInputBioSaxsISPyBModellingv1_0()
+        rootObj.build(rootNode)
+        # Check that all minOccurs are obeyed by marshalling the created object
+        oStreamString = StringIO()
+        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsISPyBModellingv1_0" )
+        oStreamString.close()
+        return rootObj
+    parseString = staticmethod( parseString )
+    #Static method for parsing a file
+    def parseFile( _inFilePath ):
+        doc = minidom.parse(_inFilePath)
+        rootNode = doc.documentElement
+        rootObj = XSDataInputBioSaxsISPyBModellingv1_0()
+        rootObj.build(rootNode)
+        return rootObj
+    parseFile = staticmethod( parseFile )
+# end class XSDataInputBioSaxsISPyBModellingv1_0
 
 
 class XSDataInputBioSaxsISPyBv1_0(XSDataInput):
@@ -4121,6 +4243,68 @@ class XSDataResultBioSaxsAzimutIntv1_0(XSDataResult):
         return rootObj
     parseFile = staticmethod( parseFile )
 # end class XSDataResultBioSaxsAzimutIntv1_0
+
+
+class XSDataResultBioSaxsISPyBModellingv1_0(XSDataResult):
+    def __init__(self, status=None):
+        XSDataResult.__init__(self, status)
+    def export(self, outfile, level, name_='XSDataResultBioSaxsISPyBModellingv1_0'):
+        showIndent(outfile, level)
+        outfile.write(unicode('<%s>\n' % name_))
+        self.exportChildren(outfile, level + 1, name_)
+        showIndent(outfile, level)
+        outfile.write(unicode('</%s>\n' % name_))
+    def exportChildren(self, outfile, level, name_='XSDataResultBioSaxsISPyBModellingv1_0'):
+        XSDataResult.exportChildren(self, outfile, level, name_)
+    def build(self, node_):
+        for child_ in node_.childNodes:
+            nodeName_ = child_.nodeName.split(':')[-1]
+            self.buildChildren(child_, nodeName_)
+    def buildChildren(self, child_, nodeName_):
+        pass
+        XSDataResult.buildChildren(self, child_, nodeName_)
+    #Method for marshalling an object
+    def marshal( self ):
+        oStreamString = StringIO()
+        oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
+        self.export( oStreamString, 0, name_="XSDataResultBioSaxsISPyBModellingv1_0" )
+        oStringXML = oStreamString.getvalue()
+        oStreamString.close()
+        return oStringXML
+    #Only to export the entire XML tree to a file stream on disk
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
+        outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
+        self.export( outfile, 0, name_='XSDataResultBioSaxsISPyBModellingv1_0' )
+        outfile.close()
+    #Deprecated method, replaced by exportToFile
+    def outputFile( self, _outfileName ):
+        print("WARNING: Method outputFile in class XSDataResultBioSaxsISPyBModellingv1_0 is deprecated, please use instead exportToFile!")
+        self.exportToFile(_outfileName)
+    #Method for making a copy in a new instance
+    def copy( self ):
+        return XSDataResultBioSaxsISPyBModellingv1_0.parseString(self.marshal())
+    #Static method for parsing a string
+    def parseString( _inString ):
+        doc = minidom.parseString(_inString)
+        rootNode = doc.documentElement
+        rootObj = XSDataResultBioSaxsISPyBModellingv1_0()
+        rootObj.build(rootNode)
+        # Check that all minOccurs are obeyed by marshalling the created object
+        oStreamString = StringIO()
+        rootObj.export( oStreamString, 0, name_="XSDataResultBioSaxsISPyBModellingv1_0" )
+        oStreamString.close()
+        return rootObj
+    parseString = staticmethod( parseString )
+    #Static method for parsing a file
+    def parseFile( _inFilePath ):
+        doc = minidom.parse(_inFilePath)
+        rootNode = doc.documentElement
+        rootObj = XSDataResultBioSaxsISPyBModellingv1_0()
+        rootObj.build(rootNode)
+        return rootObj
+    parseFile = staticmethod( parseFile )
+# end class XSDataResultBioSaxsISPyBModellingv1_0
 
 
 class XSDataResultBioSaxsISPyBv1_0(XSDataResult):

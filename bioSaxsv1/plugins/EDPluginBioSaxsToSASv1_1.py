@@ -62,6 +62,7 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
     cpWait = "EDPluginWaitFile"
     cpModeling = "EDPluginControlSaxsModelingv1_0"
     cpAnalysisModeling = "EDPluginControlSaxsAnalysisModelingv1_0"
+    cpISPyB = "EDPluginBioSaxsISPyBModellingv1_0"
     cpRsync = "EDPluginExecRsync"
 
 
@@ -79,6 +80,7 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
         self.gnomFile = None
         self.outFile = None
         self.wd = None
+        self.xsdModellingResult = None
 
 
 
@@ -225,6 +227,7 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
         self.DEBUG("EDPluginBioSaxsToSASv1_1.doSuccessExecSAS")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsToSASv1_1.doSuccessExecSAS")
         self.retrieveMessages(_edPlugin)
+        self.xsdModellingResult = _edPlugin.dataOutput
         self.wd = os.path.join(_edPlugin.getWorkingDirectory(), "")
 
     def doFailureExecSAS(self, _edPlugin=None):
