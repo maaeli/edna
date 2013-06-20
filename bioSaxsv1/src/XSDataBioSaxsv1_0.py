@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Thu Jun 20 02:46::46 2013 by EDGenerateDS.
+# Generated Thu Jun 20 03:08::33 2013 by EDGenerateDS.
 #
 
 import os, sys
@@ -13,8 +13,8 @@ strEdnaHome = os.environ.get("EDNA_HOME", None)
 
 dictLocation = {
  "XSDataCommon": "kernel/datamodel", \
- "XSDataEdnaSaxs": "ednaSaxs/datamodel"
- }
+ "XSDataEdnaSaxs": "ednaSaxs/datamodel", \
+}
 
 try:
     from XSDataCommon import XSData
@@ -3542,7 +3542,7 @@ class XSDataInputBioSaxsSubtractv1_0(XSDataInput):
 
 class XSDataInputBioSaxsToSASv1_0(XSDataInput):
     """This is just a wrapper for the SAS downstream pipeline"""
-    def __init__(self, configuration=None, destinationDirectory=None, qMax=None, lastPoint=None, firstPoint=None, gnomFile=None, subtractedCurve=None):
+    def __init__(self, configuration=None, sample=None, destinationDirectory=None, qMax=None, lastPoint=None, firstPoint=None, gnomFile=None, subtractedCurve=None):
         XSDataInput.__init__(self, configuration)
         if subtractedCurve is None:
             self._subtractedCurve = None
@@ -3585,6 +3585,13 @@ class XSDataInputBioSaxsToSASv1_0(XSDataInput):
             self._destinationDirectory = destinationDirectory
         else:
             strMessage = "ERROR! XSDataInputBioSaxsToSASv1_0 constructor argument 'destinationDirectory' is not XSDataFile but %s" % self._destinationDirectory.__class__.__name__
+            raise BaseException(strMessage)
+        if sample is None:
+            self._sample = None
+        elif sample.__class__.__name__ == "XSDataBioSaxsSample":
+            self._sample = sample
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsToSASv1_0 constructor argument 'sample' is not XSDataBioSaxsSample but %s" % self._sample.__class__.__name__
             raise BaseException(strMessage)
     # Methods and properties for the 'subtractedCurve' attribute
     def getSubtractedCurve(self): return self._subtractedCurve
@@ -3658,6 +3665,18 @@ class XSDataInputBioSaxsToSASv1_0(XSDataInput):
             raise BaseException(strMessage)
     def delDestinationDirectory(self): self._destinationDirectory = None
     destinationDirectory = property(getDestinationDirectory, setDestinationDirectory, delDestinationDirectory, "Property for destinationDirectory")
+    # Methods and properties for the 'sample' attribute
+    def getSample(self): return self._sample
+    def setSample(self, sample):
+        if sample is None:
+            self._sample = None
+        elif sample.__class__.__name__ == "XSDataBioSaxsSample":
+            self._sample = sample
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsToSASv1_0.setSample argument is not XSDataBioSaxsSample but %s" % sample.__class__.__name__
+            raise BaseException(strMessage)
+    def delSample(self): self._sample = None
+    sample = property(getSample, setSample, delSample, "Property for sample")
     def export(self, outfile, level, name_='XSDataInputBioSaxsToSASv1_0'):
         showIndent(outfile, level)
         outfile.write(unicode('<%s>\n' % name_))
@@ -3678,6 +3697,8 @@ class XSDataInputBioSaxsToSASv1_0(XSDataInput):
             self.qMax.export(outfile, level, name_='qMax')
         if self._destinationDirectory is not None:
             self.destinationDirectory.export(outfile, level, name_='destinationDirectory')
+        if self._sample is not None:
+            self.sample.export(outfile, level, name_='sample')
     def build(self, node_):
         for child_ in node_.childNodes:
             nodeName_ = child_.nodeName.split(':')[-1]
@@ -3713,6 +3734,11 @@ class XSDataInputBioSaxsToSASv1_0(XSDataInput):
             obj_ = XSDataFile()
             obj_.build(child_)
             self.setDestinationDirectory(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'sample':
+            obj_ = XSDataBioSaxsSample()
+            obj_.build(child_)
+            self.setSample(obj_)
         XSDataInput.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
     def marshal( self ):

@@ -38,7 +38,7 @@ edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
 edFactoryPlugin.loadModule("XSDataWaitFilev1_0")
 edFactoryPlugin.loadModule("XSDataExecCommandLine")
 edFactoryPlugin.loadModule("XSDataEdnaSaxs")
-from XSDataBioSaxsv1_0      import XSDataInputBioSaxsToSASv1_0, XSDataResultBioSaxsToSASv1_0
+from XSDataBioSaxsv1_0      import XSDataInputBioSaxsToSASv1_0, XSDataResultBioSaxsToSASv1_0, XSDataInputBioSaxsISPyBModellingv1_0
 from XSDataWaitFilev1_0     import XSDataInputWaitFile
 from XSDataExecCommandLine  import XSDataInputRsync
 from XSDataCommon           import XSDataInteger, XSDataString, XSDataFile, XSPluginItem, XSDataStatus
@@ -75,6 +75,7 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
         self.pluginWait = None
         self.pluginModeling = None
         self.pluginRsync = None
+        self.pluginISPyB = None
         self.inputFile = None
         self.strInFile = None
         self.gnomFile = None
@@ -171,6 +172,24 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
         self.pluginModeling.connectFAILURE(self.doFailureExecSAS)
         self.pluginModeling.executeSynchronous()
 
+        ########################################################################
+        # Send to ISPyB
+        ########################################################################
+
+        if self.dataInput.sample and self.dataInput.sample.login and \
+                self.dataInput.sample.passwd and self.dataInput.sample.measurementID and \
+                self.xsdModellingResult:
+            self.addExecutiveSummaryLine("Registering to ISPyB")
+            self.pluginISPyB = self.loadPlugin(self.cpISPyB)
+            self.pluginISPyB.dataInput = XSDataInputBioSaxsISPyBModellingv1_0(sample=self.dataInput.sample,
+                                                                              saxsModelingResult=self.xsdModellingResult)
+            self.pluginISPyB.connectSUCCESS()
+            self.pluginISPyB.connectFAILURE()
+            self.pluginISPyB.executeSynchronous()
+        ########################################################################
+        # Move results
+        ########################################################################
+
         if self.dataInput.destinationDirectory is None:
             outdir = os.path.join(os.path.dirname(os.path.dirname(self.strInFile)), "ednaSAS")
         else:
@@ -236,6 +255,19 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
         self.retrieveMessages(_edPlugin)
         self.wd = os.path.join(_edPlugin.getWorkingDirectory(), "")
         self.setFailure()
+
+    def doSuccessExecISPyB(self, _edPlugin=None):
+        self.DEBUG("EDPluginBioSaxsToSASv1_1.doSuccessExecISPyB")
+        self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsToSASv1_1.doSuccessExecISPyB")
+        self.retrieveMessages(_edPlugin)
+
+
+    def doFailureExecISPyB(self, _edPlugin=None):
+        self.DEBUG("EDPluginBioSaxsToSASv1_1.doFailureExecISPyB")
+        self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsToSASv1_1.doFailureExecISPyB")
+        self.retrieveMessages(_edPlugin)
+        self.setFailure()
+
 
     def doSuccessExecRsync(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsToSASv1_1.doSuccessExecRsync")

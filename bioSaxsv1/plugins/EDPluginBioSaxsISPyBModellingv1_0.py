@@ -30,7 +30,7 @@ __copyright__ = "2012 ESRF"
 __status__ = "Development"
 __date__ = "20130124"
 
-import os, shutil
+import os, shutil, json
 from EDPluginControl        import EDPluginControl
 from EDFactoryPlugin        import edFactoryPlugin
 from suds.client            import Client
@@ -39,6 +39,39 @@ edFactoryPlugin.loadModule("XSDataBioEdnaSaxsv1_0")
 from XSDataBioSaxsv1_0      import XSDataInputBioSaxsISPyBModellingv1_0, XSDataResultBioSaxsISPyBModellingv1_0
 from XSDataCommon           import  XSDataString, XSDataStatus
 
+def sensibleDict(dico):
+    """
+    Convert an EDNA XSData dictionary into a normal python dictionary for human beings
+    
+    This is likely to be called recursively 
+    """
+    sdic = {}
+    if not isinstance(dico, dict):
+        return dico
+    mytype = dico.get("__XSDataName", "")
+    if mytype == 'XSDataCommon.XSDataFile':
+        return  dico.get("_path", {}).get("_value", "")
+    elif mytype == 'XSDataCommon.XSDataDouble':
+        return  dico.get("_value", "")
+    elif mytype == 'XSDataCommon.XSDataString':
+        return  dico.get("_value", "")
+
+    else:
+        for key in dico:
+            if key.startswith("__"):
+                continue
+            if key.startswith("_"):
+                newkey = key[1:]
+            else:
+                newkey = key
+            val = dico[key]
+            if isinstance(val, dict):
+                sdic[newkey] = sensibleDict(val)
+            elif isinstance(val, (list, tuple)):
+                sdic[newkey] = [sensibleDict(i) for i in val]
+            else:
+                sdic[newkey] = dico[key]
+        return sdic
 
 
 class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
@@ -56,6 +89,13 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
        
         # Params to be sent and I dont know them
         self.modellingResult = None
+        self.models = None
+        self.damaver = None
+        self.damfilt = None
+        self.dammin = None
+        self.nsdPlot = None
+        self.chi2plot = None
+
 
 
     def checkParameters(self):
@@ -74,6 +114,13 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
          - The "url" key from config file        
         """
         EDPluginControl.configure(self)
+        if self.URL is None:
+            self.DEBUG("EDPluginBioSaxsISPyBv1_0.configure")
+            url = self.config.get(self.CONF_URL_KEY, None)
+            if url:
+                self.__class__.URL = url
+            else:
+                self.__class__.URL = self.CONF_URL_DEFAULT
       
 
 
@@ -84,18 +131,19 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
         self.DEBUG("EDPluginBioSaxsISPyBModellingv1_0.preProcess")
         self.dataBioSaxsSample = self.dataInput.sample
     
-        self.URL = self.dataBioSaxsSample.ispybURL
+
         user = None
         password = ""
         if self.dataBioSaxsSample:
             if self.dataBioSaxsSample.login:
                 user = self.dataBioSaxsSample.login.value
                 password = self.dataBioSaxsSample.passwd.value
+                self.URL = self.dataBioSaxsSample.ispybURL
         if not user:
             self.ERROR("No login/password information in sample configuration. Giving up.")
             self.setFailure()
             return
-
+        self.modellingResult = self.dataInput.saxsModelingResult
         # I don't trust in this authentication.... but it is going to work soon
         self.httpAuthenticatedToolsForBiosaxsWebService = HttpAuthenticated(username=user, password=password)
         self.client = Client(self.dataBioSaxsSample.ispybURL, transport=self.httpAuthenticatedToolsForBiosaxsWebService, cache=None)
@@ -104,26 +152,23 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
     def process(self, _edObject=None):
         EDPluginControl.process(self)
         self.DEBUG("EDPluginBioSaxsISPyBModellingv1_0.process")
+        dico = sensibleDict(self.modellingResult.exportToDict())
+        self.models = dico.get("dammifModels", [])
+        self.damaver = dico.get("damaverModel", {})
+        self.damfilt = dico.get("damfiltModel", {})
+        self.dammin = dico.get("damminModel", {})
+        self.nsdPlot = dico.get("nsdPlot", "")
+        self.chi2plot = dico.get("chiRfactorPlot", "")
         try:
             self.copy_to_pyarch()
         except Exception as error:
             strErrorMessage = "Error while copying to pyarch: %s" % error
             self.ERROR(strErrorMessage)
             self.lstError.append(strErrorMessage)
-        if self.dataInput.sample.collectionOrder is not None:
-            collectionOrder = str(self.dataInput.sample.collectionOrder.value)
-        else:
-            collectionOrder = "-1"
+
         try:
-            self.id = self.dataInput.sample.measurementID
-            self.concentrations = [2.4, 4.5,7]
-            self.models = "[{pdbFile: '/data/../dammif1.pdb', rg: '1.23', dMax: '232', I0: '12121'}, {pdbFile: '/data/../dammif2.pdb', rg: '2.23', dMax: '232', I0: '12121'}]"
-            self.dammaver = "{pdbFile: '/data/../dammif1.pdb', rg: '1.23', dMax: '232', I0: '12121'}"
-            self.dammif = "{pdbFile: '/data/../dammif1.pdb', rg: '1.23', dMax: '232', I0: '12121'}"
-            self.damming = "{pdbFile: '/data/../damming1.pdb', rg: '1.23', dMax: '232', I0: '12121'}"
-            self.nsdPlot = '/data/../nsd.png'
-            self.chi2plot = '/data/../chi2plot.png'           
-            return self.client.service.storeAbInitioModels(self.id, str(self.concentrations), self.models, self.dammaver, self.dammif, self.damming, self.nsdPlot, self.chi2plot)
+            self.id = [self.dataInput.sample.measurementID]
+            return self.client.service.storeAbInitioModels(self.id, str(self.concentrations), self.models, self.damaver, self.damfilt, self.dammin, self.nsdPlot, self.chi2plot)
            
         except Exception, error:
             strError = "ISPyB error: %s" % error
