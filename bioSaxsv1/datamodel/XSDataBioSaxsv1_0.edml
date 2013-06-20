@@ -114,6 +114,7 @@ complex type XSDataBioSaxsSample extends XSData {
 	measurementID: XSDataInteger optional
 	collectionOrder: XSDataInteger optional
 	ispybDestination: XSDataFile optional
+	ispybURL	: XSDataString optional
 }
 
 
@@ -238,6 +239,7 @@ complex type XSDataResultBioSaxsSmartMergev1_0 extends XSDataResult {
 	gnom: XSDataGnom optional 
 	volume: XSDataDoubleWithUnit optional
 	subtractedCurve: XSDataFile optional
+	sample: XSDataBioSaxsSample optional
 }
 
 
@@ -296,6 +298,7 @@ complex type XSDataInputBioSaxsToSASv1_0 extends XSDataInput  {
 	lastPoint: XSDataInteger optional
 	qMax: XSDataDouble optional
 	destinationDirectory: XSDataFile optional
+	
 }
 
 complex type XSDataResultBioSaxsToSASv1_0 extends XSDataResult {
