@@ -38,7 +38,7 @@ import matplotlib.pyplot as plt
 from EDThreading import Semaphore
 from EDPluginControl import EDPluginControl
 from EDActionCluster import EDActionCluster
-from XSDataCommon import XSDataStatus, XSDataString, XSDataBoolean, XSDataInteger
+from XSDataCommon import XSDataStatus, XSDataString, XSDataBoolean, XSDataInteger, XSDataFile
 from XSDataEdnaSaxs import XSDataInputSaxsModeling, XSDataResultSaxsModeling, \
                             XSDataInputDammif, XSDataInputSupcomb, XSDataInputDamaver, \
                             XSDataInputDamstart, XSDataInputDamfilt, XSDataInputDammin
@@ -157,6 +157,9 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         #retrieve results from best dammif
         self.dammif = self.bestDammif()
         self.chi2plot("chi2_R.png")
+        self.result.chiRfactorPlot = XSDataFile(XSDataString(os.path.abspath("chi2_R.png")))
+
+
 
         #temporary results: use best dammif
         self.result.fitFile = self.dammif.dataOutput.fitFile
@@ -188,6 +191,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
             return
 
         self.makeNSDarray("nsd.png")
+        self.result.nsdPlot = XSDataFile(XSDataString(os.path.abspath("nsd.png")))
 
         idx = self.ref
         self.actclust_supcomb = EDActionCluster(self.cluster_size)
