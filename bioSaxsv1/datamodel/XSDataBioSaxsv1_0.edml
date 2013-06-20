@@ -19,6 +19,7 @@ import XSDataEdnaSaxs.XSDataAutoRg
 import XSDataEdnaSaxs.XSDataGnom
 import XSDataEdnaSaxs.XSDataResultDatGnom
 import XSDataEdnaSaxs.XSDataResultDatPorod
+import XSDataEdnaSaxs.XSDataResultSaxsModeling
 
 /*******************************************
   *  Common types used only in BioSaxs
@@ -114,6 +115,7 @@ complex type XSDataBioSaxsSample extends XSData {
 	measurementID: XSDataInteger optional
 	collectionOrder: XSDataInteger optional
 	ispybDestination: XSDataFile optional
+	ispybURL	: XSDataString optional
 }
 
 
@@ -238,6 +240,7 @@ complex type XSDataResultBioSaxsSmartMergev1_0 extends XSDataResult {
 	gnom: XSDataGnom optional 
 	volume: XSDataDoubleWithUnit optional
 	subtractedCurve: XSDataFile optional
+	sample: XSDataBioSaxsSample optional
 }
 
 
@@ -290,11 +293,13 @@ complex type XSDataResultBioSaxsHPLCv1_0 extends XSDataResultBioSaxsProcessOneFi
 
 complex type XSDataInputBioSaxsToSASv1_0 extends XSDataInput  {
 	"This is just a wrapper for the SAS downstream pipeline"
-	subtractedCurve: XSDataFile
+	subtractedCurve: XSDataFile optional
+	gnomFile: XSDataFile optional
 	firstPoint: XSDataInteger optional
 	lastPoint: XSDataInteger optional
 	qMax: XSDataDouble optional
 	destinationDirectory: XSDataFile optional
+	
 }
 
 complex type XSDataResultBioSaxsToSASv1_0 extends XSDataResult {
@@ -364,6 +369,15 @@ complex type XSDataInputBioSaxsISPyBv1_0 extends XSDataInput  {
 }
 
 complex type XSDataResultBioSaxsISPyBv1_0 extends XSDataResult {
+	
+}
+complex type XSDataInputBioSaxsISPyBModellingv1_0 extends XSDataInput  {
+	"Input class for populating ISPyB"
+	saxsModelingResult: XSDataResultSaxsModeling
+	sample: XSDataBioSaxsSample
+}
+
+complex type XSDataResultBioSaxsISPyBModellingv1_0 extends XSDataResult {
 	
 }
 
