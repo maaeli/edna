@@ -161,8 +161,11 @@ class EDPluginExecSupcombv0_2(EDPluginExecProcessScript):
     def postProcess(self, _edObject=None):
         EDPluginExecProcessScript.postProcess(self)
         self.DEBUG("EDPluginExecSupcombv0_2.postProcess")
-
-        self.dataOutput = self.parseSupcombOutputFile()
+        try:
+            self.dataOutput = self.parseSupcombOutputFile()
+        except Exception as error:
+            self.ERROR("Error in supcomb: parseSupcombOutputFile: %s" % error)
+            self.setFailure()
 
     def generateSupcombScript(self):
         self.DEBUG("EDPluginExecSupcombv0_2.generateSupcombScript")

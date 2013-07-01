@@ -299,7 +299,7 @@ complex type XSDataInputBioSaxsToSASv1_0 extends XSDataInput  {
 	lastPoint: XSDataInteger optional
 	qMax: XSDataDouble optional
 	destinationDirectory: XSDataFile optional
-	
+	sample: XSDataBioSaxsSample optional
 }
 
 complex type XSDataResultBioSaxsToSASv1_0 extends XSDataResult {

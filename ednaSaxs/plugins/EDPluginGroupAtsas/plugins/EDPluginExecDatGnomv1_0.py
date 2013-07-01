@@ -29,7 +29,7 @@ __copyright__ = "2012, ESRF Grenoble"
 __date__ = "2012-08-30"
 __status__ = "Development"
 
-import os
+import os, shutil
 from EDPluginExecProcessScript import EDPluginExecProcessScript
 from XSDataEdnaSaxs import XSDataInputDatGnom, XSDataResultDatGnom, XSDataGnom
 from XSDataCommon import XSDataString, XSDataDouble, XSDataFile, XSDataLength, XSDataStatus
@@ -85,7 +85,10 @@ class EDPluginExecDatGnomv1_0(EDPluginExecProcessScript):
             self.setFailure()
             self.dataOutput = XSDataResultDatGnom()
             return
-        os.rename(outfile, self.outFile)
+        try:
+            os.rename(outfile, self.outFile)
+        except OSError:  # may fail if src and dst on different filesystem
+            shutil.copy(outfile, self.outFile)
         gnom = XSDataGnom(gnomFile=XSDataFile(XSDataString(self.outFile)))
         logfile = os.path.join(self.getWorkingDirectory(), self.getScriptLogFileName())
         out = open(logfile, "r").read().split()
