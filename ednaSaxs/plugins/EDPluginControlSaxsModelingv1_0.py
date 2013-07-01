@@ -62,7 +62,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
     strPluginExecDamfilt = "EDPluginExecDamfiltv0_2"
     strPluginExecDamstart = "EDPluginExecDamstartv0_2"
     strPluginExecDammin = "EDPluginExecDamminv0_2"
-
+    Rg_min = 0.5  # nm
     def __init__(self):
         """
         """
@@ -126,7 +126,27 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.xsGnomFile = self.dataInput.gnomFile
         if self.dataInput.graphFormat:
             self.graph_format = self.dataInput.graphFormat.value
+        self.checkRg()
+            
 
+    def checkRg(self):
+        """
+        If there is nothing in the sample, Rg = 0.1 nm 
+        damaver is likely to produce log files of many GB  
+        """
+        last_line = open(self.xsGnomFile.path.value).readlines()[-1]
+        key = "Real space: Rg ="
+        start = last_line.find(key) + len(key)
+        val = last_line[start].split()[0]
+        try:
+            rg = float(val)
+        except ValueError:
+            rg = 0.0
+        if rg < self.Rg_min:
+            str_err = "Radius of Giration is too small (%s<%s). Stop processing !!!!" % (rg, self.Rg_min)
+            self.ERROR(str_err)
+            self.setFailure()
+            raise RuntimeError(str_err)
 
     def process(self, _edObject=None):
         EDPluginControl.process(self)
