@@ -135,7 +135,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         damaver is likely to produce log files of many GB  
         """
         last_line = open(self.xsGnomFile.path.value).readlines()[-1]
-        self.WARNING("last Gnom file line is %s" % last_line)
+#         self.WARNING("last Gnom file line is %s" % last_line)
         key = "Rg ="
         start = last_line.find(key) + len(key)
         val = last_line[start:].split()[0]
@@ -432,7 +432,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         """
         fitResultDict = dict([(plg.dataOutput.chiSqrt.value, plg)
                               for plg in self.dammif_plugins
-                              if plg.dataOutput.chiSqrt is not None])
+                              if (plg.dataOutput is not None) and (plg.dataOutput.chiSqrt is not None)])
         fitResultList = fitResultDict.keys()
         fitResultList.sort()
 

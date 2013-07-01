@@ -15,6 +15,7 @@ import XSDataCommon.XSDataImage
 import XSDataCommon.XSDataLength
 import XSDataCommon.XSDataWavelength
 import XSDataCommon.XSDataTime
+import XSDataCommon.XSDataArray
 import XSDataEdnaSaxs.XSDataAutoRg
 import XSDataEdnaSaxs.XSDataGnom
 import XSDataEdnaSaxs.XSDataResultDatGnom
@@ -220,6 +221,9 @@ complex type XSDataResultBioSaxsProcessOneFilev1_0 extends XSDataResult {
 //	processLog : XSDataString => use executive summary
     sample: XSDataBioSaxsSample	optional
 	experimentSetup: XSDataBioSaxsExperimentSetup optional
+	dataQ: XSDataArray optional
+	dataI: XSDataArray optional
+	dataStdErr: XSDataArray optional
 }
 
 

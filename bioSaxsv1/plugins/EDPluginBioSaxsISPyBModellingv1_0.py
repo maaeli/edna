@@ -168,8 +168,13 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
 
         try:
             self.id = [self.dataInput.sample.measurementID]
-            return self.client.service.storeAbInitioModels(self.id, self.models, self.damaver, self.damfilt, self.dammin, self.nsdPlot, self.chi2plot)
-
+            return self.client.service.storeAbInitioModels(self.id,
+                                                           json.dumps(self.models),
+                                                           json.dumps(self.damaver),
+                                                           json.dumps(self.damfilt),
+                                                           json.dumps(self.dammin),
+                                                           self.nsdPlot,
+                                                           self.chi2plot)
         except Exception, error:
             strError = "ISPyB error: %s" % error
             self.ERROR(strError)
