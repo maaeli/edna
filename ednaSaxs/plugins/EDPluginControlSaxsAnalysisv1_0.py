@@ -94,6 +94,9 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
             self.edPluginAutoRg.connectFAILURE(self.doFailureRg)
             self.edPluginAutoRg.executeSynchronous()
 
+        if self.autoRg is None:
+            self.setFailure()
+
         if self.isFailure():
             return
 
