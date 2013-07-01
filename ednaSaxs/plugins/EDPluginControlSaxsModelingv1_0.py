@@ -135,9 +135,10 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         damaver is likely to produce log files of many GB  
         """
         last_line = open(self.xsGnomFile.path.value).readlines()[-1]
-        key = "Real space: Rg ="
+        self.WARNING("last Gnom file line is %s" % last_line)
+        key = "Rg ="
         start = last_line.find(key) + len(key)
-        val = last_line[start].split()[0]
+        val = last_line[start:].split()[0]
         try:
             rg = float(val)
         except ValueError:
