@@ -167,6 +167,8 @@ Volume  =    %12.2f""" % (self.xVolume.value)
 
         except Exception as error:
             self.ERROR("Error in doSuccessAnalysis: %s" % error)
+            if self.gnomFile is None:
+                self.setFailure()
 
 
     def doFailureAnalysis(self, _edPlugin=None):
