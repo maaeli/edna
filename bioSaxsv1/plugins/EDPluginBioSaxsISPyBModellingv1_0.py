@@ -144,6 +144,7 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
             self.setFailure()
             return
         self.modellingResult = self.dataInput.saxsModelingResult
+
         # I don't trust in this authentication.... but it is going to work soon
         self.httpAuthenticatedToolsForBiosaxsWebService = HttpAuthenticated(username=user, password=password)
         self.client = Client(self.dataBioSaxsSample.ispybURL, transport=self.httpAuthenticatedToolsForBiosaxsWebService, cache=None)
@@ -152,7 +153,18 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
     def process(self, _edObject=None):
         EDPluginControl.process(self)
         self.DEBUG("EDPluginBioSaxsISPyBModellingv1_0.process")
-        dico = sensibleDict(self.modellingResult.exportToDict())
+#         dammifModels: XSDataSaxsModel [] optional
+#         damaverModel: XSDataSaxsModel  optional
+#         damfiltModel: XSDataSaxsModel  optional
+#         damstartModel: XSDataSaxsModel  optional
+#         damminModel: XSDataSaxsModel  optional
+#         fitFile: XSDataFile optional
+#         logFile: XSDataFile optional
+#         pdbMoleculeFile: XSDataFile optional
+#         pdbSolventFile: XSDataFile optional
+#         chiRfactorPlot: XSDataFile optional
+#         nsdPlot: XSDataFile optional
+        dico = sensibleDict(self.datainput.exportToDict())
         self.models = dico.get("dammifModels", [])
         self.damaver = dico.get("damaverModel", {})
         self.damfilt = dico.get("damfiltModel", {})

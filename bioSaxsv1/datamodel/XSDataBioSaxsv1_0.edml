@@ -20,7 +20,7 @@ import XSDataEdnaSaxs.XSDataAutoRg
 import XSDataEdnaSaxs.XSDataGnom
 import XSDataEdnaSaxs.XSDataResultDatGnom
 import XSDataEdnaSaxs.XSDataResultDatPorod
-import XSDataEdnaSaxs.XSDataResultSaxsModeling
+import XSDataEdnaSaxs.XSDataSaxsModel
 
 /*******************************************
   *  Common types used only in BioSaxs
@@ -377,8 +377,21 @@ complex type XSDataResultBioSaxsISPyBv1_0 extends XSDataResult {
 }
 complex type XSDataInputBioSaxsISPyBModellingv1_0 extends XSDataInput  {
 	"Input class for populating ISPyB"
-	saxsModelingResult: XSDataResultSaxsModeling
+	//saxsModelingResult: XSDataResultSaxsModeling
 	sample: XSDataBioSaxsSample
+	dammifModels: XSDataSaxsModel [] optional
+	damaverModel: XSDataSaxsModel  optional
+	damfiltModel: XSDataSaxsModel  optional
+	damstartModel: XSDataSaxsModel  optional
+	damminModel: XSDataSaxsModel  optional
+
+	fitFile: XSDataFile optional
+	logFile: XSDataFile optional
+	pdbMoleculeFile: XSDataFile optional
+	pdbSolventFile: XSDataFile optional
+
+	chiRfactorPlot: XSDataFile optional
+	nsdPlot: XSDataFile optional
 }
 
 complex type XSDataResultBioSaxsISPyBModellingv1_0 extends XSDataResult {
