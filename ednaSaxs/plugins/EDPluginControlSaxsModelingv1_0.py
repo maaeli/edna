@@ -429,7 +429,9 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         """
         Find DAMMIF run with best chi-square value
         """
-        fitResultDict = dict([(plg.dataOutput.chiSqrt.value, plg) for plg in self.dammif_plugins])
+        fitResultDict = dict([(plg.dataOutput.chiSqrt.value, plg)
+                              for plg in self.dammif_plugins
+                              if plg.dataOutput.chiSqrt is not None])
         fitResultList = fitResultDict.keys()
         fitResultList.sort()
 
