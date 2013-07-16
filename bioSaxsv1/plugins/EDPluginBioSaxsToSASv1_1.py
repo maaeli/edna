@@ -183,8 +183,8 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
             self.pluginISPyB = self.loadPlugin(self.cpISPyB)
             self.xsdIspybInput.sample = self.dataInput.sample
             self.pluginISPyB.dataInput = self.xsdIspybInput
-            self.pluginISPyB.connectSUCCESS()
-            self.pluginISPyB.connectFAILURE()
+            self.pluginISPyB.connectSUCCESS(self.doSuccessExecISPyB)
+            self.pluginISPyB.connectFAILURE(self.doFailureExecISPyB)
             self.pluginISPyB.executeSynchronous()
         ########################################################################
         # Move results
