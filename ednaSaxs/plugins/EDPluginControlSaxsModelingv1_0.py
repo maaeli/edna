@@ -177,10 +177,9 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
 
         #retrieve results from best dammif
         self.dammif = self.bestDammif()
+
         self.chi2plot("chi2_R.png")
-        self.result.chiRfactorPlot = XSDataFile(XSDataString(os.path.abspath("chi2_R.png")))
-
-
+        self.result.chiRfactorPlot = XSDataFile(XSDataString(os.path.join(self.getWorkingDirectory(), "chi2_R.png")))
 
         #temporary results: use best dammif
         self.result.fitFile = self.dammif.dataOutput.fitFile
@@ -212,7 +211,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
             return
 
         self.makeNSDarray("nsd.png")
-        self.result.nsdPlot = XSDataFile(XSDataString(os.path.abspath("nsd.png")))
+        self.result.nsdPlot = XSDataFile(XSDataString(os.path.join(self.getWorkingDirectory(), "nsd.png")))
 
         idx = self.ref
         self.actclust_supcomb = EDActionCluster(self.cluster_size)
@@ -412,6 +411,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
             self.result.pdbMoleculeFile = _edPlugin.dataOutput.pdbMoleculeFile
             self.result.pdbSolventFile = _edPlugin.dataOutput.pdbSolventFile
             self.result.fitFile = _edPlugin.dataOutput.fitFile
+            self.result.firFile = _edPlugin.dataOutput.firFile
             self.result.logFile = _edPlugin.dataOutput.logFile
             self.result.damminModel = _edPlugin.dataOutput.model
             self.symlink(_edPlugin.dataOutput.model.pdbFile.path.value, _edPlugin.dataOutput.model.name.value + ".pdb")

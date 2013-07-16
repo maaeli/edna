@@ -189,7 +189,7 @@ Volume  =    %12.2f""" % (self.xVolume.value)
             self.xsDataResult.damminModel = _edPlugin.dataOutput.damminModel
             self.xsDataResult.chiRfactorPlot = _edPlugin.dataOutput.chiRfactorPlot
             self.xsDataResult.nsdPlot = _edPlugin.dataOutput.nsdPlot
-
+            self.xsDataResult.firFile = _edPlugin.dataOutput.firFile
             self.xsDataResult.fitFile = _edPlugin.dataOutput.fitFile
             self.xsDataResult.logFile = _edPlugin.dataOutput.logFile
             self.xsDataResult.pdbMoleculeFile = _edPlugin.dataOutput.pdbMoleculeFile

@@ -35,7 +35,7 @@ from EDPluginControl        import EDPluginControl
 from EDFactoryPlugin        import edFactoryPlugin
 from suds.client            import Client
 from suds.transport.http    import HttpAuthenticated
-edFactoryPlugin.loadModule("XSDataBioEdnaSaxsv1_0")
+edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
 from XSDataBioSaxsv1_0      import XSDataInputBioSaxsISPyBModellingv1_0, XSDataResultBioSaxsISPyBModellingv1_0
 from XSDataCommon           import  XSDataString, XSDataStatus
 
@@ -88,7 +88,7 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
         self.setXSDataInputClass(XSDataInputBioSaxsISPyBModellingv1_0)
 
         # Params to be sent and I dont know them
-        self.modellingResult = None
+#         self.modellingResult = None
         self.models = None
         self.damaver = None
         self.damfilt = None
@@ -96,7 +96,7 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
         self.nsdPlot = None
         self.chi2plot = None
         self.pyarchmodels = []
-
+        self.lstError = []
 
     def checkParameters(self):
         """
@@ -105,7 +105,7 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
         self.DEBUG("EDPluginBioSaxsISPyBModellingv1_0.checkParameters")
         self.checkMandatoryParameters(self.dataInput, "Data Input is None")
         self.checkMandatoryParameters(self.dataInput.sample, "Sample is None")
-        self.checkMandatoryParameters(self.dataInput.saxsModelingResult, "SaxsModelingResult is None")
+#         self.checkMandatoryParameters(self.dataInput.saxsModelingResult, "SaxsModelingResult is None")
 
 
     def configure(self):
@@ -143,11 +143,11 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
             self.ERROR("No login/password information in sample configuration. Giving up.")
             self.setFailure()
             return
-        self.modellingResult = self.dataInput.saxsModelingResult
+#         self.modellingResult = self.dataInput.saxsModelingResult
 
         # I don't trust in this authentication.... but it is going to work soon
         self.httpAuthenticatedToolsForBiosaxsWebService = HttpAuthenticated(username=user, password=password)
-        self.client = Client(self.dataBioSaxsSample.ispybURL, transport=self.httpAuthenticatedToolsForBiosaxsWebService, cache=None)
+        self.client = Client(self.dataBioSaxsSample.ispybURL.value, transport=self.httpAuthenticatedToolsForBiosaxsWebService, cache=None)
 
 
     def process(self, _edObject=None):
@@ -164,7 +164,7 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
 #         pdbSolventFile: XSDataFile optional
 #         chiRfactorPlot: XSDataFile optional
 #         nsdPlot: XSDataFile optional
-        dico = sensibleDict(self.datainput.exportToDict())
+        dico = sensibleDict(self.dataInput.exportToDict())
         self.models = dico.get("dammifModels", [])
         self.damaver = dico.get("damaverModel", {})
         self.damfilt = dico.get("damfiltModel", {})
@@ -179,8 +179,8 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
             self.lstError.append(strErrorMessage)
 
         try:
-            self.id = [self.dataInput.sample.measurementID]
-            return self.client.service.storeAbInitioModels(self.id,
+            self.id = self.dataInput.sample.measurementID.value
+            return self.client.service.storeAbInitioModels("[%s]" % self.id ,
                                                            json.dumps(self.models),
                                                            json.dumps(self.damaver),
                                                            json.dumps(self.damfilt),
@@ -220,8 +220,10 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
             self.damaver["pdbFile"] = self.copyfile(self.damaver.get("pdbFile"), pyarch, "damaver.pdb")
             self.damfilt["pdbFile"] = self.copyfile(self.damfilt.get("pdbFile"), pyarch, "damfilt.pdb")
             self.dammin["pdbFile"] = self.copyfile(self.dammin.get("pdbFile"), pyarch, "dammin.pdb")
-            self.copyfile(self.nsdPlot, pyarch)
-            self.copyfile(self.chi2plot, pyarch)
+
+
+            self.nsdPlot = self.copyfile(self.nsdPlot, pyarch)
+            self.chi2plot = self.copyfile(self.chi2plot, pyarch)
 
 
     def copyfile(self, afile, pyarch, dest=None):
@@ -229,6 +231,7 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
         if not pyarch:
             self.ERROR("pyArch is %s" % pyarch)
             return
+
         if afile and os.path.exists(afile) and os.path.isdir(pyarch):
             if dest == "model":
                 fullname = os.path.join(pyarch, "model_%02i.pdb" % (len(self.pyarchmodels) + 1))
