@@ -411,7 +411,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
             self.result.pdbMoleculeFile = _edPlugin.dataOutput.pdbMoleculeFile
             self.result.pdbSolventFile = _edPlugin.dataOutput.pdbSolventFile
             self.result.fitFile = _edPlugin.dataOutput.fitFile
-            self.result.firFile = _edPlugin.dataOutput.firFile
+            self.result.firFile = _edPlugin.dataOutput.model.firFile
             self.result.logFile = _edPlugin.dataOutput.logFile
             self.result.damminModel = _edPlugin.dataOutput.model
             self.symlink(_edPlugin.dataOutput.model.pdbFile.path.value, _edPlugin.dataOutput.model.name.value + ".pdb")
