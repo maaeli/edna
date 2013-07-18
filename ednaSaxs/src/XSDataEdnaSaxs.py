@@ -11,22 +11,7 @@ from xml.dom import Node
 
 strEdnaHome = os.environ.get("EDNA_HOME", None)
 
-dictLocation = { \
- "XSDataCommon": "workspace-ssd/edna-git/kernel/datamodel", \
- "XSDataCommon": "workspace-ssd/edna-git/kernel/datamodel", \
- "XSDataCommon": "workspace-ssd/edna-git/kernel/datamodel", \
- "XSDataCommon": "workspace-ssd/edna-git/kernel/datamodel", \
- "XSDataCommon": "workspace-ssd/edna-git/kernel/datamodel", \
- "XSDataCommon": "workspace-ssd/edna-git/kernel/datamodel", \
- "XSDataCommon": "workspace-ssd/edna-git/kernel/datamodel", \
- "XSDataCommon": "workspace-ssd/edna-git/kernel/datamodel", \
- "XSDataCommon": "workspace-ssd/edna-git/kernel/datamodel", \
- "XSDataCommon": "workspace-ssd/edna-git/kernel/datamodel", \
- "XSDataCommon": "workspace-ssd/edna-git/kernel/datamodel", \
- "XSDataCommon": "workspace-ssd/edna-git/kernel/datamodel", \
- "XSDataCommon": "workspace-ssd/edna-git/kernel/datamodel", \
- "XSDataCommon": "workspace-ssd/edna-git/kernel/datamodel", \
- "XSDataCommon": "workspace-ssd/edna-git/kernel/datamodel", \
+dictLocation = {  "XSDataCommon": "kernel/datamodel", \
 }
 
 try:
