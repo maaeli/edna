@@ -239,7 +239,7 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
             elif dest:
                 fullname = os.path.join(pyarch, dest)
             else:
-                fullname = pyarch
+                fullname = os.path.join(pyarch, os.path.basename(afile))
             try:
                 shutil.copy(afile, fullname)
             except IOError as error:
