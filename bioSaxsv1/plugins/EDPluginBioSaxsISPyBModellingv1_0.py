@@ -177,7 +177,7 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
             strErrorMessage = "Error while copying to pyarch: %s" % error
             self.ERROR(strErrorMessage)
             self.lstError.append(strErrorMessage)
-
+            self.writeErrorTrace()
         try:
             self.id = self.dataInput.sample.measurementID.value
             return self.client.service.storeAbInitioModels("[%s]" % self.id ,
