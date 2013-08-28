@@ -100,12 +100,13 @@ class EDPluginExecMeasureOffsetv2_1(EDPluginExec):
         """
         Configures the plugin (if not done yet
         """
-        EDPluginControl.configure(self)
+        EDPluginExec.configure(self)
         if self.use_sift_pyocl is None:
             with self.config_lock:
                 if self.use_sift_pyocl is None:
                     self.DEBUG("EDPluginExecMeasureOffsetv2_1.configure")
                     self.__class__.use_sift_pyocl = self.config.get("sift_pyocl", False)
+                    print self.use_sift_pyocl, self.sift_keypoints, self.sift_match
 
     def calc_plan(self, image=None):
         if self.sift_keypoints is None:
@@ -113,19 +114,20 @@ class EDPluginExecMeasureOffsetv2_1(EDPluginExec):
                 if self.sift_keypoints is None:
                     if self.use_sift_pyocl and sift_pyocl:
                         if self.config.get("device", None):
-                            self.__class__.sift_keypoints = sift_pyocl.SiftPlan(template=image, device=self.config["device"])
-                            self.__class__.match_plan = sift_pyocl.MatchPlan(device=self.config["device"])
+                            self.__class__.sift_match = sift_pyocl.MatchPlan(device=self.config["device"]).match
+                            self.__class__.sift_keypoints = sift_pyocl.SiftPlan(template=image, device=self.config["device"]).keypoints
                         else:
                             deviceType = self.config.get("deviceType", "cpu")
-                            self.__class__.sift_keypoints = sift_pyocl.SiftPlan(template=image, deviceType=deviceType)
-                            self.__class__.match_plan = sift_pyocl.MatchPlan(deviceType=deviceType)
+                            self.__class__.sift_match = sift_pyocl.MatchPlan(devicetype=deviceType).match
+                            self.__class__.sift_keypoints = sift_pyocl.SiftPlan(template=image, devicetype=deviceType).keypoints
                     elif feature:
-                        self.__class__.sift_keypoints = feature.sift_keypoints
                         self.__class__.sift_match = feature.sift_match
+                        self.__class__.sift_keypoints = feature.sift_keypoints
                     else:
                         strerr = "Impossible to make plan: use_sift_pyocl=%s but feature=%s and sift_pyocl=%s" % (self.use_sift_pyoc, feature, sift_pyocl)
                         self.ERROR(strerr)
                         raise RuntimeError(strerr)
+                    print self.use_sift_pyocl, self.sift_keypoints, self.sift_match
 
     def preProcess(self, _edObject=None):
         EDPluginExec.preProcess(self)
@@ -229,6 +231,7 @@ class EDPluginExecMeasureOffsetv2_1(EDPluginExec):
             self.npaIm1 = scipy.ndimage.sobel(self.npaIm1)
             self.npaIm2 = scipy.ndimage.sobel(self.npaIm2)
 
+        self.calc_plan(self.npaIm1)
         checksum1 = hashlib.md5(self.npaIm1).hexdigest()
         checksum2 = hashlib.md5(self.npaIm2).hexdigest()
         if checksum1 not in self.keyindex:
