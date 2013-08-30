@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Tue Apr 16 04:55::25 2013 by EDGenerateDS.
+# Generated Tue Jul 16 08:48::39 2013 by EDGenerateDS.
 #
 
 import os, sys
@@ -11,7 +11,7 @@ from xml.dom import Node
 
 strEdnaHome = os.environ.get("EDNA_HOME", None)
 
-dictLocation = {  "XSDataCommon": "kernel/datamodel",
+dictLocation = {  "XSDataCommon": "kernel/datamodel", \
 }
 
 try:

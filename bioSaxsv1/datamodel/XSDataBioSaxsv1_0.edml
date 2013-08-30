@@ -15,10 +15,12 @@ import XSDataCommon.XSDataImage
 import XSDataCommon.XSDataLength
 import XSDataCommon.XSDataWavelength
 import XSDataCommon.XSDataTime
+import XSDataCommon.XSDataArray
 import XSDataEdnaSaxs.XSDataAutoRg
 import XSDataEdnaSaxs.XSDataGnom
 import XSDataEdnaSaxs.XSDataResultDatGnom
 import XSDataEdnaSaxs.XSDataResultDatPorod
+import XSDataEdnaSaxs.XSDataSaxsModel
 
 /*******************************************
   *  Common types used only in BioSaxs
@@ -114,6 +116,7 @@ complex type XSDataBioSaxsSample extends XSData {
 	measurementID: XSDataInteger optional
 	collectionOrder: XSDataInteger optional
 	ispybDestination: XSDataFile optional
+	ispybURL	: XSDataString optional
 }
 
 
@@ -218,6 +221,9 @@ complex type XSDataResultBioSaxsProcessOneFilev1_0 extends XSDataResult {
 //	processLog : XSDataString => use executive summary
     sample: XSDataBioSaxsSample	optional
 	experimentSetup: XSDataBioSaxsExperimentSetup optional
+	dataQ: XSDataArray optional
+	dataI: XSDataArray optional
+	dataStdErr: XSDataArray optional
 }
 
 
@@ -238,6 +244,7 @@ complex type XSDataResultBioSaxsSmartMergev1_0 extends XSDataResult {
 	gnom: XSDataGnom optional 
 	volume: XSDataDoubleWithUnit optional
 	subtractedCurve: XSDataFile optional
+	sample: XSDataBioSaxsSample optional
 }
 
 
@@ -296,6 +303,7 @@ complex type XSDataInputBioSaxsToSASv1_0 extends XSDataInput  {
 	lastPoint: XSDataInteger optional
 	qMax: XSDataDouble optional
 	destinationDirectory: XSDataFile optional
+	sample: XSDataBioSaxsSample optional
 }
 
 complex type XSDataResultBioSaxsToSASv1_0 extends XSDataResult {
@@ -365,6 +373,28 @@ complex type XSDataInputBioSaxsISPyBv1_0 extends XSDataInput  {
 }
 
 complex type XSDataResultBioSaxsISPyBv1_0 extends XSDataResult {
+	
+}
+complex type XSDataInputBioSaxsISPyBModellingv1_0 extends XSDataInput  {
+	"Input class for populating ISPyB"
+	//saxsModelingResult: XSDataResultSaxsModeling
+	sample: XSDataBioSaxsSample
+	dammifModels: XSDataSaxsModel [] optional
+	damaverModel: XSDataSaxsModel  optional
+	damfiltModel: XSDataSaxsModel  optional
+	damstartModel: XSDataSaxsModel  optional
+	damminModel: XSDataSaxsModel  optional
+
+	fitFile: XSDataFile optional
+	logFile: XSDataFile optional
+	pdbMoleculeFile: XSDataFile optional
+	pdbSolventFile: XSDataFile optional
+
+	chiRfactorPlot: XSDataFile optional
+	nsdPlot: XSDataFile optional
+}
+
+complex type XSDataResultBioSaxsISPyBModellingv1_0 extends XSDataResult {
 	
 }
 

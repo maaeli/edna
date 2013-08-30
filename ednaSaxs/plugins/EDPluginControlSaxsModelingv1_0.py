@@ -38,7 +38,7 @@ import matplotlib.pyplot as plt
 from EDThreading import Semaphore
 from EDPluginControl import EDPluginControl
 from EDActionCluster import EDActionCluster
-from XSDataCommon import XSDataStatus, XSDataString, XSDataBoolean, XSDataInteger
+from XSDataCommon import XSDataStatus, XSDataString, XSDataBoolean, XSDataInteger, XSDataFile
 from XSDataEdnaSaxs import XSDataInputSaxsModeling, XSDataResultSaxsModeling, \
                             XSDataInputDammif, XSDataInputSupcomb, XSDataInputDamaver, \
                             XSDataInputDamstart, XSDataInputDamfilt, XSDataInputDammin
@@ -62,7 +62,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
     strPluginExecDamfilt = "EDPluginExecDamfiltv0_2"
     strPluginExecDamstart = "EDPluginExecDamstartv0_2"
     strPluginExecDammin = "EDPluginExecDamminv0_2"
-
+    Rg_min = 0.5  # nm
     def __init__(self):
         """
         """
@@ -92,6 +92,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.checkMandatoryParameters(self.dataInput.gnomFile, "gnom output is missing")
 
     def configure(self):
+        EDPluginControl.configure(self)
         if not self.configured:
             with self.classlock:
                 if not self.configured:
@@ -125,7 +126,28 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.xsGnomFile = self.dataInput.gnomFile
         if self.dataInput.graphFormat:
             self.graph_format = self.dataInput.graphFormat.value
+        self.checkRg()
+            
 
+    def checkRg(self):
+        """
+        If there is nothing in the sample, Rg = 0.1 nm 
+        damaver is likely to produce log files of many GB  
+        """
+        last_line = open(self.xsGnomFile.path.value).readlines()[-1]
+#         self.WARNING("last Gnom file line is %s" % last_line)
+        key = "Rg ="
+        start = last_line.find(key) + len(key)
+        val = last_line[start:].split()[0]
+        try:
+            rg = float(val)
+        except ValueError:
+            rg = 0.0
+        if rg < self.Rg_min:
+            str_err = "Radius of Giration is too small (%s<%s). Stop processing !!!!" % (rg, self.Rg_min)
+            self.ERROR(str_err)
+            self.setFailure()
+            raise RuntimeError(str_err)
 
     def process(self, _edObject=None):
         EDPluginControl.process(self)
@@ -155,7 +177,9 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
 
         #retrieve results from best dammif
         self.dammif = self.bestDammif()
+
         self.chi2plot("chi2_R.png")
+        self.result.chiRfactorPlot = XSDataFile(XSDataString(os.path.join(self.getWorkingDirectory(), "chi2_R.png")))
 
         #temporary results: use best dammif
         self.result.fitFile = self.dammif.dataOutput.fitFile
@@ -187,6 +211,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
             return
 
         self.makeNSDarray("nsd.png")
+        self.result.nsdPlot = XSDataFile(XSDataString(os.path.join(self.getWorkingDirectory(), "nsd.png")))
 
         idx = self.ref
         self.actclust_supcomb = EDActionCluster(self.cluster_size)
@@ -386,6 +411,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
             self.result.pdbMoleculeFile = _edPlugin.dataOutput.pdbMoleculeFile
             self.result.pdbSolventFile = _edPlugin.dataOutput.pdbSolventFile
             self.result.fitFile = _edPlugin.dataOutput.fitFile
+            self.result.firFile = _edPlugin.dataOutput.model.firFile
             self.result.logFile = _edPlugin.dataOutput.logFile
             self.result.damminModel = _edPlugin.dataOutput.model
             self.symlink(_edPlugin.dataOutput.model.pdbFile.path.value, _edPlugin.dataOutput.model.name.value + ".pdb")
@@ -404,7 +430,9 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         """
         Find DAMMIF run with best chi-square value
         """
-        fitResultDict = dict([(plg.dataOutput.chiSqrt.value, plg) for plg in self.dammif_plugins])
+        fitResultDict = dict([(plg.dataOutput.chiSqrt.value, plg)
+                              for plg in self.dammif_plugins
+                              if (plg.dataOutput is not None) and (plg.dataOutput.chiSqrt is not None)])
         fitResultList = fitResultDict.keys()
         fitResultList.sort()
 

@@ -32,7 +32,7 @@ __copyright__ = "2010 DLS; 2013 ESRF"
 import os
 from EDPluginExecProcessScript import EDPluginExecProcessScript
 from XSDataEdnaSaxs import XSDataInputDammin, XSDataResultDammin, XSDataSaxsModel
-from XSDataCommon import XSDataString, XSDataFile, XSDataDouble, XSDataMessage, XSDataStatus
+from XSDataCommon import XSDataString, XSDataFile, XSDataDouble, XSDataStatus
 import parse_atsas
 
 class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
@@ -155,7 +155,7 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
         pathSolventFile = os.path.join(cwd, "dammin-0.pdb")
 
         try:
-            res = parse_atsas.parsePDB(pathMoleculeFile)
+            res = parse_atsas.parsePDB(pathMoleculeFile, pathMoleculeFile)
         except Exception as error:
             self.ERROR("EDPluginExecDamminv0_2:parsePDB: %s" % error)
         else:

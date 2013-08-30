@@ -27,24 +27,22 @@ __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "2013 ESRF"
 __status__ = "Development"
-__date__ = "20130417"
+__date__ = "20130515"
 
-import os
+import os, shutil
 from EDPluginControl        import EDPluginControl
 from EDFactoryPlugin        import edFactoryPlugin
-from EDConfiguration        import EDConfiguration
 from EDUtilsPath            import EDUtilsPath
 from EDUtilsPlatform        import EDUtilsPlatform
-from EDUtilsArray           import EDUtilsArray
 edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
 edFactoryPlugin.loadModule("XSDataWaitFilev1_0")
 edFactoryPlugin.loadModule("XSDataExecCommandLine")
 edFactoryPlugin.loadModule("XSDataEdnaSaxs")
-from XSDataBioSaxsv1_0      import XSDataInputBioSaxsToSASv1_0, XSDataResultBioSaxsToSASv1_0
+from XSDataBioSaxsv1_0      import XSDataInputBioSaxsToSASv1_0, XSDataResultBioSaxsToSASv1_0, XSDataInputBioSaxsISPyBModellingv1_0
 from XSDataWaitFilev1_0     import XSDataInputWaitFile
 from XSDataExecCommandLine  import XSDataInputRsync
-from XSDataCommon           import XSDataInteger, XSDataDouble, XSDataString, XSDataFile, XSPluginItem, XSDataStatus
-from XSDataEdnaSaxs         import XSDataInputSaxsAnalysisModeling, XSDataInputSaxsAnalysis, XSDataInputSaxsModeling
+from XSDataCommon           import XSDataInteger, XSDataString, XSDataFile, XSPluginItem, XSDataStatus
+from XSDataEdnaSaxs         import XSDataInputSaxsAnalysisModeling, XSDataInputSaxsModeling
 
 architecture = EDUtilsPlatform.architecture
 numpyPath = os.path.join(EDUtilsPath.EDNA_HOME, "libraries", "20090405-Numpy-1.3", architecture)
@@ -64,6 +62,7 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
     cpWait = "EDPluginWaitFile"
     cpModeling = "EDPluginControlSaxsModelingv1_0"
     cpAnalysisModeling = "EDPluginControlSaxsAnalysisModelingv1_0"
+    cpISPyB = "EDPluginBioSaxsISPyBModellingv1_0"
     cpRsync = "EDPluginExecRsync"
 
 
@@ -76,11 +75,13 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
         self.pluginWait = None
         self.pluginModeling = None
         self.pluginRsync = None
+        self.pluginISPyB = None
         self.inputFile = None
         self.strInFile = None
         self.gnomFile = None
         self.outFile = None
         self.wd = None
+        self.xsdIspybInput = XSDataInputBioSaxsISPyBModellingv1_0()
 
 
 
@@ -171,8 +172,24 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
         self.pluginModeling.connectFAILURE(self.doFailureExecSAS)
         self.pluginModeling.executeSynchronous()
 
-        if self.isFailure():
-            return
+        ########################################################################
+        # Send to ISPyB
+        ########################################################################
+
+        if self.dataInput.sample and self.dataInput.sample.login and \
+                self.dataInput.sample.passwd and self.dataInput.sample.measurementID and \
+                self.xsdIspybInput:
+            self.addExecutiveSummaryLine("Registering to ISPyB")
+            self.pluginISPyB = self.loadPlugin(self.cpISPyB)
+            self.xsdIspybInput.sample = self.dataInput.sample
+            self.pluginISPyB.dataInput = self.xsdIspybInput
+            self.pluginISPyB.connectSUCCESS(self.doSuccessExecISPyB)
+            self.pluginISPyB.connectFAILURE(self.doFailureExecISPyB)
+            self.pluginISPyB.executeSynchronous()
+        ########################################################################
+        # Move results
+        ########################################################################
+
         if self.dataInput.destinationDirectory is None:
             outdir = os.path.join(os.path.dirname(os.path.dirname(self.strInFile)), "ednaSAS")
         else:
@@ -180,7 +197,7 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
         outdir = os.path.join(outdir, os.path.basename(os.path.splitext(self.strInFile)[0]))
         if not os.path.isdir(outdir):
             os.makedirs(outdir)
-        self.outFile = os.path.join(outdir, "pipelineResults.html")
+        self.outFile = os.path.join(outdir, "NoResults.html")
 
         self.pluginRsync = self.loadPlugin(self.cpRsync)
         self.pluginRsync.dataInput = XSDataInputRsync(source=XSDataFile(XSDataString(self.wd)) ,
@@ -190,6 +207,12 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
         self.pluginRsync.connectSUCCESS(self.doSuccessExecRsync)
         self.pluginRsync.connectFAILURE(self.doFailureExecRsync)
         self.pluginRsync.executeSynchronous()
+
+        # if no errors up to now, clean up scratch disk
+        if not self.isFailure():
+            to_remove = self.pluginModeling.getWorkingDirectory()
+            if os.path.isdir(to_remove):
+                shutil.rmtree(to_remove)
 
 
     def postProcess(self, _edObject=None):
@@ -223,13 +246,49 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
         self.DEBUG("EDPluginBioSaxsToSASv1_1.doSuccessExecSAS")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsToSASv1_1.doSuccessExecSAS")
         self.retrieveMessages(_edPlugin)
+        self.xsdIspybInput.dammifModels = _edPlugin.dataOutput.dammifModels
+        self.xsdIspybInput.damaverModel = _edPlugin.dataOutput.damaverModel
+        self.xsdIspybInput.damfiltModel = _edPlugin.dataOutput.damfiltModel
+        self.xsdIspybInput.damstartModel = _edPlugin.dataOutput.damstartModel
+        self.xsdIspybInput.damminModel = _edPlugin.dataOutput.damminModel
+        self.xsdIspybInput.fitFile = _edPlugin.dataOutput.fitFile
+        self.xsdIspybInput.logFile = _edPlugin.dataOutput.logFile
+        self.xsdIspybInput.pdbMoleculeFile = _edPlugin.dataOutput.pdbMoleculeFile
+        self.xsdIspybInput.pdbSolventFile = _edPlugin.dataOutput.pdbSolventFile
+        self.xsdIspybInput.chiRfactorPlot = _edPlugin.dataOutput.chiRfactorPlot
+        self.xsdIspybInput.nsdPlot = _edPlugin.dataOutput.nsdPlot
+#         dammifModels: XSDataSaxsModel [] optional
+#         damaverModel: XSDataSaxsModel  optional
+#         damfiltModel: XSDataSaxsModel  optional
+#         damstartModel: XSDataSaxsModel  optional
+#         damminModel: XSDataSaxsModel  optional
+#         fitFile: XSDataFile optional
+#         logFile: XSDataFile optional
+#         pdbMoleculeFile: XSDataFile optional
+#         pdbSolventFile: XSDataFile optional
+#         chiRfactorPlot: XSDataFile optional
+#         nsdPlot: XSDataFile optional
         self.wd = os.path.join(_edPlugin.getWorkingDirectory(), "")
 
     def doFailureExecSAS(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsToSASv1_1.doFailureExecSAS")
         self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsToSASv1_1.doFailureExecSAS")
         self.retrieveMessages(_edPlugin)
+        self.wd = os.path.join(_edPlugin.getWorkingDirectory(), "")
         self.setFailure()
+
+    def doSuccessExecISPyB(self, _edPlugin=None):
+        self.DEBUG("EDPluginBioSaxsToSASv1_1.doSuccessExecISPyB")
+        self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsToSASv1_1.doSuccessExecISPyB")
+        self.retrieveMessages(_edPlugin)
+
+
+    def doFailureExecISPyB(self, _edPlugin=None):
+        self.DEBUG("EDPluginBioSaxsToSASv1_1.doFailureExecISPyB")
+        self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsToSASv1_1.doFailureExecISPyB")
+        self.retrieveMessages(_edPlugin)
+        self.setFailure()
+
 
     def doSuccessExecRsync(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsToSASv1_1.doSuccessExecRsync")

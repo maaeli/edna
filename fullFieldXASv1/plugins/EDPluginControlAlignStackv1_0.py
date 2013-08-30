@@ -110,7 +110,7 @@ class EDPluginControlAlignStackv1_0(EDPluginControl):
         self.queue = Queue()
         self.__strControlledPluginAccumulator = "EDPluginAccumulatorv1_0"
         self.__strControlledPluginMeasureFFT = "EDPluginExecMeasureOffsetv1_0"
-        self.__strControlledPluginMeasureSIFT = "EDPluginExecMeasureOffsetv2_0"
+        self.__strControlledPluginMeasureSIFT = "EDPluginExecMeasureOffsetv2_1"
         self.__strControlledPluginShift = "EDPluginExecShiftImagev1_1"
         self.__strControlledPluginHDF5 = "EDPluginHDF5StackImagesv10"
 

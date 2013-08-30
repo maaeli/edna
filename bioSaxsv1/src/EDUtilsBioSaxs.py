@@ -365,7 +365,7 @@ class HPLCrun(object):
     def calc_size(self, idx):
         return (1 + (idx // self.chunk_size)) * self.chunk_size
 
-    def extract_data(self):
+    def extract_data(self, force_finished=False):
         self.max_size = self.calc_size(max(self.frames.keys()) + 1)
         self.time = numpy.zeros(self.max_size, dtype=numpy.float64)
         self.gnom = numpy.zeros(self.max_size, dtype=numpy.float32)
@@ -386,8 +386,9 @@ class HPLCrun(object):
         self.subtracted_I = numpy.zeros((self.max_size, self.size), dtype=numpy.float32)
         self.subtracted_Stdev = numpy.zeros((self.max_size, self.size), dtype=numpy.float32)
         for i, frame in self.frames.items():
-            while frame.processing:
-                time.sleep(1)
+            if not force_finished:
+                while frame.processing:
+                    time.sleep(1)
             self.time[i] = frame.time or 0
             self.gnom[i] = frame.gnom or 0
             self.Dmax[i] = frame.Dmax or 0
@@ -433,49 +434,73 @@ class HPLCrun(object):
             self.hdf5.create_dataset(name="scattering_Stdev", shape=(self.max_size, self.size), dtype=numpy.float32, data=self.scattering_Stdev, chunks=(self.chunk_size, self.size))
             self.hdf5.create_dataset(name="subtracted_I", shape=(self.max_size, self.size), dtype=numpy.float32, data=self.subtracted_I, chunks=(self.chunk_size, self.size))
             self.hdf5.create_dataset(name="subtracted_Stdev", shape=(self.max_size, self.size), dtype=numpy.float32, data=self.subtracted_Stdev, chunks=(self.chunk_size, self.size))
+            self.hdf5.close()
         return self.hdf5_filename
 
     def make_plot(self):
+        valid_pts = numpy.where(self.time)[0]
+        data = self.scattering_I.sum(axis= -1)
+        if (data > 0).sum() > valid_pts:
+            EDVerbose.WARNING("Error in time scale. discarding time scale")
+            valid_time = valid_pts = numpy.arange(data.size)
+
+        else:
+            valid_time = self.time[valid_pts]
+        if valid_pts.size < 2:
+            EDVerbose.WARNING("Too few points to make a curve")
+            return
+
         fig = pylab.plt.figure()
         fig_size = fig.get_size_inches()
         fig.set_size_inches([fig_size[0], 2 * fig_size[1]])
 
         sp0 = fig.add_subplot(511)
-        data = self.scattering_I.sum(axis= -1)
-        sp0.plot(self.time, data)#, label="Total Scattering")
+
+
+        sp0.plot(valid_time, data)  # , label="Total Scattering")
         sp0.set_ylabel("Scattering")
-        sp0.set_ylim((data[data > 0]).min(), data.max())
-        sp0.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(4))
-        sp0.legend()
+        datamin = (data[data > 0]).min()
+        datamax = data.max()
+        if datamax > datamin:  # avoid division by zero
+            sp0.set_ylim(datamin, datamax)
+            sp0.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(4))
+#         sp0.legend()
 
         sp1 = fig.add_subplot(512)
-        sp1.errorbar(self.time, self.Rg, self.Rg_Stdev, label="Rg")
-        sp1.plot(self.time, self.gnom, label="Gnom")
-        sp1.plot(self.time, self.Dmax, label="Dmax")
+        sp1.errorbar(valid_time, self.Rg, self.Rg_Stdev, label="Rg")
+        sp1.plot(valid_time, self.gnom[valid_pts], label="Gnom")
+        sp1.plot(valid_time, self.Dmax[valid_pts], label="Dmax")
         sp1.set_ylabel("Radius nm")
-        sp1.set_ylim(0, median_filt(self.Dmax, 9).max())
-        sp1.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(4))
-        sp1.legend()
+        datamax = median_filt(self.Dmax[valid_pts], 9).max()
+        if datamax > 0:
+            sp1.set_ylim(0, datamax)
+            sp1.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(4))
+#         sp1.legend()
 
         sp2 = fig.add_subplot(513)
-        sp2.errorbar(self.time, self.I0, self.I0_Stdev)#, label="I0")
+        sp2.errorbar(valid_time, self.I0[valid_pts], self.I0_Stdev[valid_pts])  # , label="I0")
         sp2.set_ylabel("I0")
         sp2.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(4))
-        sp2.legend()
+#         sp2.legend()
 
         sp3 = fig.add_subplot(514)
-        sp3.plot(self.time, 100 * self.quality)#, label="Quality")
+        sp3.plot(valid_time, 100.0 * self.quality[valid_pts])  # , label="Quality")
         sp3.set_ylabel("Qual. %")
         sp3.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(4))
-        sp3.legend()
+#         sp3.legend()
 
         sp4 = fig.add_subplot(515)
-        sp4.plot(self.time, self.volume)#, label="Volume")
+        sp4.plot(valid_time, self.volume[valid_pts])  # , label="Volume")
         sp4.set_ylabel("Vol. nm^3")
-        sp4.set_xlabel("time (seconds)")
-        sp4.set_ylim(0, median_filt(self.volume, 9).max())
-        sp4.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(4))
-        sp4.legend()
+        if (valid_time - valid_pts).sum() == 0:
+            sp4.set_xlabel("Point")
+        else:
+            sp4.set_xlabel("time (seconds)")
+        datamax = median_filt(self.volume, 9).max()
+        if datamax > 0:
+            sp4.set_ylim(0, datamax)
+            sp4.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(4))
+#         sp4.legend()
         pngFile = os.path.splitext(self.hdf5_filename)[0] + ".png"
         fig.savefig(pngFile)
         fig.savefig(os.path.splitext(self.hdf5_filename)[0] + ".svg", transparent=True, bbox_inches='tight', pad_inches=0)
