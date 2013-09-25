@@ -203,7 +203,7 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
 
     def copy_to_pyarch(self):
         if self.dataInput.sample.ispybDestination:
-            pyarch = os.path.join(self.dataInput.sample.ispybDestination.path.value, "1d")
+            pyarch = os.path.join(self.dataInput.sample.ispybDestination.path.value, str(self.dataInput.sample.measurementID.value))
             try:
                 if not os.path.isdir(pyarch):
                     os.makedirs(pyarch)
@@ -217,7 +217,7 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
                 if afile:
                     amodel["pdbFile"] = self.copyfile(afile, pyarch, "model")
 
-            self.damaver["pdbFile"] = self.copyfile(self.damaver.get("pdbFile"), pyarch, "damaver.pdb")
+            self.damaver["pdbFile"] = self.copyfile(self.damaver.get("pdbFile"), pyarch, "damaver_%s.pdb")
             self.damfilt["pdbFile"] = self.copyfile(self.damfilt.get("pdbFile"), pyarch, "damfilt.pdb")
             self.dammin["pdbFile"] = self.copyfile(self.dammin.get("pdbFile"), pyarch, "dammin.pdb")
 
