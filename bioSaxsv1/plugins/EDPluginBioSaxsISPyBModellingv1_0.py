@@ -220,8 +220,9 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
             self.damaver["pdbFile"] = self.copyfile(self.damaver.get("pdbFile"), pyarch, "damaver.pdb")
             self.damfilt["pdbFile"] = self.copyfile(self.damfilt.get("pdbFile"), pyarch, "damfilt.pdb")
             self.dammin["pdbFile"] = self.copyfile(self.dammin.get("pdbFile"), pyarch, "dammin.pdb")
-
-
+            self.dammin["fitFile"] = self.copyfile(self.dammin.get("fitFile"), pyarch, "dammin.fit")
+            self.dammin["firFile"] = self.copyfile(self.dammin.get("firFile"), pyarch, "dammin.fir")
+            self.dammin["logFile"] = self.copyfile(self.dammin.get("logFile"), pyarch, "dammin.log")
             self.nsdPlot = self.copyfile(self.nsdPlot, pyarch)
             self.chi2plot = self.copyfile(self.chi2plot, pyarch)
 
