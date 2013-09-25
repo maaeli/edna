@@ -232,7 +232,7 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
 
     def returnDamminChiSqrt(self):
         logFile = open(os.path.join(self.getWorkingDirectory(), "dammin.fir"))
-        self.sqrtChi = float(logFile.readline().split(' ')[-1])
+        self.sqrtChi = float(logFile.readline().split()[-1].split("=")[-1])
         return XSDataDouble(self.sqrtChi)
 
     def returnDamminRFactor(self):
