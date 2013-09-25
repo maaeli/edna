@@ -89,12 +89,12 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
 
         # Params to be sent and I dont know them
 #         self.modellingResult = None
-        self.models = None
-        self.damaver = None
-        self.damfilt = None
-        self.dammin = None
-        self.nsdPlot = None
-        self.chi2plot = None
+        self.models = []
+        self.damaver = {}
+        self.damfilt = {}
+        self.dammin = {}
+        self.nsdPlot = ""
+        self.chi2plot = ""
         self.pyarchmodels = []
         self.lstError = []
 
