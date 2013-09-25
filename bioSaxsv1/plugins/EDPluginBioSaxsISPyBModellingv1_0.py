@@ -217,7 +217,7 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
                 if afile:
                     amodel["pdbFile"] = self.copyfile(afile, pyarch, "model")
 
-            self.damaver["pdbFile"] = self.copyfile(self.damaver.get("pdbFile"), pyarch, "damaver_%s.pdb")
+            self.damaver["pdbFile"] = self.copyfile(self.damaver.get("pdbFile"), pyarch, "damaver.pdb")
             self.damfilt["pdbFile"] = self.copyfile(self.damfilt.get("pdbFile"), pyarch, "damfilt.pdb")
             self.dammin["pdbFile"] = self.copyfile(self.dammin.get("pdbFile"), pyarch, "dammin.pdb")
 
