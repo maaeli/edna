@@ -292,6 +292,8 @@ complex type XSDataResultBioSaxsHPLCv1_0 extends XSDataResultBioSaxsProcessOneFi
 	hplcFile: XSDataFile optional
 	mergedCurves: XSDataFile [] optional
 	hplcImage:XSDataFile optional
+	summedIntensity: XSDataDouble optional
+	timeStamp: XSDataTime optional
 }
 
 

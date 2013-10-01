@@ -301,6 +301,7 @@ class HPLCrun(object):
         if first_curve:
             self.files.append(first_curve)
         self.max_size = None
+        self.start_time = None
         self.time = None
         self.gnom = None
         self.Dmax = None

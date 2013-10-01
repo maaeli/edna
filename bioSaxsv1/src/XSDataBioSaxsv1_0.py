@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Mon Jul 1 06:01::02 2013 by EDGenerateDS.
+# Generated Tue Oct 1 11:12::39 2013 by EDGenerateDS.
 #
 
 import os, sys
@@ -6699,7 +6699,7 @@ class XSDataInputBioSaxsSampleExperiment(XSDataInputBioSaxsSample):
 
 class XSDataResultBioSaxsHPLCv1_0(XSDataResultBioSaxsProcessOneFilev1_0):
     """Plugin that runs subsequently ProcessOneFile, subtraction of buffer and SaxsAnalysis"""
-    def __init__(self, status=None, dataStdErr=None, dataI=None, dataQ=None, experimentSetup=None, sample=None, integratedCurve=None, integratedImage=None, normalizedImage=None, hplcImage=None, mergedCurves=None, hplcFile=None, volume=None, gnom=None, autoRg=None, subtractedCurve=None, bufferCurve=None):
+    def __init__(self, status=None, dataStdErr=None, dataI=None, dataQ=None, experimentSetup=None, sample=None, integratedCurve=None, integratedImage=None, normalizedImage=None, timeStamp=None, summedIntensity=None, hplcImage=None, mergedCurves=None, hplcFile=None, volume=None, gnom=None, autoRg=None, subtractedCurve=None, bufferCurve=None):
         XSDataResultBioSaxsProcessOneFilev1_0.__init__(self, status, dataStdErr, dataI, dataQ, experimentSetup, sample, integratedCurve, integratedImage, normalizedImage)
         if bufferCurve is None:
             self._bufferCurve = None
@@ -6756,6 +6756,20 @@ class XSDataResultBioSaxsHPLCv1_0(XSDataResultBioSaxsProcessOneFilev1_0):
             self._hplcImage = hplcImage
         else:
             strMessage = "ERROR! XSDataResultBioSaxsHPLCv1_0 constructor argument 'hplcImage' is not XSDataFile but %s" % self._hplcImage.__class__.__name__
+            raise BaseException(strMessage)
+        if summedIntensity is None:
+            self._summedIntensity = None
+        elif summedIntensity.__class__.__name__ == "XSDataDouble":
+            self._summedIntensity = summedIntensity
+        else:
+            strMessage = "ERROR! XSDataResultBioSaxsHPLCv1_0 constructor argument 'summedIntensity' is not XSDataDouble but %s" % self._summedIntensity.__class__.__name__
+            raise BaseException(strMessage)
+        if timeStamp is None:
+            self._timeStamp = None
+        elif timeStamp.__class__.__name__ == "XSDataTime":
+            self._timeStamp = timeStamp
+        else:
+            strMessage = "ERROR! XSDataResultBioSaxsHPLCv1_0 constructor argument 'timeStamp' is not XSDataTime but %s" % self._timeStamp.__class__.__name__
             raise BaseException(strMessage)
     # Methods and properties for the 'bufferCurve' attribute
     def getBufferCurve(self): return self._bufferCurve
@@ -6874,6 +6888,30 @@ class XSDataResultBioSaxsHPLCv1_0(XSDataResultBioSaxsProcessOneFilev1_0):
             raise BaseException(strMessage)
     def delHplcImage(self): self._hplcImage = None
     hplcImage = property(getHplcImage, setHplcImage, delHplcImage, "Property for hplcImage")
+    # Methods and properties for the 'summedIntensity' attribute
+    def getSummedIntensity(self): return self._summedIntensity
+    def setSummedIntensity(self, summedIntensity):
+        if summedIntensity is None:
+            self._summedIntensity = None
+        elif summedIntensity.__class__.__name__ == "XSDataDouble":
+            self._summedIntensity = summedIntensity
+        else:
+            strMessage = "ERROR! XSDataResultBioSaxsHPLCv1_0.setSummedIntensity argument is not XSDataDouble but %s" % summedIntensity.__class__.__name__
+            raise BaseException(strMessage)
+    def delSummedIntensity(self): self._summedIntensity = None
+    summedIntensity = property(getSummedIntensity, setSummedIntensity, delSummedIntensity, "Property for summedIntensity")
+    # Methods and properties for the 'timeStamp' attribute
+    def getTimeStamp(self): return self._timeStamp
+    def setTimeStamp(self, timeStamp):
+        if timeStamp is None:
+            self._timeStamp = None
+        elif timeStamp.__class__.__name__ == "XSDataTime":
+            self._timeStamp = timeStamp
+        else:
+            strMessage = "ERROR! XSDataResultBioSaxsHPLCv1_0.setTimeStamp argument is not XSDataTime but %s" % timeStamp.__class__.__name__
+            raise BaseException(strMessage)
+    def delTimeStamp(self): self._timeStamp = None
+    timeStamp = property(getTimeStamp, setTimeStamp, delTimeStamp, "Property for timeStamp")
     def export(self, outfile, level, name_='XSDataResultBioSaxsHPLCv1_0'):
         showIndent(outfile, level)
         outfile.write(unicode('<%s>\n' % name_))
@@ -6898,6 +6936,10 @@ class XSDataResultBioSaxsHPLCv1_0(XSDataResultBioSaxsProcessOneFilev1_0):
             mergedCurves_.export(outfile, level, name_='mergedCurves')
         if self._hplcImage is not None:
             self.hplcImage.export(outfile, level, name_='hplcImage')
+        if self._summedIntensity is not None:
+            self.summedIntensity.export(outfile, level, name_='summedIntensity')
+        if self._timeStamp is not None:
+            self.timeStamp.export(outfile, level, name_='timeStamp')
     def build(self, node_):
         for child_ in node_.childNodes:
             nodeName_ = child_.nodeName.split(':')[-1]
@@ -6943,6 +6985,16 @@ class XSDataResultBioSaxsHPLCv1_0(XSDataResultBioSaxsProcessOneFilev1_0):
             obj_ = XSDataFile()
             obj_.build(child_)
             self.setHplcImage(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'summedIntensity':
+            obj_ = XSDataDouble()
+            obj_.build(child_)
+            self.setSummedIntensity(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'timeStamp':
+            obj_ = XSDataTime()
+            obj_.build(child_)
+            self.setTimeStamp(obj_)
         XSDataResultBioSaxsProcessOneFilev1_0.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
     def marshal( self ):
