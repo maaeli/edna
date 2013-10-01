@@ -101,7 +101,7 @@ class EDPluginControlSaxsAnalysisModelingv1_0(EDPluginControl):
             self.edPluginAnalysis.connectSUCCESS(self.doSuccessAnalysis)
             self.edPluginAnalysis.connectFAILURE(self.doFailureAnalysis)
             self.edPluginAnalysis.executeSynchronous()
-
+        strLog = ""
         if self.isFailure():
             return
         else:
@@ -115,6 +115,9 @@ Quality: %4.2f%%     Aggregated: %s""" % (self.autoRg.rg.value, self.autoRg.rgSt
         if self.gnom is None:
             strLog += """
 datGnom failed"""
+            self.addExecutiveSummaryLine(strLog)
+            self.setFailure()
+            return
         else:
             strLog += """
 Dmax    =    %12.2f       Total =   %12.2f
@@ -127,7 +130,7 @@ datPorod failed"""
             strLog += """
 Volume  =    %12.2f""" % (self.xVolume.value)
 
-            self.addExecutiveSummaryLine(strLog)
+        self.addExecutiveSummaryLine(strLog)
 
         self.edPluginModeling = self.loadPlugin(self.cpModeling)
         self.edPluginModeling.dataInput = XSDataInputSaxsModeling(gnomFile=self.gnom.gnomFile,
@@ -167,8 +170,8 @@ Volume  =    %12.2f""" % (self.xVolume.value)
 
         except Exception as error:
             self.ERROR("Error in doSuccessAnalysis: %s" % error)
-            if self.gnomFile is None:
-                self.setFailure()
+#            if self.gnomFile is None:
+            self.setFailure()
 
 
     def doFailureAnalysis(self, _edPlugin=None):
@@ -189,7 +192,7 @@ Volume  =    %12.2f""" % (self.xVolume.value)
             self.xsDataResult.damminModel = _edPlugin.dataOutput.damminModel
             self.xsDataResult.chiRfactorPlot = _edPlugin.dataOutput.chiRfactorPlot
             self.xsDataResult.nsdPlot = _edPlugin.dataOutput.nsdPlot
-
+            self.xsDataResult.firFile = _edPlugin.dataOutput.firFile
             self.xsDataResult.fitFile = _edPlugin.dataOutput.fitFile
             self.xsDataResult.logFile = _edPlugin.dataOutput.logFile
             self.xsDataResult.pdbMoleculeFile = _edPlugin.dataOutput.pdbMoleculeFile

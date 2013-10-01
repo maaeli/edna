@@ -169,7 +169,7 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
             if self.Rfactor:
                 xsDataResult.rfactor = model.rfactor = XSDataDouble(self.Rfactor)
         if os.path.exists(pathFitFile):
-            xsDataResult.fitFile = model.fitfile = XSDataFile(XSDataString(pathFitFile))
+            xsDataResult.fitFile = model.fitFile = XSDataFile(XSDataString(pathFitFile))
         if os.path.exists(pathFirFile):
             model.firfile = XSDataFile(XSDataString(pathFirFile))
             xsDataResult.chiSqrt = model.chiSqrt = self.returnDamminChiSqrt()
@@ -177,8 +177,6 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
             xsDataResult.pdbMoleculeFile = model.pdbFile = XSDataFile(XSDataString(pathMoleculeFile))
         if os.path.exists(pathSolventFile):
             xsDataResult.pdbSolventFile = XSDataFile(XSDataString(pathSolventFile))
-        if os.path.exists(pathFirFile):
-            model.firFile = XSDataFile(XSDataString(pathFirFile))
 
         if self.volume:
             model.volume = XSDataDouble(self.volume)
@@ -231,12 +229,12 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
 
 
     def returnDamminChiSqrt(self):
-        logFile = open(os.path.join(self.getWorkingDirectory(), "dammin.fir"))
-        self.sqrtChi = float(logFile.readline().split(' ')[-1])
+        logFile = open(os.path.join(self.getWorkingDirectory(), "dammin.fir"), "r")
+        self.sqrtChi = float(logFile.readline().split()[-1].split("=")[-1])
         return XSDataDouble(self.sqrtChi)
 
     def returnDamminRFactor(self):
-        logFile = open(os.path.join(self.getWorkingDirectory(), "dammin.log"))
+        logFile = open(os.path.join(self.getWorkingDirectory(), "dammin.log"), "r")
 
         tmpRfactor = None
 

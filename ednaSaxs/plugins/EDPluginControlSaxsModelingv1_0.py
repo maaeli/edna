@@ -135,9 +135,10 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         damaver is likely to produce log files of many GB  
         """
         last_line = open(self.xsGnomFile.path.value).readlines()[-1]
-        key = "Real space: Rg ="
+#         self.WARNING("last Gnom file line is %s" % last_line)
+        key = "Rg ="
         start = last_line.find(key) + len(key)
-        val = last_line[start].split()[0]
+        val = last_line[start:].split()[0]
         try:
             rg = float(val)
         except ValueError:
@@ -176,10 +177,9 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
 
         #retrieve results from best dammif
         self.dammif = self.bestDammif()
+
         self.chi2plot("chi2_R.png")
-        self.result.chiRfactorPlot = XSDataFile(XSDataString(os.path.abspath("chi2_R.png")))
-
-
+        self.result.chiRfactorPlot = XSDataFile(XSDataString(os.path.join(self.getWorkingDirectory(), "chi2_R.png")))
 
         #temporary results: use best dammif
         self.result.fitFile = self.dammif.dataOutput.fitFile
@@ -211,7 +211,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
             return
 
         self.makeNSDarray("nsd.png")
-        self.result.nsdPlot = XSDataFile(XSDataString(os.path.abspath("nsd.png")))
+        self.result.nsdPlot = XSDataFile(XSDataString(os.path.join(self.getWorkingDirectory(), "nsd.png")))
 
         idx = self.ref
         self.actclust_supcomb = EDActionCluster(self.cluster_size)
@@ -411,6 +411,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
             self.result.pdbMoleculeFile = _edPlugin.dataOutput.pdbMoleculeFile
             self.result.pdbSolventFile = _edPlugin.dataOutput.pdbSolventFile
             self.result.fitFile = _edPlugin.dataOutput.fitFile
+            self.result.firFile = _edPlugin.dataOutput.model.firFile
             self.result.logFile = _edPlugin.dataOutput.logFile
             self.result.damminModel = _edPlugin.dataOutput.model
             self.symlink(_edPlugin.dataOutput.model.pdbFile.path.value, _edPlugin.dataOutput.model.name.value + ".pdb")
@@ -431,7 +432,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         """
         fitResultDict = dict([(plg.dataOutput.chiSqrt.value, plg)
                               for plg in self.dammif_plugins
-                              if plg.dataOutput.chiSqrt is not None])
+                              if (plg.dataOutput is not None) and (plg.dataOutput.chiSqrt is not None)])
         fitResultList = fitResultDict.keys()
         fitResultList.sort()
 

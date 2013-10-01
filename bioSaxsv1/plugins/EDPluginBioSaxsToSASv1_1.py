@@ -81,7 +81,7 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
         self.gnomFile = None
         self.outFile = None
         self.wd = None
-        self.xsdModellingResult = None
+        self.xsdIspybInput = XSDataInputBioSaxsISPyBModellingv1_0()
 
 
 
@@ -178,13 +178,13 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
 
         if self.dataInput.sample and self.dataInput.sample.login and \
                 self.dataInput.sample.passwd and self.dataInput.sample.measurementID and \
-                self.xsdModellingResult:
+                self.xsdIspybInput:
             self.addExecutiveSummaryLine("Registering to ISPyB")
             self.pluginISPyB = self.loadPlugin(self.cpISPyB)
-            self.pluginISPyB.dataInput = XSDataInputBioSaxsISPyBModellingv1_0(sample=self.dataInput.sample,
-                                                                              saxsModelingResult=self.xsdModellingResult)
-            self.pluginISPyB.connectSUCCESS()
-            self.pluginISPyB.connectFAILURE()
+            self.xsdIspybInput.sample = self.dataInput.sample
+            self.pluginISPyB.dataInput = self.xsdIspybInput
+            self.pluginISPyB.connectSUCCESS(self.doSuccessExecISPyB)
+            self.pluginISPyB.connectFAILURE(self.doFailureExecISPyB)
             self.pluginISPyB.executeSynchronous()
         ########################################################################
         # Move results
@@ -246,7 +246,28 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
         self.DEBUG("EDPluginBioSaxsToSASv1_1.doSuccessExecSAS")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsToSASv1_1.doSuccessExecSAS")
         self.retrieveMessages(_edPlugin)
-        self.xsdModellingResult = _edPlugin.dataOutput
+        self.xsdIspybInput.dammifModels = _edPlugin.dataOutput.dammifModels
+        self.xsdIspybInput.damaverModel = _edPlugin.dataOutput.damaverModel
+        self.xsdIspybInput.damfiltModel = _edPlugin.dataOutput.damfiltModel
+        self.xsdIspybInput.damstartModel = _edPlugin.dataOutput.damstartModel
+        self.xsdIspybInput.damminModel = _edPlugin.dataOutput.damminModel
+        self.xsdIspybInput.fitFile = _edPlugin.dataOutput.fitFile
+        self.xsdIspybInput.logFile = _edPlugin.dataOutput.logFile
+        self.xsdIspybInput.pdbMoleculeFile = _edPlugin.dataOutput.pdbMoleculeFile
+        self.xsdIspybInput.pdbSolventFile = _edPlugin.dataOutput.pdbSolventFile
+        self.xsdIspybInput.chiRfactorPlot = _edPlugin.dataOutput.chiRfactorPlot
+        self.xsdIspybInput.nsdPlot = _edPlugin.dataOutput.nsdPlot
+#         dammifModels: XSDataSaxsModel [] optional
+#         damaverModel: XSDataSaxsModel  optional
+#         damfiltModel: XSDataSaxsModel  optional
+#         damstartModel: XSDataSaxsModel  optional
+#         damminModel: XSDataSaxsModel  optional
+#         fitFile: XSDataFile optional
+#         logFile: XSDataFile optional
+#         pdbMoleculeFile: XSDataFile optional
+#         pdbSolventFile: XSDataFile optional
+#         chiRfactorPlot: XSDataFile optional
+#         nsdPlot: XSDataFile optional
         self.wd = os.path.join(_edPlugin.getWorkingDirectory(), "")
 
     def doFailureExecSAS(self, _edPlugin=None):

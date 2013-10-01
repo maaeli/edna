@@ -365,7 +365,7 @@ class HPLCrun(object):
     def calc_size(self, idx):
         return (1 + (idx // self.chunk_size)) * self.chunk_size
 
-    def extract_data(self):
+    def extract_data(self, force_finished=False):
         self.max_size = self.calc_size(max(self.frames.keys()) + 1)
         self.time = numpy.zeros(self.max_size, dtype=numpy.float64)
         self.gnom = numpy.zeros(self.max_size, dtype=numpy.float32)
@@ -386,8 +386,9 @@ class HPLCrun(object):
         self.subtracted_I = numpy.zeros((self.max_size, self.size), dtype=numpy.float32)
         self.subtracted_Stdev = numpy.zeros((self.max_size, self.size), dtype=numpy.float32)
         for i, frame in self.frames.items():
-            while frame.processing:
-                time.sleep(1)
+            if not force_finished:
+                while frame.processing:
+                    time.sleep(1)
             self.time[i] = frame.time or 0
             self.gnom[i] = frame.gnom or 0
             self.Dmax[i] = frame.Dmax or 0
