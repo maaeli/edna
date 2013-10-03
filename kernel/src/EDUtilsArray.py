@@ -293,3 +293,48 @@ class EDUtilsArray(object):
         if bError is True:
             EDVerbose.ERROR("EDUtilsArray.getArray works better on platform with numpy & fabio ... No solution found for you, sorry.%s%s " % (os.linesep, _inputObject.marshal()))
         return npaOutput
+
+
+
+def xsDataToArray(_xsdata, _bCheckMd5sum=True, _bUseAsserts=False):
+        """
+        Lightweight, EDNA-Free implementation of the same function. 
+
+        Needed library: Numpy, base64 and 
+        
+        convert a XSDataArray into either a numpy array or a list of list 
+        
+        @param _xsdata: XSDataArray instance  
+        @param checkMd5sum: Check if the data are correct based on the checksum 
+                                It is useful when sending object through the network
+                                It is a problem for testing                               
+        @type _bCheckMd5sum: boolean
+        @return: numpy array
+        """
+        shape = tuple(_xsdata.getShape())
+        encData = _xsdata.getData()
+
+        if _xsdata.getCoding() is not None:
+            strCoding = _xsdata.getCoding().getValue()
+            if strCoding == "base64":
+                decData = base64.b64decode(encData)
+            elif strCoding == "base32":
+                decData = base64.b32decode(encData)
+            elif strCoding == "base16":
+                decData = base64.b16decode(encData)
+            else:
+                EDVerbose.WARNING("Unable to recognize the encoding of the data !!! got %s, expected base64, base32 or base16, I assume it is base64 " % strCoding)
+                decData = base64.b64decode(encData)
+        else:
+            EDVerbose.WARNING("No coding provided, I assume it is base64 ")
+            strCoding = "base64"
+            decData = base64.b64decode(encData)
+        try:
+            matIn = numpy.fromstring(decData, dtype=_xsdata.getDtype())
+        except Exception:
+            matIn = numpy.fromstring(decData, dtype=numpy.dtype(str(_xsdata.getDtype())))
+        arrayOut = matIn.reshape(shape)
+        # Enforce little Endianness
+        if sys.byteorder == "big":
+            arrayOut.byteswap(True)
+        return arrayOut
