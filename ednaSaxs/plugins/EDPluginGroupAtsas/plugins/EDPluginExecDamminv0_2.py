@@ -171,7 +171,7 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
         if os.path.exists(pathFitFile):
             xsDataResult.fitFile = model.fitFile = XSDataFile(XSDataString(pathFitFile))
         if os.path.exists(pathFirFile):
-            model.firfile = XSDataFile(XSDataString(pathFirFile))
+            model.firFile = XSDataFile(XSDataString(pathFirFile))
             xsDataResult.chiSqrt = model.chiSqrt = self.returnDamminChiSqrt()
         if os.path.exists(pathMoleculeFile):
             xsDataResult.pdbMoleculeFile = model.pdbFile = XSDataFile(XSDataString(pathMoleculeFile))
