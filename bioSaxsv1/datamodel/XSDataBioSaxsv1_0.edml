@@ -303,7 +303,7 @@ complex type XSDataResultBioSaxsHPLCv1_0 extends XSDataResultBioSaxsProcessOneFi
 	hplcImage:XSDataFile optional
 	summedIntensity: XSDataDouble optional
 	timeStamp: XSDataTime optional
-	rti: XSDataRamboTainer optional
+	rti: XSDataRamboTainer optional	
 }
 
 
@@ -407,6 +407,17 @@ complex type XSDataInputBioSaxsISPyBModellingv1_0 extends XSDataInput  {
 }
 
 complex type XSDataResultBioSaxsISPyBModellingv1_0 extends XSDataResult {
+}
+
+complex type XSDataInputBioSaxsISPyB_HPLCv1_0 extends XSDataInput  {
+	"Input class for populating ISPyB"
+	sample 		: XSDataBioSaxsSample
+	hdf5File	: XSDataFile optional
+	jsonFile	: XSDataFile optional
+	hplcPlot	: XSDataFile optional	
+}
+
+complex type XSDataResultBioSaxsISPyB_HPLCv1_0 extends XSDataResult {
 	
 }
 

@@ -37,7 +37,8 @@ from EDFactoryPlugin import edFactoryPlugin
 edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
 edFactoryPlugin.loadModule("XSDataEdnaSaxs")
 
-from XSDataBioSaxsv1_0 import XSDataInputBioSaxsHPLCv1_0, XSDataResultBioSaxsHPLCv1_0#, \
+from XSDataBioSaxsv1_0 import XSDataInputBioSaxsHPLCv1_0, XSDataResultBioSaxsHPLCv1_0,
+                            XSDataInputBioSaxsISPyB_HPLCv1_0
 from XSDataEdnaSaxs import XSDataInputDataver
 from XSDataCommon import XSDataString, XSDataStatus, XSDataFile
 from EDPluginBioSaxsHPLCv1_1 import EDPluginBioSaxsHPLCv1_1
@@ -50,6 +51,7 @@ class EDPluginBioSaxsFlushHPLCv1_1 (EDPluginControl):
     New: addapt for version 1.1
     """
     strControlledPluginDatAver = "EDPluginExecDataverv1_0"
+    strControlledPluginISPyB = "EDPluginBioSaxsISPyB_HPLCv1_0"
     def __init__(self):
         """
         """
@@ -89,6 +91,12 @@ class EDPluginBioSaxsFlushHPLCv1_1 (EDPluginControl):
         self.DEBUG("EDPluginBioSaxsFlushHPLCv1_1.process")
         if self.runId in EDPluginBioSaxsHPLCv1_1.dictHPLC:
             res = self.processRun(EDPluginBioSaxsHPLCv1_1.dictHPLC[self.runId])
+            edpluginIsPyB = self.loadPlugin(self.strControlledPluginISPyB)
+            edpluginIsPyB.dataInput=XSDataInputBioSaxsISPyB_HPLCv1_0(sample=self.dataInput.sample,
+                                                                     hdf5File=self.xsDataResult.hplcFile,
+                                                                     jsonFile=XSDataFile(XSDataString(self.json)),
+                                                                     hplcPlot=self.xsDataResult.hplcImage)
+            edpluginIsPyB.executeSynchronous()
 
 
     def postProcess(self, _edObject=None):
@@ -104,7 +112,9 @@ class EDPluginBioSaxsFlushHPLCv1_1 (EDPluginControl):
 
     def processRun(self, run):
         run.dump_json()
-        self.xsDataResult.hplcFile = XSDataFile(XSDataString(run.save_hdf5()))
+        hdf5 = run.save_hdf5()
+        self.json = os.path.splitext(hdf5)[0]+".json"
+        self.xsDataResult.hplcFile = XSDataFile(XSDataString(hdf5))
         self.xsDataResult.hplcImage = XSDataFile(XSDataString(run.make_plot()))
         for group in run.analyse():
             self.lstExecutiveSummary.append("Merging frames from %s to %s" % (group[0], group[-1]))
@@ -115,6 +125,7 @@ class EDPluginBioSaxsFlushHPLCv1_1 (EDPluginControl):
             edpugin.connectSUCCESS(self.doSuccessDatAver)
             edpugin.connectFAILURE(self.doFailureDatAver)
             edpugin.execute()
+        self.synchronizePlugins()
 
 
     def doSuccessDatAver(self, _edPlugin=None):

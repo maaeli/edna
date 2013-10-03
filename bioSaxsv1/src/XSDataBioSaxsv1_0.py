@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Thu Oct 3 09:01::39 2013 by EDGenerateDS.
+# Generated Thu Oct 3 04:42::44 2013 by EDGenerateDS.
 #
 
 import os, sys
@@ -15,7 +15,6 @@ dictLocation = {
  "XSDataCommon": "kernel/datamodel", \
  "XSDataEdnaSaxs": "ednaSaxs/datamodel", \
 }
-
 try:
     from XSDataCommon import XSData
     from XSDataCommon import XSDataArray
@@ -2080,6 +2079,174 @@ class XSDataInputBioSaxsISPyBModellingv1_0(XSDataInput):
         return rootObj
     parseFile = staticmethod( parseFile )
 # end class XSDataInputBioSaxsISPyBModellingv1_0
+
+
+class XSDataInputBioSaxsISPyB_HPLCv1_0(XSDataInput):
+    """Input class for populating ISPyB"""
+    def __init__(self, configuration=None, hplcPlot=None, jsonFile=None, hdf5File=None, sample=None):
+        XSDataInput.__init__(self, configuration)
+        if sample is None:
+            self._sample = None
+        elif sample.__class__.__name__ == "XSDataBioSaxsSample":
+            self._sample = sample
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0 constructor argument 'sample' is not XSDataBioSaxsSample but %s" % self._sample.__class__.__name__
+            raise BaseException(strMessage)
+        if hdf5File is None:
+            self._hdf5File = None
+        elif hdf5File.__class__.__name__ == "XSDataFile":
+            self._hdf5File = hdf5File
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0 constructor argument 'hdf5File' is not XSDataFile but %s" % self._hdf5File.__class__.__name__
+            raise BaseException(strMessage)
+        if jsonFile is None:
+            self._jsonFile = None
+        elif jsonFile.__class__.__name__ == "XSDataFile":
+            self._jsonFile = jsonFile
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0 constructor argument 'jsonFile' is not XSDataFile but %s" % self._jsonFile.__class__.__name__
+            raise BaseException(strMessage)
+        if hplcPlot is None:
+            self._hplcPlot = None
+        elif hplcPlot.__class__.__name__ == "XSDataFile":
+            self._hplcPlot = hplcPlot
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0 constructor argument 'hplcPlot' is not XSDataFile but %s" % self._hplcPlot.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'sample' attribute
+    def getSample(self): return self._sample
+    def setSample(self, sample):
+        if sample is None:
+            self._sample = None
+        elif sample.__class__.__name__ == "XSDataBioSaxsSample":
+            self._sample = sample
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0.setSample argument is not XSDataBioSaxsSample but %s" % sample.__class__.__name__
+            raise BaseException(strMessage)
+    def delSample(self): self._sample = None
+    sample = property(getSample, setSample, delSample, "Property for sample")
+    # Methods and properties for the 'hdf5File' attribute
+    def getHdf5File(self): return self._hdf5File
+    def setHdf5File(self, hdf5File):
+        if hdf5File is None:
+            self._hdf5File = None
+        elif hdf5File.__class__.__name__ == "XSDataFile":
+            self._hdf5File = hdf5File
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0.setHdf5File argument is not XSDataFile but %s" % hdf5File.__class__.__name__
+            raise BaseException(strMessage)
+    def delHdf5File(self): self._hdf5File = None
+    hdf5File = property(getHdf5File, setHdf5File, delHdf5File, "Property for hdf5File")
+    # Methods and properties for the 'jsonFile' attribute
+    def getJsonFile(self): return self._jsonFile
+    def setJsonFile(self, jsonFile):
+        if jsonFile is None:
+            self._jsonFile = None
+        elif jsonFile.__class__.__name__ == "XSDataFile":
+            self._jsonFile = jsonFile
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0.setJsonFile argument is not XSDataFile but %s" % jsonFile.__class__.__name__
+            raise BaseException(strMessage)
+    def delJsonFile(self): self._jsonFile = None
+    jsonFile = property(getJsonFile, setJsonFile, delJsonFile, "Property for jsonFile")
+    # Methods and properties for the 'hplcPlot' attribute
+    def getHplcPlot(self): return self._hplcPlot
+    def setHplcPlot(self, hplcPlot):
+        if hplcPlot is None:
+            self._hplcPlot = None
+        elif hplcPlot.__class__.__name__ == "XSDataFile":
+            self._hplcPlot = hplcPlot
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0.setHplcPlot argument is not XSDataFile but %s" % hplcPlot.__class__.__name__
+            raise BaseException(strMessage)
+    def delHplcPlot(self): self._hplcPlot = None
+    hplcPlot = property(getHplcPlot, setHplcPlot, delHplcPlot, "Property for hplcPlot")
+    def export(self, outfile, level, name_='XSDataInputBioSaxsISPyB_HPLCv1_0'):
+        showIndent(outfile, level)
+        outfile.write(unicode('<%s>\n' % name_))
+        self.exportChildren(outfile, level + 1, name_)
+        showIndent(outfile, level)
+        outfile.write(unicode('</%s>\n' % name_))
+    def exportChildren(self, outfile, level, name_='XSDataInputBioSaxsISPyB_HPLCv1_0'):
+        XSDataInput.exportChildren(self, outfile, level, name_)
+        if self._sample is not None:
+            self.sample.export(outfile, level, name_='sample')
+        else:
+            warnEmptyAttribute("sample", "XSDataBioSaxsSample")
+        if self._hdf5File is not None:
+            self.hdf5File.export(outfile, level, name_='hdf5File')
+        if self._jsonFile is not None:
+            self.jsonFile.export(outfile, level, name_='jsonFile')
+        if self._hplcPlot is not None:
+            self.hplcPlot.export(outfile, level, name_='hplcPlot')
+    def build(self, node_):
+        for child_ in node_.childNodes:
+            nodeName_ = child_.nodeName.split(':')[-1]
+            self.buildChildren(child_, nodeName_)
+    def buildChildren(self, child_, nodeName_):
+        if child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'sample':
+            obj_ = XSDataBioSaxsSample()
+            obj_.build(child_)
+            self.setSample(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'hdf5File':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setHdf5File(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'jsonFile':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setJsonFile(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'hplcPlot':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setHplcPlot(obj_)
+        XSDataInput.buildChildren(self, child_, nodeName_)
+    #Method for marshalling an object
+    def marshal( self ):
+        oStreamString = StringIO()
+        oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
+        self.export( oStreamString, 0, name_="XSDataInputBioSaxsISPyB_HPLCv1_0" )
+        oStringXML = oStreamString.getvalue()
+        oStreamString.close()
+        return oStringXML
+    #Only to export the entire XML tree to a file stream on disk
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
+        outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
+        self.export( outfile, 0, name_='XSDataInputBioSaxsISPyB_HPLCv1_0' )
+        outfile.close()
+    #Deprecated method, replaced by exportToFile
+    def outputFile( self, _outfileName ):
+        print("WARNING: Method outputFile in class XSDataInputBioSaxsISPyB_HPLCv1_0 is deprecated, please use instead exportToFile!")
+        self.exportToFile(_outfileName)
+    #Method for making a copy in a new instance
+    def copy( self ):
+        return XSDataInputBioSaxsISPyB_HPLCv1_0.parseString(self.marshal())
+    #Static method for parsing a string
+    def parseString( _inString ):
+        doc = minidom.parseString(_inString)
+        rootNode = doc.documentElement
+        rootObj = XSDataInputBioSaxsISPyB_HPLCv1_0()
+        rootObj.build(rootNode)
+        # Check that all minOccurs are obeyed by marshalling the created object
+        oStreamString = StringIO()
+        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsISPyB_HPLCv1_0" )
+        oStreamString.close()
+        return rootObj
+    parseString = staticmethod( parseString )
+    #Static method for parsing a file
+    def parseFile( _inFilePath ):
+        doc = minidom.parse(_inFilePath)
+        rootNode = doc.documentElement
+        rootObj = XSDataInputBioSaxsISPyB_HPLCv1_0()
+        rootObj.build(rootNode)
+        return rootObj
+    parseFile = staticmethod( parseFile )
+# end class XSDataInputBioSaxsISPyB_HPLCv1_0
 
 
 class XSDataInputBioSaxsISPyBv1_0(XSDataInput):
@@ -4829,6 +4996,68 @@ class XSDataResultBioSaxsISPyBModellingv1_0(XSDataResult):
         return rootObj
     parseFile = staticmethod( parseFile )
 # end class XSDataResultBioSaxsISPyBModellingv1_0
+
+
+class XSDataResultBioSaxsISPyB_HPLCv1_0(XSDataResult):
+    def __init__(self, status=None):
+        XSDataResult.__init__(self, status)
+    def export(self, outfile, level, name_='XSDataResultBioSaxsISPyB_HPLCv1_0'):
+        showIndent(outfile, level)
+        outfile.write(unicode('<%s>\n' % name_))
+        self.exportChildren(outfile, level + 1, name_)
+        showIndent(outfile, level)
+        outfile.write(unicode('</%s>\n' % name_))
+    def exportChildren(self, outfile, level, name_='XSDataResultBioSaxsISPyB_HPLCv1_0'):
+        XSDataResult.exportChildren(self, outfile, level, name_)
+    def build(self, node_):
+        for child_ in node_.childNodes:
+            nodeName_ = child_.nodeName.split(':')[-1]
+            self.buildChildren(child_, nodeName_)
+    def buildChildren(self, child_, nodeName_):
+        pass
+        XSDataResult.buildChildren(self, child_, nodeName_)
+    #Method for marshalling an object
+    def marshal( self ):
+        oStreamString = StringIO()
+        oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
+        self.export( oStreamString, 0, name_="XSDataResultBioSaxsISPyB_HPLCv1_0" )
+        oStringXML = oStreamString.getvalue()
+        oStreamString.close()
+        return oStringXML
+    #Only to export the entire XML tree to a file stream on disk
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
+        outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
+        self.export( outfile, 0, name_='XSDataResultBioSaxsISPyB_HPLCv1_0' )
+        outfile.close()
+    #Deprecated method, replaced by exportToFile
+    def outputFile( self, _outfileName ):
+        print("WARNING: Method outputFile in class XSDataResultBioSaxsISPyB_HPLCv1_0 is deprecated, please use instead exportToFile!")
+        self.exportToFile(_outfileName)
+    #Method for making a copy in a new instance
+    def copy( self ):
+        return XSDataResultBioSaxsISPyB_HPLCv1_0.parseString(self.marshal())
+    #Static method for parsing a string
+    def parseString( _inString ):
+        doc = minidom.parseString(_inString)
+        rootNode = doc.documentElement
+        rootObj = XSDataResultBioSaxsISPyB_HPLCv1_0()
+        rootObj.build(rootNode)
+        # Check that all minOccurs are obeyed by marshalling the created object
+        oStreamString = StringIO()
+        rootObj.export( oStreamString, 0, name_="XSDataResultBioSaxsISPyB_HPLCv1_0" )
+        oStreamString.close()
+        return rootObj
+    parseString = staticmethod( parseString )
+    #Static method for parsing a file
+    def parseFile( _inFilePath ):
+        doc = minidom.parse(_inFilePath)
+        rootNode = doc.documentElement
+        rootObj = XSDataResultBioSaxsISPyB_HPLCv1_0()
+        rootObj.build(rootNode)
+        return rootObj
+    parseFile = staticmethod( parseFile )
+# end class XSDataResultBioSaxsISPyB_HPLCv1_0
 
 
 class XSDataResultBioSaxsISPyBv1_0(XSDataResult):

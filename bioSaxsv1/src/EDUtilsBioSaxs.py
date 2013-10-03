@@ -450,7 +450,7 @@ class HPLCrun(object):
 
         fig = pylab.plt.figure()
         fig_size = fig.get_size_inches()
-        fig.set_size_inches([fig_size[0], 3 * fig_size[1]])
+        fig.set_size_inches([fig_size[0], 2 * fig_size[1]])
 
         sp0 = fig.add_subplot(311)  # summed I
         sp1 = fig.add_subplot(312)  # Rg

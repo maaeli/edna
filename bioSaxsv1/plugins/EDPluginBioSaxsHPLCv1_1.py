@@ -69,7 +69,7 @@ class EDPluginBioSaxsHPLCv1_1(EDPluginControl):
     * fix issue with timestamp. 
     """
 
-    strControlledPluginProcessOneFile = "EDPluginBioSaxsProcessOneFilev1_3"
+    strControlledPluginProcessOneFile = "EDPluginBioSaxsProcessOneFilev1_4"
     strControlledPluginDatop = "EDPluginExecDatopv1_0"
     strControlledPluginAutoRg = "EDPluginExecAutoRgv1_0"
     strControlledPluginDatCmp = "EDPluginExecDatcmpv1_0"
@@ -152,11 +152,19 @@ class EDPluginBioSaxsHPLCv1_1(EDPluginControl):
             hplc = sdi.hplcFile.path.value
         else:
             path = sdi.rawImage.path.value
-            if "_" in path:
-                hplc = "_".join(os.path.splitext(path)[0].split("_")[:-1]) + ".h5"
-            else:
-                hplc = os.path.splitext(path)[0] + ".h5"
+            dirname = os.path.dirname(os.path.dirname(path))
+            hplc_dir = os.path.join(dirname, "HPLC")
+            if not os.path.exists(hplc_dir):
+                try:
+                    os.mkdir(hplc_dir)
+                except:
+                    pass  # I don't care
 
+            if "_" in path:
+                hplc = "_".join(os.path.splitext(os.path.basename(path))[0].split("_")[:-1]) + ".h5"
+            else:
+                hplc = os.path.splitext(os.path.basename(path))[0] + ".h5"
+            hplc = os.path.join(hplc_dir, hplc)
         if not self.hplc_run.hdf5_filename:
             with self._sem:
                 self.hplc_run.init_hdf5(hplc)
@@ -274,6 +282,9 @@ class EDPluginBioSaxsHPLCv1_1(EDPluginControl):
             return
         self.xsDataResult.integratedCurve = output.integratedCurve
         self.xsDataResult.normalizedImage = output.normalizedImage
+        self.xsDataResult.dataI = output.dataI
+        self.xsDataResult.dataQ = output.dataQ
+        self.xsDataResult.dataStdErr = output.dataStdErr
         if output.experimentSetup and output.experimentSetup.timeOfFrame:
             startTime = output.experimentSetup.timeOfFrame.value
         else:
