@@ -40,12 +40,13 @@ from EDFactoryPlugin import edFactoryPlugin
 edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
 edFactoryPlugin.loadModule("XSDataEdnaSaxs")
 from XSDataBioSaxsv1_0 import XSDataInputBioSaxsHPLCv1_0, XSDataResultBioSaxsHPLCv1_0, \
-                            XSDataInputBioSaxsProcessOneFilev1_0
+                            XSDataInputBioSaxsProcessOneFilev1_0,\
+    XSDataRamboTainer
 from XSDataEdnaSaxs import XSDataInputDatcmp, XSDataInputDataver, XSDataInputDatop, XSDataInputAutoRg
 from XSDataCommon import XSDataFile, XSDataString, XSDataStatus, XSDataTime,\
     XSDataDouble
 
-from EDUtilsBioSaxs import HPLCframe, HPLCrun
+from EDUtilsBioSaxs import HPLCframe, HPLCrun, EDUtilsBioSaxs, RamboTainerInvariant
 
 
 
@@ -94,7 +95,8 @@ class EDPluginBioSaxsHPLCv1_1(EDPluginControl):
         self.subtracted = None
         self.lstExecutiveSummary = []
         self.isBuffer = False
-
+        self.scatter_data = None
+        
     def checkParameters(self):
         """
         Checks the mandatory parameters.
@@ -288,9 +290,7 @@ class EDPluginBioSaxsHPLCv1_1(EDPluginControl):
         self.frame.curve = self.curve
         self.frame.time = startTime
         self.xsDataResult.timeStamp = XSDataTime(value=(startTime - self.hplc_run.start_time))
-        q, I, std = numpy.loadtxt(output.integratedCurve.path.value, unpack=True)
-        self.xsDataResult.summedIntensity = XSDataDouble(value=I.sum())
-
+        self.calcIntensity()
 
     def doFailureProcessOneFile(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsHPLCv1_1.doFailureProcessOneFile")
@@ -351,6 +351,30 @@ class EDPluginBioSaxsHPLCv1_1(EDPluginControl):
             if rg.quality:
                 self.frame.quality = rg.quality.value
             self.xsDataResult.autoRg = rg
+
+        """
+        Calculate the invariants Vc and Qr from the Rambo&Tainer 2013 Paper,
+        also the the mass estimate based on Qr for proteins
+        """
+        if self.scatter_data is not None and\
+            self.frame.Rg and self.frame.Rg_Stdev and self.frame.I0 and self.frame.I0_Stdev:
+            dictRTI = RamboTainerInvariant(self.scatter_data, self.frame.Rg,
+                                           self.frame.rgStdev, self.frame.I0,
+                                           self.frame.I0_Stdev, rg.firstPointUsed.value)
+#             {'Vc': vc[0], 'dVc': vc[1], 'Qr': qr, 'dQr': dqr, 'mass': mass, 'dmass': dmass}
+            self.frame.Vc = dictRTI.get("Vc")
+            self.frame.Vc_Stdev = dictRTI.get("dVc")
+            self.frame.Qr = dictRTI.get("Qr")
+            self.frame.Qr_Stdev = dictRTI.get("dQ")
+            self.frame.mass = dictRTI.get("mass")
+            self.frame.mass_Stdev = dictRTI.get("dmass")
+            xsdRTI = XSDataRamboTainer(vc=XSDataDouble(dictRTI["Vc"]),
+                                       qr=XSDataDouble(dictRTI["Qr"]),                                           
+                                       mass=XSDataDouble(dictRTI["mass"]),
+                                       dvc=XSDataDouble(dictRTI["dVc"]),
+                                       dqr=XSDataDouble(dictRTI["dQr"]),
+                                       dmass=XSDataDouble(dictRTI["dmass"]))
+            self.xsDataResult.rti = xsdRTI
 
     def doFailureAutoRg(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsHPLCv1_1.doFailureAutoRg")
@@ -419,4 +443,14 @@ class EDPluginBioSaxsHPLCv1_1(EDPluginControl):
             self.lstExecutiveSummary.append("Edna plugin DatAver failed.")
         self.setFailure()
 
+    def calcIntensity(self):
+        """
+        Calculate invarients like:
+        Sum(I),
+        and set output datastructure.
+        
+        """
+        self.scatter_data = numpy.loadtxt(self.xsDataResult.integratedCurve.path.value, unpack=True)
+        self.frame.sum_I = self.scatter_data[:,1].sum()
+        self.xsDataResult.summedIntensity = XSDataDouble(value=self.frame.sum_I)
 

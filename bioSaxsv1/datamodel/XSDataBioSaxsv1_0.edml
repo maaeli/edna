@@ -282,6 +282,15 @@ complex type XSDataInputBioSaxsHPLCv1_0 extends XSDataInputBioSaxsProcessOneFile
 	hplcFile: XSDataFile optional
 }
 
+complex type XSDataRamboTainer extends XSData{
+	vc: XSDataDouble optional
+	qr: XSDataDouble optional
+	mass: XSDataDouble optional
+	dvc: XSDataDouble optional
+	dqr: XSDataDouble optional
+	dmass: XSDataDouble optional	
+}
+
 complex type XSDataResultBioSaxsHPLCv1_0 extends XSDataResultBioSaxsProcessOneFilev1_0{
 	"Plugin that runs subsequently ProcessOneFile, subtraction of buffer and SaxsAnalysis"
 	bufferCurve: XSDataFile optional
@@ -294,6 +303,7 @@ complex type XSDataResultBioSaxsHPLCv1_0 extends XSDataResultBioSaxsProcessOneFi
 	hplcImage:XSDataFile optional
 	summedIntensity: XSDataDouble optional
 	timeStamp: XSDataTime optional
+	rti: XSDataRamboTainer optional
 }
 
 

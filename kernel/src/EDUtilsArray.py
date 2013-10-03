@@ -296,19 +296,13 @@ class EDUtilsArray(object):
 
 
 
-def xsDataToArray(_xsdata, _bCheckMd5sum=True, _bUseAsserts=False):
+def xsDataToArray(_xsdata):
         """
         Lightweight, EDNA-Free implementation of the same function. 
-
-        Needed library: Numpy, base64 and 
-        
-        convert a XSDataArray into either a numpy array or a list of list 
+        Needed library: Numpy, base64 and sys       
+        Convert a XSDataArray into either a numpy array or a list of list 
         
         @param _xsdata: XSDataArray instance  
-        @param checkMd5sum: Check if the data are correct based on the checksum 
-                                It is useful when sending object through the network
-                                It is a problem for testing                               
-        @type _bCheckMd5sum: boolean
         @return: numpy array
         """
         shape = tuple(_xsdata.getShape())
