@@ -370,7 +370,7 @@ class EDPluginBioSaxsHPLCv1_1(EDPluginControl):
         if self.scatter_data is not None and\
             self.frame.Rg and self.frame.Rg_Stdev and self.frame.I0 and self.frame.I0_Stdev:
             dictRTI = RamboTainerInvariant(self.scatter_data, self.frame.Rg,
-                                           self.frame.rgStdev, self.frame.I0,
+                                           self.frame.Rg_Stdev, self.frame.I0,
                                            self.frame.I0_Stdev, rg.firstPointUsed.value)
 #             {'Vc': vc[0], 'dVc': vc[1], 'Qr': qr, 'dQr': dqr, 'mass': mass, 'dmass': dmass}
             self.frame.Vc = dictRTI.get("Vc")
