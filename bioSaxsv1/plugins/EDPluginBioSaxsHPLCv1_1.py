@@ -461,7 +461,7 @@ class EDPluginBioSaxsHPLCv1_1(EDPluginControl):
         and set output datastructure.
         
         """
-        self.scatter_data = numpy.loadtxt(self.xsDataResult.integratedCurve.path.value, unpack=True)
+        self.scatter_data = numpy.loadtxt(self.xsDataResult.integratedCurve.path.value)
         self.frame.sum_I = self.scatter_data[:,1].sum()
         self.xsDataResult.summedIntensity = XSDataDouble(value=self.frame.sum_I)
 

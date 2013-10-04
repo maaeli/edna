@@ -37,7 +37,7 @@ from EDFactoryPlugin import edFactoryPlugin
 edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
 edFactoryPlugin.loadModule("XSDataEdnaSaxs")
 
-from XSDataBioSaxsv1_0 import XSDataInputBioSaxsHPLCv1_0, XSDataResultBioSaxsHPLCv1_0,
+from XSDataBioSaxsv1_0 import XSDataInputBioSaxsHPLCv1_0, XSDataResultBioSaxsHPLCv1_0, \
                             XSDataInputBioSaxsISPyB_HPLCv1_0
 from XSDataEdnaSaxs import XSDataInputDataver
 from XSDataCommon import XSDataString, XSDataStatus, XSDataFile
