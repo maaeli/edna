@@ -17,5 +17,10 @@
 		"DummyPixelValue": -2.0,
     	"DummyPixelDelta": 1.1,
     	"DeviceType": "lut_ocl_gpu"	
-	}
+	},
+    "EDPluginBioSaxsProcessOneFilev1_4":{
+        "DummyPixelValue": -2.0,
+        "DummyPixelDelta": 1.1,
+        "DeviceType": "lut_ocl_gpu" 
+    }
 }

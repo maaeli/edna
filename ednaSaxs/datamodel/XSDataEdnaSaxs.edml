@@ -111,13 +111,13 @@ complex type XSDataInputAutoRg extends XSDataInput{
 }
 
 complex type XSDataAutoRg extends XSData{
-	filename:XSDataFile
-	rg:XSDataLength
-	rgStdev:XSDataLength
+	filename: XSDataFile
+	rg: XSDataLength
+	rgStdev: XSDataLength
 	i0: XSDataDouble
-	i0Stdev:XSDataDouble
-	firstPointUsed:XSDataInteger
-	lastPointUsed:XSDataInteger
+	i0Stdev: XSDataDouble
+	firstPointUsed: XSDataInteger
+	lastPointUsed: XSDataInteger
 	quality: XSDataDouble "from 0 to 1"
 	isagregated: XSDataBoolean
 }

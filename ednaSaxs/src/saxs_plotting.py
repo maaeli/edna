@@ -559,8 +559,8 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
     ag.allocate()
     ag.refine()
     ag.cluster()
-    if logger.level <= logging.INFO:
-            raw_input("Enter to quit")
+#    if logger.level <= logging.INFO:
+#            raw_input("Enter to quit")
 
 #    fig.show()
 
