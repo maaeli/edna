@@ -107,7 +107,6 @@ class EDPluginExecSupcombv0_2(EDPluginExecProcessScript):
         self.__bEnantiomorphs = True
         self.__bBackbone = False
 
-        self.__strOutputFileNameRaw = 'result_raw.pdb'
         self.__strOutputFileName = 'result.pdb'
         self.__fNSD = None
         self.__vecRot = None
@@ -162,8 +161,11 @@ class EDPluginExecSupcombv0_2(EDPluginExecProcessScript):
     def postProcess(self, _edObject=None):
         EDPluginExecProcessScript.postProcess(self)
         self.DEBUG("EDPluginExecSupcombv0_2.postProcess")
-
-        self.dataOutput = self.parseSupcombOutputFile()
+        try:
+            self.dataOutput = self.parseSupcombOutputFile()
+        except Exception as error:
+            self.ERROR("Error in supcomb: parseSupcombOutputFile: %s" % error)
+            self.setFailure()
 
     def generateSupcombScript(self):
         self.DEBUG("EDPluginExecSupcombv0_2.generateSupcombScript")
@@ -185,7 +187,7 @@ class EDPluginExecSupcombv0_2(EDPluginExecProcessScript):
 
         commandLine = ['template.pdb', _tmpBackbone, \
                        'supimpose.pdb', _tmpEnantiomorphs, \
-                       self.__strOutputFileNameRaw]
+                       self.__strOutputFileName]
 
         self.addListCommandExecution('\n'.join(commandLine))
 
@@ -220,11 +222,10 @@ class EDPluginExecSupcombv0_2(EDPluginExecProcessScript):
         xsRot = self.returnRotation(logLines[-3:])
         xsTrns = self.returnTranslation(logLines[-6:-3])
         xsNSD = XSDataDouble(float(logLines[-8].split()[-1]))
-        raw = os.path.join(self.getWorkingDirectory(), self.__strOutputFileNameRaw)
         pdb = os.path.join(self.getWorkingDirectory(), self.__strOutputFileName)
                            
         try:
-            res = parse_atsas.parsePDB(raw, pdb)
+            res = parse_atsas.parsePDB(pdb, pdb)
         except Exception as error:
             self.ERROR("in parsePDB: %s" % error)
         model = XSDataSaxsModel(name=XSDataString(self.name),

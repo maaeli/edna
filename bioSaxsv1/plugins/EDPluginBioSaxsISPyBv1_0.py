@@ -126,6 +126,8 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
             if self.dataBioSaxsSample.login:
                 user = self.dataBioSaxsSample.login.value
                 password = self.dataBioSaxsSample.passwd.value
+                if self.dataBioSaxsSample.ispybURL:
+                    self.URL = self.dataBioSaxsSample.ispybURL.value
         if not user:
             self.ERROR("No login/password information in sample configuration. Giving up.")
             self.setFailure()

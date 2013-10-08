@@ -134,6 +134,7 @@ class EDConfiguration(EDLogging):
                     self._dictConfigurationFiles[strFileName] = dictConfig
                 # First look for configuration imports
                 for importConfiguration in dictConfig["__extend__"]:
+                    strImportPath = None
                     if importConfiguration.startswith(os.sep):
                         for ext in ["", ".json", ".xml" ]:
                             if os.path.isfile(importConfiguration + ext):
@@ -145,6 +146,10 @@ class EDConfiguration(EDLogging):
                             if os.path.isfile(path):
                                 strImportPath = path
                                 break
+                    if strImportPath is None:
+                        strErr = "FATAL: Configuration file %s was not found." % importConfiguration
+                        self.ERROR(strErr)
+                        raise RuntimeError(strErr)
                     self.DEBUG("Importing configuration file : %s" % strImportPath)
                     self.addConfigurationFile(strImportPath, _bReplace) #Was True, why?
 

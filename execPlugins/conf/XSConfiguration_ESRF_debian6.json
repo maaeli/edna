@@ -121,5 +121,10 @@
         "execProcessScriptExecutable": "/sware/exp/saxs/edf/ubuntu1004/edfheaderaddkey", 
         "execProcessScriptShell": "/bin/dash", 
         "timeOut": 60
+    },
+    "EDPluginExecMeasureOffsetv2_1": {
+        "sift_pyocl": false,
+        "deviceType": "CPU", 
+        "timeOut": 60
     }
 }

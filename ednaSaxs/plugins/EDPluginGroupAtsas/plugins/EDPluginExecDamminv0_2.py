@@ -32,7 +32,7 @@ __copyright__ = "2010 DLS; 2013 ESRF"
 import os
 from EDPluginExecProcessScript import EDPluginExecProcessScript
 from XSDataEdnaSaxs import XSDataInputDammin, XSDataResultDammin, XSDataSaxsModel
-from XSDataCommon import XSDataString, XSDataFile, XSDataDouble, XSDataMessage, XSDataStatus
+from XSDataCommon import XSDataString, XSDataFile, XSDataDouble, XSDataStatus
 import parse_atsas
 
 class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
@@ -155,7 +155,7 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
         pathSolventFile = os.path.join(cwd, "dammin-0.pdb")
 
         try:
-            res = parse_atsas.parsePDB(pathMoleculeFile)
+            res = parse_atsas.parsePDB(pathMoleculeFile, pathMoleculeFile)
         except Exception as error:
             self.ERROR("EDPluginExecDamminv0_2:parsePDB: %s" % error)
         else:
@@ -169,16 +169,14 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
             if self.Rfactor:
                 xsDataResult.rfactor = model.rfactor = XSDataDouble(self.Rfactor)
         if os.path.exists(pathFitFile):
-            xsDataResult.fitFile = model.fitfile = XSDataFile(XSDataString(pathFitFile))
+            xsDataResult.fitFile = model.fitFile = XSDataFile(XSDataString(pathFitFile))
         if os.path.exists(pathFirFile):
-            model.firfile = XSDataFile(XSDataString(pathFirFile))
+            model.firFile = XSDataFile(XSDataString(pathFirFile))
             xsDataResult.chiSqrt = model.chiSqrt = self.returnDamminChiSqrt()
         if os.path.exists(pathMoleculeFile):
             xsDataResult.pdbMoleculeFile = model.pdbFile = XSDataFile(XSDataString(pathMoleculeFile))
         if os.path.exists(pathSolventFile):
             xsDataResult.pdbSolventFile = XSDataFile(XSDataString(pathSolventFile))
-        if os.path.exists(pathFirFile):
-            model.firFile = XSDataFile(XSDataString(pathFirFile))
 
         if self.volume:
             model.volume = XSDataDouble(self.volume)
@@ -231,12 +229,12 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
 
 
     def returnDamminChiSqrt(self):
-        logFile = open(os.path.join(self.getWorkingDirectory(), "dammin.fir"))
-        self.sqrtChi = float(logFile.readline().split(' ')[-1])
+        logFile = open(os.path.join(self.getWorkingDirectory(), "dammin.fir"), "r")
+        self.sqrtChi = float(logFile.readline().split()[-1].split("=")[-1])
         return XSDataDouble(self.sqrtChi)
 
     def returnDamminRFactor(self):
-        logFile = open(os.path.join(self.getWorkingDirectory(), "dammin.log"))
+        logFile = open(os.path.join(self.getWorkingDirectory(), "dammin.log"), "r")
 
         tmpRfactor = None
 

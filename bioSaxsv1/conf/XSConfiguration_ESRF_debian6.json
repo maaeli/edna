@@ -11,11 +11,16 @@
         "DummyPixelValue": -1
     },
 	"EDPluginBioSaxsISPyBv1_0":{
-         "url":"http://pcantolinos.esrf.fr:8080/ispyb-ejb3/ispybWS/ToolsForBiosaxsWebService?wsdl"
+         "url":"http://ispyb.esrf.fr:8080/ispyb-ejb3/ispybWS/ToolsForBiosaxsWebService?wsdl"
 	},
 	"EDPluginBioSaxsProcessOneFilev1_3":{
 		"DummyPixelValue": -2.0,
     	"DummyPixelDelta": 1.1,
-    	"DeviceType": "lut_ocl"	
+    	"DeviceType": "lut_ocl_gpu"	
 	}
+    "EDPluginBioSaxsProcessOneFilev1_4":{
+        "DummyPixelValue": -2.0,
+        "DummyPixelDelta": 1.1,
+        "DeviceType": "lut_ocl_gpu" 
+    }
 }

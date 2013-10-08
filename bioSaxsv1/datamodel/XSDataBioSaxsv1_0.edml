@@ -15,10 +15,12 @@ import XSDataCommon.XSDataImage
 import XSDataCommon.XSDataLength
 import XSDataCommon.XSDataWavelength
 import XSDataCommon.XSDataTime
+import XSDataCommon.XSDataArray
 import XSDataEdnaSaxs.XSDataAutoRg
 import XSDataEdnaSaxs.XSDataGnom
 import XSDataEdnaSaxs.XSDataResultDatGnom
 import XSDataEdnaSaxs.XSDataResultDatPorod
+import XSDataEdnaSaxs.XSDataSaxsModel
 
 /*******************************************
   *  Common types used only in BioSaxs
@@ -114,6 +116,7 @@ complex type XSDataBioSaxsSample extends XSData {
 	measurementID: XSDataInteger optional
 	collectionOrder: XSDataInteger optional
 	ispybDestination: XSDataFile optional
+	ispybURL	: XSDataString optional
 }
 
 
@@ -218,6 +221,9 @@ complex type XSDataResultBioSaxsProcessOneFilev1_0 extends XSDataResult {
 //	processLog : XSDataString => use executive summary
     sample: XSDataBioSaxsSample	optional
 	experimentSetup: XSDataBioSaxsExperimentSetup optional
+	dataQ: XSDataArray optional
+	dataI: XSDataArray optional
+	dataStdErr: XSDataArray optional
 }
 
 
@@ -238,6 +244,7 @@ complex type XSDataResultBioSaxsSmartMergev1_0 extends XSDataResult {
 	gnom: XSDataGnom optional 
 	volume: XSDataDoubleWithUnit optional
 	subtractedCurve: XSDataFile optional
+	sample: XSDataBioSaxsSample optional
 }
 
 
@@ -275,6 +282,15 @@ complex type XSDataInputBioSaxsHPLCv1_0 extends XSDataInputBioSaxsProcessOneFile
 	hplcFile: XSDataFile optional
 }
 
+complex type XSDataRamboTainer extends XSData{
+	vc: XSDataDouble optional
+	qr: XSDataDouble optional
+	mass: XSDataDouble optional
+	dvc: XSDataDouble optional
+	dqr: XSDataDouble optional
+	dmass: XSDataDouble optional	
+}
+
 complex type XSDataResultBioSaxsHPLCv1_0 extends XSDataResultBioSaxsProcessOneFilev1_0{
 	"Plugin that runs subsequently ProcessOneFile, subtraction of buffer and SaxsAnalysis"
 	bufferCurve: XSDataFile optional
@@ -285,6 +301,9 @@ complex type XSDataResultBioSaxsHPLCv1_0 extends XSDataResultBioSaxsProcessOneFi
 	hplcFile: XSDataFile optional
 	mergedCurves: XSDataFile [] optional
 	hplcImage:XSDataFile optional
+	summedIntensity: XSDataDouble optional
+	timeStamp: XSDataTime optional
+	rti: XSDataRamboTainer optional	
 }
 
 
@@ -296,6 +315,7 @@ complex type XSDataInputBioSaxsToSASv1_0 extends XSDataInput  {
 	lastPoint: XSDataInteger optional
 	qMax: XSDataDouble optional
 	destinationDirectory: XSDataFile optional
+	sample: XSDataBioSaxsSample optional
 }
 
 complex type XSDataResultBioSaxsToSASv1_0 extends XSDataResult {
@@ -365,6 +385,39 @@ complex type XSDataInputBioSaxsISPyBv1_0 extends XSDataInput  {
 }
 
 complex type XSDataResultBioSaxsISPyBv1_0 extends XSDataResult {
+	
+}
+complex type XSDataInputBioSaxsISPyBModellingv1_0 extends XSDataInput  {
+	"Input class for populating ISPyB"
+	//saxsModelingResult: XSDataResultSaxsModeling
+	sample: XSDataBioSaxsSample
+	dammifModels: XSDataSaxsModel [] optional
+	damaverModel: XSDataSaxsModel  optional
+	damfiltModel: XSDataSaxsModel  optional
+	damstartModel: XSDataSaxsModel  optional
+	damminModel: XSDataSaxsModel  optional
+
+	fitFile: XSDataFile optional
+	logFile: XSDataFile optional
+	pdbMoleculeFile: XSDataFile optional
+	pdbSolventFile: XSDataFile optional
+
+	chiRfactorPlot: XSDataFile optional
+	nsdPlot: XSDataFile optional
+}
+
+complex type XSDataResultBioSaxsISPyBModellingv1_0 extends XSDataResult {
+}
+
+complex type XSDataInputBioSaxsISPyB_HPLCv1_0 extends XSDataInput  {
+	"Input class for populating ISPyB"
+	sample 		: XSDataBioSaxsSample
+	hdf5File	: XSDataFile optional
+	jsonFile	: XSDataFile optional
+	hplcPlot	: XSDataFile optional	
+}
+
+complex type XSDataResultBioSaxsISPyB_HPLCv1_0 extends XSDataResult {
 	
 }
 

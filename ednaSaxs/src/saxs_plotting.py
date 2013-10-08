@@ -184,7 +184,7 @@ def densityPlot(gnomfile, filename=None, format="png", unit="nm"):
     ax1.errorbar(out["r"], out["P(r)"], out["P(r)_err"], label="Density")
     ax1.set_ylabel('$\\rho (r)$')
     ax1.set_xlabel('$r$ (%s)' % unit)
-    ax1.set_title("Density curve")
+    ax1.set_title("Pair distribution function")
 #    ax1.set_yscale("log")
     ax1.legend()
 #    ax1.legend(loc=3)
@@ -559,8 +559,8 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
     ag.allocate()
     ag.refine()
     ag.cluster()
-    if logger.level <= logging.INFO:
-            raw_input("Enter to quit")
+#    if logger.level <= logging.INFO:
+#            raw_input("Enter to quit")
 
 #    fig.show()
 

@@ -34,7 +34,7 @@ import os, gc, sys
 from EDPluginControl import EDPluginControl
 from XSDataEdnaSaxs import XSDataInputSaxsAnalysis, XSDataResultSaxsAnalysis, \
                            XSDataInputAutoRg, XSDataInputDatGnom, XSDataInputDatPorod
-from XSDataCommon import XSDataString, XSDataLength, XSDataFile, XSDataInteger, XSDataStatus
+from XSDataCommon import XSDataString, XSDataFile, XSDataInteger, XSDataStatus
 from saxs_plotting import scatterPlot, guinierPlot, kartkyPlot, densityPlot
 
 
@@ -93,6 +93,9 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
             self.edPluginAutoRg.connectSUCCESS(self.doSuccessRg)
             self.edPluginAutoRg.connectFAILURE(self.doFailureRg)
             self.edPluginAutoRg.executeSynchronous()
+
+        if self.autoRg is None:
+            self.setFailure()
 
         if self.isFailure():
             return

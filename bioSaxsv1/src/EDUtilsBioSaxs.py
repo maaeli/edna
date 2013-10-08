@@ -53,6 +53,7 @@ except:
 import h5py, numpy, matplotlib, json
 matplotlib.use('Agg')
 from matplotlib import pylab
+import scipy.integrate as scint
 
 class EDUtilsBioSaxs(EDObject):
 
@@ -256,6 +257,13 @@ class HPLCframe(object):
         self.I0 = None
         self.I0_Stdev = None
         self.quality = None
+        self.sum_I = None
+        self.Vc = None
+        self.Qr = None
+        self.mass = None
+        self.Vc_Stdev = None
+        self.Qr_Stdev = None
+        self.mass_Stdev = None
 
 def median_filt(input_array, width=3):
     """
@@ -301,6 +309,7 @@ class HPLCrun(object):
         if first_curve:
             self.files.append(first_curve)
         self.max_size = None
+        self.start_time = None
         self.time = None
         self.gnom = None
         self.Dmax = None
@@ -317,8 +326,16 @@ class HPLCrun(object):
         self.scattering_Stdev = None
         self.subtracted_I = None
         self.subtracted_Stdev = None
-
-
+        self.sum_I = None
+        self.Vc = None
+        self.Qr = None
+        self.mass = None
+        self.Vc_Stdev = None
+        self.Qr_Stdev = None
+        self.mass_Stdev = None       
+        self.keys1d = ["gnom","Dmax","total","volume","Rg","Rg_Stdev","I0","I0_Stdev","quality","sum_I","Vc", "Qr","mass","Vc_Stdev","Qr_Stdev","mass_Stdev"]
+        self.keys2d = ["scattering_I","scattering_Stdev","subtracted_I","subtracted_Stdev"]
+        
     def reset(self):
         self.frames = []
         self.curves = []
@@ -365,39 +382,26 @@ class HPLCrun(object):
     def calc_size(self, idx):
         return (1 + (idx // self.chunk_size)) * self.chunk_size
 
-    def extract_data(self):
+    def extract_data(self, force_finished=False):
         self.max_size = self.calc_size(max(self.frames.keys()) + 1)
         self.time = numpy.zeros(self.max_size, dtype=numpy.float64)
-        self.gnom = numpy.zeros(self.max_size, dtype=numpy.float32)
-        self.Dmax = numpy.zeros(self.max_size, dtype=numpy.float32)
-        self.total = numpy.zeros(self.max_size, dtype=numpy.float32)
-        self.volume = numpy.zeros(self.max_size, dtype=numpy.float32)
-        self.Rg = numpy.zeros(self.max_size, dtype=numpy.float32)
-        self.Rg_Stdev = numpy.zeros(self.max_size, dtype=numpy.float32)
-        self.I0 = numpy.zeros(self.max_size, dtype=numpy.float32)
-        self.I0_Stdev = numpy.zeros(self.max_size, dtype=numpy.float32)
-        self.quality = numpy.zeros(self.max_size, dtype=numpy.float32)
         data = numpy.loadtxt(self.first_curve)
         self.q = data[:, 0]
         self.size = self.q.size
 #        print self.size
-        self.scattering_I = numpy.zeros((self.max_size, self.size), dtype=numpy.float32)
-        self.scattering_Stdev = numpy.zeros((self.max_size, self.size), dtype=numpy.float32)
-        self.subtracted_I = numpy.zeros((self.max_size, self.size), dtype=numpy.float32)
-        self.subtracted_Stdev = numpy.zeros((self.max_size, self.size), dtype=numpy.float32)
+        for key in self.keys2d:
+            self.__setattr__(key,numpy.zeros((self.max_size, self.size), dtype=numpy.float32))
+
+        for key in self.keys1d:
+            self.__setattr__(key, numpy.zeros(self.max_size, dtype=numpy.float32))
+
         for i, frame in self.frames.items():
-            while frame.processing:
-                time.sleep(1)
-            self.time[i] = frame.time or 0
-            self.gnom[i] = frame.gnom or 0
-            self.Dmax[i] = frame.Dmax or 0
-            self.total[i] = frame.total or 0
-            self.volume[i] = frame.volume or 0
-            self.Rg[i] = frame.Rg or 0
-            self.Rg_Stdev[i] = frame.Rg_Stdev or 0
-            self.I0[i] = frame.I0 or 0
-            self.I0_Stdev[i] = frame.I0_Stdev or 0
-            self.quality[i] = frame.quality or 0
+            if not force_finished:
+                while frame.processing:
+                    time.sleep(1.0)
+            for key in ["time"] + self.keys1d:
+                self.__getattribute__(key)[i] = frame.__getattribute__(key) or 0.0
+            
             if frame.curve and os.path.exists(frame.curve):
                 data = numpy.loadtxt(frame.curve)
                 self.scattering_I[i, :] = data[:, 1]
@@ -409,7 +413,10 @@ class HPLCrun(object):
         t = self.time > 0
         x = numpy.arange(self.max_size)
         self.time = numpy.interp(x, x[t], self.time[t])
-        self.time -= self.time.min()
+        if self.start_time:
+            self.time -= self.start_time
+        else:
+            self.time -= self.time.min()
 
     def save_hdf5(self):
         if not self.size:
@@ -419,63 +426,80 @@ class HPLCrun(object):
                 os.unlink(self.hdf5_filename)
             self.hdf5 = h5py.File(self.hdf5_filename)
             self.hdf5.create_dataset("q", shape=(self.size,), dtype=numpy.float32, data=self.q)
-            self.hdf5.create_dataset(name="time", shape=(self.max_size,), dtype=numpy.float32, data=self.time, chunks=(self.chunk_size,))
-            self.hdf5.create_dataset(name="gnom", shape=(self.max_size,), dtype=numpy.float32, data=self.gnom, chunks=(self.chunk_size,))
-            self.hdf5.create_dataset(name="Dmax", shape=(self.max_size,), dtype=numpy.float32, data=self.Dmax, chunks=(self.chunk_size,))
-            self.hdf5.create_dataset(name="total", shape=(self.max_size,), dtype=numpy.float32, data=self.total, chunks=(self.chunk_size,))
-            self.hdf5.create_dataset(name="volume", shape=(self.max_size,), dtype=numpy.float32, data=self.volume, chunks=(self.chunk_size,))
-            self.hdf5.create_dataset(name="Rg", shape=(self.max_size,), dtype=numpy.float32, data=self.Rg, chunks=(self.chunk_size,))
-            self.hdf5.create_dataset(name="Rg_Stdev", shape=(self.max_size,), dtype=numpy.float32, data=self.Rg_Stdev, chunks=(self.chunk_size,))
-            self.hdf5.create_dataset(name="I0", shape=(self.max_size,), dtype=numpy.float32, data=self.I0, chunks=(self.chunk_size,))
-            self.hdf5.create_dataset(name="I0_Stdev", shape=(self.max_size,), dtype=numpy.float32, data=self.I0_Stdev, chunks=(self.chunk_size,))
-            self.hdf5.create_dataset(name="quality", shape=(self.max_size,), dtype=numpy.float32, data=self.quality, chunks=(self.chunk_size,))
-            self.hdf5.create_dataset(name="scattering_I", shape=(self.max_size, self.size), dtype=numpy.float32, data=self.scattering_I, chunks=(self.chunk_size, self.size))
-            self.hdf5.create_dataset(name="scattering_Stdev", shape=(self.max_size, self.size), dtype=numpy.float32, data=self.scattering_Stdev, chunks=(self.chunk_size, self.size))
-            self.hdf5.create_dataset(name="subtracted_I", shape=(self.max_size, self.size), dtype=numpy.float32, data=self.subtracted_I, chunks=(self.chunk_size, self.size))
-            self.hdf5.create_dataset(name="subtracted_Stdev", shape=(self.max_size, self.size), dtype=numpy.float32, data=self.subtracted_Stdev, chunks=(self.chunk_size, self.size))
+            for key in ["time"] + self.keys1d + self.keys2d:
+                self.hdf5[key] = numpy.asarray(self.__getattribute__(key), dtype=numpy.float32)
+            self.hdf5.close()
         return self.hdf5_filename
 
     def make_plot(self):
+        if self.time is None:
+            self.extract_data()
+        data = self.sum_I
+        if (self.time is None) or ((data > 0).sum() > self.time.size):
+            EDVerbose.WARNING("Error in time scale. discarding time scale")
+            valid_pts = numpy.arange(data.size)
+            valid_time = valid_pts
+            xaxislabel = "Point"
+        else:
+            valid_time = self.time
+            valid_pts = numpy.arange(self.time.size)
+            xaxislabel = "time (seconds)"
+        if valid_pts.size < 2:
+            EDVerbose.WARNING("Too few points to make a curve")
+            return
+
         fig = pylab.plt.figure()
         fig_size = fig.get_size_inches()
         fig.set_size_inches([fig_size[0], 2 * fig_size[1]])
 
-        sp0 = fig.add_subplot(511)
-        data = self.scattering_I.sum(axis= -1)
-        sp0.plot(self.time, data)#, label="Total Scattering")
-        sp0.set_ylabel("Scattering")
-        sp0.set_ylim((data[data > 0]).min(), data.max())
-        sp0.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(4))
+        sp0 = fig.add_subplot(311)  # summed I
+        sp1 = fig.add_subplot(312)  # Rg
+        sp2 = fig.add_subplot(313)  # I0
+
+        sp0.plot(valid_time, data)  # , label="Total Scattering")
+        sp0.set_ylabel("Total Scattering")
+        datamin = (data[data > 0]).min()
+        datamax = data.max()
+        if datamax > datamin:  # avoid division by zero
+            sp0.set_ylim(datamin, datamax)
+            sp0.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(4))
         sp0.legend()
 
-        sp1 = fig.add_subplot(512)
-        sp1.errorbar(self.time, self.Rg, self.Rg_Stdev, label="Rg")
-        sp1.plot(self.time, self.gnom, label="Gnom")
-        sp1.plot(self.time, self.Dmax, label="Dmax")
-        sp1.set_ylabel("Radius nm")
-        sp1.set_ylim(0, median_filt(self.Dmax, 9).max())
-        sp1.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(4))
+        sp1.errorbar(valid_time, self.Rg, self.Rg_Stdev, label="Rg")
+#         sp1.plot(valid_time, self.gnom[valid_pts], label="Gnom")
+#         sp1.plot(valid_time, self.Dmax[valid_pts], label="Dmax")
+        sp1.set_ylabel("Radius of giration (nm)")
+        datamax = median_filt((self.Rg + self.Rg_Stdev)[valid_pts], 9).max()
+        if datamax > 0:
+            sp1.set_ylim(0, datamax)
+            sp1.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(4))
         sp1.legend()
 
-        sp2 = fig.add_subplot(513)
-        sp2.errorbar(self.time, self.I0, self.I0_Stdev)#, label="I0")
-        sp2.set_ylabel("I0")
+        sp2.errorbar(valid_time, self.I0[valid_pts], self.I0_Stdev[valid_pts])  # , label="I0")
+        sp2.set_ylabel("I0 from AutoRg")
         sp2.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(4))
+        sp2.set_xlabel(xaxislabel)
         sp2.legend()
 
-        sp3 = fig.add_subplot(514)
-        sp3.plot(self.time, 100 * self.quality)#, label="Quality")
-        sp3.set_ylabel("Qual. %")
-        sp3.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(4))
-        sp3.legend()
-
-        sp4 = fig.add_subplot(515)
-        sp4.plot(self.time, self.volume)#, label="Volume")
-        sp4.set_ylabel("Vol. nm^3")
-        sp4.set_xlabel("time (seconds)")
-        sp4.set_ylim(0, median_filt(self.volume, 9).max())
-        sp4.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(4))
-        sp4.legend()
+#
+#         sp3 = fig.add_subplot(514)
+#         sp3.plot(valid_time, 100.0 * self.quality[valid_pts])  # , label="Quality")
+#         sp3.set_ylabel("Qual. %")
+#         sp3.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(4))
+# #         sp3.legend()
+#
+#         sp4 = fig.add_subplot(515)
+#         sp4.plot(valid_time, self.volume[valid_pts])  # , label="Volume")
+#         sp4.set_ylabel("Vol. nm^3")
+#         if (valid_time - valid_pts).sum() == 0:
+#             sp4.set_xlabel("Point")
+#         else:
+#             sp4.set_xlabel("time (seconds)")
+#         datamax = median_filt(self.volume, 9).max()
+#         if datamax > 0:
+#             sp4.set_ylim(0, datamax)
+#             sp4.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(4))
+# #         sp4.legend()
         pngFile = os.path.splitext(self.hdf5_filename)[0] + ".png"
         fig.savefig(pngFile)
         fig.savefig(os.path.splitext(self.hdf5_filename)[0] + ".svg", transparent=True, bbox_inches='tight', pad_inches=0)
@@ -504,3 +528,49 @@ class HPLCrun(object):
                 lv = lg[maxi - start]
                 res.append(numpy.where(lg == lv)[0] + start)
         return res
+
+def calcVc(dat, Rg, dRg, I0, dI0, imin):
+    """Calculates the Rambo-Tainer invariant Vc, including extrapolation to q=0
+
+    Arguments: 
+    @param dat:  data in q,I,dI format, cropped to maximal q that should be used for calculation (normally 2 nm-1)
+    @param Rg,dRg,I0,dI0:  results from Guinier approximation/autorg
+    @param imin:  minimal index of the Guinier range, below that index data will be extrapolated by the Guinier approximation
+    @returns: Vc and an error estimate based on non-correlated error propagation
+    """
+    dq = dat[1, 0] - dat[0, 0]
+    qmin = dat[imin, 0]
+    qlow = numpy.arange(0, qmin, dq)
+
+    lowqint = scint.trapz((qlow * I0 * numpy.exp(-(qlow * qlow * Rg * Rg) / 3.0)), qlow)
+    dlowqint = scint.trapz(qlow * numpy.sqrt((numpy.exp(-(qlow * qlow * Rg * Rg) / 3.0) * dI0) ** 2 + ((I0 * 2.0 * (qlow * qlow) * Rg / 3.0) * numpy.exp(-(qlow * qlow * Rg * Rg) / 3.0) * dRg) ** 2), qlow)
+    vabs = scint.trapz(dat[imin:, 0] * dat[imin:, 1], dat[imin:, 0])
+    dvabs = scint.trapz(dat[imin:, 0] * dat[imin:, 2], dat[imin:, 0])
+    vc = I0 / (lowqint + vabs)
+    dvc = (dI0 / I0 + (dlowqint + dvabs) / (lowqint + vabs)) * vc
+    return (vc, dvc)
+
+def RamboTainerInvariant(dat, Rg, dRg, I0, dI0, imin, qmax=2):
+    """calculates the invariants Vc and Qr from the Rambo&Tainer 2013 Paper,
+    also the the mass estimate based on Qr for proteins
+
+    Arguments: 
+    @param dat: data in q,I,dI format, q in nm-1
+    @parma Rg,dRg,I0,dI0: results from Guinier approximation
+    @parma imin: minimal index of the Guinier range, below that index data will be extrapolated by the Guinier approximation
+    @parma qmax: maximum q-value for the calculation in nm-1
+    @return: dict with Vc, Qr and mass plus errors
+    """
+    scale_prot = 1.0 / 0.1231
+    power_prot = 1.0
+
+    imax = abs(dat[:, 0] - qmax).argmin()
+    vc = calcVc(dat[:imax, :], Rg, dRg, I0, dI0, imin)
+
+    qr = vc[0] ** 2 / (Rg)
+    mass = scale_prot * qr ** power_prot
+
+    dqr = qr * (dRg / Rg + 2 * ((vc[1]) / (vc[0])))
+    dmass = mass * dqr / qr
+
+    return {'Vc': vc[0], 'dVc': vc[1], 'Qr': qr, 'dQr': dqr, 'mass': mass, 'dmass': dmass}
