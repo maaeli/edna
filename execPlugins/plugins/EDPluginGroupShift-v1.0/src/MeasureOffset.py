@@ -42,7 +42,7 @@ except ImportError:
     fftw3 = None
 try:
     import pycuda
-    import pycuda.autoinit
+#    import pycuda.autoinit
     import pycuda.elementwise
     import pycuda.gpuarray as gpuarray
     import scikits.cuda.fft as cu_fft
@@ -155,6 +155,8 @@ class CudaCorrelate(object):
         if self.ctx is None:
             with self.__class__.initsem:
                 if self.ctx is None:
+                    if "autoinit" not in dir(pycuda):
+                        import pycuda.autoinit
                     self.__class__.ctx = pycuda.autoinit.context
         if not self.shape in self.plans:
             with self.__class__.initsem:
