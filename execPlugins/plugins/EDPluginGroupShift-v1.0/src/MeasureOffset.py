@@ -28,8 +28,12 @@ __author__ = "Jérôme Kieffer"
 __contact__ = "Jerome.Kieffer@esrf.eu"
 __license__ = "GPLv3+"
 __copyright__ = "2011, ESRF, Grenoble"
-__date__ = "20120112"
-__doc__ = "This is a python module to measure image offsets using pyfftw3 or fftpack"
+__date__ = "20131030"
+__doc__ = """This is a python module to measure image offsets using pyfftw3 or fftpack
+
+TODO: perform phase correlation instead of simple convolution. See wikipedia. 
+
+"""
 import os, time, gc
 
 try:
@@ -44,7 +48,7 @@ try:
     import scikits.cuda.fft as cu_fft
 except ImportError:
     cu_fft = None
-
+#cu_fft = None
 import numpy
 from math import ceil, floor
 try:
