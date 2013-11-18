@@ -46,7 +46,7 @@ from XSDataEdnaSaxs import XSDataInputDatcmp, XSDataInputDataver, XSDataInputDat
 from XSDataCommon import XSDataFile, XSDataString, XSDataStatus, XSDataTime, \
     XSDataDouble
 
-from EDUtilsBioSaxs import HPLCframe, HPLCrun, EDUtilsBioSaxs, RamboTainerInvariant
+from EDUtilsBioSaxs import HPLCframe, HPLCrun, RamboTainerInvariant
 
 
 
@@ -82,6 +82,8 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
     SIMILARITY_THRESHOLD_BUFFER_KEY = "similarityBuffer"
     SIMILARITY_THRESHOLD_SAMPLE_DEFAULT = 0.0
     SIMILARITY_THRESHOLD_BUFFER_DEFAULT = 0.1
+    SIMILARITY_THRESHOLD_SAMPLE = None
+    SIMILARITY_THRESHOLD_BUFFER = None
     def __init__(self):
         """
         """
@@ -101,8 +103,6 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
         self.lstExecutiveSummary = []
         self.isBuffer = False
         self.scatter_data = None
-        self.similarityBuffer = None
-        self.similaritySample = None
 
     def checkParameters(self):
         """
@@ -120,10 +120,13 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
          - The threshold for similarity with sample & buffer
         """
         EDPluginControl.configure(self)
-        if self.URL is None:
-            self.DEBUG("EDPluginBioSaxsHPLCv1_2.configure")
-            self.similarityBuffer = float(self.config.get(self.SIMILARITY_THRESHOLD_BUFFER_KEY, self.SIMILARITY_THRESHOLD_BUFFER_DEFAULT))
-            self.similaritySample = float(self.config.get(self.SIMILARITY_THRESHOLD_SAMPLE_KEY, self.SIMILARITY_THRESHOLD_SAMPLE_DEFAULT))
+        if self.__class__.SIMILARITY_THRESHOLD_SAMPLE is None:
+            with self._sem:        
+                if self.__class__.SIMILARITY_THRESHOLD_SAMPLE is None:
+                    self.DEBUG("EDPluginBioSaxsHPLCv1_2.configure")
+                    self.__class__.SIMILARITY_THRESHOLD_BUFFER = float(self.config.get(self.SIMILARITY_THRESHOLD_BUFFER_KEY, self.SIMILARITY_THRESHOLD_BUFFER_DEFAULT))
+                    self.__class__.SIMILARITY_THRESHOLD_SAMPLE = float(self.config.get(self.SIMILARITY_THRESHOLD_SAMPLE_KEY, self.SIMILARITY_THRESHOLD_SAMPLE_DEFAULT))
+
     def preProcess(self, _edObject=None):
         EDPluginControl.preProcess(self)
         self.DEBUG("EDPluginBioSaxsHPLCv1_2.preProcess")
@@ -395,12 +398,12 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
             self.frame.Qr_Stdev = dictRTI.get("dQ")
             self.frame.mass = dictRTI.get("mass")
             self.frame.mass_Stdev = dictRTI.get("dmass")
-            xsdRTI = XSDataRamboTainer(vc=XSDataDouble(dictRTI["Vc"]),
-                                       qr=XSDataDouble(dictRTI["Qr"]),
-                                       mass=XSDataDouble(dictRTI["mass"]),
-                                       dvc=XSDataDouble(dictRTI["dVc"]),
-                                       dqr=XSDataDouble(dictRTI["dQr"]),
-                                       dmass=XSDataDouble(dictRTI["dmass"]))
+            xsdRTI = XSDataRamboTainer(vc=XSDataDouble(self.frame.Vc),
+                                       qr=XSDataDouble(self.frame.Qr),
+                                       mass=XSDataDouble(self.frame.mass),
+                                       dvc=XSDataDouble(self.frame.Vc_Stdev),
+                                       dqr=XSDataDouble(self.frame.Qr_Stdev),
+                                       dmass=XSDataDouble(self.frame.mass_Stdev))
             self.xsDataResult.rti = xsdRTI
 
     def doFailureAutoRg(self, _edPlugin=None):
@@ -428,13 +431,13 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
             #self.setFailure()
             fidelity = 0
         if self.hplc_run.buffer is None:
-            if fidelity > self.similaritySample:
+            if fidelity > self.SIMILARITY_THRESHOLD_SAMPLE:
                 self.isBuffer = True
-                if fidelity > self.similarityBuffer:
+                if fidelity > self.SIMILARITY_THRESHOLD_BUFFER:
                     self.hplc_run.for_buffer.append(self.curve)
             else :
                 self.average_buffers()
-        elif fidelity > self.similaritySample:
+        elif fidelity > self.SIMILARITY_THRESHOLD_SAMPLE:
             self.isBuffer = True
 
     def doFailureDatCmp(self, _edPlugin=None):

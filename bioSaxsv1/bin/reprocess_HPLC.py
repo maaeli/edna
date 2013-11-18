@@ -29,7 +29,7 @@ __author__ = "Jérôme Kieffer"
 __contact__ = "Jerome.Kieffer@ESRF.eu"
 __license__ = "GPLv3+"
 __copyright__ = "European Synchrotron Radiation Facility, Grenoble, France"
-__date__ = "20120924"
+__date__ = "20131118"
 
 import os, sys, time, threading, gc
 if sys.version > (3, 0):
@@ -50,7 +50,6 @@ if "EDNA_HOME" not in os.environ:
 
 sys.path.append(os.path.join(os.environ["EDNA_HOME"], "kernel", "src"))
 from EDLogging import EDLogging
-from EDFactoryPluginStatic  import EDFactoryPluginStatic
 from EDJob import EDJob
 from EDThreading import Semaphore
 from EDUtilsParallel import EDUtilsParallel
@@ -221,7 +220,7 @@ if __name__ == "__main__":
                       action="store_true", dest="verbose", default=False,
                       help="switch to debug mode")
     parser.add_option("-p", "--plugin", action="store", type="string",
-                      dest="plugin", default="EDPluginBioSaxsHPLCv1_0",
+                      dest="plugin", default="EDPluginBioSaxsHPLCv1_2",
                       help="use an alternative plugin")
     parser.add_option("-y", "--yappi", action="store_true",
                       dest="yappi", default=False,
@@ -277,7 +276,7 @@ if __name__ == "__main__":
             for i in keys:
                 f.write("%8s\t%16s\t%16s\t%s%s" % (res[i][0], res[i][1], res[i][1] / res[i][0], i, os.linesep))
         print("Profiling information written in yappi.out")
-    edJob = EDJob("EDPluginBioSaxsFlushHPLCv1_0")
+    edJob = EDJob(options.plugin.replace("EDPluginBioSaxsHPLC", "EDPluginBioSaxsFlushHPLC"))
     edJob.setDataInput(open(fullargs[-1], "r").read())
     edJob.execute()
 

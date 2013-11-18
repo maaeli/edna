@@ -565,6 +565,8 @@ def RamboTainerInvariant(dat, Rg, dRg, I0, dI0, imin, qmax=2):
     power_prot = 1.0
 
     imax = abs(dat[:, 0] - qmax).argmin()
+    if imax <= imin:  # unlikely but can happened
+        return {}
     vc = calcVc(dat[:imax, :], Rg, dRg, I0, dI0, imin)
 
     qr = vc[0] ** 2 / (Rg)

@@ -27,7 +27,7 @@ from __future__ import with_statement
 __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "2012 ESRF"
-__date__ = "20130310"
+__date__ = "20131118"
 __status__ = "development"
 
 import os
@@ -40,14 +40,20 @@ from XSDataBioSaxsv1_0 import XSDataInputBioSaxsHPLCv1_0, XSDataResultBioSaxsHPL
                             XSDataInputBioSaxsISPyB_HPLCv1_0
 from XSDataEdnaSaxs import XSDataInputDataver
 from XSDataCommon import XSDataString, XSDataStatus, XSDataFile
-from EDPluginBioSaxsHPLCv1_1 import EDPluginBioSaxsHPLCv1_1
+from EDPluginBioSaxsHPLCv1_2 import EDPluginBioSaxsHPLCv1_2
 
 
-class EDPluginBioSaxsFlushHPLCv1_1 (EDPluginControl):
+class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
     """
     plugin that just flushes the HPLC data to disk
     
-    New: addapt for version 1.1
+    News: 
+    v1.1: 
+    * adapt for version HPLC plugin v1.1
+    * ISPyB
+    
+    v1.2:
+    * adapt for version HPLC plugin v1.2
     """
     strControlledPluginDatAver = "EDPluginExecDataverv1_0"
     strControlledPluginISPyB = "EDPluginBioSaxsISPyB_HPLCv1_0"
@@ -68,13 +74,13 @@ class EDPluginBioSaxsFlushHPLCv1_1 (EDPluginControl):
         """
         Checks the mandatory parameters.
         """
-        self.DEBUG("EDPluginBioSaxsFlushHPLCv1_1.checkParameters")
+        self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.checkParameters")
         self.checkMandatoryParameters(self.dataInput, "Data Input is None")
         self.checkMandatoryParameters(self.dataInput.rawImage, "No raw image")
 
     def preProcess(self, _edObject=None):
         EDPluginControl.preProcess(self)
-        self.DEBUG("EDPluginBioSaxsFlushHPLCv1_1.preProcess")
+        self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.preProcess")
         sdi = self.dataInput
         if sdi.runId is not None:
             self.runId = sdi.runId.value
@@ -87,9 +93,9 @@ class EDPluginBioSaxsFlushHPLCv1_1 (EDPluginControl):
 
     def process(self, _edObject=None):
         EDPluginControl.process(self)
-        self.DEBUG("EDPluginBioSaxsFlushHPLCv1_1.process")
-        if self.runId in EDPluginBioSaxsHPLCv1_1.dictHPLC:
-            self.processRun(EDPluginBioSaxsHPLCv1_1.dictHPLC[self.runId])
+        self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.process")
+        if self.runId in EDPluginBioSaxsHPLCv1_2.dictHPLC:
+            self.processRun(EDPluginBioSaxsHPLCv1_2.dictHPLC[self.runId])
             edpluginIsPyB = self.loadPlugin(self.strControlledPluginISPyB)
             edpluginIsPyB.dataInput=XSDataInputBioSaxsISPyB_HPLCv1_0(sample=self.dataInput.sample,
                                                                      hdf5File=self.xsDataResult.hplcFile,
@@ -100,7 +106,7 @@ class EDPluginBioSaxsFlushHPLCv1_1 (EDPluginControl):
 
     def postProcess(self, _edObject=None):
         EDPluginControl.postProcess(self)
-        self.DEBUG("EDPluginBioSaxsFlushHPLCv1_1.postProcess")
+        self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.postProcess")
         self.synchronizePlugins()
 
     def finallyProcess(self, _edObject=None):
@@ -128,8 +134,8 @@ class EDPluginBioSaxsFlushHPLCv1_1 (EDPluginControl):
 
 
     def doSuccessDatAver(self, _edPlugin=None):
-        self.DEBUG("EDPluginBioSaxsFlushHPLCv1_1.doSuccessDatAver")
-        self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsFlushHPLCv1_1.doSuccessDatAver")
+        self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.doSuccessDatAver")
+        self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsFlushHPLCv1_2.doSuccessDatAver")
         if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.outputCurve:
             outCurve = _edPlugin.dataOutput.outputCurve.path.value
             if os.path.exists(outCurve):
@@ -142,8 +148,8 @@ class EDPluginBioSaxsFlushHPLCv1_1 (EDPluginControl):
 
 
     def doFailureDatAver(self, _edPlugin=None):
-        self.DEBUG("EDPluginBioSaxsFlushHPLCv1_1.doFailureDatAver")
-        self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsFlushHPLCv1_1.doFailureDatAver")
+        self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.doFailureDatAver")
+        self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsFlushHPLCv1_2.doFailureDatAver")
         if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.status and  _edPlugin.dataOutput.status.executiveSummary:
             self.lstExecutiveSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
         else:

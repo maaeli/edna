@@ -25,6 +25,6 @@
     },
     "EDPluginBioSaxsHPLCv1_2":{
         "similaritySample": 0.01,
-        "similarityBuffer": 0.1,
+        "similarityBuffer": 0.1
     }
 }
