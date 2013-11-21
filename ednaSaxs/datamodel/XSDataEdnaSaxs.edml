@@ -176,7 +176,7 @@ complex type XSDataInputSaxsModeling extends XSDataInput{
 }
 
 complex type XSDataResultSaxsModeling extends XSDataResult{
-	"Damif -> Supcomb -> Damaver -> Damfilt -> Damstart pipeline"
+	"Damif -> Supcomb -> Damaver -> Damfilt -> Damstart -> Dammin pipeline"
 
 	fitFile: XSDataFile
 	logFile: XSDataFile
