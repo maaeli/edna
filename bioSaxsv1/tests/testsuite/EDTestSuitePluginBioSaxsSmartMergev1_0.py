@@ -43,6 +43,10 @@ class EDTestSuitePluginBioSaxsSmartMergev1_0(EDTestSuite):
         self.addTestCaseFromName("EDTestCasePluginExecuteBioSaxsSmartMergev1_1_noRadDam")
         self.addTestCaseFromName("EDTestCasePluginExecuteBioSaxsSmartMergev1_2")
         self.addTestCaseFromName("EDTestCasePluginExecuteBioSaxsSmartMergev1_3")
+        self.addTestCaseFromName("EDTestCasePluginExecuteBioSaxsSmartMergev1_4")
+        self.addTestCaseFromName("EDTestCasePluginExecuteBioSaxsSmartMergev1_4_autosub")
+        self.addTestCaseFromName("EDTestCasePluginExecuteBioSaxsSmartMergev1_5")
+        self.addTestCaseFromName("EDTestCasePluginExecuteBioSaxsSmartMergev1_5_autosub")
 
 
 

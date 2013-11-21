@@ -28,8 +28,12 @@ __author__ = "Jérôme Kieffer"
 __contact__ = "Jerome.Kieffer@esrf.eu"
 __license__ = "GPLv3+"
 __copyright__ = "2011, ESRF, Grenoble"
-__date__ = "20120112"
-__doc__ = "This is a python module to measure image offsets using pyfftw3 or fftpack"
+__date__ = "20131030"
+__doc__ = """This is a python module to measure image offsets using pyfftw3 or fftpack
+
+TODO: perform phase correlation instead of simple convolution. See wikipedia. 
+
+"""
 import os, time, gc
 
 try:
@@ -38,13 +42,13 @@ except ImportError:
     fftw3 = None
 try:
     import pycuda
-    import pycuda.autoinit
+#    import pycuda.autoinit
     import pycuda.elementwise
     import pycuda.gpuarray as gpuarray
     import scikits.cuda.fft as cu_fft
 except ImportError:
     cu_fft = None
-
+#cu_fft = None
 import numpy
 from math import ceil, floor
 try:
@@ -151,6 +155,8 @@ class CudaCorrelate(object):
         if self.ctx is None:
             with self.__class__.initsem:
                 if self.ctx is None:
+                    if "autoinit" not in dir(pycuda):
+                        import pycuda.autoinit
                     self.__class__.ctx = pycuda.autoinit.context
         if not self.shape in self.plans:
             with self.__class__.initsem:

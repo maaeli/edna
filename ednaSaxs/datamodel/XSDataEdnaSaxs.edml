@@ -21,6 +21,19 @@ import XSDataCommon.XSDataDoubleWithUnit
   *  Common types used only in EdnaSaxs
   ********************************************/
 
+complex type XSDataSaxsModel extends XSData {
+	"3D model with useful metadata"
+	name: XSDataString
+	pdbFile : XSDataFile
+	fitFile : XSDataFile optional
+	firFile : XSDataFile optional
+	logFile : XSDataFile optional
+	rfactor : XSDataDouble optional
+	chiSqrt : XSDataDouble optional
+	volume: XSDataDouble optional
+	rg: XSDataDouble optional
+	dmax: XSDataDouble optional
+}
 
 complex type XSDataSaxsSeries extends XSData {
 	"Basical"
@@ -98,13 +111,13 @@ complex type XSDataInputAutoRg extends XSDataInput{
 }
 
 complex type XSDataAutoRg extends XSData{
-	filename:XSDataFile
-	rg:XSDataLength
-	rgStdev:XSDataLength
+	filename: XSDataFile
+	rg: XSDataLength
+	rgStdev: XSDataLength
 	i0: XSDataDouble
-	i0Stdev:XSDataDouble
-	firstPointUsed:XSDataInteger
-	lastPointUsed:XSDataInteger
+	i0Stdev: XSDataDouble
+	firstPointUsed: XSDataInteger
+	lastPointUsed: XSDataInteger
 	quality: XSDataDouble "from 0 to 1"
 	isagregated: XSDataBoolean
 }
@@ -170,19 +183,27 @@ complex type XSDataResultSaxsAnalysis extends XSDataResult{
 }
 
 complex type XSDataInputSaxsModeling extends XSDataInput{
-	"Damif -> Supcomb -> Damaver -> Damfilt -> Damstart pipeline"
+	"Dammif -> Supcomb -> Damaver -> Damfilt -> Damstart -> Dammin pipeline"
 	gnomFile: XSDataFile
 	graphFormat: XSDataString optional
 }
 
 complex type XSDataResultSaxsModeling extends XSDataResult{
-	"Damif -> Supcomb -> Damaver -> Damfilt -> Damstart -> Dammin pipeline"
+	"Dammif -> Supcomb -> Damaver -> Damfilt -> Damstart -> Dammin pipeline"
+
+	dammifModels: XSDataSaxsModel [] optional
+	damaverModel: XSDataSaxsModel  optional
+	damfiltModel: XSDataSaxsModel  optional
+	damstartModel: XSDataSaxsModel  optional
+	damminModel: XSDataSaxsModel  optional
 
 	fitFile: XSDataFile
 	logFile: XSDataFile
 	pdbMoleculeFile: XSDataFile
 	pdbSolventFile: XSDataFile
 
+	chiRfactorPlot: XSDataFile
+	nsdPlot: XSDataFile
 //	corelationFitValues: XSDataDouble [] optional
 //	lineProfileFitQuality: XSDataDouble
 //	scatteringFitQ: XSDataDouble [] optional
@@ -192,6 +213,41 @@ complex type XSDataResultSaxsModeling extends XSDataResult{
 //	meanNSD: XSDataDouble optional
 //	variationNSD: XSDataDouble optional
 }
+
+complex type XSDataInputSaxsAnalysisModeling extends XSDataInput{
+	"AutoRg -> Gnom -> Prod -> Dammif -> Supcomb -> Damaver -> Damfilt -> Damstart -> Dammin pipeline"
+	scatterCurve: XSDataFile
+	autoRg: XSDataAutoRg optional
+	gnomFile: XSDataFile optional
+	graphFormat: XSDataString optional
+}
+
+complex type XSDataResultSaxsAnalysisModeling extends XSDataResult{
+	"AutoRg -> Gnom -> Prod -> Dammif -> Supcomb -> Damaver -> Damfilt -> Damstart -> Dammin pipeline"
+
+	autoRg: XSDataAutoRg
+	gnom: XSDataGnom
+	volume: XSDataDoubleWithUnit
+	scatterPlot: XSDataFile optional
+	guinierPlot: XSDataFile optional
+	kratkyPlot: XSDataFile optional
+	densityPlot: XSDataFile optional
+
+	dammifModels: XSDataSaxsModel [] optional
+	damaverModel: XSDataSaxsModel  optional
+	damfiltModel: XSDataSaxsModel  optional
+	damstartModel: XSDataSaxsModel  optional
+	damminModel: XSDataSaxsModel  optional
+
+	chiRfactorPlot: XSDataFile
+	nsdPlot: XSDataFile
+
+	fitFile: XSDataFile
+	logFile: XSDataFile
+	pdbMoleculeFile: XSDataFile
+	pdbSolventFile: XSDataFile
+}
+
 
 
 complex type XSDataFileSeries extends XSData {
@@ -315,6 +371,9 @@ complex type XSDataResultDamaver extends XSDataResult {
 	damaverPdbFile : XSDataFile optional
 	damfilterPdbFile : XSDataFile optional
 	damstartPdbFile : XSDataFile optional
+	model: XSDataSaxsModel optional
+	damfiltModel: XSDataSaxsModel optional
+	damstartModel: XSDataSaxsModel optional
 }
 
 complex type XSDataInputDamfilt extends XSDataInput {
@@ -322,6 +381,7 @@ complex type XSDataInputDamfilt extends XSDataInput {
 }
 complex type XSDataResultDamfilt extends XSDataResult {
 	outputPdbFile : XSDataFile optional
+	model: XSDataSaxsModel optional
 }
 
 complex type XSDataInputDammif extends XSDataInput {
@@ -332,6 +392,7 @@ complex type XSDataInputDammif extends XSDataInput {
 	mode : XSDataString optional
 	chained : XSDataBoolean optional
 	constant : XSDataDouble optional
+	order: XSDataInteger optional
 }
 complex type XSDataResultDammif extends XSDataResult {
 	fitFile : XSDataFile
@@ -340,15 +401,20 @@ complex type XSDataResultDammif extends XSDataResult {
 	pdbSolventFile : XSDataFile
 	rfactor : XSDataDouble optional
 	chiSqrt : XSDataDouble optional
+	model: XSDataSaxsModel
 }
 
 complex type XSDataInputDammin extends XSDataInput {
+	"name is the name to be given to the model"
 	expectedParticleShape : XSDataInteger
 	gnomOutputFile : XSDataFile
 	initialDummyAtomModel : XSDataInteger
 	pdbInputFile : XSDataFile
 	symmetry : XSDataString
 	mode : XSDataString optional
+	unit : XSDataString optional
+	name: XSDataString optional
+	
 }
 complex type XSDataResultDammin extends XSDataResult {
 	fitFile : XSDataFile
@@ -357,6 +423,7 @@ complex type XSDataResultDammin extends XSDataResult {
 	pdbSolventFile : XSDataFile
 	rfactor : XSDataDouble optional
 	chiSqrt : XSDataDouble optional
+	model: XSDataSaxsModel
 }
 
 complex type XSDataInputDamstart extends XSDataInput {
@@ -364,18 +431,23 @@ complex type XSDataInputDamstart extends XSDataInput {
 }
 complex type XSDataResultDamstart extends XSDataResult {
 	outputPdbFile : XSDataFile optional
+	model: XSDataSaxsModel
 }
 
 
 complex type XSDataInputSupcomb extends XSDataInput {
+	"name is the name to be given to the model"
 	templateFile : XSDataFile
 	superimposeFile : XSDataFile
 	enantiomorphs : XSDataBoolean optional
 	backbone : XSDataBoolean optional
+	name: XSDataString optional
 }
 complex type XSDataResultSupcomb extends XSDataResult {
+	"model is new unified container for the saxs model"
 	outputFilename : XSDataFile
 	rot : XSDataRotation
 	trns : XSDataVectorDouble
 	NSD : XSDataDouble
+	model: XSDataSaxsModel optional
 }

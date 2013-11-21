@@ -29,10 +29,10 @@ __copyright__ = "2012, ESRF Grenoble"
 __date__ = "2012-08-30"
 __status__ = "Development"
 
-import os
+import os, shutil
 from EDPluginExecProcessScript import EDPluginExecProcessScript
 from XSDataEdnaSaxs import XSDataInputDatGnom, XSDataResultDatGnom, XSDataGnom
-from XSDataCommon import XSDataString, XSDataDouble, XSDataFile, XSDataLength
+from XSDataCommon import XSDataString, XSDataDouble, XSDataFile, XSDataLength, XSDataStatus
 
 class EDPluginExecDatGnomv1_0(EDPluginExecProcessScript):
     """
@@ -70,7 +70,7 @@ class EDPluginExecDatGnomv1_0(EDPluginExecProcessScript):
             self.rg = self.dataInput.rg.value
         if self.dataInput.skip is not None:
             self.skip = self.dataInput.skip.value
-
+        self.symlink(self.datFile, os.path.basename(self.datFile))
         self.generateCommandLineOptions()
 
 
@@ -78,12 +78,17 @@ class EDPluginExecDatGnomv1_0(EDPluginExecProcessScript):
         EDPluginExecProcessScript.postProcess(self)
         self.DEBUG("EDPluginExecDatGnomv1_0.postProcess")
         # Create some output data
-        if not os.path.isfile(self.outFile):
+        cwd = self.getWorkingDirectory()
+        outfile = os.path.join(cwd, os.path.basename(self.outFile))
+        if not os.path.isfile(outfile):
             self.error("EDPluginExecDatGnomv1_0 did not produce output file %s as expected !" % self.outFile)
             self.setFailure()
             self.dataOutput = XSDataResultDatGnom()
             return
-
+        try:
+            os.rename(outfile, self.outFile)
+        except OSError:  # may fail if src and dst on different filesystem
+            shutil.copy(outfile, self.outFile)
         gnom = XSDataGnom(gnomFile=XSDataFile(XSDataString(self.outFile)))
         logfile = os.path.join(self.getWorkingDirectory(), self.getScriptLogFileName())
         out = open(logfile, "r").read().split()
@@ -99,11 +104,21 @@ class EDPluginExecDatGnomv1_0(EDPluginExecProcessScript):
                 self.error("EDPluginExecDatGnomv1_0.postProcess No key %s in file %s" % (key, logfile))
                 self.setFailure()
         self.dataOutput = XSDataResultDatGnom(gnom=gnom)
+        self.dataOutput.status = XSDataStatus(message=self.getXSDataMessage())
 
     def generateCommandLineOptions(self):
-        lstArg = [self.datFile, "-o", self.outFile]
+        lstArg = [self.datFile, "-o", os.path.basename(self.outFile)]
         if self.rg:
             lstArg += ["-r", str(self.rg)]
         if self.skip and self.skip > 0:
             lstArg += ["-s", str(self.skip)]
         self.setScriptCommandline(" ".join(lstArg))
+
+    def symlink(self, filen, link):
+        """
+        Create a symlink to CWD with relative path
+        """
+        src = os.path.abspath(filen)
+        cwd = self.getWorkingDirectory()
+        dest = os.path.join(cwd, link)
+        os.symlink(os.path.relpath(src, cwd), dest)

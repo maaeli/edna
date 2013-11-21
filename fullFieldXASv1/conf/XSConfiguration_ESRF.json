@@ -1,0 +1,8 @@
+{
+    "__extend__": [], 
+    "EDPluginControlFullFieldXASv1_0": {}, 
+    "EDPluginControlAlignStackv1_0": {
+        "writeXMLInput": 0, 
+        "timeOut": 6000
+    }
+}

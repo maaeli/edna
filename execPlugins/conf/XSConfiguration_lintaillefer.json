@@ -130,4 +130,10 @@
         "execProcessScriptShell": "/bin/bash", 
         "timeOut": 60
     }
+    "EDPluginExecMeasureOffsetv2_1": {
+        "sift_pyocl": true,
+        "deviceType": "GPU", 
+        "timeOut": 60
+    }
+    
 }

@@ -79,8 +79,9 @@ class EDPluginExecDatPorodv1_0(EDPluginExecProcessScript):
         except (ValueError, IndexError):
             self.error("Unable to read porod log file: " + logfile)
             self.setFailure()
-        xsDataResult = XSDataResultDatPorod(volume=XSDataDoubleWithUnit(value=res))
-        self.setDataOutput(xsDataResult)
+        else:
+            xsDataResult = XSDataResultDatPorod(volume=XSDataDoubleWithUnit(value=res))
+            self.setDataOutput(xsDataResult)
 
     def generateCommandLineOptions(self):
         self.setScriptCommandline(self.gnomFile)
