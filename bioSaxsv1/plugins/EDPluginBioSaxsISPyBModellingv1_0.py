@@ -66,7 +66,7 @@ def sensibleDict(dico):
                 newkey = key
             val = dico[key]
             if isinstance(val, dict):
-                sdic[newkey] = sensibleDict(val)
+                sdic[newkey] = sensibleDict(val) or {}
             elif isinstance(val, (list, tuple)):
                 sdic[newkey] = [sensibleDict(i) for i in val]
             else:
@@ -165,12 +165,12 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
 #         chiRfactorPlot: XSDataFile optional
 #         nsdPlot: XSDataFile optional
         dico = sensibleDict(self.dataInput.exportToDict())
-        self.models = dico.get("dammifModels", [])
-        self.damaver = dico.get("damaverModel", {})
-        self.damfilt = dico.get("damfiltModel", {})
-        self.dammin = dico.get("damminModel", {})
-        self.nsdPlot = dico.get("nsdPlot", "")
-        self.chi2plot = dico.get("chiRfactorPlot", "")
+        self.models = dico.get("dammifModels", []) or []
+        self.damaver = dico.get("damaverModel", {}) or {}
+        self.damfilt = dico.get("damfiltModel", {}) or {}
+        self.dammin = dico.get("damminModel", {}) or {}
+        self.nsdPlot = dico.get("nsdPlot", "") or ""
+        self.chi2plot = dico.get("chiRfactorPlot", "") or ""
         try:
             self.copy_to_pyarch()
         except Exception as error:
