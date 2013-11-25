@@ -295,7 +295,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         dammin.connectSUCCESS(self.doSuccessExecDammin)
         dammin.connectFAILURE(self.doFailureExecDammin)
         dammin.executeSynchronous()
-
+        #Dammin takes as lot of time ... wait here for completion
 
     def postProcess(self, _edObject=None):
         EDPluginControl.postProcess(self)
