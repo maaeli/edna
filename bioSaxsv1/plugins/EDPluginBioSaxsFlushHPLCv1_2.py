@@ -130,7 +130,12 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
             edpugin.connectSUCCESS(self.doSuccessDatAver)
             edpugin.connectFAILURE(self.doFailureDatAver)
             edpugin.execute()
+
+        # Append to hdf5
+        run.append_hdf5()
+
         self.synchronizePlugins()
+
 
 
     def doSuccessDatAver(self, _edPlugin=None):

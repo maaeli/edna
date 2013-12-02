@@ -25,6 +25,8 @@
 #
 
 from __future__ import with_statement
+import errno
+import traceback
 """
 Utilities for BioSaxs, especially for logging back both to EDNA using EDVerbose and to BioSaxsCube through SpecVariable
 """
@@ -166,7 +168,6 @@ class EDUtilsBioSaxs(EDObject):
             # must do this, since SpecClient is apparently returning a non-expected data structure
             EDVerbose.ERROR("Aborting data reprocess!")
 #            sys.exit(0)
-
 
     @staticmethod
     def getFilenameDetails(_strFilename):
@@ -332,10 +333,19 @@ class HPLCrun(object):
         self.mass = None
         self.Vc_Stdev = None
         self.Qr_Stdev = None
-        self.mass_Stdev = None       
+        self.mass_Stdev = None  
+        self.buffer_frames = None
+        self.merge_frames = None  
+        self.buffer_I = None
+        self.buffer_Stdev = None
+        self.merge_I = None 
+        self.merge_Stdev = None     
         self.keys1d = ["gnom","Dmax","total","volume","Rg","Rg_Stdev","I0","I0_Stdev","quality","sum_I","Vc", "Qr","mass","Vc_Stdev","Qr_Stdev","mass_Stdev"]
         self.keys2d = ["scattering_I","scattering_Stdev","subtracted_I","subtracted_Stdev"]
-        
+        self.keys_frames = ["buffer_frames", "merge_frames"]
+        self.keys_merges = ["buffer_I", "buffer_Stdev", "merge_I", "merge_Stdev"]
+
+
     def reset(self):
         self.frames = []
         self.curves = []
@@ -511,6 +521,7 @@ class HPLCrun(object):
         """
         lab = label(self.I0)
         res = []
+        self.merge_frames = []
         for i in range(1, int(lab.max() + 1)):
             loc = (lab == i)
             c = loc.sum()
@@ -526,8 +537,55 @@ class HPLCrun(object):
                 good[stop:] = 0
                 lg = label(good[start:stop + 1])
                 lv = lg[maxi - start]
+                resl = numpy.where(lg == lv)[0] + start
                 res.append(numpy.where(lg == lv)[0] + start)
+                self.merge_frames.append([resl[0], resl[-1]])
         return res
+
+    def extract_merges(self):
+        self.buffer_I = numpy.zeros(self.size, dtype=numpy.float32)
+        self.buffer_Stdev = numpy.zeros(self.size, dtype=numpy.float32)
+        if (not self.merge_frames == None) and len(self.merge_frames) > 0:
+            self.merge_I = numpy.zeros((len(self.merge_frames), self.size), dtype=numpy.float32)
+            self.merge_Stdev = numpy.zeros((len(self.merge_frames), self.size), dtype=numpy.float32)
+        else:
+            self.merge_I = numpy.zeros(self.size, dtype=numpy.float32)
+            self.merge_Stdev = numpy.zeros(self.size, dtype=numpy.float32)
+
+        self.buffer_frames = [0, len(self.for_buffer)]
+
+        if self.buffer and os.path.exists(self.buffer):
+            data = numpy.loadtxt(self.buffer)
+            self.buffer_I = data[:, 1]
+            self.buffer_Stdev = data[:, 2]
+
+        if (not self.merge_frames == None) and len(self.merge_frames) > 0:
+            for i in range(len(self.merge_frames)):
+                group = self.merge_frames[i]
+                outname = os.path.splitext(self.frames[group[0]].subtracted)[0] + "_aver_%s.dat" % group[-1]
+                print outname
+                if os.path.exists(outname):
+                    data = numpy.loadtxt(self.buffer)
+                    self.merge_I[i, :] = data[:, 1]
+                    self.merge_Stdev[i, :] = data[:, 2]
+        else:
+            self.merge_frames = [0]
+
+
+    def append_hdf5(self):
+        self.extract_merges()
+        with self.lock:
+            try:
+#                 if os.path.exists(self.hdf5_filename):
+#                     os.unlink(self.hdf5_filename)
+                self.hdf5 = h5py.File(self.hdf5_filename)
+                for key in self.keys_frames + self.keys_merges :
+                    self.hdf5[key] = numpy.asarray(self.__getattribute__(key), dtype=numpy.float32)
+                self.hdf5.close()
+            except:
+                print traceback.format_exc()
+                
+        return self.hdf5_filename
 
 def calcVc(dat, Rg, dRg, I0, dI0, imin):
     """Calculates the Rambo-Tainer invariant Vc, including extrapolation to q=0
