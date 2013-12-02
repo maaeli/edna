@@ -563,11 +563,11 @@ class HPLCrun(object):
             for i in range(len(self.merge_frames)):
                 group = self.merge_frames[i]
                 outname = os.path.splitext(self.frames[group[0]].subtracted)[0] + "_aver_%s.dat" % group[-1]
-                print outname
                 if os.path.exists(outname):
-                    data = numpy.loadtxt(self.buffer)
+                    data = numpy.loadtxt(outname)
                     self.merge_I[i, :] = data[:, 1]
                     self.merge_Stdev[i, :] = data[:, 2]
+                    print "Loaded"
         else:
             self.merge_frames = [0]
 
