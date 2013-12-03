@@ -57,6 +57,8 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
     """
     strControlledPluginDatAver = "EDPluginExecDataverv1_0"
     strControlledPluginISPyB = "EDPluginBioSaxsISPyB_HPLCv1_0"
+    __strControlledPluginSaxsAnalysis = "EDPluginControlSaxsAnalysisv1_0"
+
     def __init__(self):
         """
         """
@@ -131,17 +133,16 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
             edpugin.connectFAILURE(self.doFailureDatAver)
             edpugin.execute()
             run.merge_curves.append(outname)
-            run.merge_Rg[outname] = []
-            run.merge_gnom[outname] = []
-            run.merge_volume[outname] = []
+            run.merge_Rg[outname] = None
+            run.merge_gnom[outname] = None
+            run.merge_volume[outname] = None
         # run analysis of merges
 
         for merge in run.merge_curves:
-            merge = run.merge_curves[i]
             xsdSubtractedCurve = XSDataFile(XSDataString(merge))
             self.__edPluginSaxsAnalysis = self.loadPlugin(self.__strControlledPluginSaxsAnalysis)
             self.__edPluginSaxsAnalysis.dataInput = XSDataInputSaxsAnalysis(scatterCurve=xsdSubtractedCurve,
-                                                                                autoRg=self.autoRg,
+                                                                                autoRg=run.merge_Rg[merge],
                                                                                 graphFormat=XSDataString("png"))
             self.__edPluginSaxsAnalysis.connectSUCCESS(self.doSuccessSaxsAnalysis)
             self.__edPluginSaxsAnalysis.connectFAILURE(self.doFailureSaxsAnalysis)
