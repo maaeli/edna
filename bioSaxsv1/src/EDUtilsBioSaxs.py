@@ -340,6 +340,10 @@ class HPLCrun(object):
         self.buffer_Stdev = None
         self.merge_I = None 
         self.merge_Stdev = None     
+        self.merge_curves = []
+        self.merge_Rg = {}
+        self.merge_gnom = {}
+        self.merge_volume = {}
         self.keys1d = ["gnom","Dmax","total","volume","Rg","Rg_Stdev","I0","I0_Stdev","quality","sum_I","Vc", "Qr","mass","Vc_Stdev","Qr_Stdev","mass_Stdev"]
         self.keys2d = ["scattering_I","scattering_Stdev","subtracted_I","subtracted_Stdev"]
         self.keys_frames = ["buffer_frames", "merge_frames"]
