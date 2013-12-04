@@ -185,6 +185,8 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
         run = EDPluginBioSaxsHPLCv1_2.dictHPLC[self.runId]
         curvename = _edPlugin.dataOutput.autoRg.filename.path
         run.merge_Rg[curvename] = _edPlugin.dataOutput.autoRg
+        print type(run.merge_Rg[curvename])
+        print run.merge_Rg[curvename]
         run.merge_gnom[curvename] = _edPlugin.dataOutput.gnom
         run.merge_volume[curvename] = _edPlugin.dataOutput.volume
 #         self.xsScatterPlot = _edPlugin.dataOutput.scatterPlot

@@ -52,6 +52,9 @@ try:
     from SpecClient         import SpecVariable
 except:
     SpecVariable = None
+
+from XSDataEdnaSaxs    import XSDataAutoRg
+
 import h5py, numpy, matplotlib, json
 matplotlib.use('Agg')
 from matplotlib import pylab
@@ -344,10 +347,14 @@ class HPLCrun(object):
         self.merge_Rg = {}
         self.merge_gnom = {}
         self.merge_volume = {}
+        self.merge_Guinier = None
+        self.merge_Gnom = None
+        self.merge_Porod = None
         self.keys1d = ["gnom","Dmax","total","volume","Rg","Rg_Stdev","I0","I0_Stdev","quality","sum_I","Vc", "Qr","mass","Vc_Stdev","Qr_Stdev","mass_Stdev"]
         self.keys2d = ["scattering_I","scattering_Stdev","subtracted_I","subtracted_Stdev"]
         self.keys_frames = ["buffer_frames", "merge_frames"]
         self.keys_merges = ["buffer_I", "buffer_Stdev", "merge_I", "merge_Stdev"]
+        self.keys_analysis = ["merge_Guinier", "merge_Gnom", "merge_Porod"]
 
 
     def reset(self):
@@ -552,6 +559,7 @@ class HPLCrun(object):
         if (not self.merge_frames == None) and len(self.merge_frames) > 0:
             self.merge_I = numpy.zeros((len(self.merge_frames), self.size), dtype=numpy.float32)
             self.merge_Stdev = numpy.zeros((len(self.merge_frames), self.size), dtype=numpy.float32)
+            self.merge_Guinier = numpy.zeros((len(self.merge_frames), 8), dtype=numpy.float32)
         else:
             self.merge_I = numpy.zeros(self.size, dtype=numpy.float32)
             self.merge_Stdev = numpy.zeros(self.size, dtype=numpy.float32)
@@ -571,9 +579,18 @@ class HPLCrun(object):
                     data = numpy.loadtxt(outname)
                     self.merge_I[i, :] = data[:, 1]
                     self.merge_Stdev[i, :] = data[:, 2]
-                    print "Loaded"
+
+                    if not self.merge_Rg[outname] == None:
+                        print type(self.merge_Rg[outname])
+                        print self.merge_Rg[outname]
+
+                        self.merge_Guinier[i, :] = (self.merge_Rg[outname].rg.value, self.merge_Rg[outname].rgStdev.value,
+                            self.merge_Rg[outname].i0.value, self.merge_Rg[outname].i0Stdev.value,
+                            self.merge_Rg[outname].firstPointUsed.value, self.merge_Rg[outname].lastPointUsed.value,
+                            self.merge_Rg[outname].quality.value * 100., int(self.merge_Rg[outname].isagregated.value))
         else:
             self.merge_frames = [0]
+
 
 
     def append_hdf5(self):
@@ -583,8 +600,9 @@ class HPLCrun(object):
 #                 if os.path.exists(self.hdf5_filename):
 #                     os.unlink(self.hdf5_filename)
                 self.hdf5 = h5py.File(self.hdf5_filename)
-                for key in self.keys_frames + self.keys_merges :
-                    self.hdf5[key] = numpy.asarray(self.__getattribute__(key), dtype=numpy.float32)
+                for key in self.keys_frames + self.keys_merges + self.keys_analysis:
+                    if not self.__getattribute__(key) == None:
+                        self.hdf5[key] = numpy.asarray(self.__getattribute__(key), dtype=numpy.float32)
                 self.hdf5.close()
             except:
                 print traceback.format_exc()
