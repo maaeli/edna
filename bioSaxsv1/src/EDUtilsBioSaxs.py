@@ -345,8 +345,7 @@ class HPLCrun(object):
         self.merge_Stdev = None     
         self.merge_curves = []
         self.merge_Rg = {}
-        self.merge_gnom = {}
-        self.merge_volume = {}
+        self.merge_analysis = {}
         self.merge_Guinier = None
         self.merge_Gnom = None
         self.merge_Porod = None
@@ -580,15 +579,12 @@ class HPLCrun(object):
                     data = numpy.loadtxt(outname)
                     self.merge_I[i, :] = data[:, 1]
                     self.merge_Stdev[i, :] = data[:, 2]
-
-                    if True:  # not self.merge_Rg[outname] == None:
-                        print type(self.merge_Rg[outname])
-                        print self.merge_Rg[outname]
-
-                        self.merge_Guinier[i, :] = (self.merge_Rg[outname].rg.value, self.merge_Rg[outname].rgStdev.value,
-                            self.merge_Rg[outname].i0.value, self.merge_Rg[outname].i0Stdev.value,
-                            self.merge_Rg[outname].firstPointUsed.value, self.merge_Rg[outname].lastPointUsed.value,
-                            self.merge_Rg[outname].quality.value * 100., int(self.merge_Rg[outname].isagregated.value))
+                    if  not self.merge_analysis[outname] == None:
+                        autorg = self.merge_analysis[outname].autoRg
+                        self.merge_Guinier[i, :] = (autorg.rg.value, autorg.rgStdev.value,
+                             autorg.i0.value, autorg.i0Stdev.value,
+                             autorg.firstPointUsed.value, autorg.lastPointUsed.value,
+                             autorg.quality.value * 100., int(autorg.isagregated.value))
         else:
             self.merge_frames = [0]
 
