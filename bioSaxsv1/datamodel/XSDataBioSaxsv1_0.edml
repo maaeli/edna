@@ -384,6 +384,12 @@ complex type XSDataInputBioSaxsISPyBv1_0 extends XSDataInput  {
 	densityPlot: XSDataFile optional	
 }
 
+complex type XSDataInputBioSaxsISPyBHPLCv1_0 extends XSDataInputBioSaxsISPyBv1_0  {
+	"Input class for populating ISPyB for ISPyB experiments"
+	startFrame 		: XSDataString
+	endFrame 		: XSDataString
+}
+
 complex type XSDataResultBioSaxsISPyBv1_0 extends XSDataResult {
 	
 }
@@ -418,7 +424,8 @@ complex type XSDataInputBioSaxsISPyB_HPLCv1_0 extends XSDataInput  {
 }
 
 complex type XSDataResultBioSaxsISPyB_HPLCv1_0 extends XSDataResult {
-	
+	sample			: XSDataBioSaxsSample
+	experimentId	: XSDataInteger
 }
 
 

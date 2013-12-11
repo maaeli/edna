@@ -279,7 +279,7 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
             try:
                 shutil.copy(afile, pyarch)
             except IOError as error:
-                ermsg = "Error while copying %s to pyarch %s: %s " % (afile, pyarch, error)
+                ermsg = "BioSAXSISPyBv1_0: Error while copying %s to pyarch %s: %s " % (afile, pyarch, error)
                 self.lstError.append(ermsg)
                 self.WARNING(ermsg)
             else:

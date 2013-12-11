@@ -119,27 +119,39 @@ class EDPluginBioSaxsISPyB_HPLCv1_0(EDPluginControl):
     def process(self, _edObject=None):
         EDPluginControl.process(self)
         self.DEBUG("EDPluginBioSaxsISPyB_HPLCv1_0.process")
-        try:
-            self.copy_to_pyarch()
-        except Exception as error:
-            strErrorMessage = "Error while copying to pyarch: %s" % error
-            self.ERROR(strErrorMessage)
-            self.lstError.append(strErrorMessage)
         if self.dataInput.sample.collectionOrder is not None:
             collectionOrder = str(self.dataInput.sample.collectionOrder.value)
         else:
             collectionOrder = "-1"
+        self.experimentId = None
         try:
-            self.client.service.storeHPLC(
+            experimentId = self.client.service.createHPLC(
                                     self.code,
                                     self.number,
-                                    self.hdf5File,
-                                    self.jsonFile,
-                                    self.hplcPlot)
+                                    'name')
+            print "Experiment Id " + str(experimentId)
         except Exception, error:
             strError = "ISPyB error: %s" % error
             self.ERROR(strError)
             self.setFailure()
+        try:
+            self.copy_to_pyarch(str(experimentId))
+            
+        except Exception as error:
+            strErrorMessage = "In EDPluginBioSaxsISPyB_HPLCv1_0.process: Error while copying to pyarch: %s" % error
+            self.ERROR(strErrorMessage)
+            self.lstError.append(strErrorMessage)
+            
+        try:
+            if (experimentId is not None):
+                self.client.service.storeHPLC(
+                                    experimentId,
+                                    self.hdf5File,
+                                    self.jsonFile)
+        except Exception as error:
+            strErrorMessage = "ISPyB storeHPLC error: %s" % error
+            self.ERROR(strErrorMessage)
+            self.lstError.append(strErrorMessage)
 
 
     def postProcess(self, _edObject=None):
@@ -150,9 +162,11 @@ class EDPluginBioSaxsISPyB_HPLCv1_0(EDPluginControl):
         xsDataResult = XSDataResultBioSaxsISPyB_HPLCv1_0(status=XSDataStatus(executiveSummary=XSDataString(os.linesep.join(self.lstError))))
         self.setDataOutput(xsDataResult)
 
-    def copy_to_pyarch(self):
+    def copy_to_pyarch(self, experimentId):
         if self.dataInput.sample.ispybDestination:
-            pyarch = os.path.join(self.dataInput.sample.ispybDestination.path.value, "HPLC", self.dataInput.sample.measurementID.value)
+            pyarch = os.path.join(self.dataInput.sample.ispybDestination.path.value)
+            if (experimentId is not None):
+                pyarch = os.path.join(self.dataInput.sample.ispybDestination.path.value, experimentId)
             try:
                 if not os.path.isdir(pyarch):
                     os.makedirs(pyarch)
@@ -171,8 +185,8 @@ class EDPluginBioSaxsISPyB_HPLCv1_0(EDPluginControl):
             try:
                 shutil.copy(afile, pyarch)
             except IOError as error:
-                ermsg = "Error while copying %s to pyarch %s: %s " % (afile, pyarch, error)
+                ermsg = "BiosaxsISPyB HPLC Error while copying %s to pyarch %s: %s " % (afile, pyarch, error)
                 self.lstError.append(ermsg)
                 self.WARNING(ermsg)
             else:
-                return os.path.join(pyarch, afile)
+                return os.path.join(pyarch, os.path.basename(afile))  # os.path.join(pyarch, afile)
