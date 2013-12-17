@@ -103,6 +103,7 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
         self.lstExecutiveSummary = []
         self.isBuffer = False
         self.scatter_data = None
+        self.subtracted_data = None
 
     def checkParameters(self):
         """
@@ -386,25 +387,27 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
         Calculate the invariants Vc and Qr from the Rambo&Tainer 2013 Paper,
         also the the mass estimate based on Qr for proteins
         """
-        if self.scatter_data is not None and\
-            self.frame.Rg and self.frame.Rg_Stdev and self.frame.I0 and self.frame.I0_Stdev:
-            dictRTI = RamboTainerInvariant(self.scatter_data, self.frame.Rg,
-                                           self.frame.Rg_Stdev, self.frame.I0,
-                                           self.frame.I0_Stdev, rg.firstPointUsed.value)
+        if self.subtracted and os.path.exists(self.subtracted):
+            self.subtracted_data = numpy.loadtxt(self.subtracted)
+            if self.subtracted_data is not None and\
+                self.frame.Rg and self.frame.Rg_Stdev and self.frame.I0 and self.frame.I0_Stdev:
+                dictRTI = RamboTainerInvariant(self.subtracted_data, self.frame.Rg,
+                                               self.frame.Rg_Stdev, self.frame.I0,
+                                               self.frame.I0_Stdev, rg.firstPointUsed.value)
 #             {'Vc': vc[0], 'dVc': vc[1], 'Qr': qr, 'dQr': dqr, 'mass': mass, 'dmass': dmass}
-            self.frame.Vc = dictRTI.get("Vc")
-            self.frame.Vc_Stdev = dictRTI.get("dVc")
-            self.frame.Qr = dictRTI.get("Qr")
-            self.frame.Qr_Stdev = dictRTI.get("dQ")
-            self.frame.mass = dictRTI.get("mass")
-            self.frame.mass_Stdev = dictRTI.get("dmass")
-            xsdRTI = XSDataRamboTainer(vc=XSDataDouble(self.frame.Vc),
-                                       qr=XSDataDouble(self.frame.Qr),
-                                       mass=XSDataDouble(self.frame.mass),
-                                       dvc=XSDataDouble(self.frame.Vc_Stdev),
-                                       dqr=XSDataDouble(self.frame.Qr_Stdev),
-                                       dmass=XSDataDouble(self.frame.mass_Stdev))
-            self.xsDataResult.rti = xsdRTI
+                self.frame.Vc = dictRTI.get("Vc")
+                self.frame.Vc_Stdev = dictRTI.get("dVc")
+                self.frame.Qr = dictRTI.get("Qr")
+                self.frame.Qr_Stdev = dictRTI.get("dQ")
+                self.frame.mass = dictRTI.get("mass")
+                self.frame.mass_Stdev = dictRTI.get("dmass")
+                xsdRTI = XSDataRamboTainer(vc=XSDataDouble(self.frame.Vc),
+                                           qr=XSDataDouble(self.frame.Qr),
+                                           mass=XSDataDouble(self.frame.mass),
+                                           dvc=XSDataDouble(self.frame.Vc_Stdev),
+                                           dqr=XSDataDouble(self.frame.Qr_Stdev),
+                                           dmass=XSDataDouble(self.frame.mass_Stdev))
+                self.xsDataResult.rti = xsdRTI
 
     def doFailureAutoRg(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsHPLCv1_2.doFailureAutoRg")

@@ -546,8 +546,9 @@ class HPLCrun(object):
                 lg = label(good[start:stop + 1])
                 lv = lg[maxi - start]
                 resl = numpy.where(lg == lv)[0] + start
-                res.append(numpy.where(lg == lv)[0] + start)
-                self.merge_frames.append([resl[0], resl[-1]])
+                if len(resl) > 1:
+                    res.append(numpy.where(lg == lv)[0] + start)
+                    self.merge_frames.append([resl[0], resl[-1]])
         return res
 
     def extract_merges(self):
@@ -567,21 +568,15 @@ class HPLCrun(object):
             self.buffer_I = data[:, 1]
             self.buffer_Stdev = data[:, 2]
 
+
         if (not self.merge_frames == None) and len(self.merge_frames) > 0:
             for i in range(len(self.merge_frames)):
                 group = self.merge_frames[i]
                 outname = os.path.splitext(self.frames[group[0]].subtracted)[0] + "_aver_%s.dat" % group[-1]
-                print outname
                 if os.path.exists(outname):
                     data = numpy.loadtxt(outname)
                     self.merge_I[i, :] = data[:, 1]
                     self.merge_Stdev[i, :] = data[:, 2]
-#                     if  not self.merge_analysis[outname] == None:
-#                         autorg = self.merge_analysis[outname].autoRg
-#                         self.merge_Guinier[i, :] = (autorg.rg.value, autorg.rgStdev.value,
-#                              autorg.i0.value, autorg.i0Stdev.value,
-#                              autorg.firstPointUsed.value, autorg.lastPointUsed.value,
-#                              autorg.quality.value * 100., int(autorg.isagregated.value))
         else:
             self.merge_frames = [0]
 

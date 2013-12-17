@@ -30,13 +30,14 @@ __copyright__ = "2012 ESRF"
 __status__ = "Development"
 __date__ = "20131003"
 
-import os, shutil
+import os, shutil, traceback
 from EDPluginControl        import EDPluginControl
 from EDFactoryPlugin        import edFactoryPlugin
 from suds.client            import Client
 from suds.transport.http    import HttpAuthenticated
 edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
-from XSDataBioSaxsv1_0      import XSDataInputBioSaxsISPyB_HPLCv1_0, XSDataResultBioSaxsISPyB_HPLCv1_0
+from XSDataBioSaxsv1_0      import XSDataResultBioSaxsISPyB_HPLCv1_0, XSDataInteger
+from XSDataBioSaxsv1_0      import XSDataInputBioSaxsISPyB_HPLCv1_0
 from XSDataCommon           import  XSDataString, XSDataStatus
 
 
@@ -61,6 +62,8 @@ class EDPluginBioSaxsISPyB_HPLCv1_0(EDPluginControl):
         self.hdf5File = None
         self.jsonFile = None
         self.hplcPlot = None
+
+        self.xsdResult = XSDataResultBioSaxsISPyB_HPLCv1_0()
 
 
     def checkParameters(self):
@@ -111,25 +114,30 @@ class EDPluginBioSaxsISPyB_HPLCv1_0(EDPluginControl):
 
         self.httpAuthenticatedToolsForBiosaxsWebService = HttpAuthenticated(username=user, password=password)
         self.client = Client(self.URL, transport=self.httpAuthenticatedToolsForBiosaxsWebService, cache=None)
-        self.hdf5File = self.dataInput.hdf5File.path.value
-        self.jsonFile = self.dataInput.jsonFile.path.value
-        self.hplcPlot = self.dataInput.hplcPlot.path.value
+        
+        
+        if (self.dataInput.hdf5File is not None):
+            if (self.dataInput.hdf5File.path is not None):
+                self.hdf5File = self.dataInput.hdf5File.path.value
+                
+        if (self.dataInput.jsonFile is not None):
+            if (self.dataInput.jsonFile.path is not None):        
+                self.jsonFile = self.dataInput.jsonFile.path.value
+                
+        if (self.dataInput.hplcPlot is not None):
+            if (self.dataInput.hplcPlot.path is not None):   
+                self.hplcPlot = self.dataInput.hplcPlot.path.value
 
 
     def process(self, _edObject=None):
         EDPluginControl.process(self)
         self.DEBUG("EDPluginBioSaxsISPyB_HPLCv1_0.process")
-        if self.dataInput.sample.collectionOrder is not None:
-            collectionOrder = str(self.dataInput.sample.collectionOrder.value)
-        else:
-            collectionOrder = "-1"
         self.experimentId = None
         try:
             experimentId = self.client.service.createHPLC(
-                                    self.code,
-                                    self.number,
-                                    'name')
-            print "Experiment Id " + str(experimentId)
+                                                            self.code,
+                                                            self.number,
+                                                            'name')
         except Exception, error:
             strError = "ISPyB error: %s" % error
             self.ERROR(strError)
@@ -144,11 +152,18 @@ class EDPluginBioSaxsISPyB_HPLCv1_0(EDPluginControl):
             
         try:
             if (experimentId is not None):
-                self.client.service.storeHPLC(
-                                    experimentId,
-                                    self.hdf5File,
-                                    self.jsonFile)
+                self.xsdResult.setExperimentId(XSDataInteger(experimentId))
+                #Updating folder
+                if (self.dataInput.sample.ispybDestination is not None):
+                    if (self.dataInput.sample.ispybDestination.path is not None):
+                        self.dataInput.sample.ispybDestination.path.value = os.path.join(self.dataInput.sample.ispybDestination.path.value, str(experimentId))
+                        self.xsdResult.setSample(self.dataInput.sample)
+                        self.client.service.storeHPLC(
+                                            experimentId,
+                                            self.hdf5File,
+                                            self.jsonFile)
         except Exception as error:
+            traceback.print_exc()
             strErrorMessage = "ISPyB storeHPLC error: %s" % error
             self.ERROR(strErrorMessage)
             self.lstError.append(strErrorMessage)

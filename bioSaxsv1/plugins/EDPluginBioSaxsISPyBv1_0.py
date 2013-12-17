@@ -133,7 +133,6 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
             self.setFailure()
             return
 
-        # I don't trust in this authentication.... but it is going to work soon
 
         self.httpAuthenticatedToolsForBiosaxsWebService = HttpAuthenticated(username=user, password=password)
         self.client = Client(self.URL, transport=self.httpAuthenticatedToolsForBiosaxsWebService, cache=None)
