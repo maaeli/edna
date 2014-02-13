@@ -109,6 +109,10 @@ class EDPluginBioSaxsISPyB_HPLCv1_0(EDPluginControl):
             user = "opd29"
             password = "tonic29"
 
+        # construct code based on letters + numbers user concept
+        self.code = ''.join(i for i in user if i.isalpha())
+        self.number = ''.join(i for i in user if i.isdigit())
+
 
         # I don't trust in this authentication.... but it is going to work soon
 

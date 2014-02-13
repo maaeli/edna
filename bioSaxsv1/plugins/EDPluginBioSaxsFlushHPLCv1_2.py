@@ -30,7 +30,7 @@ __copyright__ = "2012 ESRF"
 __date__ = "20131118"
 __status__ = "development"
 
-import os
+import os, traceback
 from EDPluginControl import EDPluginControl
 from EDFactoryPlugin import edFactoryPlugin
 edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
@@ -39,7 +39,7 @@ edFactoryPlugin.loadModule("XSDataEdnaSaxs")
 from XSDataBioSaxsv1_0 import XSDataInputBioSaxsISPyB_HPLCv1_0, XSDataInputBioSaxsISPyBHPLCv1_0, XSDataInputBioSaxsISPyBv1_0, XSDataInputBioSaxsHPLCv1_0, XSDataResultBioSaxsHPLCv1_0, \
                               XSDataInputBioSaxsToSASv1_0, XSDataInputBioSaxsISPyBHPLCv1_0
 from XSDataEdnaSaxs import XSDataInputDataver, XSDataInputDatcmp, XSDataInputAutoSub, XSDataInputDatop, XSDataInputSaxsAnalysis
-from XSDataCommon import XSDataString, XSDataStatus, XSDataFile
+from XSDataCommon import XSDataString, XSDataStatus, XSDataFile, XSDataInteger
 from EDPluginBioSaxsHPLCv1_2 import EDPluginBioSaxsHPLCv1_2
 
 class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
@@ -83,7 +83,8 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
         self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.checkParameters")
         self.checkMandatoryParameters(self.dataInput, "Data Input is None")
         self.checkMandatoryParameters(self.dataInput.rawImage, "No raw image")
-
+        x = 1
+        print x
     def preProcess(self, _edObject=None):
         EDPluginControl.preProcess(self)
         self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.preProcess")
@@ -111,6 +112,7 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
                 edpluginIsPyB.executeSynchronous()
                 self.dataOutputBioSaxsISPyB_HPLC = edpluginIsPyB.xsdResult
             except Exception as error:
+                traceback.print_stack()
                 self.ERROR("EDPluginBioSaxsFlushHPLCv1_2 calling to EDPluginBioSaxsISPyB_HPLCv1_0: %s" % error)
 
 
@@ -196,16 +198,21 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
                 self.__edPluginISPyBAnalysis.connectFAILURE(self.doFailureISPyBAnalysis)
                 self.__edPluginISPyBAnalysis.executeSynchronous()
             except Exception as error:
+                traceback.print_stack()
                 self.ERROR("EDPluginBioSaxsFlushHPLCv1_2 calling to EDPluginHPLCPrimayDataISPyBv1_0: %s" % error)
 
             
-            
+            mergeNumber = 1
             for merge in run.merge_curves:
                 try:
                     xsdSubtractedCurve = XSDataFile(XSDataString(merge))
                     xsdGnomFile = XSDataFile(XSDataString(run.merge_analysis[merge].gnom.gnomFile.path.value))
                     destination = XSDataFile(XSDataString(os.path.join(os.path.dirname(os.path.dirname(merge)), "ednaSAS")))
                     self.__edPluginSaxsToSAS = self.loadPlugin(self.__strControlledPluginSaxsModeling)
+                    print "Changing measurentID by runMerge"
+                    #In order to keep dammin models in different folder a measurementId should be given
+                    self.__edPluginISPyBAnalysis.xsDataResult.dataInputBioSaxs.sample.measurementID.value = mergeNumber
+                    print "------------>  MeasurementId changed " + str(self.__edPluginISPyBAnalysis.xsDataResult.dataInputBioSaxs.sample.measurementID.value)
                     self.__edPluginSaxsToSAS.dataInput = XSDataInputBioSaxsToSASv1_0(
                                                                                         sample=self.__edPluginISPyBAnalysis.xsDataResult.dataInputBioSaxs.sample,
                                                                                         subtractedCurve=xsdSubtractedCurve,
@@ -213,9 +220,11 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
                                                                                         destinationDirectory=destination)
                     self.__edPluginSaxsToSAS.connectSUCCESS(self.doSuccessSaxsToSAS)
                     self.__edPluginSaxsToSAS.connectFAILURE(self.doFailureSaxsToSAS)
+                    mergeNumber = mergeNumber + 1;
                     self.__edPluginSaxsToSAS.executeSynchronous()
                 except Exception as error:
-                    self.ERROR("EDPluginBioSaxsFlushHPLCv1_2 calling to EDPluginHPLCPrimayDataISPyBv1_0: %s" % error)
+                    traceback.print_stack()
+                    self.ERROR("EDPluginBioSaxsFlushHPLCv1_2 calling to EDPluginBioSaxsToSASv1_1: %s" % error)
         self.synchronizePlugins()
 
 

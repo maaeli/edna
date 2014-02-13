@@ -269,17 +269,20 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
         Average out all buffers
         """
         self.lstExecutiveSummary.append("Averaging out buffer files: " + ", ".join(self.hplc_run.for_buffer))
-        xsdIn = XSDataInputDataver(inputCurve=[XSDataFile(XSDataString(i)) for i in self.hplc_run.for_buffer])
-        if self.dataInput.bufferCurve:
-            xsdIn.outputCurve = self.dataInput.bufferCurve
+        if len(self.hplc_run.for_buffer) > 1:
+            xsdIn = XSDataInputDataver(inputCurve=[XSDataFile(XSDataString(i)) for i in self.hplc_run.for_buffer])
+            if self.dataInput.bufferCurve:
+                xsdIn.outputCurve = self.dataInput.bufferCurve
+            else:
+                xsdIn.outputCurve = XSDataFile(XSDataString(self.hplc_run.first_curve[::-1].split("_", 1)[1][::-1] + "_buffer_aver%02i.dat" % len(self.hplc_run.for_buffer)))
+            self.edPluginDatAver = self.loadPlugin(self.strControlledPluginDatAver)
+            self.edPluginDatAver.dataInput = xsdIn
+            self.edPluginDatAver.connectSUCCESS(self.doSuccessDatAver)
+            self.edPluginDatAver.connectFAILURE(self.doFailureDatAver)
+            self.edPluginDatAver.executeSynchronous()
         else:
-            xsdIn.outputCurve = XSDataFile(XSDataString(self.hplc_run.first_curve[::-1].split("_", 1)[1][::-1] + "_buffer_aver%02i.dat" % len(self.hplc_run.for_buffer)))
-        self.edPluginDatAver = self.loadPlugin(self.strControlledPluginDatAver)
-        self.edPluginDatAver.dataInput = xsdIn
-        self.edPluginDatAver.connectSUCCESS(self.doSuccessDatAver)
-        self.edPluginDatAver.connectFAILURE(self.doFailureDatAver)
-        self.edPluginDatAver.executeSynchronous()
-
+            # I am not absolutely sure that this does the trick
+            self.hplc_run.buffer = self.hplc_run.first_curve
 
     def doSuccessProcessOneFile(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsHPLCv1_2.doSuccessProcessOneFile")
