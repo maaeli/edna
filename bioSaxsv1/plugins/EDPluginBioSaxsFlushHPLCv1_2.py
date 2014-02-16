@@ -37,8 +37,8 @@ edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
 edFactoryPlugin.loadModule("XSDataEdnaSaxs")
 
 from XSDataBioSaxsv1_0 import XSDataInputBioSaxsHPLCv1_0, XSDataResultBioSaxsHPLCv1_0, \
-                            XSDataInputBioSaxsISPyB_HPLCv1_0
-from XSDataEdnaSaxs import XSDataInputDataver
+                            XSDataInputBioSaxsISPyB_HPLCv1_0, XSDataInputBioSaxsToSASv1_0
+from XSDataEdnaSaxs import XSDataInputDataver, XSDataInputDatcmp, XSDataInputAutoSub, XSDataInputDatop, XSDataInputSaxsAnalysis
 from XSDataCommon import XSDataString, XSDataStatus, XSDataFile
 from EDPluginBioSaxsHPLCv1_2 import EDPluginBioSaxsHPLCv1_2
 
@@ -57,6 +57,11 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
     """
     strControlledPluginDatAver = "EDPluginExecDataverv1_0"
     strControlledPluginISPyB = "EDPluginBioSaxsISPyB_HPLCv1_0"
+    __strControlledPluginSaxsAnalysis = "EDPluginControlSaxsAnalysisv1_0"
+    __strControlledPluginSaxsModeling = "EDPluginBioSaxsToSASv1_1"
+
+
+
     def __init__(self):
         """
         """
@@ -130,7 +135,13 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
             edpugin.connectSUCCESS(self.doSuccessDatAver)
             edpugin.connectFAILURE(self.doFailureDatAver)
             edpugin.execute()
+            run.merge_curves.append(outname)
+            run.merge_analysis[outname] = None
+            run.merge_Rg[outname] = None
+
+
         self.synchronizePlugins()
+
 
 
     def doSuccessDatAver(self, _edPlugin=None):
@@ -154,5 +165,42 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
             self.lstExecutiveSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
         else:
             self.lstExecutiveSummary.append("Edna plugin DatAver failed.")
+        self.setFailure()
+
+
+    def doSuccessSaxsAnalysis(self, _edPlugin=None):
+        self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.doSuccessSaxsAnalysis")
+        self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsFlushHPLCv1_2.doSuccessSaxsAnalysis")
+        self.retrieveMessages(_edPlugin)
+        run = EDPluginBioSaxsHPLCv1_2.dictHPLC[self.runId]
+        curvename = _edPlugin.dataOutput.autoRg.filename.path.value
+        run.merge_analysis[curvename] = _edPlugin.dataOutput
+#         self.xsScatterPlot = _edPlugin.dataOutput.scatterPlot
+#         self.xsGuinierPlot = _edPlugin.dataOutput.guinierPlot
+#         self.xsKratkyPlot = _edPlugin.dataOutput.kratkyPlot
+#         self.xsDensityPlot = _edPlugin.dataOutput.densityPlot
+        self.addExecutiveSummaryLine(_edPlugin.dataOutput.status.executiveSummary.value)
+
+    def doFailureSaxsAnalysis(self, _edPlugin=None):
+        self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.doFailureSaxsAnalysis")
+        self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsFlushHPLCv1_2.doFailureSaxsAnalysis")
+        self.retrieveMessages(_edPlugin)
+        strErr = "Error in Processing of EDNA SaxsAnalysis = AutoRg => datGnom => datPorod"
+        self.ERROR(strErr)
+        self.addExecutiveSummaryLine(strErr)
+        self.setFailure()
+
+    def doSuccessSaxsToSAS(self, _edPlugin=None):
+        self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.doSuccessSaxsToSAS")
+        self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsFlushHPLCv1_2.doSuccessSaxsToSAS")
+
+
+    def doFailureSaxsToSAS(self, _edPlugin=None):
+        self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.doFailureSaxsToSAS")
+        self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsFlushHPLCv1_2.doFailureSaxsToSAS")
+        self.retrieveMessages(_edPlugin)
+        strErr = "Error in Modeling of merged data"
+        self.ERROR(strErr)
+        self.addExecutiveSummaryLine(strErr)
         self.setFailure()
 
