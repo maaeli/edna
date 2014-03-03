@@ -578,7 +578,7 @@ class HPLCrun(object):
                     self.merge_I[i, :] = data[:, 1]
                     self.merge_Stdev[i, :] = data[:, 2]
         else:
-            self.merge_frames = [0]
+            self.merge_frames = [0, 0]
 
 
 
