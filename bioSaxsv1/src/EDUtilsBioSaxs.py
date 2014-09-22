@@ -1,5 +1,5 @@
 #
-#coding: utf-8
+#coding: utf8
 #
 #    Project: BioSaxs : ID14-3
 #             http://www.edna-site.org
@@ -36,6 +36,7 @@ __copyright__ = "ESRF"
 import sys
 import os
 import time
+import traceback
 from EDUtilsPlatform import EDUtilsPlatform
 from EDThreading import Semaphore
 from EDUtilsPath import EDUtilsPath
@@ -51,6 +52,7 @@ try:
     from SpecClient import SpecVariable
 except:
     SpecVariable = None
+
 import h5py
 import numpy
 import matplotlib
@@ -61,6 +63,7 @@ import scipy.integrate as scint
 
 
 class EDUtilsBioSaxs(EDObject):
+
     DETECTORS = ["pilatus", "vantec"]
     OPERATIONS = ["normalisation", "reprocess", "average", "complete"]
     TRANSLATION = {"beamStopDiode": "DiodeCurr",
@@ -145,6 +148,8 @@ class EDUtilsBioSaxs(EDObject):
             EDVerbose.WARNING(_strMessage)
         else:
             EDVerbose.screen(_strMessage)
+#        else:
+#            EDVerbose.DEBUG(_strMessage)
 
         if EDUtilsBioSaxs.specStatus is not None:
             currentStatus = EDUtilsBioSaxs.specStatus.value["reprocess"]["status"]     # must do this, since SpecClient is apparently returning a non-expected data structure
@@ -200,12 +205,13 @@ class EDUtilsBioSaxs(EDObject):
                 else:
                     extra += "_" + oneItem
 
-        try:  # remove the "." at the begining of the extension
+        try: #remove the "." at the begining of the extension
             extension = extension[1:]
         except IndexError:
             extension = ""
 
-        try:  # remove the "_" at the begining of the extra
+
+        try: #remove the "_" at the begining of the extra
             extra = extra[1:]
         except IndexError:
             extra = ""
@@ -262,7 +268,6 @@ class HPLCframe(object):
         self.Vc_Stdev = None
         self.Qr_Stdev = None
         self.mass_Stdev = None
-
 
 def median_filt(input_array, width=3):
     """
@@ -332,10 +337,23 @@ class HPLCrun(object):
         self.mass = None
         self.Vc_Stdev = None
         self.Qr_Stdev = None
-        self.mass_Stdev = None       
+        self.mass_Stdev = None  
+        self.buffer_frames = None
+        self.merge_frames = None  
+        self.buffer_I = None
+        self.buffer_Stdev = None
+        self.merge_I = None 
+        self.merge_Stdev = None     
+        self.merge_curves = []
+        self.merge_Rg = {}
+        self.merge_analysis = {}
+        self.merge_framesDIC = {}
         self.keys1d = ["gnom","Dmax","total","volume","Rg","Rg_Stdev","I0","I0_Stdev","quality","sum_I","Vc", "Qr","mass","Vc_Stdev","Qr_Stdev","mass_Stdev"]
         self.keys2d = ["scattering_I","scattering_Stdev","subtracted_I","subtracted_Stdev"]
-        
+        self.keys_frames = ["buffer_frames", "merge_frames"]
+        self.keys_merges = ["buffer_I", "buffer_Stdev", "merge_I", "merge_Stdev"]
+        # self.keys_analysis = ["merge_Guinier", "merge_Gnom", "merge_Porod"]
+
     def reset(self):
         self.frames = []
         self.curves = []
@@ -511,6 +529,8 @@ class HPLCrun(object):
         """
         lab = label(self.I0)
         res = []
+
+        self.merge_frames = []
         for i in range(1, int(lab.max() + 1)):
             loc = (lab == i)
             c = loc.sum()
@@ -526,8 +546,56 @@ class HPLCrun(object):
                 good[stop:] = 0
                 lg = label(good[start:stop + 1])
                 lv = lg[maxi - start]
-                res.append(numpy.where(lg == lv)[0] + start)
+                resl = numpy.where(lg == lv)[0] + start
+                if len(resl) > 1:
+                    res.append(numpy.where(lg == lv)[0] + start)
+                    self.merge_frames.append([resl[0], resl[-1]])
         return res
+
+    def extract_merges(self):
+        self.buffer_I = numpy.zeros(self.size, dtype=numpy.float32)
+        self.buffer_Stdev = numpy.zeros(self.size, dtype=numpy.float32)
+        if (not self.merge_frames == None) and len(self.merge_frames) > 0:
+            self.merge_I = numpy.zeros((len(self.merge_frames), self.size), dtype=numpy.float32)
+            self.merge_Stdev = numpy.zeros((len(self.merge_frames), self.size), dtype=numpy.float32)
+        else:
+            self.merge_I = numpy.zeros(self.size, dtype=numpy.float32)
+            self.merge_Stdev = numpy.zeros(self.size, dtype=numpy.float32)
+
+        self.buffer_frames = [0, len(self.for_buffer)]
+
+        if self.buffer and os.path.exists(self.buffer):
+            data = numpy.loadtxt(self.buffer)
+            self.buffer_I = data[:, 1]
+            self.buffer_Stdev = data[:, 2]
+
+        if (not self.merge_frames == None) and len(self.merge_frames) > 0:
+            for i in range(len(self.merge_frames)):
+                group = self.merge_frames[i]
+                outname = os.path.splitext(self.frames[group[0]].subtracted)[0] + "_aver_%s.dat" % group[-1]
+                if os.path.exists(outname):
+                    data = numpy.loadtxt(outname)
+                    self.merge_I[i, :] = data[:, 1]
+                    self.merge_Stdev[i, :] = data[:, 2]
+        else:
+            self.merge_frames = [0, 0]
+
+
+    def append_hdf5(self):
+        self.extract_merges()
+        with self.lock:
+            try:
+#                 if os.path.exists(self.hdf5_filename):
+#                     os.unlink(self.hdf5_filename)
+                self.hdf5 = h5py.File(self.hdf5_filename)
+                for key in self.keys_frames + self.keys_merges:
+                    if not self.__getattribute__(key) == None:
+                        self.hdf5[key] = numpy.asarray(self.__getattribute__(key), dtype=numpy.float32)
+                self.hdf5.close()
+            except:
+                print traceback.format_exc()
+                
+        return self.hdf5_filename
 
 
 def calcVc(dat, Rg, dRg, I0, dI0, imin):

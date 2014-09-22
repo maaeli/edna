@@ -140,6 +140,8 @@ class EDPluginBioSaxsToSASv1_1(EDPluginControl):
             return
         if self.dataInput.destinationDirectory is not None:
             self.strWorkingDirectory = self.dataInput.destinationDirectory.path.value
+        if self.dataInput.subtractedCurve is not None:
+            self.strInFile = self.dataInput.subtractedCurve.path.value
 
 
     def process(self, _edObject=None):

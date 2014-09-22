@@ -210,7 +210,7 @@ class EDPluginBioSaxsSolutionScatteringISPyBv1_0(EDPluginControl):
         try:
             shutil.copy(afile, pyarch)
         except IOError as error:
-            ermsg = "Error while copying %s to pyarch: %s " % (afile, error)
+            ermsg = "Saxs Solution Scattering Error while copying %s to pyarch: %s " % (afile, error)
             self.lstError.append(ermsg)
             self.WARNING(ermsg)
         else:

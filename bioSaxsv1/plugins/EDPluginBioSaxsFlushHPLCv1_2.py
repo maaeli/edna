@@ -101,13 +101,20 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
         self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.process")
         if self.runId in EDPluginBioSaxsHPLCv1_2.dictHPLC:
             self.processRun(EDPluginBioSaxsHPLCv1_2.dictHPLC[self.runId])
-            edpluginIsPyB = self.loadPlugin(self.strControlledPluginISPyB)
-            edpluginIsPyB.dataInput=XSDataInputBioSaxsISPyB_HPLCv1_0(sample=self.dataInput.sample,
-                                                                     hdf5File=self.xsDataResult.hplcFile,
-                                                                     jsonFile=XSDataFile(XSDataString(self.json)),
-                                                                     hplcPlot=self.xsDataResult.hplcImage)
-            edpluginIsPyB.executeSynchronous()
+            try:
+                edpluginIsPyB = self.loadPlugin(self.strControlledPluginISPyB)
+                edpluginIsPyB.dataInput = XSDataInputBioSaxsISPyB_HPLCv1_0(sample=self.dataInput.sample,
+                                                                         hdf5File=self.xsDataResult.hplcFile,
+                                                                         jsonFile=XSDataFile(XSDataString(self.json)),
+                                                                         hplcPlot=self.xsDataResult.hplcImage)
+                edpluginIsPyB.executeSynchronous()
+                self.dataOutputBioSaxsISPyB_HPLC = edpluginIsPyB.xsdResult
+            except Exception as error:
+                traceback.print_stack()
+                self.ERROR("EDPluginBioSaxsFlushHPLCv1_2 calling to EDPluginBioSaxsISPyB_HPLCv1_0: %s" % error)
 
+
+            self.processMerges(EDPluginBioSaxsHPLCv1_2.dictHPLC[self.runId])
 
     def postProcess(self, _edObject=None):
         EDPluginControl.postProcess(self)
@@ -138,10 +145,87 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
             run.merge_curves.append(outname)
             run.merge_analysis[outname] = None
             run.merge_Rg[outname] = None
+            run.merge_framesDIC[outname] = [group[0],group[-1]]
+        # Append to hdf5
+        run.append_hdf5()
+
+    def processMerges(self, run):
+        # run analysis of merges
+
+        for merge in run.merge_curves:
+            xsdSubtractedCurve = XSDataFile(XSDataString(merge))
+            self.__edPluginSaxsAnalysis = self.loadPlugin(self.__strControlledPluginSaxsAnalysis)
+
+            self.__edPluginSaxsAnalysis.dataInput = XSDataInputSaxsAnalysis(
+
+                                                                                scatterCurve=xsdSubtractedCurve,
+                                                                                autoRg=run.merge_Rg[merge],
+                                                                                graphFormat=XSDataString("png")
+                                                                            )
 
 
+            self.__edPluginSaxsAnalysis.connectSUCCESS(self.doSuccessSaxsAnalysis)
+            self.__edPluginSaxsAnalysis.connectFAILURE(self.doFailureSaxsAnalysis)
+            self.__edPluginSaxsAnalysis.executeSynchronous()
+            xsdBuffer =  XSDataFile(XSDataString(run.buffer))
+            xsdStartFrame = XSDataString(run.merge_framesDIC[merge][0])
+            xsdEndFrame = XSDataString(run.merge_framesDIC[merge][-1])
+            self.__edPluginISPyBAnalysis = self.loadPlugin(self.__strControlledPluginISPyBAnalysis)  
+            try:
+                inputBioSaxsISPyB = XSDataInputBioSaxsISPyBv1_0(
+                                                            sample=self.dataOutputBioSaxsISPyB_HPLC.getSample(),
+                                                            autoRg=run.merge_analysis[merge].autoRg,
+                                                            gnom=run.merge_analysis[merge].gnom,
+                                                            volume=run.merge_analysis[merge].volume,
+                                                            bestBuffer=xsdBuffer,
+                                                            scatterPlot=run.merge_analysis[merge].scatterPlot,
+                                                            guinierPlot=run.merge_analysis[merge].guinierPlot,
+                                                            kratkyPlot=run.merge_analysis[merge].kratkyPlot,
+                                                            densityPlot=run.merge_analysis[merge].densityPlot
+                                            )
+    
+                xsdISPyBin = XSDataInputBioSaxsISPyBHPLCv1_0(
+                                                            experimentId=self.dataOutputBioSaxsISPyB_HPLC.getExperimentId(),
+                                                            startFrame=xsdStartFrame,
+                                                            endFrame=xsdEndFrame,
+                                                            dataInputBioSaxs=inputBioSaxsISPyB
+                                                            )
+    
+                self.__edPluginISPyBAnalysis.dataInput = xsdISPyBin
+                self.__edPluginISPyBAnalysis.connectSUCCESS(self.doSuccessISPyBAnalysis)
+                self.__edPluginISPyBAnalysis.connectFAILURE(self.doFailureISPyBAnalysis)
+                self.__edPluginISPyBAnalysis.executeSynchronous()
+            except Exception as error:
+                traceback.print_stack()
+                self.ERROR("EDPluginBioSaxsFlushHPLCv1_2 calling to EDPluginHPLCPrimayDataISPyBv1_0: %s" % error)
+
+            
+            mergeNumber = 1
+            # There were some recurring issues with dammin slowing down slavia, therefore I commented this out for the time being
+            # Martha, 11.7.2014
+#             for merge in run.merge_curves:
+#                 try:
+#                     xsdSubtractedCurve = XSDataFile(XSDataString(merge))
+#                     xsdGnomFile = XSDataFile(XSDataString(run.merge_analysis[merge].gnom.gnomFile.path.value))
+#                     destination = XSDataFile(XSDataString(os.path.join(os.path.dirname(os.path.dirname(merge)), "ednaSAS")))
+#                     self.__edPluginSaxsToSAS = self.loadPlugin(self.__strControlledPluginSaxsModeling)
+#                     print "Changing measurentID by runMerge"
+#                     #In order to keep dammin models in different folder a measurementId should be given
+#                     self.__edPluginISPyBAnalysis.xsDataResult.dataInputBioSaxs.sample.measurementID.value = mergeNumber
+#                     print "------------>  MeasurementId changed " + str(self.__edPluginISPyBAnalysis.xsDataResult.dataInputBioSaxs.sample.measurementID.value)
+#                     self.__edPluginSaxsToSAS.dataInput = XSDataInputBioSaxsToSASv1_0(
+#                                                                                         sample=self.__edPluginISPyBAnalysis.xsDataResult.dataInputBioSaxs.sample,
+#                                                                                         subtractedCurve=xsdSubtractedCurve,
+#                                                                                         gnomFile=xsdGnomFile,
+#                                                                                         destinationDirectory=destination)
+#                     self.__edPluginSaxsToSAS.connectSUCCESS(self.doSuccessSaxsToSAS)
+#                     self.__edPluginSaxsToSAS.connectFAILURE(self.doFailureSaxsToSAS)
+#                     mergeNumber = mergeNumber + 1;
+#                     self.__edPluginSaxsToSAS.executeSynchronous()
+#                 except Exception as error:
+#                     traceback.print_stack()
+#                     self.ERROR("EDPluginBioSaxsFlushHPLCv1_2 calling to EDPluginBioSaxsToSASv1_1: %s" % error)
         self.synchronizePlugins()
-
 
 
     def doSuccessDatAver(self, _edPlugin=None):
@@ -175,10 +259,10 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
         run = EDPluginBioSaxsHPLCv1_2.dictHPLC[self.runId]
         curvename = _edPlugin.dataOutput.autoRg.filename.path.value
         run.merge_analysis[curvename] = _edPlugin.dataOutput
-#         self.xsScatterPlot = _edPlugin.dataOutput.scatterPlot
-#         self.xsGuinierPlot = _edPlugin.dataOutput.guinierPlot
-#         self.xsKratkyPlot = _edPlugin.dataOutput.kratkyPlot
-#         self.xsDensityPlot = _edPlugin.dataOutput.densityPlot
+#         run.merge_xsScatterPlot[curvename] = _edPlugin.dataOutput.scatterPlot
+#         run.merge_xsGuinierPlot[curvename] = _edPlugin.dataOutput.guinierPlot
+#         run.merge_xsKratkyPlot[curvename] = _edPlugin.dataOutput.kratkyPlot
+#         run.merge_xsDensityPlot[curvename] = _edPlugin.dataOutput.densityPlot
         self.addExecutiveSummaryLine(_edPlugin.dataOutput.status.executiveSummary.value)
 
     def doFailureSaxsAnalysis(self, _edPlugin=None):
@@ -189,11 +273,11 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
         self.ERROR(strErr)
         self.addExecutiveSummaryLine(strErr)
         self.setFailure()
-
+        
     def doSuccessSaxsToSAS(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.doSuccessSaxsToSAS")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsFlushHPLCv1_2.doSuccessSaxsToSAS")
-
+        
 
     def doFailureSaxsToSAS(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.doFailureSaxsToSAS")
@@ -203,4 +287,14 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
         self.ERROR(strErr)
         self.addExecutiveSummaryLine(strErr)
         self.setFailure()
+        
+    def doSuccessISPyBAnalysis(self, _edPlugin=None):
+        self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.doSuccessISPyBAnalysis")
+        self.addExecutiveSummaryLine("Registered analysis in ISPyB")
+        self.retrieveMessages(_edPlugin)
 
+    def doFailureISPyBAnalysis(self, _edPlugin=None):
+        self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.doFailureISPyBAnalysis")
+        self.addExecutiveSummaryLine("Failed to register analysis in ISPyB")
+        self.retrieveMessages(_edPlugin)
+    

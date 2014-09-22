@@ -1,0 +1,23 @@
+<?xml version="3.0" ?>
+<XSDataResultBioSaxsHPLCv1_0>
+    <status>
+        <executiveSummary>
+            <value>Merging frames from 507 to 606</value>
+        </executiveSummary>
+    </status>
+    <hplcFile>
+        <path>
+            <value>/users/opd29/test/unitTest/B2_013.h5</value>
+        </path>
+    </hplcFile>
+    <mergedCurves>
+        <path>
+            <value>/users/opd29/test/unitTest/B2_013_00507_sub_aver_606.dat</value>
+        </path>
+    </mergedCurves>
+    <hplcImage>
+        <path>
+            <value>/users/opd29/test/unitTest/B2_013.png</value>
+        </path>
+    </hplcImage>
+</XSDataResultBioSaxsHPLCv1_0>

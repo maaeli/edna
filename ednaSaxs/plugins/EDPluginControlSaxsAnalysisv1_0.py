@@ -125,8 +125,11 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
             plt = sys.modules.get("matplotlib.pyplot")
             try:
                 guinierfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-Guinier" + ext)
+#                 guinierplot = guinierPlot(self.scatterFile, unit="nm",
+#                                        filename=guinierfile, format=ext[1:])
                 guinierplot = guinierPlot(self.scatterFile, unit="nm",
-                                       filename=guinierfile, format=ext[1:])
+                                       filename=guinierfile, format=ext[1:], first_point=self.autoRg.firstPointUsed.value,
+                                       last_point=self.autoRg.lastPointUsed.value)
                 guinierplot.clf()
                 if plt:
                     plt.close(guinierplot)

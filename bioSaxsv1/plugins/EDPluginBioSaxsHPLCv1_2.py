@@ -38,12 +38,15 @@ from EDFactoryPlugin import edFactoryPlugin
 edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
 edFactoryPlugin.loadModule("XSDataEdnaSaxs")
 from XSDataBioSaxsv1_0 import XSDataInputBioSaxsHPLCv1_0, XSDataResultBioSaxsHPLCv1_0, \
-                            XSDataInputBioSaxsProcessOneFilev1_0, XSDataRamboTainer
+                            XSDataInputBioSaxsProcessOneFilev1_0, \
+    XSDataRamboTainer
 from XSDataEdnaSaxs import XSDataInputDatcmp, XSDataInputDataver, XSDataInputDatop, XSDataInputAutoRg
 from XSDataCommon import XSDataFile, XSDataString, XSDataStatus, XSDataTime, \
     XSDataDouble
 
 from EDUtilsBioSaxs import HPLCframe, HPLCrun, RamboTainerInvariant
+
+
 
 
 class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
@@ -79,7 +82,6 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
     SIMILARITY_THRESHOLD_BUFFER_DEFAULT = 0.1
     SIMILARITY_THRESHOLD_SAMPLE = None
     SIMILARITY_THRESHOLD_BUFFER = None
-
     def __init__(self):
         """
         """
@@ -221,10 +223,16 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
             subtracted = self.dataInput.subtractedCurve.path.value
         else:
             subtracted = os.path.splitext(self.curve)[0] + "_sub.dat"
-        xsdIn = XSDataInputDatop(inputCurve=[XSDataFile(XSDataString(self.curve)),
-                                             XSDataFile(XSDataString(self.hplc_run.buffer))],
-                                 outputCurve=XSDataFile(XSDataString(subtracted)),
-                                 operation=XSDataString("sub"))
+        if self.hplc_run.buffer is not None:
+            xsdIn = XSDataInputDatop(inputCurve=[XSDataFile(XSDataString(self.curve)),
+                                                  XSDataFile(XSDataString(self.hplc_run.buffer))],
+                                     outputCurve=XSDataFile(XSDataString(subtracted)),
+                                     operation=XSDataString("sub"))
+        else:
+            xsdIn = XSDataInputDatop(inputCurve=[XSDataFile(XSDataString(self.curve)),
+                                                  XSDataFile(XSDataString(self.hplc_run.first_curve))],
+                                     outputCurve=XSDataFile(XSDataString(subtracted)),
+                                     operation=XSDataString("sub"))
         self.edPluginDatop = self.loadPlugin(self.strControlledPluginDatop)
         self.edPluginDatop.dataInput = xsdIn
         self.edPluginDatop.connectSUCCESS(self.doSuccessDatop)
@@ -237,6 +245,7 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
             self.edPluginAutoRg.connectSUCCESS(self.doSuccessAutoRg)
             self.edPluginAutoRg.connectFAILURE(self.doFailureAutoRg)
             self.edPluginAutoRg.executeSynchronous()
+
 
     def postProcess(self, _edObject=None):
         """
@@ -251,6 +260,7 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
         if self.subtracted:
             self.xsDataResult.subtractedCurve = XSDataFile(XSDataString(self.subtracted))
 
+
     def finallyProcess(self, _edObject=None):
         EDPluginControl.finallyProcess(self)
         executiveSummary = os.linesep.join(self.lstExecutiveSummary)
@@ -258,6 +268,7 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
         self.dataOutput = self.xsDataResult
         if self.frame:
             self.frame.processing = False
+
 
     def average_buffers(self):
         """
@@ -274,6 +285,7 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
         self.edPluginDatAver.connectSUCCESS(self.doSuccessDatAver)
         self.edPluginDatAver.connectFAILURE(self.doFailureDatAver)
         self.edPluginDatAver.executeSynchronous()
+
 
     def doSuccessProcessOneFile(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsHPLCv1_2.doSuccessProcessOneFile")
@@ -381,25 +393,27 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
         Calculate the invariants Vc and Qr from the Rambo&Tainer 2013 Paper,
         also the the mass estimate based on Qr for proteins
         """
-        if self.scatter_data is not None and\
-           self.frame.Rg and self.frame.Rg_Stdev and self.frame.I0 and self.frame.I0_Stdev:
-            dictRTI = RamboTainerInvariant(self.scatter_data, self.frame.Rg,
-                                           self.frame.Rg_Stdev, self.frame.I0,
-                                           self.frame.I0_Stdev, rg.firstPointUsed.value)
+        if self.subtracted and os.path.exists(self.subtracted):
+            self.subtracted_data = numpy.loadtxt(self.subtracted)
+            if self.subtracted_data is not None and\
+                self.frame.Rg and self.frame.Rg_Stdev and self.frame.I0 and self.frame.I0_Stdev:
+                dictRTI = RamboTainerInvariant(self.subtracted_data, self.frame.Rg,
+                                               self.frame.Rg_Stdev, self.frame.I0,
+                                               self.frame.I0_Stdev, rg.firstPointUsed.value)
 #             {'Vc': vc[0], 'dVc': vc[1], 'Qr': qr, 'dQr': dqr, 'mass': mass, 'dmass': dmass}
-            self.frame.Vc = dictRTI.get("Vc")
-            self.frame.Vc_Stdev = dictRTI.get("dVc")
-            self.frame.Qr = dictRTI.get("Qr")
-            self.frame.Qr_Stdev = dictRTI.get("dQ")
-            self.frame.mass = dictRTI.get("mass")
-            self.frame.mass_Stdev = dictRTI.get("dmass")
-            xsdRTI = XSDataRamboTainer(vc=XSDataDouble(self.frame.Vc),
-                                       qr=XSDataDouble(self.frame.Qr),
-                                       mass=XSDataDouble(self.frame.mass),
-                                       dvc=XSDataDouble(self.frame.Vc_Stdev),
-                                       dqr=XSDataDouble(self.frame.Qr_Stdev),
-                                       dmass=XSDataDouble(self.frame.mass_Stdev))
-            self.xsDataResult.rti = xsdRTI
+                self.frame.Vc = dictRTI.get("Vc")
+                self.frame.Vc_Stdev = dictRTI.get("dVc")
+                self.frame.Qr = dictRTI.get("Qr")
+                self.frame.Qr_Stdev = dictRTI.get("dQ")
+                self.frame.mass = dictRTI.get("mass")
+                self.frame.mass_Stdev = dictRTI.get("dmass")
+                xsdRTI = XSDataRamboTainer(vc=XSDataDouble(self.frame.Vc),
+                                           qr=XSDataDouble(self.frame.Qr),
+                                           mass=XSDataDouble(self.frame.mass),
+                                           dvc=XSDataDouble(self.frame.Vc_Stdev),
+                                           dqr=XSDataDouble(self.frame.Qr_Stdev),
+                                           dmass=XSDataDouble(self.frame.mass_Stdev))
+                self.xsDataResult.rti = xsdRTI
 
     def doFailureAutoRg(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsHPLCv1_2.doFailureAutoRg")
@@ -444,6 +458,7 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
             self.lstExecutiveSummary.append("Edna plugin DatCmp failed.")
         self.setFailure()
 
+
     def doSuccessDatAver(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsHPLCv1_2.doSuccessDatAver")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_2.doSuccessDatAver")
@@ -477,3 +492,4 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
         self.scatter_data = numpy.loadtxt(self.xsDataResult.integratedCurve.path.value)
         self.frame.sum_I = self.scatter_data[:, 1].sum()
         self.xsDataResult.summedIntensity = XSDataDouble(value=self.frame.sum_I)
+
