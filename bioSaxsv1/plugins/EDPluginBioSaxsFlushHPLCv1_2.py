@@ -3,8 +3,6 @@
 #    Project: BioSaxs
 #             http://www.edna-site.org
 #
-#    File: "$Id$"
-#
 #    Copyright (C) 2012 ESRF
 #
 #    Principal author:        Jérôme Kieffer
@@ -27,18 +25,22 @@ from __future__ import with_statement
 __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "2012 ESRF"
-__date__ = "20131118"
+__date__ = "2014-09-22"
 __status__ = "development"
 
 import os
+import traceback
+
 from EDPluginControl import EDPluginControl
 from EDFactoryPlugin import edFactoryPlugin
 edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
 edFactoryPlugin.loadModule("XSDataEdnaSaxs")
 
 from XSDataBioSaxsv1_0 import XSDataInputBioSaxsHPLCv1_0, XSDataResultBioSaxsHPLCv1_0, \
-                            XSDataInputBioSaxsISPyB_HPLCv1_0, XSDataInputBioSaxsToSASv1_0
-from XSDataEdnaSaxs import XSDataInputDataver, XSDataInputDatcmp, XSDataInputAutoSub, XSDataInputDatop, XSDataInputSaxsAnalysis
+                            XSDataInputBioSaxsISPyB_HPLCv1_0, XSDataInputBioSaxsToSASv1_0, \
+                            XSDataInputBioSaxsISPyBv1_0, XSDataInputBioSaxsISPyBHPLCv1_0 
+from XSDataEdnaSaxs import XSDataInputDataver, XSDataInputSaxsAnalysis
+
 from XSDataCommon import XSDataString, XSDataStatus, XSDataFile
 from EDPluginBioSaxsHPLCv1_2 import EDPluginBioSaxsHPLCv1_2
 
@@ -59,8 +61,6 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
     strControlledPluginISPyB = "EDPluginBioSaxsISPyB_HPLCv1_0"
     __strControlledPluginSaxsAnalysis = "EDPluginControlSaxsAnalysisv1_0"
     __strControlledPluginSaxsModeling = "EDPluginBioSaxsToSASv1_1"
-
-
 
     def __init__(self):
         """
@@ -104,15 +104,14 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
             try:
                 edpluginIsPyB = self.loadPlugin(self.strControlledPluginISPyB)
                 edpluginIsPyB.dataInput = XSDataInputBioSaxsISPyB_HPLCv1_0(sample=self.dataInput.sample,
-                                                                         hdf5File=self.xsDataResult.hplcFile,
-                                                                         jsonFile=XSDataFile(XSDataString(self.json)),
-                                                                         hplcPlot=self.xsDataResult.hplcImage)
+                                                                           hdf5File=self.xsDataResult.hplcFile,
+                                                                           jsonFile=XSDataFile(XSDataString(self.json)),
+                                                                           hplcPlot=self.xsDataResult.hplcImage)
                 edpluginIsPyB.executeSynchronous()
                 self.dataOutputBioSaxsISPyB_HPLC = edpluginIsPyB.xsdResult
             except Exception as error:
                 traceback.print_stack()
                 self.ERROR("EDPluginBioSaxsFlushHPLCv1_2 calling to EDPluginBioSaxsISPyB_HPLCv1_0: %s" % error)
-
 
             self.processMerges(EDPluginBioSaxsHPLCv1_2.dictHPLC[self.runId])
 
@@ -130,7 +129,7 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
     def processRun(self, run):
         run.dump_json()
         hdf5 = run.save_hdf5()
-        self.json = os.path.splitext(hdf5)[0]+".json"
+        self.json = os.path.splitext(hdf5)[0] + ".json"
         self.xsDataResult.hplcFile = XSDataFile(XSDataString(hdf5))
         self.xsDataResult.hplcImage = XSDataFile(XSDataString(run.make_plot()))
         for group in run.analyse():
@@ -145,7 +144,7 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
             run.merge_curves.append(outname)
             run.merge_analysis[outname] = None
             run.merge_Rg[outname] = None
-            run.merge_framesDIC[outname] = [group[0],group[-1]]
+            run.merge_framesDIC[outname] = [group[0], group[-1]]
         # Append to hdf5
         run.append_hdf5()
 
@@ -162,12 +161,10 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
                                                                                 autoRg=run.merge_Rg[merge],
                                                                                 graphFormat=XSDataString("png")
                                                                             )
-
-
             self.__edPluginSaxsAnalysis.connectSUCCESS(self.doSuccessSaxsAnalysis)
             self.__edPluginSaxsAnalysis.connectFAILURE(self.doFailureSaxsAnalysis)
             self.__edPluginSaxsAnalysis.executeSynchronous()
-            xsdBuffer =  XSDataFile(XSDataString(run.buffer))
+            xsdBuffer = XSDataFile(XSDataString(run.buffer))
             xsdStartFrame = XSDataString(run.merge_framesDIC[merge][0])
             xsdEndFrame = XSDataString(run.merge_framesDIC[merge][-1])
             self.__edPluginISPyBAnalysis = self.loadPlugin(self.__strControlledPluginISPyBAnalysis)  
@@ -190,7 +187,6 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
                                                             endFrame=xsdEndFrame,
                                                             dataInputBioSaxs=inputBioSaxsISPyB
                                                             )
-    
                 self.__edPluginISPyBAnalysis.dataInput = xsdISPyBin
                 self.__edPluginISPyBAnalysis.connectSUCCESS(self.doSuccessISPyBAnalysis)
                 self.__edPluginISPyBAnalysis.connectFAILURE(self.doFailureISPyBAnalysis)
@@ -200,9 +196,9 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
                 self.ERROR("EDPluginBioSaxsFlushHPLCv1_2 calling to EDPluginHPLCPrimayDataISPyBv1_0: %s" % error)
 
             
-            mergeNumber = 1
             # There were some recurring issues with dammin slowing down slavia, therefore I commented this out for the time being
             # Martha, 11.7.2014
+#            mergeNumber = 1
 #             for merge in run.merge_curves:
 #                 try:
 #                     xsdSubtractedCurve = XSDataFile(XSDataString(merge))
@@ -227,7 +223,6 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
 #                     self.ERROR("EDPluginBioSaxsFlushHPLCv1_2 calling to EDPluginBioSaxsToSASv1_1: %s" % error)
         self.synchronizePlugins()
 
-
     def doSuccessDatAver(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.doSuccessDatAver")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsFlushHPLCv1_2.doSuccessDatAver")
@@ -241,7 +236,6 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
                 self.lstExecutiveSummary.append(strErr)
                 self.setFailure()
 
-
     def doFailureDatAver(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.doFailureDatAver")
         self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsFlushHPLCv1_2.doFailureDatAver")
@@ -250,7 +244,6 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
         else:
             self.lstExecutiveSummary.append("Edna plugin DatAver failed.")
         self.setFailure()
-
 
     def doSuccessSaxsAnalysis(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.doSuccessSaxsAnalysis")
@@ -278,7 +271,6 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
         self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.doSuccessSaxsToSAS")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsFlushHPLCv1_2.doSuccessSaxsToSAS")
         
-
     def doFailureSaxsToSAS(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.doFailureSaxsToSAS")
         self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsFlushHPLCv1_2.doFailureSaxsToSAS")
@@ -297,4 +289,3 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
         self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.doFailureISPyBAnalysis")
         self.addExecutiveSummaryLine("Failed to register analysis in ISPyB")
         self.retrieveMessages(_edPlugin)
-    
