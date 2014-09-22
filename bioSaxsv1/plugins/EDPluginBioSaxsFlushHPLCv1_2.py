@@ -203,28 +203,30 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
 
             
             mergeNumber = 1
-            for merge in run.merge_curves:
-                try:
-                    xsdSubtractedCurve = XSDataFile(XSDataString(merge))
-                    xsdGnomFile = XSDataFile(XSDataString(run.merge_analysis[merge].gnom.gnomFile.path.value))
-                    destination = XSDataFile(XSDataString(os.path.join(os.path.dirname(os.path.dirname(merge)), "ednaSAS")))
-                    self.__edPluginSaxsToSAS = self.loadPlugin(self.__strControlledPluginSaxsModeling)
-                    print "Changing measurentID by runMerge"
-                    #In order to keep dammin models in different folder a measurementId should be given
-                    self.__edPluginISPyBAnalysis.xsDataResult.dataInputBioSaxs.sample.measurementID.value = mergeNumber
-                    print "------------>  MeasurementId changed " + str(self.__edPluginISPyBAnalysis.xsDataResult.dataInputBioSaxs.sample.measurementID.value)
-                    self.__edPluginSaxsToSAS.dataInput = XSDataInputBioSaxsToSASv1_0(
-                                                                                        sample=self.__edPluginISPyBAnalysis.xsDataResult.dataInputBioSaxs.sample,
-                                                                                        subtractedCurve=xsdSubtractedCurve,
-                                                                                        gnomFile=xsdGnomFile,
-                                                                                        destinationDirectory=destination)
-                    self.__edPluginSaxsToSAS.connectSUCCESS(self.doSuccessSaxsToSAS)
-                    self.__edPluginSaxsToSAS.connectFAILURE(self.doFailureSaxsToSAS)
-                    mergeNumber = mergeNumber + 1;
-                    self.__edPluginSaxsToSAS.executeSynchronous()
-                except Exception as error:
-                    traceback.print_stack()
-                    self.ERROR("EDPluginBioSaxsFlushHPLCv1_2 calling to EDPluginBioSaxsToSASv1_1: %s" % error)
+            # There were some recurring issues with dammin slowing down slavia, therefore I commented this out for the time being
+            # Martha, 11.7.2014
+#             for merge in run.merge_curves:
+#                 try:
+#                     xsdSubtractedCurve = XSDataFile(XSDataString(merge))
+#                     xsdGnomFile = XSDataFile(XSDataString(run.merge_analysis[merge].gnom.gnomFile.path.value))
+#                     destination = XSDataFile(XSDataString(os.path.join(os.path.dirname(os.path.dirname(merge)), "ednaSAS")))
+#                     self.__edPluginSaxsToSAS = self.loadPlugin(self.__strControlledPluginSaxsModeling)
+#                     print "Changing measurentID by runMerge"
+#                     #In order to keep dammin models in different folder a measurementId should be given
+#                     self.__edPluginISPyBAnalysis.xsDataResult.dataInputBioSaxs.sample.measurementID.value = mergeNumber
+#                     print "------------>  MeasurementId changed " + str(self.__edPluginISPyBAnalysis.xsDataResult.dataInputBioSaxs.sample.measurementID.value)
+#                     self.__edPluginSaxsToSAS.dataInput = XSDataInputBioSaxsToSASv1_0(
+#                                                                                         sample=self.__edPluginISPyBAnalysis.xsDataResult.dataInputBioSaxs.sample,
+#                                                                                         subtractedCurve=xsdSubtractedCurve,
+#                                                                                         gnomFile=xsdGnomFile,
+#                                                                                         destinationDirectory=destination)
+#                     self.__edPluginSaxsToSAS.connectSUCCESS(self.doSuccessSaxsToSAS)
+#                     self.__edPluginSaxsToSAS.connectFAILURE(self.doFailureSaxsToSAS)
+#                     mergeNumber = mergeNumber + 1;
+#                     self.__edPluginSaxsToSAS.executeSynchronous()
+#                 except Exception as error:
+#                     traceback.print_stack()
+#                     self.ERROR("EDPluginBioSaxsFlushHPLCv1_2 calling to EDPluginBioSaxsToSASv1_1: %s" % error)
         self.synchronizePlugins()
 
 

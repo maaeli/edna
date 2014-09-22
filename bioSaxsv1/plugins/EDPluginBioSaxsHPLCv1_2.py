@@ -226,10 +226,16 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
             subtracted = self.dataInput.subtractedCurve.path.value
         else:
             subtracted = os.path.splitext(self.curve)[0] + "_sub.dat"
-        xsdIn = XSDataInputDatop(inputCurve=[XSDataFile(XSDataString(self.curve)),
-                                              XSDataFile(XSDataString(self.hplc_run.first_curve))],
-                                 outputCurve=XSDataFile(XSDataString(subtracted)),
-                                 operation=XSDataString("sub"))
+        if self.hplc_run.buffer is not None:
+            xsdIn = XSDataInputDatop(inputCurve=[XSDataFile(XSDataString(self.curve)),
+                                                  XSDataFile(XSDataString(self.hplc_run.buffer))],
+                                     outputCurve=XSDataFile(XSDataString(subtracted)),
+                                     operation=XSDataString("sub"))
+        else:
+            xsdIn = XSDataInputDatop(inputCurve=[XSDataFile(XSDataString(self.curve)),
+                                                  XSDataFile(XSDataString(self.hplc_run.first_curve))],
+                                     outputCurve=XSDataFile(XSDataString(subtracted)),
+                                     operation=XSDataString("sub"))
         self.edPluginDatop = self.loadPlugin(self.strControlledPluginDatop)
         self.edPluginDatop.dataInput = xsdIn
         self.edPluginDatop.connectSUCCESS(self.doSuccessDatop)

@@ -529,6 +529,7 @@ class HPLCrun(object):
         """
         lab = label(self.I0)
         res = []
+
         self.merge_frames = []
         for i in range(1, int(lab.max() + 1)):
             loc = (lab == i)
