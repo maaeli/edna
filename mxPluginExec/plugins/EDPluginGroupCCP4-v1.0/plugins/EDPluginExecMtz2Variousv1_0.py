@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: MX Plugin Exec
 #             http://www.edna-site.org

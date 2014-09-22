@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #
 #    Project: execPlugins
@@ -47,6 +47,7 @@ try:
     import pycuda.gpuarray as gpuarray
     import scikits.cuda.fft as cu_fft
 except ImportError:
+    pycuda = None
     cu_fft = None
 #cu_fft = None
 import numpy
@@ -155,6 +156,7 @@ class CudaCorrelate(object):
         if self.ctx is None:
             with self.__class__.initsem:
                 if self.ctx is None:
+                    import pycuda
                     if "autoinit" not in dir(pycuda):
                         import pycuda.autoinit
                     self.__class__.ctx = pycuda.autoinit.context

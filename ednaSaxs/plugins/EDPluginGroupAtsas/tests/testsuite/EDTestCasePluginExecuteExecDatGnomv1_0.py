@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: EdnaSaxs / 
 #             http://www.edna-site.org

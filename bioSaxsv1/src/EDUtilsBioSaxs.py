@@ -1,5 +1,5 @@
 #
-#coding: utf8
+#coding: utf-8
 #
 #    Project: BioSaxs : ID14-3
 #             http://www.edna-site.org
@@ -33,59 +33,62 @@ __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
 
-import sys, os, time
-from EDUtilsPlatform    import EDUtilsPlatform
+import sys
+import os
+import time
+from EDUtilsPlatform import EDUtilsPlatform
 from EDThreading import Semaphore
-from EDUtilsPath        import EDUtilsPath
+from EDUtilsPath import EDUtilsPath
 architecture = EDUtilsPlatform.architecture
 specClientPath = os.path.join(EDUtilsPath.EDNA_HOME, "libraries", "SpecClient", architecture)
-if  os.path.isdir(specClientPath) and (specClientPath not in sys.path):
+if os.path.isdir(specClientPath) and (specClientPath not in sys.path):
     sys.path.insert(1, specClientPath)
 
 
-from EDVerbose          import EDVerbose 
-#from EDFactoryPluginStatic      import EDFactoryPluginStatic
-from EDObject           import EDObject
+from EDVerbose import EDVerbose
+from EDObject import EDObject
 try:
-    from SpecClient         import SpecVariable
+    from SpecClient import SpecVariable
 except:
     SpecVariable = None
-import h5py, numpy, matplotlib, json
+import h5py
+import numpy
+import matplotlib
+import json
 matplotlib.use('Agg')
 from matplotlib import pylab
 import scipy.integrate as scint
 
-class EDUtilsBioSaxs(EDObject):
 
+class EDUtilsBioSaxs(EDObject):
     DETECTORS = ["pilatus", "vantec"]
     OPERATIONS = ["normalisation", "reprocess", "average", "complete"]
-    TRANSLATION = {"beamStopDiode":"DiodeCurr",
-                   "machineCurrent":"MachCurr",
-                   "concentration":"Concentration",
-                   "comments":"Comments",
-                   "code":"Code",
-                   "maskFile":"Mask",
-                   "normalizationFactor":"Normalization",
-                   "beamCenter_1":"Center_1",
-                   "beamCenter_2":"Center_2",
-                   "pixelSize_1":"PSize_1",
-                   "pixelSize_2":"PSize_2",
-                   "detectorDistance":"SampleDistance",
-                   "wavelength":"WaveLength",
-                   "detector":"Detector",
-                   "storageTemperature":"storageTemperature",
-                   "exposureTemperature":"exposureTemperature",
-                   "exposureTime":"exposureTime",
-                   "frameNumber":"frameNumber",
-                   "frameMax":"frameMax",
-                   "timeOfFrame":"time_of_day"
+    TRANSLATION = {"beamStopDiode": "DiodeCurr",
+                   "machineCurrent": "MachCurr",
+                   "concentration": "Concentration",
+                   "comments": "Comments",
+                   "code": "Code",
+                   "maskFile": "Mask",
+                   "normalizationFactor": "Normalization",
+                   "beamCenter_1": "Center_1",
+                   "beamCenter_2": "Center_2",
+                   "pixelSize_1": "PSize_1",
+                   "pixelSize_2": "PSize_2",
+                   "detectorDistance": "SampleDistance",
+                   "wavelength": "WaveLength",
+                   "detector": "Detector",
+                   "storageTemperature": "storageTemperature",
+                   "exposureTemperature": "exposureTemperature",
+                   "exposureTime": "exposureTime",
+                   "frameNumber": "frameNumber",
+                   "frameMax": "frameMax",
+                   "timeOfFrame": "time_of_day"
                    }
     FLOAT_KEYS = ["beamStopDiode", "machineCurrent", "concentration", "normalizationFactor",
                   "beamCenter_1", "beamCenter_2", "pixelSize_1", "pixelSize_2",
                   "detectorDistance", "wavelength", "timeOfFrame",
                   "storageTemperature", "exposureTemperature", "exposureTime"]
-    INT_KEYS = [ "frameNumber", "frameMax"]
-
+    INT_KEYS = ["frameNumber", "frameMax"]
 
     __strSpecVersion = None
     __strSpecStatus = None
@@ -142,9 +145,6 @@ class EDUtilsBioSaxs(EDObject):
             EDVerbose.WARNING(_strMessage)
         else:
             EDVerbose.screen(_strMessage)
-#        else:
-#            EDVerbose.DEBUG(_strMessage)
-
 
         if EDUtilsBioSaxs.specStatus is not None:
             currentStatus = EDUtilsBioSaxs.specStatus.value["reprocess"]["status"]     # must do this, since SpecClient is apparently returning a non-expected data structure
@@ -166,7 +166,6 @@ class EDUtilsBioSaxs(EDObject):
             # must do this, since SpecClient is apparently returning a non-expected data structure
             EDVerbose.ERROR("Aborting data reprocess!")
 #            sys.exit(0)
-
 
     @staticmethod
     def getFilenameDetails(_strFilename):
@@ -201,19 +200,17 @@ class EDUtilsBioSaxs(EDObject):
                 else:
                     extra += "_" + oneItem
 
-        try: #remove the "." at the begining of the extension
+        try:  # remove the "." at the begining of the extension
             extension = extension[1:]
         except IndexError:
             extension = ""
 
-
-        try: #remove the "_" at the begining of the extra
+        try:  # remove the "_" at the begining of the extra
             extra = extra[1:]
         except IndexError:
             extra = ""
 
         return prefix, run, frame, extra, extension
-
 
     @staticmethod
     def makeTranslation(pTranslate, pKeyword, pDefaultValue):
@@ -240,6 +237,7 @@ class EDUtilsBioSaxs(EDObject):
 
         return pDefaultValue
 
+
 class HPLCframe(object):
     def __init__(self, runID, frameId=None):
         self.runID = runID
@@ -264,6 +262,7 @@ class HPLCframe(object):
         self.Vc_Stdev = None
         self.Qr_Stdev = None
         self.mass_Stdev = None
+
 
 def median_filt(input_array, width=3):
     """
@@ -293,6 +292,7 @@ def label(a):
             out[i] = cnt
             last = cnt
     return out
+
 
 class HPLCrun(object):
     def __init__(self, runId, first_curve=None):
@@ -529,6 +529,7 @@ class HPLCrun(object):
                 res.append(numpy.where(lg == lv)[0] + start)
         return res
 
+
 def calcVc(dat, Rg, dRg, I0, dI0, imin):
     """Calculates the Rambo-Tainer invariant Vc, including extrapolation to q=0
 
@@ -550,15 +551,16 @@ def calcVc(dat, Rg, dRg, I0, dI0, imin):
     dvc = (dI0 / I0 + (dlowqint + dvabs) / (lowqint + vabs)) * vc
     return (vc, dvc)
 
+
 def RamboTainerInvariant(dat, Rg, dRg, I0, dI0, imin, qmax=2):
     """calculates the invariants Vc and Qr from the Rambo&Tainer 2013 Paper,
     also the the mass estimate based on Qr for proteins
 
     Arguments: 
     @param dat: data in q,I,dI format, q in nm-1
-    @parma Rg,dRg,I0,dI0: results from Guinier approximation
-    @parma imin: minimal index of the Guinier range, below that index data will be extrapolated by the Guinier approximation
-    @parma qmax: maximum q-value for the calculation in nm-1
+    @param Rg,dRg,I0,dI0: results from Guinier approximation
+    @param imin: minimal index of the Guinier range, below that index data will be extrapolated by the Guinier approximation
+    @param qmax: maximum q-value for the calculation in nm-1
     @return: dict with Vc, Qr and mass plus errors
     """
     scale_prot = 1.0 / 0.1231

@@ -1,6 +1,6 @@
 from __future__ import with_statement
 
-# coding: utf8
+# coding: utf-8
 #
 #    Project: <projectName>
 #             http://www.edna-site.org

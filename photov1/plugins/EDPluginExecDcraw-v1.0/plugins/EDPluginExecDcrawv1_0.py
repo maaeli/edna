@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: Photo-v1.0
 #             http://www.edna-site.org

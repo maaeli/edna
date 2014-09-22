@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: bioSaxs Downstream processing
 #             http://www.edna-site.org

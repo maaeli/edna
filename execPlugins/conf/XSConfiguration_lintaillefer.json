@@ -134,6 +134,14 @@
         "sift_pyocl": true,
         "deviceType": "GPU", 
         "timeOut": 60
-    }
+    },
+    "EDPluginExecMeasureOffsetv1_0": {
+        "dtype": "float32", 
+        "convolution": "fftw", 
+        "writeXMLInput": 1, 
+        "timeOut": 600, 
+        "writeXMLOutput": 1
+    }, 
+    
     
 }

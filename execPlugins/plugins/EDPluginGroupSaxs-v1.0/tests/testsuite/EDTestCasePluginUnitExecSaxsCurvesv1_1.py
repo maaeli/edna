@@ -1,5 +1,5 @@
 #
-# coding: utf8 
+# coding: utf-8 
 # 
 #    Project: execPlugins / Saxs Group / saxs_mac
 #             http://www.edna-site.org

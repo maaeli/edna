@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: BioSaxs: bio-saxs data reduction
 #             http://www.edna-site.org

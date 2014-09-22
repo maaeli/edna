@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: ExecPlugins / Saxs Group / SaxsCurves
 #             http://www.edna-site.org

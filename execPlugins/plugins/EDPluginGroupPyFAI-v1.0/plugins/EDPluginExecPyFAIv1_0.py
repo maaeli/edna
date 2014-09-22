@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: Python Fast Azimuthal Integration
 #             http://www.edna-site.org

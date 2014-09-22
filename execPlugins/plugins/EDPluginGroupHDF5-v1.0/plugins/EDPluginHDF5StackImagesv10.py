@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: Exec Plugin: HDF5 writers
 #             http://www.edna-site.org

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# coding: utf8 
+# coding: utf-8 
 #
 #    Project: General purpose Exec Plugins
 #             http://www.edna-site.org

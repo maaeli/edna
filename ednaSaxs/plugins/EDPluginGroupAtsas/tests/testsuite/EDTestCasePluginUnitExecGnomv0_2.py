@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: solution Scattering
 #             http://www.edna-site.org

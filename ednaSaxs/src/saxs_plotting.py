@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# coding: utf8
+# coding: utf-8
 #
 #    Project: Edna Saxs
 #             http://www.edna-site.org

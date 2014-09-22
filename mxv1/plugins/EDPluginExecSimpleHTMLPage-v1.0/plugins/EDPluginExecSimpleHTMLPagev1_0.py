@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: EDNA MXv1
 #             http://www.edna-site.org

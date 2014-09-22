@@ -1,5 +1,5 @@
 #!/usr/bin/env python2.6
-# coding: utf8
+# coding: utf-8
 #
 #    Project: The EDNA Image alignment and stitching project
 #             http://www.edna-site.org
