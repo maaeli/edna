@@ -21,7 +21,7 @@
     "EDPluginBioSaxsProcessOneFilev1_4":{
         "DummyPixelValue": -2.0,
         "DummyPixelDelta": 1.1,
-        "DeviceType": "lut_ocl_gpu" 
+        "DeviceType": "csr_ocl_gpu" 
     },
     "EDPluginBioSaxsHPLCv1_2":{
         "similaritySample": 0.01,
