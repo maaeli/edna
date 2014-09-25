@@ -60,6 +60,9 @@ import json
 matplotlib.use('Agg')
 from matplotlib import pylab
 import scipy.integrate as scint
+from signalProcessing import find_peaks_cwt
+from scipy.signal import medfilt, butter, filtfilt
+from math import floor as mfloor
 
 
 class EDUtilsBioSaxs(EDObject):
