@@ -339,7 +339,7 @@ class HPLCrun(object):
         self.Qr_Stdev = None
         self.mass_Stdev = None  
         self.buffer_frames = None
-        self.merge_frames = None  
+        self.merge_frames = None  # indexes of first and last frame marged
         self.buffer_I = None
         self.buffer_Stdev = None
         self.merge_I = None 
@@ -555,7 +555,7 @@ class HPLCrun(object):
     def extract_merges(self):
         self.buffer_I = numpy.zeros(self.size, dtype=numpy.float32)
         self.buffer_Stdev = numpy.zeros(self.size, dtype=numpy.float32)
-        if (not self.merge_frames == None) and len(self.merge_frames) > 0:
+        if self.merge_frames:
             self.merge_I = numpy.zeros((len(self.merge_frames), self.size), dtype=numpy.float32)
             self.merge_Stdev = numpy.zeros((len(self.merge_frames), self.size), dtype=numpy.float32)
         else:
@@ -572,7 +572,11 @@ class HPLCrun(object):
         if (not self.merge_frames == None) and len(self.merge_frames) > 0:
             for i in range(len(self.merge_frames)):
                 group = self.merge_frames[i]
-                outname = os.path.splitext(self.frames[group[0]].subtracted)[0] + "_aver_%s.dat" % group[-1]
+                assert len(group) == 2
+                if group[0] == group[1]:  # we have only 1 frame in the group
+                    outname = self.frames[group[0]].subtracted
+                else:
+                    outname = os.path.splitext(self.frames[group[0]].subtracted)[0] + "_aver_%s.dat" % group[-1]
                 if os.path.exists(outname):
                     data = numpy.loadtxt(outname)
                     self.merge_I[i, :] = data[:, 1]
@@ -635,7 +639,7 @@ def RamboTainerInvariant(dat, Rg, dRg, I0, dI0, imin, qmax=2):
     power_prot = 1.0
 
     imax = abs(dat[:, 0] - qmax).argmin()
-    if imax <= imin:  # unlikely but can happened
+    if (imax <= imin) or (imin < 0):  # unlikely but can happened
         return {}
     vc = calcVc(dat[:imax, :], Rg, dRg, I0, dI0, imin)
 

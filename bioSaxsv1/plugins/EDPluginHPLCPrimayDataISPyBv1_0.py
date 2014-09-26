@@ -207,8 +207,6 @@ class EDPluginHPLCPrimayDataISPyBv1_0(EDPluginControl):
             self.lstError.append(strErrorMessage)
 
         try:
-            print str(self.dataInput.startFrame)
-            print str(self.dataInput.endFrame)
             self.measurementId = self.client.service.storeHPLCDataAnalysisResult(
                                     self.dataInput.experimentId.value,
                                     self.filename,
