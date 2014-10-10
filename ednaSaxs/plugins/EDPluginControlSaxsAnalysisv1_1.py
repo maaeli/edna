@@ -220,9 +220,9 @@ Volume  =    %12.2f""" % (self.xVolume.value)
         if self.scatterFile and os.path.exists(self.scatterFile):
             self.subtracted_data = loadtxt(self.scatterFile)
             if self.subtracted_data is not None and\
-                self.frame.Rg and self.frame.Rg_Stdev and self.frame.I0 and self.frame.I0_Stdev:
+                self.autoRg.rg and self.autoRg.rgStdev and self.autoRg.i0 and self.autoRg.i0Stdev:
                 dictRTI = RamboTainerInvariant(self.subtracted_data, self.autoRg.rg.value,
-                                               self.autoRg.RgStdev.value, self.autoRg.i0.value,
+                                               self.autoRg.rgStdev.value, self.autoRg.i0.value,
                                                self.autoRg.i0Stdev.value, self.autoRg.firstPointUsed.value)
 #             {'Vc': vc[0], 'dVc': vc[1], 'Qr': qr, 'dQr': dqr, 'mass': mass, 'dmass': dmass}
                 Vc = dictRTI.get("Vc")
