@@ -21,6 +21,7 @@ import XSDataEdnaSaxs.XSDataGnom
 import XSDataEdnaSaxs.XSDataResultDatGnom
 import XSDataEdnaSaxs.XSDataResultDatPorod
 import XSDataEdnaSaxs.XSDataSaxsModel
+import XSDataEdnaSaxs.XSDataRamboTainer
 
 /*******************************************
   *  Common types used only in BioSaxs
@@ -282,14 +283,6 @@ complex type XSDataInputBioSaxsHPLCv1_0 extends XSDataInputBioSaxsProcessOneFile
 	hplcFile: XSDataFile optional
 }
 
-complex type XSDataRamboTainer extends XSData{
-	vc: XSDataDouble optional
-	qr: XSDataDouble optional
-	mass: XSDataDouble optional
-	dvc: XSDataDouble optional
-	dqr: XSDataDouble optional
-	dmass: XSDataDouble optional	
-}
 
 complex type XSDataResultBioSaxsHPLCv1_0 extends XSDataResultBioSaxsProcessOneFilev1_0{
 	"Plugin that runs subsequently ProcessOneFile, subtraction of buffer and SaxsAnalysis"

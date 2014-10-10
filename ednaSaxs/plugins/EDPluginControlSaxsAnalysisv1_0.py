@@ -37,6 +37,8 @@ from XSDataEdnaSaxs import XSDataInputSaxsAnalysis, XSDataResultSaxsAnalysis, \
 from XSDataCommon import XSDataString, XSDataFile, XSDataInteger, XSDataStatus
 from saxs_plotting import scatterPlot, guinierPlot, kartkyPlot, densityPlot
 
+from EDUtilsBioSaxs import RamboTainerInvariant
+
 
 class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
     """

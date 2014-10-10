@@ -78,7 +78,7 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
     __strControlledPluginDatcmp = "EDPluginExecDatcmpv1_0"
     __strControlledPluginWaitFile = "EDPluginWaitMultiFile"
     __strControlledPluginAutoSub = "EDPluginAutoSubv1_0"
-    __strControlledPluginSaxsAnalysis = "EDPluginControlSaxsAnalysisv1_0"
+    __strControlledPluginSaxsAnalysis = "EDPluginControlSaxsAnalysisv1_1"
     __strControlledPluginSaxsISPyB = "EDPluginBioSaxsISPyBv1_0"
 
 
