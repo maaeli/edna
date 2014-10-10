@@ -218,7 +218,7 @@ Volume  =    %12.2f""" % (self.xVolume.value)
         self.retrieveMessages(_edPlugin)
         self.autoRg = _edPlugin.dataOutput.autoRgOut[0]
         if self.scatterFile and os.path.exists(self.scatterFile):
-            self.subtracted_data = loadtxt(self.scatter_File)
+            self.subtracted_data = loadtxt(self.scatterFile)
             if self.subtracted_data is not None and\
                 self.frame.Rg and self.frame.Rg_Stdev and self.frame.I0 and self.frame.I0_Stdev:
                 dictRTI = RamboTainerInvariant(self.subtracted_data, self.autoRg.rg.value,
