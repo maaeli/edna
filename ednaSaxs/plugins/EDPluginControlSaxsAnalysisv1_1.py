@@ -37,7 +37,7 @@ from XSDataEdnaSaxs import XSDataInputSaxsAnalysis, XSDataResultSaxsAnalysis, \
                            XSDataInputAutoRg, XSDataInputDatGnom, XSDataInputDatPorod
 from XSDataCommon import XSDataString, XSDataFile, XSDataInteger, XSDataStatus, XSDataDouble
 from XSDataBioSaxsv1_0 import XSDataRamboTainer
-from saxs_plotting import scatterPlot, guinierPlot, kartkyPlot, densityPlot
+from saxs_plotting import scatterPlot, guinierPlot, kartkyPlot, densityPlot, kratkyRgPlot
 
 from EDUtilsBioSaxs import RamboTainerInvariant
 
@@ -153,6 +153,18 @@ class EDPluginControlSaxsAnalysisv1_1(EDPluginControl):
                 self.ERROR("EDPluginControlSaxsAnalysisv1_1 in kratkyplot: %s" % error)
             else:
                 self.xsDataResult.kratkyPlot = XSDataFile(XSDataString(kratkyfile))
+            if self.autoRg.i0.value > 0 and self.autoRg.rg.value > 0:
+                try:
+                    kratkyRgfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-KratkyRg" + ext)
+                    kratkyRgplot = kratkyRgPlot(self.scatterFile, self.autoRg.i0.value, self.autoRg.rg.value,
+                                               filename=kratkyRgfile, format=ext[1:])
+                    kratkyRgplot.clf()
+                    if plt:
+                        plt.close(kratkyRgplot)
+                except Exception as error:
+                    self.ERROR("EDPluginControlSaxsAnalysisv1_1 in kratkyRgplot: %s" % error)
+                else:
+                    self.xsDataResult.kratkyRgPlot = XSDataFile(XSDataString(kratkyRgfile))
             try:
                 scatterplotfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-scattering" + ext)
                 scatterplot = scatterPlot(self.scatterFile, unit="nm", gnomfile=self.gnomFile,

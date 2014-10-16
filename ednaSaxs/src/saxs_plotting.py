@@ -340,6 +340,41 @@ def kartkyPlot(curve_file, filename=None, format="png", unit="nm"):
             fig1.savefig(filename)
     return fig1
 
+def kratkyRgPlot(curve_file, I0, Rg, filename=None, format="png"):
+    """
+    Generate a normalized Kratky: q2Rg2I(q)/I0 vs qRg
+    @param curve_file: name of the saxs curve file
+    @param I0: forward scattering intensity
+    @param Rg: radius of gyration
+    @param: first_point,last point: integers, by default 0 and -1
+    @param  filename: name of the file where the curve should be saved
+    @param format: image format
+    @return: the matplotlib figure
+    """
+    data = numpy.loadtxt(curve_file)
+    q = data[:, 0]
+    I = data[:, 1]
+    xdata = q * Rg
+    ydata = xdata * xdata * I / I0
+    fig1 = plt.figure(figsize=(12, 10))
+    ax1 = fig1.add_subplot(1, 1, 1)
+    dplot = ax1.plot(xdata, ydata, label="Experimental curve")
+    ax1.set_ylabel('$(qR_{G})^2 I/I_{0}$')
+    ax1.set_xlabel('$qR_{G}$')
+    ax1.hlines(3.0 * numpy.exp(-1), xmin=-0.05, xmax=max(xdata), color='0.75', linewidth=1.0)
+    ax1.vlines(numpy.sqrt(3.0), ymin=-0.01, ymax=max(ydata), color='0.75', linewidth=1.0)
+    ax1.set_xlim(xmin=-0.05, xmax=8.5)
+    ax1.set_ylim(ymin=-0.01, ymax=3.5)
+    ax1.set_title("Dimensionless Kratky plot -$R_{G}$ ")
+    ax1.legend([dplot[0]], [ dplot[0].get_label()], loc=0)
+    if filename:
+        if format:
+            fig1.savefig(filename, format=format)
+        else:
+            fig1.savefig(filename)
+    return fig1
+
+
 class AutoRg(object):
     """
     a class to calculate Automatically the Radius of Giration based on Guinier approximation.

@@ -129,6 +129,7 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
         self.xsDataResult.status = XSDataStatus(executiveSummary=XSDataString(executiveSummary))
         self.dataOutput = self.xsDataResult
 
+
     def processRun(self, run):
         run.dump_json()
         hdf5 = run.save_hdf5()
@@ -256,10 +257,6 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
         run = EDPluginBioSaxsHPLCv1_2.dictHPLC[self.runId]
         curvename = _edPlugin.dataOutput.autoRg.filename.path.value
         run.merge_analysis[curvename] = _edPlugin.dataOutput
-#         run.merge_xsScatterPlot[curvename] = _edPlugin.dataOutput.scatterPlot
-#         run.merge_xsGuinierPlot[curvename] = _edPlugin.dataOutput.guinierPlot
-#         run.merge_xsKratkyPlot[curvename] = _edPlugin.dataOutput.kratkyPlot
-#         run.merge_xsDensityPlot[curvename] = _edPlugin.dataOutput.densityPlot
         self.addExecutiveSummaryLine(_edPlugin.dataOutput.status.executiveSummary.value)
 
     def doFailureSaxsAnalysis(self, _edPlugin=None):
