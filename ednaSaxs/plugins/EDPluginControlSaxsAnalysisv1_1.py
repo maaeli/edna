@@ -31,6 +31,8 @@ __date__ = "2013-04-04"
 __status__ = "Development"
 
 import os, gc, sys
+
+
 from numpy import loadtxt
 from EDPluginControl import EDPluginControl
 from XSDataEdnaSaxs import XSDataInputSaxsAnalysis, XSDataResultSaxsAnalysis, \

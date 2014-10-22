@@ -33,7 +33,7 @@ import traceback
 
 from EDPluginControl import EDPluginControl
 from EDFactoryPlugin import edFactoryPlugin
-edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
+edFactoryPlugin.loadModule("XSDataBioSaxsv1_1")
 edFactoryPlugin.loadModule("XSDataEdnaSaxs")
 
 from XSDataBioSaxsv1_0 import XSDataInputBioSaxsHPLCv1_0, XSDataResultBioSaxsHPLCv1_0, \
@@ -59,7 +59,7 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
     """
     strControlledPluginDatAver = "EDPluginExecDataverv1_0"
     strControlledPluginISPyB = "EDPluginBioSaxsISPyB_HPLCv1_0"
-    __strControlledPluginSaxsAnalysis = "EDPluginControlSaxsAnalysisv1_1"
+    __strControlledPluginSaxsAnalysis = "EDPluginControlSaxsAnalysisv1_0"
     __strControlledPluginSaxsModeling = "EDPluginBioSaxsToSASv1_1"
     __strControlledPluginISPyBAnalysis = "EDPluginHPLCPrimayDataISPyBv1_0"
 
