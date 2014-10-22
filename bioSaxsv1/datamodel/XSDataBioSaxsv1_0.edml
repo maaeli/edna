@@ -244,6 +244,7 @@ complex type XSDataResultBioSaxsSmartMergev1_0 extends XSDataResult {
 	autoRg: XSDataAutoRg optional
 	gnom: XSDataGnom optional 
 	volume: XSDataDoubleWithUnit optional
+	rti: XSDataRamboTainer optional	
 	subtractedCurve: XSDataFile optional
 	sample: XSDataBioSaxsSample optional
 }

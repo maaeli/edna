@@ -66,6 +66,7 @@ class EDPluginControlSaxsAnalysisv1_1(EDPluginControl):
         self.autoRg = None
         self.gnom = None
         self.xVolume = None
+        self.rti = None
         self.xsDataResult = XSDataResultSaxsAnalysis()
 
     def checkParameters(self):
@@ -164,14 +165,14 @@ class EDPluginControlSaxsAnalysisv1_1(EDPluginControl):
                 except Exception as error:
                     self.ERROR("EDPluginControlSaxsAnalysisv1_1 in kratkyRgplot: %s" % error)
                 else:
-                    self.xsDataResult.kratkyRgPlot = XSDataFile(XSDataString(kratkyRgfile))
-            if self.autoRg.i0.value > 0 and self.xsDataResult.rti.vc.value > 0:
+                    self.xsDataResult.kratkyRgPlot = XSDataFile(XSDataString(kratkyRgfile))       
+            if self.autoRg.i0.value > 0 and self.rti.vc.value > 0:
                 try:
                     kratkyVcfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-KratkyVc" + ext)
-                    kratkyVcplot = kratkyVcPlot(self.scatterFile, self.autoRg.i0.value, self.xsDataResult.rti.vc.value,
-                                               filename=kratkyVcfile, format=ext[1:])
+                    kratkyVcplot = kratkyVcPlot(self.scatterFile, self.autoRg.i0.value, self.rti.vc.value,
+                                                       filename=kratkyVcfile, format=ext[1:])
                     kratkyVcplot.clf()
-                    if plt:
+                     if plt:
                         plt.close(kratkyVcplot)
                 except Exception as error:
                     self.ERROR("EDPluginControlSaxsAnalysisv1_1 in kratkyVcplot: %s" % error)
@@ -231,6 +232,7 @@ Volume  =    %12.2f""" % (self.xVolume.value)
         self.xsDataResult.autoRg = self.autoRg
         self.xsDataResult.gnom = self.gnom
         self.xsDataResult.volume = self.xVolume
+        self.xsDataResult.volume = self.rti
         self.xsDataResult.status = XSDataStatus(executiveSummary=XSDataString(strLog),
                                                 message=self.getXSDataMessage())
         self.setDataOutput(self.xsDataResult)
@@ -261,7 +263,7 @@ Volume  =    %12.2f""" % (self.xVolume.value)
                                            dvc=XSDataDouble(Vc_Stdev),
                                            dqr=XSDataDouble(Qr_Stdev),
                                            dmass=XSDataDouble(mass_Stdev))
-                self.xsDataResult.rti = xsdRTI
+                self.rti = xsdRTI
 
     def doFailureRg(self, _edPlugin=None):
         self.DEBUG("EDPluginControlSaxsAnalysisv1_1.doFailureRg")
