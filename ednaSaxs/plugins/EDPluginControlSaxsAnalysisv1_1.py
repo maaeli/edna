@@ -170,7 +170,7 @@ class EDPluginControlSaxsAnalysisv1_1(EDPluginControl):
                 try:
                     kratkyVcfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-KratkyVc" + ext)
                     kratkyVcplot = kratkyVcPlot(self.scatterFile, self.autoRg.i0.value, self.rti.vc.value,
-                                                       filename=kratkyVcfile, format=ext[1:])
+                                                    filename=kratkyVcfile, format=ext[1:])
                     kratkyVcplot.clf()
                      if plt:
                         plt.close(kratkyVcplot)
@@ -232,7 +232,7 @@ Volume  =    %12.2f""" % (self.xVolume.value)
         self.xsDataResult.autoRg = self.autoRg
         self.xsDataResult.gnom = self.gnom
         self.xsDataResult.volume = self.xVolume
-        self.xsDataResult.volume = self.rti
+        self.xsDataResult.rti = self.rti
         self.xsDataResult.status = XSDataStatus(executiveSummary=XSDataString(strLog),
                                                 message=self.getXSDataMessage())
         self.setDataOutput(self.xsDataResult)
