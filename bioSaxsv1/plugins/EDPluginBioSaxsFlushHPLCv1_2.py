@@ -59,7 +59,7 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
     """
     strControlledPluginDatAver = "EDPluginExecDataverv1_0"
     strControlledPluginISPyB = "EDPluginBioSaxsISPyB_HPLCv1_0"
-    __strControlledPluginSaxsAnalysis = "EDPluginControlSaxsAnalysisv1_0"
+    __strControlledPluginSaxsAnalysis = "EDPluginControlSaxsAnalysisv1_1"
     __strControlledPluginSaxsModeling = "EDPluginBioSaxsToSASv1_1"
     __strControlledPluginISPyBAnalysis = "EDPluginHPLCPrimayDataISPyBv1_0"
 

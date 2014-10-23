@@ -67,7 +67,7 @@ class EDPluginControlSaxsAnalysisv1_1(EDPluginControl):
         self.gnomFile = None
         self.autoRg = None
         self.gnom = None
-        self.xVolume = None
+        self.Volume = None
         self.rti = None
         self.xsDataResult = XSDataResultSaxsAnalysis()
 
@@ -168,13 +168,13 @@ class EDPluginControlSaxsAnalysisv1_1(EDPluginControl):
                     self.ERROR("EDPluginControlSaxsAnalysisv1_1 in kratkyRgplot: %s" % error)
                 else:
                     self.xsDataResult.kratkyRgPlot = XSDataFile(XSDataString(kratkyRgfile))       
-            if self.autoRg.i0.value > 0 and self.rti.vc.value > 0:
+            if self.autoRg.i0.value > 0 :#and self.rti.vc.value > 0:
                 try:
                     kratkyVcfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-KratkyVc" + ext)
                     kratkyVcplot = kratkyVcPlot(self.scatterFile, self.autoRg.i0.value, self.rti.vc.value,
                                                     filename=kratkyVcfile, format=ext[1:])
                     kratkyVcplot.clf()
-                     if plt:
+                    if plt:
                         plt.close(kratkyVcplot)
                 except Exception as error:
                     self.ERROR("EDPluginControlSaxsAnalysisv1_1 in kratkyVcplot: %s" % error)
