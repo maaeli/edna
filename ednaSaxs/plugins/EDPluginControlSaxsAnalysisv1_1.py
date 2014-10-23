@@ -156,30 +156,32 @@ class EDPluginControlSaxsAnalysisv1_1(EDPluginControl):
                 self.ERROR("EDPluginControlSaxsAnalysisv1_1 in kratkyplot: %s" % error)
             else:
                 self.xsDataResult.kratkyPlot = XSDataFile(XSDataString(kratkyfile))
-            if self.autoRg.i0.value > 0 and self.autoRg.rg.value > 0:
-                try:
-                    kratkyRgfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-KratkyRg" + ext)
-                    kratkyRgplot = kratkyRgPlot(self.scatterFile, self.autoRg.i0.value, self.autoRg.rg.value,
-                                               filename=kratkyRgfile, format=ext[1:])
-                    kratkyRgplot.clf()
-                    if plt:
-                        plt.close(kratkyRgplot)
-                except Exception as error:
-                    self.ERROR("EDPluginControlSaxsAnalysisv1_1 in kratkyRgplot: %s" % error)
-                else:
-                    self.xsDataResult.kratkyRgPlot = XSDataFile(XSDataString(kratkyRgfile))       
-            if self.autoRg.i0.value > 0 :#and self.rti.vc.value > 0:
-                try:
-                    kratkyVcfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-KratkyVc" + ext)
-                    kratkyVcplot = kratkyVcPlot(self.scatterFile, self.autoRg.i0.value, self.rti.vc.value,
-                                                    filename=kratkyVcfile, format=ext[1:])
-                    kratkyVcplot.clf()
-                    if plt:
-                        plt.close(kratkyVcplot)
-                except Exception as error:
-                    self.ERROR("EDPluginControlSaxsAnalysisv1_1 in kratkyVcplot: %s" % error)
-                else:
-                    self.xsDataResult.kratkyVcPlot = XSDataFile(XSDataString(kratkyVcfile))
+            if self.autoRg is not None:    
+                if self.autoRg.i0.value > 0 and self.autoRg.rg.value > 0:
+                    try:
+                        kratkyRgfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-KratkyRg" + ext)
+                        kratkyRgplot = kratkyRgPlot(self.scatterFile, self.autoRg.i0.value, self.autoRg.rg.value,
+                                                   filename=kratkyRgfile, format=ext[1:])
+                        kratkyRgplot.clf()
+                        if plt:
+                            plt.close(kratkyRgplot)
+                    except Exception as error:
+                        self.ERROR("EDPluginControlSaxsAnalysisv1_1 in kratkyRgplot: %s" % error)
+                    else:
+                        self.xsDataResult.kratkyRgPlot = XSDataFile(XSDataString(kratkyRgfile))       
+            if self.autoRg is not None and self.rti is not None:            
+                if self.autoRg.i0.value > 0 and self.rti.vc.value > 0:
+                    try:
+                        kratkyVcfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-KratkyVc" + ext)
+                        kratkyVcplot = kratkyVcPlot(self.scatterFile, self.autoRg.i0.value, self.rti.vc.value,
+                                                        filename=kratkyVcfile, format=ext[1:])
+                        kratkyVcplot.clf()
+                        if plt:
+                            plt.close(kratkyVcplot)
+                    except Exception as error:
+                        self.ERROR("EDPluginControlSaxsAnalysisv1_1 in kratkyVcplot: %s" % error)
+                    else:
+                        self.xsDataResult.kratkyVcPlot = XSDataFile(XSDataString(kratkyVcfile))
             try:
                 scatterplotfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-scattering" + ext)
                 scatterplot = scatterPlot(self.scatterFile, unit="nm", gnomfile=self.gnomFile,
@@ -233,7 +235,7 @@ Volume  =    %12.2f""" % (self.xVolume.value)
 
         self.xsDataResult.autoRg = self.autoRg
         self.xsDataResult.gnom = self.gnom
-        self.xsDataResult.volume = self.xVolume
+        self.xsDataResult.volume = self.Volume
         self.xsDataResult.rti = self.rti
         self.xsDataResult.status = XSDataStatus(executiveSummary=XSDataString(strLog),
                                                 message=self.getXSDataMessage())

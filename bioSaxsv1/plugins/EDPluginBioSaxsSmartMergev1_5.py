@@ -544,8 +544,10 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
         self.xsGuinierPlot = _edPlugin.dataOutput.guinierPlot
         self.xsKratkyPlot = _edPlugin.dataOutput.kratkyPlot
         self.xsDensityPlot = _edPlugin.dataOutput.densityPlot
-        self.xsKratkyRgPlot = _edPlugin.dataOutput.kratkyRgPlot
-        self.xsKratkyVcPlot = _edPlugin.dataOutput.kratkyVcPlot
+        if hasattr(_edPlugin.dataOutput, 'kratkyRgPlot'):
+            self.xsKratkyRgPlot = _edPlugin.dataOutput.kratkyRgPlot
+        if hasattr(_edPlugin.dataOutput, 'kratkyVcPlot'):
+            self.xsKratkyVcPlot = _edPlugin.dataOutput.kratkyVcPlot
         self.addExecutiveSummaryLine(_edPlugin.dataOutput.status.executiveSummary.value)
 
     def doFailureSaxsAnalysis(self, _edPlugin=None):
