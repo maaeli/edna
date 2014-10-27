@@ -16,6 +16,7 @@
         "execProcessScriptExecutable": "/usr/bin/damaver", 
         "execProcessScriptShell": "/bin/bash", 
         "timeOut": 600
-    }
+    },
+    "EDPluginExecDataverv2_0": {}
 
 }

@@ -26,26 +26,31 @@
 __author__ = "Jérôme Kieffer"
 __contact__ = "Jérôme.Kieffer@esrf.fr"
 __license__ = "GPLv3+"
-__copyright__ = "2011 ESRF, Grenoble"
+__copyright__ = "2014 ESRF, Grenoble"
 __date__ = "2014-10-27"
 __status__ = "Production"
 
 import os
-from EDPluginExecProcessScript import EDPluginExecProcessScript
+import shutil
+import numpy
+from EDPluginExec import EDPluginExec
 from EDFactoryPluginStatic import EDFactoryPluginStatic
 EDFactoryPluginStatic.loadModule("XSDataEdnaSaxs")
 from XSDataEdnaSaxs import XSDataInputDataver, XSDataResultDataver
 from XSDataCommon import XSDataString, XSDataFile
 
-class EDPluginExecDataverv1_0(EDPluginExecProcessScript):
+class EDPluginExecDataverv2_0(EDPluginExec):
     """
-    Execution plugin that does the (basic) data averaging , part from Atsas package
+    Execution plugin that does the (basic) data averaging
+    
+    new versiion: atsas free
     """
+    epsilon = 1e-6
 
     def __init__(self):
         """
         """
-        EDPluginExecProcessScript.__init__(self)
+        EDPluginExec.__init__(self)
         self.setXSDataInputClass(XSDataInputDataver)
         self.strOutFile = None
         self.lstInFiles = []
@@ -54,30 +59,44 @@ class EDPluginExecDataverv1_0(EDPluginExecProcessScript):
         """
         Checks the mandatory parameters.
         """
-        self.DEBUG("EDPluginExecDataverv1_0.checkParameters")
+        self.DEBUG("EDPluginExecDataverv2_0.checkParameters")
         self.checkMandatoryParameters(self.dataInput, "Data Input is None")
         self.checkMandatoryParameters(self.dataInput.inputCurve, "No input curve filenames provided")
 
     def preProcess(self, _edObject=None):
-        EDPluginExecProcessScript.preProcess(self)
-        self.DEBUG("EDPluginExecDataverv1_0.preProcess")
+        EDPluginExec.preProcess(self)
+        self.DEBUG("EDPluginExecDataverv2_0.preProcess")
         self.lstInFiles = [i.path.value for i in  self.dataInput.inputCurve]
         if self.dataInput.outputCurve is not None:
             self.strOutFile = self.dataInput.outputCurve.path.value
-        self.generateCommandLine()
+
+    def process(self, _edObject=None):
+        """
+        Numpy implementation of dataver
+        """
+        EDPluginExec.process(self)
+        l = len(self.lstInFiles)
+        if l==1:
+            shutil.copyfile(self.lstInFiles[0], self.strOutFile)
+            return
+        q=I=s2=None
+        for fn in self.lstInFiles:
+            if q is None:
+                q, I, s = numpy.loadtxt(fn, unpack=True)
+                s2 = s*s 
+            else:
+                q1, I1, s1 = numpy.loadtxt(fn, unpack=True)
+                assert abs(q1-q).max() < self.epsilon 
+                I += I1
+                s2+=s1*s1
+        m=numpy.vstack((q,I/l,numpy.sqrt(s2)/l))
+        numpy.savetxt(self.strOutFile, m.T)
 
     def postProcess(self, _edObject=None):
-        EDPluginExecProcessScript.postProcess(self)
-        self.DEBUG("EDPluginExecDataverv1_0.postProcess")
+        EDPluginExec.postProcess(self)
+        self.DEBUG("EDPluginExecDataverv2_0.postProcess")
         # Create some output data
         xsDataResult = XSDataResultDataver()
         xsDataResult.outputCurve = XSDataFile(XSDataString(self.strOutFile))
         self.setDataOutput(xsDataResult)
 
-    def generateCommandLine(self):
-        self.DEBUG("EDPluginExecDataverv1_0.generateCommandLine")
-        if self.strOutFile is not None:
-            self.setScriptCommandline("--output=%s " % self.strOutFile + " ".join(self.lstInFiles))
-        else:
-            self.setScriptCommandline(" ".join(self.lstInFiles))
-            self.strOutFile = os.path.join(self.getWorkingDirectory(), self.getScriptLogFileName())
