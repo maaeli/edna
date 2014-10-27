@@ -48,7 +48,7 @@ class EDTestSuiteExecuteAtsas(EDTestSuite):
                  'EDTestCasePluginExecuteExecGnomv0_2',
                  'EDTestCasePluginExecuteExecGnomv0_2_file',
                  'EDTestCasePluginExecuteExecGnomv0_2_list',
-                 'EDTestCasePluginExecuteExecDamaverv0_1',
+                 'EDTestCasePluginExecuteExecDamaverv0_3',
                  'EDTestCasePluginExecuteExecDamfiltv0_1',
                  'EDTestCasePluginExecuteExecDammifv0_1',
                  'EDTestCasePluginExecuteExecDammifv0_2',

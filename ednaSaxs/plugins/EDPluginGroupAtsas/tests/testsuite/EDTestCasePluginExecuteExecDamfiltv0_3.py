@@ -33,15 +33,15 @@ from XSDataCommon                    import XSDataString
 from parse_atsas import get_ATSAS_version
 
 
-class EDTestCasePluginExecuteExecDamfiltv0_1(EDTestCasePluginExecute):
+class EDTestCasePluginExecuteExecDamfiltv0_3(EDTestCasePluginExecute):
     """
-    Those are all execution tests for the EDNA Exec plugin Damfiltv0_1
+    Those are all execution tests for the EDNA Exec plugin Damfiltv0_3
     """
 
     def __init__(self, _strTestName=None):
         """
         """
-        EDTestCasePluginExecute.__init__(self, "EDPluginExecDamfiltv0_1")
+        EDTestCasePluginExecute.__init__(self, "EDPluginExecDamfiltv0_3")
 #        self.setConfigurationFile(os.path.join(self.getPluginTestsDataHome(),
 #                                               "XSConfiguration_Damfilt.xml"))
         self.setConfigurationFile(self.getRefConfigFile())
@@ -73,5 +73,5 @@ class EDTestCasePluginExecuteExecDamfiltv0_1(EDTestCasePluginExecute):
 
 if __name__ == '__main__':
 
-    testDamfiltv0_1instance = EDTestCasePluginExecuteExecDamfiltv0_1("EDTestCasePluginExecuteExecDamfiltv0_1")
-    testDamfiltv0_1instance.execute()
+    testDamfiltv0_3instance = EDTestCasePluginExecuteExecDamfiltv0_3("EDTestCasePluginExecuteExecDamfiltv0_3")
+    testDamfiltv0_3instance.execute()

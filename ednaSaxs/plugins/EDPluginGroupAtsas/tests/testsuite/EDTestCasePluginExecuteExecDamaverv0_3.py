@@ -22,44 +22,45 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-__author__ = "irakli & Jerome Kieffer"
+__author__ = "irakli"
 __license__ = "GPLv3+"
-__copyright__ = "2010 DLS, 2014 ESRF"
+__copyright__ = "DLS"
 
 import os
 
 from EDTestCasePluginExecute             import EDTestCasePluginExecute
-from XSDataCommon                    import XSDataString
+
+from XSDataCommon import XSDataString
 from parse_atsas import get_ATSAS_version
 
 
-class EDTestCasePluginExecuteExecDamfiltv0_1(EDTestCasePluginExecute):
+class EDTestCasePluginExecuteExecDamaverv0_3(EDTestCasePluginExecute):
     """
-    Those are all execution tests for the EDNA Exec plugin Damfiltv0_1
+    Those are all execution tests for the EDNA Exec plugin Damaverv0_3
     """
 
     def __init__(self, _strTestName=None):
         """
         """
-        EDTestCasePluginExecute.__init__(self, "EDPluginExecDamfiltv0_1")
+        EDTestCasePluginExecute.__init__(self, "EDPluginExecDamaverv0_3")
 #        self.setConfigurationFile(os.path.join(self.getPluginTestsDataHome(),
-#                                               "XSConfiguration_Damfilt.xml"))
-        self.setConfigurationFile(self.getRefConfigFile())
+#                                               "XSConfiguration_Damaver.xml"))
         self.setDataInputFile(os.path.join(self.getPluginTestsDataHome(), \
-                                           "XSDataInputDamfilt_reference.xml"))
-        self.setReferenceDataOutputFile(os.path.join(self.getPluginTestsDataHome(), \
-                                                     "XSDataResultDamfilt_reference.xml"))
+                                           "XSDataInputDamaver_reference.xml"))
+#         if get_ATSAS_version()<2962:
+        ref = "XSDataResultDamaver_reference.xml"
+#         else:
+#             ref = "XSDataResultDamaver_reference.xml.2962"           
+        self.setReferenceDataOutputFile(os.path.join(self.getPluginTestsDataHome(), ref))
 
 
     def testExecute(self):
         """
         """
-        inputPdbPath = XSDataString()
-
         # Add path to the input data file
-        inputPdbName = self.getPlugin().getDataInput().getInputPdbFile().getPath().getValue()
-        inputPdbPath.setValue(os.path.join(self.getPluginTestsDataHome(), inputPdbName))
-        self.getPlugin().getDataInput().getInputPdbFile().setPath(inputPdbPath)
+        for pdbInputFile in self.getPlugin().getDataInput().getPdbInputFiles():
+            dataInputName = pdbInputFile.getPath().getValue()
+            pdbInputFile.setPath(XSDataString(os.path.join(self.getPluginTestsDataHome(), dataInputName)))
 
         self.run()
 
@@ -73,5 +74,5 @@ class EDTestCasePluginExecuteExecDamfiltv0_1(EDTestCasePluginExecute):
 
 if __name__ == '__main__':
 
-    testDamfiltv0_1instance = EDTestCasePluginExecuteExecDamfiltv0_1("EDTestCasePluginExecuteExecDamfiltv0_1")
-    testDamfiltv0_1instance.execute()
+    testDamaverv0_3instance = EDTestCasePluginExecuteExecDamaverv0_3("EDTestCasePluginExecuteExecDamaverv0_3")
+    testDamaverv0_3instance.execute()
