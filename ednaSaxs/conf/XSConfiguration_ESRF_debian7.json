@@ -4,8 +4,14 @@
         "execProcessScriptExecutable": "/usr/bin/damfilt", 
         "execProcessScriptShell": "/bin/bash", 
         "timeOut": 60
-    },
-        "EDPluginExecDamaverv0_3": {
+    },    
+    "EDPluginExecDamstartv0_3": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/usr/bin/damstart", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 60
+    }, 
+    "EDPluginExecDamaverv0_3": {
         "execProcessScriptVersionString": "", 
         "execProcessScriptExecutable": "/usr/bin/damaver", 
         "execProcessScriptShell": "/bin/bash", 
