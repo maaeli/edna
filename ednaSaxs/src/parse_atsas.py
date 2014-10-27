@@ -30,11 +30,15 @@ from __future__ import with_statement
 __authors__ = ["Jérôme Kieffer"]
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
-__date__ = "20130415"
+__date__ = "20141027"
 __status__ = "Development"
 __version__ = "0.1"
 __doc__ = "parse some of the atsas files"
-import os, sys, time, logging
+import os
+import sys
+import time
+import logging
+import subprocess
 # from StringIO import  StringIO
 
 PDB_Keywords = ['HEADER', 'TITLE', 'COMPND', 'SOURCE',
@@ -133,3 +137,26 @@ def parsePDB(pdbFile=None, outPDB=None, purge=False):
     if purge and pdbFile != outPDB:
         os.unlink(pdbFile)
     return res
+
+def get_ATSAS_version():
+    """
+    @return: the version number of ATSAS (SVN version number) 
+    """
+    plugin = "EDPluginExecAutoRgv1_0"
+    import EDConfigurationStatic
+    res = EDConfigurationStatic.EDConfigurationStatic.loadPluginConfig(plugin)
+    if res and 'execProcessScriptExecutable' in res:
+        exe = res['execProcessScriptExecutable']
+
+    subp = subprocess.Popen([exe,"--version"],stdout=subprocess.PIPE)
+    res = [i.strip() for i in subp.stdout.read().split("\n")]
+    rev = 0
+    if len(res)>=1:
+        pos = res[0].find("(r")       
+        if pos>=0:
+            tmp = res[0][pos+2:]
+            try:
+                rev = int(tmp[:tmp.index(")")]) 
+            except:
+                pass
+    return rev
