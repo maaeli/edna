@@ -122,6 +122,8 @@ def parsePDB(pdbFile=None, outPDB=None, purge=False):
                     res["Rg"] = float(line.split(":")[-1])
                 elif "Maximum phase diameter" in line:
                     res["Dmax"] = float(line.split(":")[-1])
+                elif "NSD" in line:
+                    res["NSD"] = float(line.split(":")[-1])
             elif "Excluded volume" in line:
                 res["volume"] = float(line.split(":")[-1])
             elif "Radius of the coordination sphere" in line:
@@ -134,6 +136,7 @@ def parsePDB(pdbFile=None, outPDB=None, purge=False):
                 res["Dmax"] = float(line.split(":")[-1])
             elif "Total excluded DAM volume" in line:
                 res["volume"] = float(line.split(":")[-1])
+    print(res)
     if purge and pdbFile != outPDB:
         os.unlink(pdbFile)
     return res

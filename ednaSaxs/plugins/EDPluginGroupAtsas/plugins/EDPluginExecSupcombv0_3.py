@@ -34,13 +34,14 @@ from math import pi, cos, sin
 
 from EDPluginExecProcessScript import EDPluginExecProcessScript
 from XSDataEdnaSaxs import XSDataInputSupcomb, XSDataResultSupcomb, XSDataSaxsModel
-from XSDataCommon import XSDataString, XSDataFile, XSDataDouble, XSDataRotation, XSDataVectorDouble, XSDataMessage, XSDataStatus
-from EDFactoryPlugin import edFactoryPlugin
-import parse_atsas
+from XSDataCommon import XSDataString, XSDataFile, XSDataDouble, XSDataRotation, XSDataVectorDouble, XSDataStatus
+import parse_atsas 
 
 class EDPluginExecSupcombv0_3(EDPluginExecProcessScript):
     """
     Execution plugin for ab-initio model determination using Supcomb
+    
+    Tested with SupComb 23 (rev>=2962) 
 
     To superimpose two bodies in a batch mode type 
     supcomb13 <file1.pdb> <file2.pdb> [<mode>] [<Enant>]
@@ -189,11 +190,14 @@ class EDPluginExecSupcombv0_3(EDPluginExecProcessScript):
         self.setScriptCommandline(commandLine)
 
 
-    def returnRotation(self, logLines):
+    def returnRotation(self, logLines, skip_last=0):
+        """
+        @param skip_last: set it to 1 when dealing with a transformation matrix 4x4
+        """
 
-        _psi = pi * float(logLines[0].split()[-1]) / 180.0
-        _theta = pi * float(logLines[1].split()[-1]) / 180.0
-        _phi = pi * float(logLines[2].split()[-1]) / 180.0
+        _psi = pi * float(logLines[0].split()[-1-skip_last]) / 180.0
+        _theta = pi * float(logLines[1].split()[-1-skip_last]) / 180.0
+        _phi = pi * float(logLines[2].split()[-1-skip_last]) / 180.0
 
         q = [cos(_phi / 2) * cos(_theta / 2) * cos(_psi / 2) + sin(_phi / 2) * sin(_theta / 2) * sin(_psi / 2), \
              sin(_phi / 2) * cos(_theta / 2) * cos(_psi / 2) - cos(_phi / 2) * sin(_theta / 2) * sin(_psi / 2), \
@@ -216,15 +220,26 @@ class EDPluginExecSupcombv0_3(EDPluginExecProcessScript):
 
         logFile = self.readProcessLogFile()
         logLines = logFile.splitlines()
-        xsRot = self.returnRotation(logLines[-3:])
-        xsTrns = self.returnTranslation(logLines[-6:-3])
-        xsNSD = XSDataDouble(float(logLines[-8].split()[-1]))
+        line = -1
+        for l, ln in enumerate( logLines):
+            if "Transformation matrix" in ln:
+                line = l
+        if line>=0:
+            xsRot = self.returnRotation(logLines[line+1:line+4], 1)
+            xsTrns = self.returnTranslation(logLines[line+1:line+4])
+            xsNSD = None
+        else:
+            xsRot = self.returnRotation(logLines[-3:])
+            xsTrns = self.returnTranslation(logLines[-6:-3])
+            xsNSD = XSDataDouble(float(logLines[-8].split()[-1]))
         pdb = os.path.join(self.getWorkingDirectory(), self.__strOutputFileName)
                            
         try:
             res = parse_atsas.parsePDB(pdb, pdb)
         except Exception as error:
             self.ERROR("in parsePDB: %s" % error)
+        if "NSD" in res:
+            xsNSD = XSDataDouble(res["NSD"])
         model = XSDataSaxsModel(name=XSDataString(self.name),
                                 logFile=XSDataFile(XSDataString(os.path.join(self.getWorkingDirectory(), self.getScriptLogFileName()))))
                                 
