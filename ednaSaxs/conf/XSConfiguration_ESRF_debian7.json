@@ -27,5 +27,6 @@
         "execProcessScriptExecutable": "/usr/bin/supcomb", 
         "execProcessScriptShell": "/bin/bash", 
         "timeOut": 60
-    }
+    },
+   "EDPluginExecDatOpv2_0": {}   
 }
