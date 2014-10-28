@@ -136,7 +136,7 @@ def parsePDB(pdbFile=None, outPDB=None, purge=False):
                 res["Dmax"] = float(line.split(":")[-1])
             elif "Total excluded DAM volume" in line:
                 res["volume"] = float(line.split(":")[-1])
-    print(res)
+#     print(res)
     if purge and pdbFile != outPDB:
         os.unlink(pdbFile)
     return res

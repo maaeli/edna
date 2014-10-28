@@ -74,8 +74,8 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
     # dictAve = {} #key=?; value=path to average file
     lastBuffer = None
     lastSample = None
-    __strControlledPluginDataver = "EDPluginExecDataverv1_0"
-    __strControlledPluginDatcmp = "EDPluginExecDatcmpv1_0"
+    __strControlledPluginDataver = "EDPluginExecDataverv2_0"
+    __strControlledPluginDatcmp = "EDPluginExecDatcmpv2_0"
     __strControlledPluginWaitFile = "EDPluginWaitMultiFile"
     __strControlledPluginAutoSub = "EDPluginAutoSubv1_0"
     __strControlledPluginSaxsAnalysis = "EDPluginControlSaxsAnalysisv1_0"

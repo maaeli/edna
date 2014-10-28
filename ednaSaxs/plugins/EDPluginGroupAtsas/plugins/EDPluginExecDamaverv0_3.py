@@ -154,7 +154,7 @@ class EDPluginExecDamaverv0_3(EDPluginExecProcessScript):
             #damsupLog = open(os.path.join(self.getWorkingDirectory(), "damsup.log"), 'w')
             #damsupLog.write('\n'.join(dataFileNames))
             #damsupLog.close()
-            commandScriptLine += dataFileNames
+            commandScriptLine = dataFileNames
         self.setScriptCommandline(' '.join(commandScriptLine))
 
     def generateExecutiveSummary(self, __edPlugin=None):

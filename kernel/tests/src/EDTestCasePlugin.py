@@ -51,7 +51,7 @@ from EDFactoryPlugin       import EDFactoryPlugin
 
 iMAX_DOWNLOAD_TIME = 60
 
-def testExecute(self, *arg, **kwarg):
+def NoOp(self, *arg, **kwarg):
     """
     Dummy test executor for deprecated plugins 
     """
@@ -158,7 +158,9 @@ class EDTestCasePlugin(EDTestCase):
                 if module.__status__.lower().strip() == "deprecated":
                     self._deactivated = True
                     EDVerbose.WARNING("Plugin %s is deprecated, test skipped"%self.getPluginName())
-                    self.__class__.testExecute = testExecute                            
+                    #let's monky-patch the test and deactivate it
+                    self.__class__.testExecute = NoOp          
+                    self.__class__.postProcess = NoOp
         return edPlugin
 
 
