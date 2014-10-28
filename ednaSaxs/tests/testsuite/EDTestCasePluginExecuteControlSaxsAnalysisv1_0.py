@@ -35,6 +35,7 @@ from EDAssert                            import EDAssert
 from EDTestCasePluginExecute             import EDTestCasePluginExecute
 from XSDataEdnaSaxs import XSDataInputSaxsAnalysis as XSDataInput
 from XSDataEdnaSaxs import XSDataResultSaxsAnalysis as XSDataResult
+from parse_atsas import get_ATSAS_version
 
 class EDTestCasePluginExecuteControlSaxsAnalysisv1_0(EDTestCasePluginExecute):
 
@@ -45,8 +46,12 @@ class EDTestCasePluginExecuteControlSaxsAnalysisv1_0(EDTestCasePluginExecute):
 #                                               "XSConfiguration_SaxsAnalysis.xml"))
         self.setDataInputFile(os.path.join(self.getPluginTestsDataHome(), \
                                            "XSDataInputSaxsAnalysisv1_0_reference.xml"))
-        self.setReferenceDataOutputFile(os.path.join(self.getPluginTestsDataHome(), \
-                                                     "XSDataResultSaxsAnalysisv1_0_reference.xml"))
+        version = get_ATSAS_version()
+        if version<3709:
+            res =  "XSDataResultSaxsAnalysisv1_0_reference.xml"
+        else:
+            res = "XSDataResultSaxsAnalysisv1_0_reference.xml.3709"
+        self.setReferenceDataOutputFile(os.path.join(self.getPluginTestsDataHome(), res ))
 
     def preProcess(self):
         """

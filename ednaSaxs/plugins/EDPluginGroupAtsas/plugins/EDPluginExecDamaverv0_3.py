@@ -150,10 +150,11 @@ class EDPluginExecDamaverv0_3(EDPluginExecProcessScript):
                 commandScriptLine.append("--symmetry=%s"%self.__strSymmetry)
             commandScriptLine+=dataFileNames
         else:
-            damsupLog = open(os.path.join(self.getWorkingDirectory(), "damsup.log"), 'w')
-            damsupLog.write('\n'.join(dataFileNames))
-            damsupLog.close()
-            commandScriptLine = ['damsup.log']
+            #no input specification files in damaver revison >= r 2912 
+            #damsupLog = open(os.path.join(self.getWorkingDirectory(), "damsup.log"), 'w')
+            #damsupLog.write('\n'.join(dataFileNames))
+            #damsupLog.close()
+            commandScriptLine += dataFileNames
         self.setScriptCommandline(' '.join(commandScriptLine))
 
     def generateExecutiveSummary(self, __edPlugin=None):
