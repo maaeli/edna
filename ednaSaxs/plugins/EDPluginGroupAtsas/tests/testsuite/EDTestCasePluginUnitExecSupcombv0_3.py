@@ -1,13 +1,12 @@
-# coding: utf-8
 #
-#    Project: ExecPlugins/GroupAtsas
+#    Project: PROJECT
 #             http://www.edna-site.org
 #
 #    File: "$Id$"
 #
-#    Copyright (C) 2011, ESRF, Grenoble
-#
-#    Principal author:       Jérôme Kieffer
+#    Copyright (C) DLS
+
+#    Principal author:       irakli
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,31 +22,33 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-__author__ = "Jérôme Kieffer, Martha Brennich"
+__author__ = "irakli"
 __license__ = "GPLv3+"
-__copyright__ = "2014, ESRF, Grenoble"
+__copyright__ = "DLS"
 
-from EDVerbose import EDVerbose
 from EDTestCasePluginUnit import EDTestCasePluginUnit
 
-from XSDataEdnaSaxs import XSDataInputDatcmp, XSDataFile
+from XSDataEdnaSaxs import XSDataInputSupcomb
+from XSDataCommon import XSDataFile
 
-class EDTestCasePluginUnitExecDatcmpv1_0(EDTestCasePluginUnit):
+class EDTestCasePluginUnitExecSupcombv0_3(EDTestCasePluginUnit):
     """
-    Those are all units tests for the EDNA Exec plugin Datcmpv1_0
+    Those are all units tests for the EDNA Exec plugin Supcombv0_3
     """
 
     def __init__(self, _strTestName=None):
         """
         """
-        EDTestCasePluginUnit.__init__(self, "EDPluginExecDatcmpv1_0")
+        EDTestCasePluginUnit.__init__(self, "EDPluginExecSupcombv0_3")
 
 
     def testCheckParameters(self):
-        xsDataInput = XSDataInputDatcmp(inputCurve=[XSDataFile(), XSDataFile()])
-        edPluginExecDatcmp = self.createPlugin()
-        edPluginExecDatcmp.setDataInput(xsDataInput)
-        edPluginExecDatcmp.checkParameters()
+        xsDataInput = XSDataInputSupcomb()
+        xsDataInput.templateFile = XSDataFile()
+        xsDataInput.superimposeFile = XSDataFile()
+        edPluginExecSupcomb = self.createPlugin()
+        edPluginExecSupcomb.setDataInput(xsDataInput)
+        edPluginExecSupcomb.checkParameters()
 
 
 
@@ -58,5 +59,5 @@ class EDTestCasePluginUnitExecDatcmpv1_0(EDTestCasePluginUnit):
 
 if __name__ == '__main__':
 
-    edTestCasePluginUnitExecDatcmpv1_0 = EDTestCasePluginUnitExecDatcmpv1_0("EDTestCasePluginUnitExecDatcmpv1_0")
-    edTestCasePluginUnitExecDatcmpv1_0.execute()
+    edTestCasePluginUnitExecSupcombv0_3 = EDTestCasePluginUnitExecSupcombv0_3("EDTestCasePluginUnitExecSupcombv0_3")
+    edTestCasePluginUnitExecSupcombv0_3.execute()

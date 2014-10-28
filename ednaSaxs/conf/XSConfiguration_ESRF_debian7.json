@@ -17,6 +17,15 @@
         "execProcessScriptShell": "/bin/bash", 
         "timeOut": 600
     },
-    "EDPluginExecDataverv2_0": {}
-
+    "EDPluginExecDataverv2_0": {},
+    "EDPluginExecDatcmpv2_0": {
+        "execProcessScriptExecutable": "/usr/bin/datcmp", 
+        "execProcessScriptShell": "python"
+    },
+  "EDPluginExecSupcombv0_3": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/usr/bin/supcomb", 
+        "execProcessScriptShell": "/bin/bash", 
+        "timeOut": 60
+    }
 }

@@ -23,24 +23,24 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-__author__ = "Jérôme Kieffer, Martha Brennich"
+__author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
-__copyright__ = "2014, ESRF, Grenoble"
+__copyright__ = "2011, ESRF, Grenoble"
 
 from EDVerbose import EDVerbose
 from EDTestCasePluginUnit import EDTestCasePluginUnit
 
 from XSDataEdnaSaxs import XSDataInputDatcmp, XSDataFile
 
-class EDTestCasePluginUnitExecDatcmpv1_0(EDTestCasePluginUnit):
+class EDTestCasePluginUnitExecDatcmpv2_0(EDTestCasePluginUnit):
     """
-    Those are all units tests for the EDNA Exec plugin Datcmpv1_0
+    Those are all units tests for the EDNA Exec plugin Datcmpv2_0
     """
 
     def __init__(self, _strTestName=None):
         """
         """
-        EDTestCasePluginUnit.__init__(self, "EDPluginExecDatcmpv1_0")
+        EDTestCasePluginUnit.__init__(self, "EDPluginExecDatcmpv2_0")
 
 
     def testCheckParameters(self):
@@ -58,5 +58,5 @@ class EDTestCasePluginUnitExecDatcmpv1_0(EDTestCasePluginUnit):
 
 if __name__ == '__main__':
 
-    edTestCasePluginUnitExecDatcmpv1_0 = EDTestCasePluginUnitExecDatcmpv1_0("EDTestCasePluginUnitExecDatcmpv1_0")
-    edTestCasePluginUnitExecDatcmpv1_0.execute()
+    edTestCasePluginUnitExecDatcmpv2_0 = EDTestCasePluginUnitExecDatcmpv2_0("EDTestCasePluginUnitExecDatcmpv2_0")
+    edTestCasePluginUnitExecDatcmpv2_0.execute()
