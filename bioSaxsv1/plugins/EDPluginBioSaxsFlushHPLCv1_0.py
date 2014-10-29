@@ -28,7 +28,7 @@ __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "2012 ESRF"
 __date__ = "20120927"
-__status__ = "development"
+__status__ = "deprecated"
 
 import os, time
 from EDPluginControl import EDPluginControl

@@ -71,9 +71,9 @@ class EDPluginAutoSubv1_0(EDPluginControl):
         """
         EDPluginControl.__init__(self)
         self.setXSDataInputClass(XSDataInputAutoSub)
-        self.__strPluginDatop = "EDPluginExecDatopv1_0"
-        self.__strPluginDatcmp = "EDPluginExecDatcmpv1_0"
-        self.__strPluginDataver = "EDPluginExecDataverv1_0"
+        self.__strPluginDatop = "EDPluginExecDatopv2_0"
+        self.__strPluginDatcmp = "EDPluginExecDatcmpv2_0"
+        self.__strPluginDataver = "EDPluginExecDataverv2_0"
         self.__strPluginAutoRg = "EDPluginExecAutoRgv1_0"
         self.__edPluginDatcmp = None
         self.__edPluginDatop = None

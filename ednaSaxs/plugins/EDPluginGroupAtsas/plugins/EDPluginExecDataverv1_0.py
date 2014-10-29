@@ -27,8 +27,8 @@ __author__ = "Jérôme Kieffer"
 __contact__ = "Jérôme.Kieffer@esrf.fr"
 __license__ = "GPLv3+"
 __copyright__ = "2011 ESRF, Grenoble"
-__date__ = "2011-09-26"
-__status__ = "Production"
+__date__ = "2014-10-27"
+__status__ = "deprecated"
 
 import os
 from EDPluginExecProcessScript import EDPluginExecProcessScript

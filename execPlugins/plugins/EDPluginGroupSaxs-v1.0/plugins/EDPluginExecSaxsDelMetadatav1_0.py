@@ -25,6 +25,7 @@
 __author__ = "Jerome Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
+__status__ = "deprecated"
 
 import os
 from EDVerbose                  import EDVerbose

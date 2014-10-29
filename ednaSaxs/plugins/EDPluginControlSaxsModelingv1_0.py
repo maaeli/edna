@@ -57,10 +57,10 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
     mode = "fast"        #
     # constants:  plugin names
     strPluginExecDammif = "EDPluginExecDammifv0_2"
-    strPluginExecSupcomb = "EDPluginExecSupcombv0_2"
-    strPluginExecDamaver = "EDPluginExecDamaverv0_2"
-    strPluginExecDamfilt = "EDPluginExecDamfiltv0_2"
-    strPluginExecDamstart = "EDPluginExecDamstartv0_2"
+    strPluginExecSupcomb = "EDPluginExecSupcombv0_3"
+    strPluginExecDamaver = "EDPluginExecDamaverv0_3"
+    strPluginExecDamfilt = "EDPluginExecDamfiltv0_3"
+    strPluginExecDamstart = "EDPluginExecDamstartv0_3"
     strPluginExecDammin = "EDPluginExecDamminv0_2"
     Rg_min = 0.5  # nm
     def __init__(self):

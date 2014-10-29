@@ -32,6 +32,7 @@ calls azimuthal integration program of the suite
 __author__ = "Jerome Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "2008-2009 - ESRF"
+__status__ = "deprecated"
 
 import os
 from EDVerbose import EDVerbose

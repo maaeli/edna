@@ -51,6 +51,11 @@ from EDFactoryPlugin       import EDFactoryPlugin
 
 iMAX_DOWNLOAD_TIME = 60
 
+def NoOp(self, *arg, **kwarg):
+    """
+    Dummy test executor for deprecated plugins 
+    """
+    pass
 
 class EDTestCasePlugin(EDTestCase):
     """
@@ -70,6 +75,7 @@ class EDTestCasePlugin(EDTestCase):
         self._listRequiredConfigurationPluginNames = []
         self._strConfigurationFile = None
         self._oldConfig = None
+        self._deactivated = False
 
     def preProcess(self):
         # Check if the plugin to be tested requires configuration
@@ -145,6 +151,16 @@ class EDTestCasePlugin(EDTestCase):
         if edPlugin is None:
             if exceptionObject is None:
                 EDVerbose.error("EDTestCasePlugin.createPlugin: Could not create plugin: " + self.getPluginName())
+        else:
+            mod_name = edPlugin.__class__.__module__
+            module = sys.modules[mod_name]
+            if "__status__" in  dir(module):
+                if module.__status__.lower().strip() == "deprecated":
+                    self._deactivated = True
+                    EDVerbose.WARNING("Plugin %s is deprecated, test skipped"%self.getPluginName())
+                    #let's monky-patch the test and deactivate it
+                    self.__class__.testExecute = NoOp          
+                    self.__class__.postProcess = NoOp
         return edPlugin
 
 

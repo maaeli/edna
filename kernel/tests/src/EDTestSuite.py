@@ -135,7 +135,12 @@ class EDTestSuite(EDTest):
         EDVerbose.unitTest("###################################################################")
         self.setTimeInit()
         for edTestCase in self.__listTestCase:
+            if edTestCase._deactivated:
+                continue
             edTestCase.execute()
+            if edTestCase._deactivated:
+                continue
+
             if edTestCase.isExecuted():
                 self.__iNumberTestMethodSuccess += edTestCase.getNumberTestMethodSuccess()
                 if edTestCase.getNumberTestMethodFailure() == 0:

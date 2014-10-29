@@ -28,7 +28,7 @@ __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
 __date__ = "20111014"
-__status__ = "production"
+__status__ = "deprecated"
 
 import os, sys
 from EDVerbose              import EDVerbose
