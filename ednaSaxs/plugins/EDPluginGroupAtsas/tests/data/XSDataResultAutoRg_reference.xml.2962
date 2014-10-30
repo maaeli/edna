@@ -3,7 +3,7 @@
     <autoRgOut>
         <filename>
             <path>
-                <value>/users/opd29/workspace/edna/tests/data/images/autosubtracted.dat</value>
+                <value>${EDNA_TESTIMAGES}/autosubtracted.dat</value>
             </path>
         </filename>
         <rg>
