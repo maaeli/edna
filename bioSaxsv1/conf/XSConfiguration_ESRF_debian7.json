@@ -1,4 +1,4 @@
-{    "__extend__": [], 
+{    "__extend__": ["XSConfiguration_ESRF_debian6.json"], 
 
     "EDPluginBioSaxsToSASv1_0": {
         "fileSize": 1000, 
