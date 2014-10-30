@@ -4,6 +4,10 @@
         "fileSize": 1000, 
         "timeOut": 1000
     }, 
+    "EDPluginBioSaxsToSASv1_1": {
+        "fileSize": 1000, 
+        "timeOut": 1000
+    }, 
     "EDPluginExecBioSaxsReprocessv1_0": {}, 
     "EDPluginBioSaxsReprocessv1_0": {}, 
     "EDPluginBioSaxsNormalizev1_0": {}, 
