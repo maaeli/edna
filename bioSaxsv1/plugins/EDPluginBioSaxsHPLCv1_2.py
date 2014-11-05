@@ -24,7 +24,7 @@ from __future__ import with_statement
 
 __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
-__copyright__ = "2012 ESRF"
+__copyright__ = "2014 ESRF"
 __date__ = "20140903"
 __status__ = "development"
 
@@ -70,10 +70,10 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
     """
 
     strControlledPluginProcessOneFile = "EDPluginBioSaxsProcessOneFilev1_4"
-    strControlledPluginDatop = "EDPluginExecDatopv1_0"
+    strControlledPluginDatop = "EDPluginExecDatopv2_0"
     strControlledPluginAutoRg = "EDPluginExecAutoRgv1_0"
-    strControlledPluginDatCmp = "EDPluginExecDatcmpv1_0"
-    strControlledPluginDatAver = "EDPluginExecDataverv1_0"
+    strControlledPluginDatCmp = "EDPluginExecDatcmpv2_0"
+    strControlledPluginDatAver = "EDPluginExecDataverv2_0"
     dictHPLC = {}  # key=runId, value= HPLCrun instance
     _sem = Semaphore()
     SIMILARITY_THRESHOLD_SAMPLE_KEY = "similaritySample"
