@@ -46,7 +46,7 @@ import fabio
 import numpy
 import pyFAI
 
-if pyFAI.version <= "0.8":
+if [int(i) for i in pyFAI.version.split(".")[:2]] <= [0,8]:
     EDVerbose.ERROR("Too old version of pyFAI detected ... expect to fail !")
 
 
