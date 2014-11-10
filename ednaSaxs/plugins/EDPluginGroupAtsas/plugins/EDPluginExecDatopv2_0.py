@@ -67,7 +67,7 @@ class EDPluginExecDatopv2_0(EDPluginExec):
         EDPluginExec.preProcess(self)
         self.DEBUG("EDPluginExecDatopv2_0.preProcess")
         self.outputFile = self.dataInput.outputCurve.path.value
-        self.strOperation = self.dataInput.operation.value.replace("+", "ADD").replace("-", "SUB").replace("*", "MUL").replace("/", "DIV")
+        self.strOperation = self.dataInput.operation.value.upper().replace("+", "ADD").replace("-", "SUB").replace("*", "MUL").replace("/", "DIV")
         self.lstInFiles = [ i.path.value for i in  self.dataInput.inputCurve]
         if self.dataInput.constant is not None:
             self.const = self.dataInput.constant.value
