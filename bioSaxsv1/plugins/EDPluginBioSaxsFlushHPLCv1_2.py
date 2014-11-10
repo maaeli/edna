@@ -57,7 +57,7 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
     v1.2:
     * adapt for version HPLC plugin v1.2
     """
-    strControlledPluginDatAver = "EDPluginExecDataverv1_0"
+    strControlledPluginDatAver = "EDPluginExecDataverv2_0"
     strControlledPluginISPyB = "EDPluginBioSaxsISPyB_HPLCv1_0"
     __strControlledPluginSaxsAnalysis = "EDPluginControlSaxsAnalysisv1_0"
     __strControlledPluginSaxsModeling = "EDPluginBioSaxsToSASv1_1"
