@@ -69,6 +69,9 @@ class EDPluginExecDataverv2_0(EDPluginExec):
         self.lstInFiles = [i.path.value for i in  self.dataInput.inputCurve]
         if self.dataInput.outputCurve is not None:
             self.strOutFile = self.dataInput.outputCurve.path.value
+        else:
+            self.strOutFile = os.path.join(self.getWorkingDirectory(), self.getScriptLogFileName())
+
 
     def process(self, _edObject=None):
         """
