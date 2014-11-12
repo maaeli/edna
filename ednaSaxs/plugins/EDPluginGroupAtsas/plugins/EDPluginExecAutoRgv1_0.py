@@ -26,6 +26,7 @@
 __author__ = "Al, Irakli, Alun, Jerome, Olof, Peter and Claudio"
 __license__ = "GPLv3+"
 __copyright__ = "EMBL + ESRF + DLS"
+__date__ = "12/11/2014"
 
 import os
 from EDPluginExecProcessScript import EDPluginExecProcessScript
@@ -33,11 +34,11 @@ from XSDataEdnaSaxs import XSDataInputAutoRg, XSDataResultAutoRg, \
         XSDataLength, XSDataBoolean, XSDataInteger, XSDataAutoRg, \
         XSDataFile, XSDataDouble, XSDataString
 
+
 class EDPluginExecAutoRgv1_0(EDPluginExecProcessScript):
     """
     Execution plugin for AutoRg (part of Atsas package)
     """
-
 
     def __init__(self):
         """
@@ -59,7 +60,6 @@ class EDPluginExecAutoRgv1_0(EDPluginExecProcessScript):
 #        self.checkMandatoryParameters(self.dataInput.sample, "No sample provided")
         self.checkMandatoryParameters(self.dataInput.inputCurve, "No input curve  provided ")
 
-
     def preProcess(self, _edObject=None):
         EDPluginExecProcessScript.preProcess(self)
         self.DEBUG("EDPluginExecProcessScriptAutoRgv1_0.preProcess")
@@ -75,14 +75,14 @@ class EDPluginExecAutoRgv1_0(EDPluginExecProcessScript):
 #autorg filename file2 file2 ... -f csv/
         self.setScriptCommandline(self.createCommandLine())
 
-
-    def postProcess(self, _edObject=None):
-        EDPluginExecProcessScript.postProcess(self)
-        self.DEBUG("EDPluginExecProcessScriptAutoRgv1_0.postProcess")
+    def process(self):
+        EDPluginExecProcessScript.process(self)
+        self.DEBUG("EDPluginExecProcessScriptAutoRgv1_0.process")
         # Create some output data
 #        2.83326 0.011646 2.04258e+07 18565.3 47 81 0.783626 1 bioSaxsMerged.dat
         strOutput = self.readProcessLogFile()
         xsDataResult = XSDataResultAutoRg()
+        dic_Rg = {} #key: filename, value: XSDataAutoRg
         listXSDOut = []
         for line in strOutput.split(os.linesep):
             words = line.split(None, 8)
@@ -90,7 +90,7 @@ class EDPluginExecAutoRgv1_0(EDPluginExecProcessScript):
                 break
             try:
                 xsData = XSDataAutoRg()
-                xsData.filename = XSDataFile(XSDataString(words[-1]))
+                filename = words[-1]
                 xsData.rg = XSDataLength(float(words[0]))
                 xsData.rgStdev = XSDataLength(float(words[1]))
                 xsData.i0 = XSDataDouble(float(words[2]))
@@ -103,10 +103,34 @@ class EDPluginExecAutoRgv1_0(EDPluginExecProcessScript):
                 strError = "Error in parsing output:" + line
                 self.error(strError)
                 self.setFailure()
-            listXSDOut.append(xsData)
+            else:
+                xsData.filename = XSDataFile(XSDataString(filename))
+                dic_Rg[filename] = xsData
+#                listXSDOut.append(xsData)
+        if self.isFailure() and dic_Rg:
+            # we have some data ... unset the failure flag
+            self.setFailure(False)
+        xsData_zero = XSDataAutoRg(isagregated=XSDataBoolean(True),
+                                   quality=XSDataDouble(0.0),
+                                   lastPointUsed=XSDataInteger(0),
+                                   firstPointUsed=XSDataInteger(0),
+                                   i0Stdev=XSDataDouble(0.0),
+                                   i0=XSDataDouble(0.0),
+                                   rgStdev=XSDataDouble(0.0),
+                                   rg=XSDataDouble(0.0))
+        for filename in self.inputCurve:
+            if filename in dic_Rg:
+                listXSDOut.append(dic_Rg[filename])
+            else:
+                xsData_zero.filename = XSDataFile(XSDataString(filename))
+                listXSDOut.append(xsData_zero)
+
         xsDataResult.autoRgOut = listXSDOut
         self.setDataOutput(xsDataResult)
 
+    def postProcess(self, _edObject=None):
+        EDPluginExecProcessScript.postProcess(self)
+        self.DEBUG("EDPluginExecProcessScriptAutoRgv1_0.postProcess")
 
     def createCommandLine(self):
         """actually creater the command line and retruns it"""

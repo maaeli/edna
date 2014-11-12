@@ -29,9 +29,10 @@ __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "2011 ESRF"
 __status__ = "production"
-__date__ = "20120917"
+__date__ = "20141112"
 
-import os, shutil
+import os
+import shutil
 from EDPluginControl import EDPluginControl
 from XSDataCommon import XSDataFile, XSDataString, XSDataStatus
 from XSDataEdnaSaxs import XSDataInputAutoSub, XSDataInputDataver, \
@@ -39,6 +40,7 @@ from XSDataEdnaSaxs import XSDataInputAutoSub, XSDataInputDataver, \
 from XSDataEdnaSaxs import XSDataResultAutoSub
 from EDThreading import Semaphore
 _sem = Semaphore()
+
 
 def copy(src, dst):
     """
@@ -90,7 +92,7 @@ class EDPluginAutoSubv1_0(EDPluginControl):
         self.actualBestBuffer = None
         self.fidelity = None
         self.lstProcessLog = []
-        self.dictRg = {} #key: filename, value = (Rg,I0) 
+        self.dictRg = {} #key: filename, value = (Rg,I0)
         self.fConcentration = -1
         self.headers = {}
 
@@ -103,7 +105,6 @@ class EDPluginAutoSubv1_0(EDPluginControl):
         self.checkMandatoryParameters(self.dataInput.sampleCurve, "No sample curve")
         self.checkMandatoryParameters(self.dataInput.buffers, "No buffer curves")
 
-
     def preProcess(self, _edObject=None):
         EDPluginControl.preProcess(self)
         self.DEBUG("EDPluginAutoSubv1_0.preProcess")
@@ -112,13 +113,12 @@ class EDPluginAutoSubv1_0(EDPluginControl):
 
         if self.dataInput.subtractedCurve is not None:
             self.subtractedCurve = self.dataInput.subtractedCurve.path.value
-        self.buffers = [ i.path.value for i in self.dataInput.buffers ]
+        self.buffers = [i.path.value for i in self.dataInput.buffers]
         self.sampleCurve = self.dataInput.sampleCurve.path.value
         if self.subtractedCurve is None:
             self.outdir = os.path.dirname(self.sampleCurve)
         else:
             self.outdir = os.path.dirname(self.subtractedCurve)
-
 
     def process(self, _edObject=None):
         EDPluginControl.process(self)
@@ -146,7 +146,8 @@ class EDPluginAutoSubv1_0(EDPluginControl):
                 edPluginDatcmp.executeSynchronous()
                 if self.isFailure() or (self.fidelity is None):
                     return
-                if self.fidelity < self.BUFFER_SIMILARITY: #buffer are not the same: keeping the one with lowest Rg/I0
+                if self.fidelity < self.BUFFER_SIMILARITY:
+                    # buffer are not the same: keeping the one with lowest Rg/I0
                     edpluginRg = self.loadPlugin(self.__strPluginAutoRg)
                     edpluginRg.dataInput = XSDataInputAutoRg(inputCurve=self.dataInput.buffers)
                     edpluginRg.connectSUCCESS(self.doSuccessExecAutoRg)
@@ -183,25 +184,20 @@ class EDPluginAutoSubv1_0(EDPluginControl):
         edpluginRg.connectFAILURE(self.doFailureExecAutoRg)
         edpluginRg.executeSynchronous()
 
-
-
-
     def postProcess(self, _edObject=None):
         EDPluginControl.postProcess(self)
         self.DEBUG("EDPluginAutoSubv1_0.postProcess")
         # Create some output data
 
         self.xsDataResult.status = XSDataStatus(executiveSummary=XSDataString(os.linesep.join(self.lstProcessLog)))
-        self.xsDataResult.subtractedCurve = XSDataFile(XSDataString(self.subtractedCurve))        
+        self.xsDataResult.subtractedCurve = XSDataFile(XSDataString(self.subtractedCurve))
         if self.actualBestBuffer:
             self.xsDataResult.bestBuffer = XSDataFile(XSDataString(self.actualBestBuffer))
         self.dataOutput = self.xsDataResult
 
-
     def doSuccessExecDatop(self, _edPlugin=None):
         self.DEBUG("EDPluginAutoSubv1_0.doSuccessExecDatop")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginAutoSubv1_0.doSuccessExecDatop")
-
 
     def doFailureExecDatop(self, _edPlugin=None):
         self.DEBUG("EDPluginAutoSubv1_0.doFailureExecDatop")
@@ -213,13 +209,11 @@ class EDPluginAutoSubv1_0(EDPluginControl):
         self.DEBUG("EDPluginAutoSubv1_0.doSuccessExecDataver")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginAutoSubv1_0.doSuccessExecDataver")
 
-
     def doFailureExecDataver(self, _edPlugin=None):
         self.DEBUG("EDPluginAutoSubv1_0.doFailureExecDataver")
         self.retrieveFailureMessages(_edPlugin, "EDPluginAutoSubv1_0.doFailureExecDataver")
         self.lstProcessLog.append("Failure in dataver (averaging of buffer")
         self.setFailure()
-
 
     def doSuccessExecAutoRg(self, _edPlugin=None):
         self.DEBUG("EDPluginAutoSubv1_0.doSuccessExecAutoRg")
@@ -253,20 +247,16 @@ class EDPluginAutoSubv1_0(EDPluginControl):
             self.lstProcessLog += lstRg
             self.xsDataResult.autoRg = res
 
-
-
     def doFailureExecAutoRg(self, _edPlugin=None):
         self.DEBUG("EDPluginAutoSubv1_0.doFailureExecAutoRg")
         self.retrieveFailureMessages(_edPlugin, "EDPluginAutoSubv1_0.doFailureExecAutoRg")
         self.lstProcessLog.append("Failure in AutoRg")
         self.setFailure()
 
-
     def doSuccessExecDatcmp(self, _edPlugin=None):
         self.DEBUG("EDPluginAutoSubv1_0.doSuccessExecDatcmp")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginAutoSubv1_0.doSuccessExecDatcmp")
         self.fidelity = _edPlugin.dataOutput.fidelity.value
-
 
     def doFailureExecDatcmp(self, _edPlugin=None):
         self.DEBUG("EDPluginAutoSubv1_0.doFailureExecDatcmp")
@@ -313,7 +303,6 @@ class EDPluginAutoSubv1_0(EDPluginControl):
         except Exception:
             self.fConcentration = -1
         return headers
-
 
     def rewriteHeader(self, infile=None, output=None, hdr="#", linesep=os.linesep, extraHeaders=None, scale=False):
         """
