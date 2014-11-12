@@ -258,8 +258,11 @@ class EDAction(EDLogging, Thread):
         return self.__bIsFailure
 
 
-    def setFailure(self):
-        self.__bIsFailure = True
+    def setFailure(self, value=True):
+        """
+        use setFailure(False) to unset the failure flag 
+        """
+        self.__bIsFailure = value
 
 
     def run(self):
