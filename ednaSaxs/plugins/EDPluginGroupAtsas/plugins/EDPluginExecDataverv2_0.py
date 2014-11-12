@@ -27,7 +27,7 @@ __author__ = "Jérôme Kieffer"
 __contact__ = "Jérôme.Kieffer@esrf.fr"
 __license__ = "GPLv3+"
 __copyright__ = "2014 ESRF, Grenoble"
-__date__ = "2014-10-27"
+__date__ = "2014-11-12"
 __status__ = "Production"
 
 import os
@@ -70,8 +70,7 @@ class EDPluginExecDataverv2_0(EDPluginExec):
         if self.dataInput.outputCurve is not None:
             self.strOutFile = self.dataInput.outputCurve.path.value
         else:
-            self.strOutFile = os.path.join(self.getWorkingDirectory(), self.getScriptLogFileName())
-
+            self.strOutFile = os.path.join(self.getWorkingDirectory(), "dataver_out.dat")
 
     def process(self, _edObject=None):
         """
@@ -79,20 +78,20 @@ class EDPluginExecDataverv2_0(EDPluginExec):
         """
         EDPluginExec.process(self)
         l = len(self.lstInFiles)
-        if l==1:
+        if l == 1:
             shutil.copyfile(self.lstInFiles[0], self.strOutFile)
             return
-        q=I=s2=None
+        q = I = s2 = None
         for fn in self.lstInFiles:
             if q is None:
                 q, I, s = numpy.loadtxt(fn, unpack=True)
-                s2 = s*s 
+                s2 = s * s
             else:
                 q1, I1, s1 = numpy.loadtxt(fn, unpack=True)
-                assert abs(q1-q).max() < self.epsilon 
+                assert abs(q1 - q).max() < self.epsilon
                 I += I1
-                s2+=s1*s1
-        m=numpy.vstack((q,I/l,numpy.sqrt(s2)/l))
+                s2 += s1 * s1
+        m = numpy.vstack((q, I / l, numpy.sqrt(s2) / l))
         numpy.savetxt(self.strOutFile, m.T)
 
     def postProcess(self, _edObject=None):
