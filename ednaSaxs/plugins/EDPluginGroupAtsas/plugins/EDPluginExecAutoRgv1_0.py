@@ -116,8 +116,8 @@ class EDPluginExecAutoRgv1_0(EDPluginExecProcessScript):
                                    firstPointUsed=XSDataInteger(0),
                                    i0Stdev=XSDataDouble(0.0),
                                    i0=XSDataDouble(0.0),
-                                   rgStdev=XSDataDouble(0.0),
-                                   rg=XSDataDouble(0.0))
+                                   rgStdev=XSDataLength(0.0),
+                                   rg=XSDataLength(0.0))
         for filename in self.inputCurve:
             if filename in dic_Rg:
                 listXSDOut.append(dic_Rg[filename])
