@@ -134,7 +134,7 @@ class EDPluginExecAutoRgv1_0(EDPluginExecProcessScript):
 
     def createCommandLine(self):
         """actually creater the command line and retruns it"""
-        lstCommandLine = self.inputCurve
+        lstCommandLine = self.inputCurve[:]
         if self.maxSmaxRg is not None:
             lstCommandLine.append("--smaxrg %s" % self.maxSmaxRg)
         if self.maxSminRg is not None:
