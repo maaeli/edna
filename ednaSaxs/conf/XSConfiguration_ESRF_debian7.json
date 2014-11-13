@@ -20,7 +20,7 @@
     "EDPluginExecDataverv2_0": {},
     "EDPluginExecDatcmpv2_0": {
         "execProcessScriptExecutable": "/usr/bin/datcmp", 
-        "execProcessScriptShell": "/bin/dash"
+        "execProcessScriptShell": "python"
     },
   "EDPluginExecSupcombv0_3": {
         "execProcessScriptVersionString": "", 
