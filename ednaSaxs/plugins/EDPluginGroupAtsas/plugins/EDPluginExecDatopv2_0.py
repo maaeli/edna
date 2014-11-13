@@ -26,11 +26,10 @@
 __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "2011-2014, ESRF Grenoble"
+__date__ = "12/11/2014"
 
 import numpy
-
 from EDPluginExec import EDPluginExec
-
 from XSDataEdnaSaxs import XSDataInputDatop, XSDataResultDatop
 
 
@@ -68,37 +67,36 @@ class EDPluginExecDatopv2_0(EDPluginExec):
         self.DEBUG("EDPluginExecDatopv2_0.preProcess")
         self.outputFile = self.dataInput.outputCurve.path.value
         self.strOperation = self.dataInput.operation.value.upper().replace("+", "ADD").replace("-", "SUB").replace("*", "MUL").replace("/", "DIV")
-        self.lstInFiles = [ i.path.value for i in  self.dataInput.inputCurve]
+        self.lstInFiles = [i.path.value for i in  self.dataInput.inputCurve]
         if self.dataInput.constant is not None:
             self.const = self.dataInput.constant.value
         
     def process(self):
         EDPluginExec.process(self)
         l = len(self.lstInFiles)
-        if l > 0 :
+        if l > 0:
             q0, I0, s0 = numpy.loadtxt(self.lstInFiles[0], unpack=True)
-        if l > 1 :
+        if l > 1:
             q1, I1, s1 = numpy.loadtxt(self.lstInFiles[-1], unpack=True)
-        if self.strOperation in ("ADD", "SUB") and l==2:
+        if self.strOperation in ("ADD", "SUB") and (l == 2):
             q = q1
-            assert abs(q1 -  q0).max()<self.epsilon
+            assert abs(q1 - q0).max() < self.epsilon
             if self.strOperation == "SUB":
                 I = I0 - I1
             else:
                 I = I0 + I1
-            s = numpy.sqrt(s0*s0 + s1*s1)
-        if self.strOperation in ("MUL", "DIV") and l>=1 and self.dataInput.constant:
-            q=q0
+            s = numpy.sqrt(s0 * s0 + s1 * s1)
+        if self.strOperation in ("MUL", "DIV") and (l >= 1) and self.dataInput.constant:
+            q = q0
             if self.strOperation == "MUL":
-                I = I0*self.const
-                s = s0*self.const
+                I = I0 * self.const
+                s = s0 * self.const
             else:
-                I = I0/self.const
-                s = s0/self.const
+                I = I0 / self.const
+                s = s0 / self.const
             
-        m=numpy.vstack((q,I,s))
+        m = numpy.vstack((q, I, s))
         numpy.savetxt(self.outputFile, m.T)
-
 
     def postProcess(self, _edObject=None):
         EDPluginExec.postProcess(self)
@@ -106,4 +104,3 @@ class EDPluginExecDatopv2_0(EDPluginExec):
         # Create some output data
         xsDataResult = XSDataResultDatop(outputCurve=self.dataInput.outputCurve)
         self.setDataOutput(xsDataResult)
-

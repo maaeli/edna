@@ -40,7 +40,7 @@ from XSDataEdnaSaxs import XSDataInputAutoSub, XSDataInputDataver, \
 from XSDataEdnaSaxs import XSDataResultAutoSub
 from EDThreading import Semaphore
 _sem = Semaphore()
-
+import numpy
 
 def copy(src, dst):
     """
@@ -251,7 +251,12 @@ class EDPluginAutoSubv1_0(EDPluginControl):
         self.DEBUG("EDPluginAutoSubv1_0.doFailureExecAutoRg")
         self.retrieveFailureMessages(_edPlugin, "EDPluginAutoSubv1_0.doFailureExecAutoRg")
         self.lstProcessLog.append("Failure in AutoRg")
-        self.setFailure()
+        if (_edPlugin.dataInput.inputCurve) == 2: 
+            # we were comparing 2 buffers but were analyzed by AutoRg
+            for fn in self.buffers:
+                self.dictRg[fn] = (0, numpy.loadtxt(fn, unpack=True)[1].sum())
+        else:
+            self.setFailure()
 
     def doSuccessExecDatcmp(self, _edPlugin=None):
         self.DEBUG("EDPluginAutoSubv1_0.doSuccessExecDatcmp")
