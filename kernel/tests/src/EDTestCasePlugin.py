@@ -7,7 +7,7 @@
 #                            Grenoble, France
 #
 #    Principal authors: Marie-Francoise Incardona (incardon@esrf.fr)
-#                       Olof Svensson (svensson@esrf.fr) 
+#                       Olof Svensson (svensson@esrf.fr)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Lesser General Public License as published
@@ -20,7 +20,7 @@
 #    GNU Lesser General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
-#    and the GNU Lesser General Public License  along with this program.  
+#    and the GNU Lesser General Public License  along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 
@@ -33,13 +33,16 @@ It is especially in charge of
 """
 
 
-__authors__ = [ "Marie-Francoise Incardona", "Olof Svensson", "Jérôme Kieffer" ]
+__authors__ = ["Marie-Francoise Incardona", "Olof Svensson", "Jérôme Kieffer"]
 __contact__ = "svensson@esrf.fr"
 __license__ = "LGPLv3+"
 __copyright__ = "European Synchrotron Radiation Facility, Grenoble, France"
-__date__ = "20120131"
+__date__ = "20141117"
 
-import sys, os, threading, urllib2
+import sys
+import os
+import threading
+import urllib2
 
 from EDVerbose             import EDVerbose
 from EDUtilsPath           import EDUtilsPath
@@ -51,11 +54,13 @@ from EDFactoryPlugin       import EDFactoryPlugin
 
 iMAX_DOWNLOAD_TIME = 60
 
+
 def NoOp(self, *arg, **kwarg):
     """
     Dummy test executor for deprecated plugins 
     """
     pass
+
 
 class EDTestCasePlugin(EDTestCase):
     """
@@ -75,7 +80,6 @@ class EDTestCasePlugin(EDTestCase):
         self._listRequiredConfigurationPluginNames = []
         self._strConfigurationFile = None
         self._oldConfig = None
-        self._deactivated = False
 
     def preProcess(self):
         # Check if the plugin to be tested requires configuration
@@ -111,15 +115,11 @@ class EDTestCasePlugin(EDTestCase):
         xsConfiguration = EDConfigurationStatic.getXSConfigurationItem(strPluginName)
         return xsConfiguration
 
-
-
-
     def setConfigurationFile(self, _strConfigurationFile):
         """
         Sets the configuration file
         """
         self._strConfigurationFile = _strConfigurationFile
-
 
     def getConfigurationFile(self):
         """
@@ -127,14 +127,11 @@ class EDTestCasePlugin(EDTestCase):
         """
         return self._strConfigurationFile
 
-
-
     def setRequiredPluginConfiguration(self, _strPluginName=None):
         if _strPluginName is None:
             self._listRequiredConfigurationPluginNames.append(self._strPluginName)
         else:
             self._listRequiredConfigurationPluginNames.append(_strPluginName)
-
 
     def createPlugin(self):
         """
@@ -157,12 +154,11 @@ class EDTestCasePlugin(EDTestCase):
             if "__status__" in  dir(module):
                 if module.__status__.lower().strip() == "deprecated":
                     self._deactivated = True
-                    EDVerbose.WARNING("Plugin %s is deprecated, test skipped"%self.getPluginName())
+                    EDVerbose.WARNING("Plugin %s is deprecated, test skipped" % self.getPluginName())
                     #let's monky-patch the test and deactivate it
-                    self.__class__.testExecute = NoOp          
+                    self.__class__.testExecute = NoOp
                     self.__class__.postProcess = NoOp
         return edPlugin
-
 
     def getPlugin(self):
         """
@@ -171,14 +167,12 @@ class EDTestCasePlugin(EDTestCase):
         return self._edPlugin
     plugin = property(getPlugin, doc="read-only only property")
 
-
     def getPluginName(self):
         """
         Returns the plugin name
         """
         return self._strPluginName
     pluginName = property(getPluginName, doc="read-only property")
-
 
     def getPluginHome(self):
         """
@@ -187,13 +181,11 @@ class EDTestCasePlugin(EDTestCase):
         return self._strPluginHome
     pluginHome = property(getPluginHome, doc="read-only property")
 
-
     def getPluginTestsDataHome(self):
         """
         Returns the plugin test data home directory
         """
         return self._strPluginTestsDataHome
-
 
     def setPluginTestsDataHome(self, _strPluginTestsDataHome):
         """
@@ -201,7 +193,6 @@ class EDTestCasePlugin(EDTestCase):
         """
         self._strPluginTestsDataHome = _strPluginTestsDataHome
     pluginTestDataHome = property(getPluginTestsDataHome, setPluginTestsDataHome, "pluginTestDataHome is the data directory in the plugin's tests")
-
 
     def loadTestImage(self, _listImageFileName):
         """
@@ -215,14 +206,14 @@ class EDTestCasePlugin(EDTestCase):
             strImagePath = os.path.join(EDUtilsPath.EDNA_TESTIMAGES, strImageName)
             if(not os.path.exists(strImagePath)):
                 EDVerbose.unitTest("Trying to download image %s, timeout set to %d s" % (strImagePath, iMAX_DOWNLOAD_TIME))
-                if os.environ.has_key("http_proxy"):
+                if "http_proxy" in os.environ:
                     dictProxies = {'http': os.environ["http_proxy"]}
                     proxy_handler = urllib2.ProxyHandler(dictProxies)
                     opener = urllib2.build_opener(proxy_handler).open
                 else:
                     opener = urllib2.urlopen
 
-# Nota: since python2.6 there is a timeout in the urllib2                    
+# Nota: since python2.6 there is a timeout in the urllib2
                 timer = threading.Timer(iMAX_DOWNLOAD_TIME + 1, timeoutDuringDownload)
                 timer.start()
                 if sys.version > (2, 6):
@@ -234,15 +225,15 @@ class EDTestCasePlugin(EDTestCase):
                 try:
                     open(strImagePath, "wb").write(data)
                 except IOError:
-                    raise IOError, "unable to write downloaded data to disk at %s" % strImagePath
+                    raise IOError("unable to write downloaded data to disk at %s" % strImagePath)
 
                 if os.path.exists(strImagePath):
                     EDVerbose.unitTest("Image %s successfully downloaded." % strImagePath)
                 else:
-                    raise RuntimeError, "Could not automatically download test images %r! \n \
+                    raise RuntimeError("Could not automatically download test images %r! \n \
                                          If you are behind a firewall, please set the environment variable http_proxy. \n \
                                          Otherwise please try to download the images manually from \n \
-                                         http://www.edna-site.org/data/tests/images" % _listImageFileName
+                                         http://www.edna-site.org/data/tests/images" % _listImageFileName)
 
     def getDictReplace(self):
         dictReplace = EDUtilsPath.getDictOfPaths()
@@ -268,8 +259,6 @@ class EDTestCasePlugin(EDTestCase):
         Returns the content of this file as a string
         """
         return  str(EDUtilsFile.readFileAndParseVariables(_strFileName, self.dictReplace))
-
-
 
 def timeoutDuringDownload():
     """
