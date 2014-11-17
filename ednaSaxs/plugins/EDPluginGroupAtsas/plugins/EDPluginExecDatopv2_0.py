@@ -26,7 +26,7 @@
 __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "2011-2014, ESRF Grenoble"
-__date__ = "12/11/2014"
+__date__ = "17/11/2014"
 
 import numpy
 from EDPluginExec import EDPluginExec
@@ -96,7 +96,9 @@ class EDPluginExecDatopv2_0(EDPluginExec):
                 s = s0 / self.const
             
         m = numpy.vstack((q, I, s))
-        numpy.savetxt(self.outputFile, m.T)
+#        numpy.savetxt(self.outputFile, m.T)
+        with open(self.outputFile, "w") as outfile:
+            numpy.savetxt(outfile, m.T)
 
     def postProcess(self, _edObject=None):
         EDPluginExec.postProcess(self)

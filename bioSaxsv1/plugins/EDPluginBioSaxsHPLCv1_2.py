@@ -82,6 +82,7 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
     SIMILARITY_THRESHOLD_BUFFER_DEFAULT = 0.1
     SIMILARITY_THRESHOLD_SAMPLE = None
     SIMILARITY_THRESHOLD_BUFFER = None
+
     def __init__(self):
         """
         """
@@ -119,7 +120,7 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
         """
         EDPluginControl.configure(self)
         if self.__class__.SIMILARITY_THRESHOLD_SAMPLE is None:
-            with self._sem:        
+            with self._sem:
                 if self.__class__.SIMILARITY_THRESHOLD_SAMPLE is None:
                     self.DEBUG("EDPluginBioSaxsHPLCv1_2.configure")
                     self.__class__.SIMILARITY_THRESHOLD_BUFFER = float(self.config.get(self.SIMILARITY_THRESHOLD_BUFFER_KEY, self.SIMILARITY_THRESHOLD_BUFFER_DEFAULT))
@@ -246,7 +247,6 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
             self.edPluginAutoRg.connectFAILURE(self.doFailureAutoRg)
             self.edPluginAutoRg.executeSynchronous()
 
-
     def postProcess(self, _edObject=None):
         """
         after process
@@ -260,7 +260,6 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
         if self.subtracted:
             self.xsDataResult.subtractedCurve = XSDataFile(XSDataString(self.subtracted))
 
-
     def finallyProcess(self, _edObject=None):
         EDPluginControl.finallyProcess(self)
         executiveSummary = os.linesep.join(self.lstExecutiveSummary)
@@ -268,7 +267,6 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
         self.dataOutput = self.xsDataResult
         if self.frame:
             self.frame.processing = False
-
 
     def average_buffers(self):
         """
@@ -285,7 +283,6 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
         self.edPluginDatAver.connectSUCCESS(self.doSuccessDatAver)
         self.edPluginDatAver.connectFAILURE(self.doFailureDatAver)
         self.edPluginDatAver.executeSynchronous()
-
 
     def doSuccessProcessOneFile(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsHPLCv1_2.doSuccessProcessOneFile")
@@ -457,7 +454,6 @@ class EDPluginBioSaxsHPLCv1_2(EDPluginControl):
         else:
             self.lstExecutiveSummary.append("Edna plugin DatCmp failed.")
         self.setFailure()
-
 
     def doSuccessDatAver(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsHPLCv1_2.doSuccessDatAver")

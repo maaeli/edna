@@ -70,8 +70,10 @@ class EDTestCasePluginExecuteExecDataverv1_0(EDTestCasePluginExecute):
         xsdOut = self.getPlugin().getDataOutput()
         EDAssert.strAlmostEqual(XSDataResultDataver.parseString(self.readAndParseFile(self.getReferenceDataOutputFile())).marshal(),
                                 xsdOut.marshal() , "XSData are almost the same", _fAbsError=0.1)
-        refData = open(os.path.join(self.getTestsDataImagesHome(), "merged.dat")).read().replace("\n", " ")
-        obtData = open(self.destFile).read().replace(os.linesep, " ")
+        refData = " ".join([i for i in open(os.path.join(self.getTestsDataImagesHome(), "merged.dat"))
+                            if  i[0].isspace()])
+        obtData = " ".join([i for i in open(self.destFile)
+                             if  i[0].isspace()])
         EDAssert.strAlmostEqual(refData, obtData, "Checking obtained file", _fRelError=0.1)
 
     def process(self):

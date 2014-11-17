@@ -8,8 +8,8 @@
 #    Copyright (C) 2008-2009 European Synchrotron Radiation Facility
 #                            Grenoble, France
 #
-#    Principal authors: Olof Svensson (svensson@esrf.fr) 
-#                       Jérôme Kieffer (jerome.kieffer@esrf.fr) 
+#    Principal authors: Olof Svensson (svensson@esrf.fr)
+#                       Jérôme Kieffer (jerome.kieffer@esrf.fr)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Lesser General Public License as published
@@ -22,27 +22,27 @@
 #    GNU Lesser General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
-#    and the GNU Lesser General Public License  along with this program.  
+#    and the GNU Lesser General Public License  along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 
 #
-# This class has been inspired by the corresponding AALib class 
-# (20090518-PyAALib-JyAALib-111) and modified according to the needs 
+# This class has been inspired by the corresponding AALib class
+# (20090518-PyAALib-JyAALib-111) and modified according to the needs
 # for the EDNA project.
 #
 
-__authors__ = [ "Olof Svensson", "Jérôme Kieffer" ]
+__authors__ = ["Olof Svensson", "Jérôme Kieffer"]
 __contact__ = "svensson@esrf.fr"
 __license__ = "LGPLv3+"
 __copyright__ = "European Synchrotron Radiation Facility, Grenoble, France"
-
-"""
+__doc__ = """
 This class is taking care of the workflow preProcess - process - postProcess.
 """
 
 
-import time, os
+import time
+import os
 from threading   import Thread
 from EDSlot      import EDSlot
 from EDVerbose   import EDVerbose
@@ -86,7 +86,7 @@ class EDAction(EDLogging, Thread):
         self.__bLogTiming = False
 
     def executeKernel(self):
-        dictTimeStamps = { "init": time.time() }
+        dictTimeStamps = {"init": time.time()}
         self.setTimeInit()
         try:
 
@@ -194,7 +194,7 @@ class EDAction(EDLogging, Thread):
                 fTimeForFailureCalculation = dictTimeStamps["slotSUCCESS"]
             if "slotFAILURE" in dictTimeStamps:
                 lstTimings.append("\t slotFAILURE \t\t time duration = %.3f s" % (dictTimeStamps["slotFAILURE"] - fTimeForFailureCalculation))
-            if dictTimeStamps.has_key("finallyProcess"):
+            if "finallyProcess" in dictTimeStamps:
                 lstTimings.append("\t finallyProcess \t time duration = %.3f s" % (dictTimeStamps["finallyProcess"] - fTimeForFinallyCalculation))
             self.log(os.linesep.join(lstTimings))
 
@@ -239,10 +239,8 @@ class EDAction(EDLogging, Thread):
             EDVerbose.ERROR(strErrorMessage)
             self.setFailure()
 
-
     def isTimeOut(self):
         return self.__bIsTimeOut
-
 
     def hasTimedOut(self, _bTimeout):
         """
@@ -253,10 +251,8 @@ class EDAction(EDLogging, Thread):
         """
         self.__bIsTimeOut = bool(_bTimeout)
 
-
     def isFailure(self):
         return self.__bIsFailure
-
 
     def setFailure(self, value=True):
         """
@@ -264,19 +260,14 @@ class EDAction(EDLogging, Thread):
         """
         self.__bIsFailure = value
 
-
     def run(self):
         self.executeKernel()
-
 
     def executeAction(self, _edObject=None):
         self.execute(_edObject)
 
-
     def executeActionSynchronous(self, _edObject=None):
         self.executeSynchronous()
-
-
 
     def connectPreProcess(self, _oMethod):
         self.synchronizeOn()
@@ -284,13 +275,11 @@ class EDAction(EDLogging, Thread):
             self.__edSlotPreProcess.connect(_oMethod)
         self.synchronizeOff()
 
-
     def connectProcess(self, _oMethod):
         self.synchronizeOn()
         if (_oMethod != None):
             self.__edSlotProcess.connect(_oMethod)
         self.synchronizeOff()
-
 
     def connectPostProcess(self, _oMethod):
         self.synchronizeOn()
@@ -298,13 +287,11 @@ class EDAction(EDLogging, Thread):
             self.__edSlotPostProcess.connect(_oMethod)
         self.synchronizeOff()
 
-
     def connectSUCCESS(self, _oMethod):
         self.synchronizeOn()
         if (_oMethod != None):
             self.__edSlotSUCCESS.connect(_oMethod)
         self.synchronizeOff()
-
 
     def connectFAILURE(self, _oMethod):
         self.synchronizeOn()
@@ -329,14 +316,12 @@ class EDAction(EDLogging, Thread):
         EDVerbose.DEBUG("%s.isStarted return %s, %s " % (self.getName(), (self.getTimeInit() is not None), self.getTimeInit()))
         return (self.getTimeInit() is not None)
 
-
     def setTimeOut(self, _fTimeOut):
         """
         Sets the time out
         """
         EDVerbose.DEBUG("EDAction.setTimeOut called with value %s" % _fTimeOut)
         self.__fTimeOutInSeconds = float(_fTimeOut)
-
 
     def getTimeOut(self):
         """
@@ -361,45 +346,35 @@ class EDAction(EDLogging, Thread):
         """
         return self.__fDefaultTimeOutInSeconds
 
-
     def getSlotSUCCESS(self):
         return self.__edSlotSUCCESS
-
 
     def getSlotFAILURE(self):
         return self.__edSlotFAILURE
 
-
     def preProcess(self, _edObject=None):
         pass
-
 
     def process(self, _edObject=None):
         pass
 
-
     def postProcess(self, _edObject=None):
         pass
-
 
     def abort(self, _edObject=None):
         pass
 
-
     def finallyProcess(self, _edObject=None):
         pass
-
 
     def execute(self, _edObject=None):
         self.__bIsStarted = True
         self.__edObject = _edObject
         self.start()
 
-
     def executeSynchronous(self, _edObject=None):
         self.execute(_edObject)
         self.synchronize()
-
 
     def setLogTiming(self, _bValue):
         """

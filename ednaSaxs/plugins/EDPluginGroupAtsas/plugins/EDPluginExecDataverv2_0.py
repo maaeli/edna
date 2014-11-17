@@ -27,7 +27,7 @@ __author__ = "Jérôme Kieffer"
 __contact__ = "Jérôme.Kieffer@esrf.fr"
 __license__ = "GPLv3+"
 __copyright__ = "2014 ESRF, Grenoble"
-__date__ = "2014-11-12"
+__date__ = "17/11/2014"
 __status__ = "Production"
 
 import os
@@ -38,6 +38,7 @@ from EDFactoryPluginStatic import EDFactoryPluginStatic
 EDFactoryPluginStatic.loadModule("XSDataEdnaSaxs")
 from XSDataEdnaSaxs import XSDataInputDataver, XSDataResultDataver
 from XSDataCommon import XSDataString, XSDataFile
+
 
 class EDPluginExecDataverv2_0(EDPluginExec):
     """
@@ -92,7 +93,10 @@ class EDPluginExecDataverv2_0(EDPluginExec):
                 I += I1
                 s2 += s1 * s1
         m = numpy.vstack((q, I / l, numpy.sqrt(s2) / l))
-        numpy.savetxt(self.strOutFile, m.T)
+
+        with open(self.strOutFile, "w") as outfile:
+            numpy.savetxt(outfile, m.T)
+        #numpy.savetxt(self.strOutFile, m.T)
 
     def postProcess(self, _edObject=None):
         EDPluginExec.postProcess(self)
