@@ -26,7 +26,7 @@
         "execProcessScriptVersionString": "", 
         "execProcessScriptExecutable": "/usr/bin/supcomb", 
         "execProcessScriptShell": "/bin/dash", 
-        "timeOut": 60
+        "timeOut": 120
     },
    "EDPluginExecDatOpv2_0": {}   
 }
