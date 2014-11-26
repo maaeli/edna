@@ -85,27 +85,6 @@ class EDPluginExecAutoRgv1_0(EDPluginExecProcessScript):
         dic_Rg = {} #key: filename, value: XSDataAutoRg
         listXSDOut = []
         for line in strOutput.split(os.linesep):
-            if 'Not enough valid data' in line:
-                words = line.split()
-                try:
-                    xsData = XSDataAutoRg()
-                    filename = words[-1].strip("'.")
-                    xsData.rg = XSDataLength(0.0)
-                    xsData.rgStdev = XSDataLength(0.0)
-                    xsData.i0 = XSDataDouble(0.0)
-                    xsData.i0Stdev = XSDataDouble(0.0)
-                    xsData.firstPointUsed = XSDataInteger(0)
-                    xsData.lastPointUsed = XSDataInteger(0)
-                    xsData.quality = XSDataDouble(0.0)
-                    xsData.isagregated = XSDataBoolean(bool(0))
-                except Exception:
-                    strError = "Error in parsing output:" + line
-                    self.error(strError)
-                    self.setFailure()
-                else:
-                    xsData.filename = XSDataFile(XSDataString(filename))
-                    dic_Rg[filename] = xsData
-                break
             words = line.split(None, 8)
             if len(words) < 8:
                 break
@@ -128,6 +107,31 @@ class EDPluginExecAutoRgv1_0(EDPluginExecProcessScript):
                 xsData.filename = XSDataFile(XSDataString(filename))
                 dic_Rg[filename] = xsData
 #                listXSDOut.append(xsData)
+
+        if self.isFailure():
+            # Change failure output for ATSAS version >= 2.5 to micmic old version
+            strErrOutput = self.readProcessErrorLogFile()
+            for line in strErrOutput.split(os.linesep):
+                if 'Not enough valid data' in line:
+                    words = line.split()
+                    try:
+                        xsData = XSDataAutoRg()
+                        filename = words[-1].strip("'.")
+                        xsData.rg = XSDataLength(0.0)
+                        xsData.rgStdev = XSDataLength(0.0)
+                        xsData.i0 = XSDataDouble(0.0)
+                        xsData.i0Stdev = XSDataDouble(0.0)
+                        xsData.firstPointUsed = XSDataInteger(0)
+                        xsData.lastPointUsed = XSDataInteger(0)
+                        xsData.quality = XSDataDouble(0.0)
+                        xsData.isagregated = XSDataBoolean(bool(0))
+                    except Exception:
+                        strError = "Error in parsing output:" + line
+                        self.error(strError)
+                        self.setFailure()
+                    else:
+                        xsData.filename = XSDataFile(XSDataString(filename))
+                        dic_Rg[filename] = xsData
         if self.isFailure() and dic_Rg:
             # we have some data ... unset the failure flag
             self.setFailure(False)
