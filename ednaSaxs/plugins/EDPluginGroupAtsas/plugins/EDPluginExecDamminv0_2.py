@@ -139,6 +139,10 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
                 self.__strAngleUnit = "2"
         self.generateDamminScript()
 
+    def process(self, _edObject=None):
+        EDPluginExecProcessScript.process(self)
+        self.DEBUG("EDPluginExecDammin0_3.process")
+
 
     def postProcess(self, _edObject=None):
         EDPluginExecProcessScript.postProcess(self)
