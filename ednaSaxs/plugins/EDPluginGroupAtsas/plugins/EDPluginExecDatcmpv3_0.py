@@ -76,10 +76,10 @@ class EDPluginExecDatcmpv3_0(EDPluginExecProcessScript):
         if os.path.isfile(strResultFile):
             for line in open(strResultFile):
                 words = line.split()
-                if len(words) == 5:
+                if len(words) == 6 and 'vs' in line:
                     try:
-                        self.fChi = float(words[-2])
-                        self.fFidelity = float(words[-1])
+                        
+                        self.fFidelity = float(words[-1].strip('*'))
                     except ValueError:
                         self.WARNING("Strange ouptut from %s:%s %s" % (strResultFile, os.linesep, line))
                     else:
@@ -87,8 +87,7 @@ class EDPluginExecDatcmpv3_0(EDPluginExecProcessScript):
 
         # Create some output data
         xsDataResult = XSDataResultDatcmp()
-        if self.fChi is not None:
-            xsDataResult.chi = XSDataDouble(self.fChi)
+       
         if self.fFidelity is not None:
             xsDataResult.fidelity = XSDataDouble(self.fFidelity)
 
