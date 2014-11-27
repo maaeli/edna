@@ -218,7 +218,6 @@ class EDPluginAutoSubv1_0(EDPluginControl):
     def doSuccessExecAutoRg(self, _edPlugin=None):
         self.DEBUG("EDPluginAutoSubv1_0.doSuccessExecAutoRg")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginAutoSubv1_0.doSuccessExecAutoRg")
-
         for data in _edPlugin.dataOutput.autoRgOut:
             self.dictRg[data.filename.path.value] = (data.rg.value, data.i0.value)
 
@@ -251,7 +250,7 @@ class EDPluginAutoSubv1_0(EDPluginControl):
         self.DEBUG("EDPluginAutoSubv1_0.doFailureExecAutoRg")
         self.retrieveFailureMessages(_edPlugin, "EDPluginAutoSubv1_0.doFailureExecAutoRg")
         self.lstProcessLog.append("Failure in AutoRg")
-        if (_edPlugin.dataInput.inputCurve) == 2: 
+        if len(_edPlugin.dataInput.inputCurve) == 2:
             # we were comparing 2 buffers but were analyzed by AutoRg
             for fn in self.buffers:
                 self.dictRg[fn] = (0, numpy.loadtxt(fn, unpack=True)[1].sum())

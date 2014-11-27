@@ -73,7 +73,7 @@ class EDPluginBioSaxsHPLCv1_3(EDPluginControl):
     strControlledPluginProcessOneFile = "EDPluginBioSaxsProcessOneFilev1_4"
     strControlledPluginDatop = "EDPluginExecDatopv2_0"
     strControlledPluginAutoRg = "EDPluginExecAutoRgv1_0"
-    strControlledPluginDatCmp = "EDPluginExecDatcmpv2_0
+    strControlledPluginDatCmp = "EDPluginExecDatcmpv2_0"
     strControlledPluginDatAver = "EDPluginExecDataverv2_0"
     dictHPLC = {}  # key=runId, value= HPLCrun instance
     _sem = Semaphore()

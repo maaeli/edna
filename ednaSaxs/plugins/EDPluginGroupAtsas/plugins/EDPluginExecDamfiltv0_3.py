@@ -64,7 +64,9 @@ class EDPluginExecDamfiltv0_3(EDPluginExecProcessScript):
         self.DEBUG("EDPluginExecDamfiltv0_3.preProcess")
         self.generateDamfiltScript()
 
-
+    def process(self, _edObject=None):
+        EDPluginExecProcessScript.process(self)
+        self.DEBUG("EDPluginExecFiltv0_3.process")
 
     def postProcess(self, _edObject=None):
         EDPluginExecProcessScript.postProcess(self)
