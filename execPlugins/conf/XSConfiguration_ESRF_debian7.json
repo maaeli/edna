@@ -71,7 +71,7 @@
     }, 
     "EDPluginControlStitchImagev1_0": {}, 
     "EDPluginHDF5StackImagesv10": {
-        "writeXMLInput": 0, 
+        "writeXMLInput": 1, 
         "writeXMLOutput": 1
     }, 
     "EDPluginExecEDPluginHDFImageWriterv10": {}, 
