@@ -2,7 +2,7 @@
     "EDPluginExecDamfiltv0_3": {
         "execProcessScriptVersionString": "", 
         "execProcessScriptExecutable": "/usr/bin/damfilt", 
-        "execProcessScriptShell": "pyhton", 
+        "execProcessScriptShell": "python", 
         "timeOut": 60
     },    
     "EDPluginExecDamstartv0_3": {
