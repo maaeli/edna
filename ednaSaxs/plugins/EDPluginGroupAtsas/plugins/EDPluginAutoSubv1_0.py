@@ -254,6 +254,19 @@ class EDPluginAutoSubv1_0(EDPluginControl):
             # we were comparing 2 buffers but were analyzed by AutoRg
             for fn in self.buffers:
                 self.dictRg[fn] = (0, numpy.loadtxt(fn, unpack=True)[1].sum())
+        elif os.path.exists(self.subtractedCurve):
+            #we don't want to fail the subtraction plugin because the result has no Rg - default to 0
+            res = XSDataAutoRg()
+            res.rg = XSDataLength(0.0)
+            res.rgStdev = XSDataLength(0.0)
+            res.i0 = XSDataDouble(0.0)
+            res.i0Stdev = XSDataDouble(0.0)
+            res.firstPointUsed = XSDataInteger(0)
+            res.lastPointUsed = XSDataInteger(0)
+            res.quality = XSDataDouble(0.0)
+            res.isagregated = XSDataBoolean(bool(0))
+            res.filename = XSDataFile(XSDataString(self.subtractedCurve))
+            self.xsDataResult.autoRg  = res
         else:
             self.setFailure()
 
