@@ -206,8 +206,21 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
             collectionOrder = str(self.dataInput.sample.collectionOrder.value)
         else:
             collectionOrder = "-1"
+
         try:
-            self.client.service.storeDataAnalysisResultByMeasurementId(
+            self.client.service.addAverage(
+                                    self.dataBioSaxsSample.measurementID.value,
+                                    "[{filePath: /path/to/frame1.dat}, {filePath: /path/to/frame2.dat}]",
+                                    "[{filePath: /path/to/fdiscarded1.dat}]"
+                                    "/data/file_ave.dat")
+        except Exception, error:
+            strError = "ISPyB error: %s" % error
+            self.ERROR(strError)
+            
+        # Adding subtraction into ISPyB
+        try:
+            if collectionOrder == 2:
+                self.client.service.storeDataAnalysisResultByMeasurementId(
                                     self.dataBioSaxsSample.measurementID.value,
                                     self.filename,
                                     self.rg,
