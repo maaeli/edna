@@ -98,6 +98,7 @@ complex type XSDataResultAutoSub extends XSDataResult {
 	"Result of AutoSub (EDNA implementation) 	"
 	subtractedCurve: XSDataFile
 	bestBuffer: XSDataFile
+	bestBufferType: XSDataString
 	autoRg: XSDataAutoRg
 }
 

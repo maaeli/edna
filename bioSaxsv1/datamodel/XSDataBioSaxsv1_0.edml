@@ -374,10 +374,25 @@ complex type XSDataInputBioSaxsISPyBv1_0 extends XSDataInput  {
 	autoRg			: XSDataAutoRg optional
 	gnom			: XSDataGnom optional 
 	volume			: XSDataDoubleWithUnit optional
-	frameAverage	: XSDataInteger optional
-	frameMerged 	: XSDataInteger optional
+//	Deprecated	
+	frameAverage	        : XSDataInteger optional
+//	Deprecated	
+	frameMerged 	        : XSDataInteger optional
+//	Deprecated	
 	curves			: XSDataFile [] optional
+
+//	Averages
+	averagedFrames          : XSDataFile [] optional
+	discardedFrames         : XSDataFile [] optional
+	averageFilePath		: XSDataFile
+
+//	Subtractions
+	bufferFrames		: XSDataFile [] optional
+	sampleFrames		: XSDataFile [] optional
+
 	bestBuffer		: XSDataFile optional
+	averageSample		: XSDataFile optional
+
 	scatterPlot		: XSDataFile optional
 	guinierPlot		: XSDataFile optional
 	kratkyPlot		: XSDataFile optional
