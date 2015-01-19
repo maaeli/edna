@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Tue Jul 16 08:48::39 2013 by EDGenerateDS.
+# Generated Thu Jan 8 11:14::43 2015 by EDGenerateDS.
 #
 
 import os, sys
@@ -6415,7 +6415,7 @@ class XSDataResultAutoRg(XSDataResult):
 
 class XSDataResultAutoSub(XSDataResult):
     """Result of AutoSub (EDNA implementation) 	"""
-    def __init__(self, status=None, autoRg=None, bestBuffer=None, subtractedCurve=None):
+    def __init__(self, status=None, autoRg=None, bestBufferType=None, bestBuffer=None, subtractedCurve=None):
         XSDataResult.__init__(self, status)
         if subtractedCurve is None:
             self._subtractedCurve = None
@@ -6430,6 +6430,13 @@ class XSDataResultAutoSub(XSDataResult):
             self._bestBuffer = bestBuffer
         else:
             strMessage = "ERROR! XSDataResultAutoSub constructor argument 'bestBuffer' is not XSDataFile but %s" % self._bestBuffer.__class__.__name__
+            raise BaseException(strMessage)
+        if bestBufferType is None:
+            self._bestBufferType = None
+        elif bestBufferType.__class__.__name__ == "XSDataString":
+            self._bestBufferType = bestBufferType
+        else:
+            strMessage = "ERROR! XSDataResultAutoSub constructor argument 'bestBufferType' is not XSDataString but %s" % self._bestBufferType.__class__.__name__
             raise BaseException(strMessage)
         if autoRg is None:
             self._autoRg = None
@@ -6462,6 +6469,18 @@ class XSDataResultAutoSub(XSDataResult):
             raise BaseException(strMessage)
     def delBestBuffer(self): self._bestBuffer = None
     bestBuffer = property(getBestBuffer, setBestBuffer, delBestBuffer, "Property for bestBuffer")
+    # Methods and properties for the 'bestBufferType' attribute
+    def getBestBufferType(self): return self._bestBufferType
+    def setBestBufferType(self, bestBufferType):
+        if bestBufferType is None:
+            self._bestBufferType = None
+        elif bestBufferType.__class__.__name__ == "XSDataString":
+            self._bestBufferType = bestBufferType
+        else:
+            strMessage = "ERROR! XSDataResultAutoSub.setBestBufferType argument is not XSDataString but %s" % bestBufferType.__class__.__name__
+            raise BaseException(strMessage)
+    def delBestBufferType(self): self._bestBufferType = None
+    bestBufferType = property(getBestBufferType, setBestBufferType, delBestBufferType, "Property for bestBufferType")
     # Methods and properties for the 'autoRg' attribute
     def getAutoRg(self): return self._autoRg
     def setAutoRg(self, autoRg):
@@ -6490,6 +6509,10 @@ class XSDataResultAutoSub(XSDataResult):
             self.bestBuffer.export(outfile, level, name_='bestBuffer')
         else:
             warnEmptyAttribute("bestBuffer", "XSDataFile")
+        if self._bestBufferType is not None:
+            self.bestBufferType.export(outfile, level, name_='bestBufferType')
+        else:
+            warnEmptyAttribute("bestBufferType", "XSDataString")
         if self._autoRg is not None:
             self.autoRg.export(outfile, level, name_='autoRg')
         else:
@@ -6509,6 +6532,11 @@ class XSDataResultAutoSub(XSDataResult):
             obj_ = XSDataFile()
             obj_.build(child_)
             self.setBestBuffer(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'bestBufferType':
+            obj_ = XSDataString()
+            obj_.build(child_)
+            self.setBestBufferType(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'autoRg':
             obj_ = XSDataAutoRg()

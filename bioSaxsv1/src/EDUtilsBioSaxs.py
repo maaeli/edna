@@ -628,9 +628,9 @@ class HPLCrun(object):
                             maxindex = stop - start - 1
 
 
-                        if peak < maxindex:
+                        if peak < maxindex and len(I0med[peak:maxindex])>1:                               
                             maxindex = I0med[peak:maxindex].argmin() + peak
-                        if minindex < peak:
+                        if minindex < peak  and len(I0med[minindex:peak + 1])>1 :
                             minindex = I0med[minindex:peak + 1].argmin() + minindex
                         maxi = I0med[minindex:maxindex].argmax() + minindex
 
