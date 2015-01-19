@@ -123,7 +123,7 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
         self.xsGuinierPlot = None
         self.xsKratkyPlot = None
         self.xsDensityPlot = None
-
+	self.xsdSubtractedCurve = None
 
     def checkParameters(self):
         """
@@ -291,11 +291,11 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
                 base = "_".join(os.path.basename(self.__class__.lastSample.path.value).split("_")[:-1])
                 suff = os.path.basename(self.strSubFile).split("_")[-1]
                 sub = os.path.join(os.path.dirname(self.strSubFile), base + "_" + suff)
-                xsdSubtractedCurve = XSDataFile(XSDataString(sub))
-                self.curves.append(xsdSubtractedCurve)
+                self.xsdSubtractedCurve = XSDataFile(XSDataString(sub))
+                #self.curves.append(xsdSubtractedCurve)
                 self.__edPluginExecAutoSub.dataInput = XSDataInputAutoSub(sampleCurve=self.__class__.lastSample,
                                          buffers=[self.__class__.lastBuffer, self.dataInput.mergedCurve],
-                                         subtractedCurve=xsdSubtractedCurve)
+                                         subtractedCurve=self.xsdSubtractedCurve)
                 self.__edPluginExecAutoSub.connectSUCCESS(self.doSuccessExecAutoSub)
                 self.__edPluginExecAutoSub.connectFAILURE(self.doFailureExecAutoSub)
                 self.__edPluginExecAutoSub.executeSynchronous()
@@ -304,7 +304,7 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
                     return
 
                 self.__edPluginSaxsAnalysis = self.loadPlugin(self.__strControlledPluginSaxsAnalysis)
-                self.__edPluginSaxsAnalysis.dataInput = XSDataInputSaxsAnalysis(scatterCurve=xsdSubtractedCurve,
+                self.__edPluginSaxsAnalysis.dataInput = XSDataInputSaxsAnalysis(scatterCurve=self.xsdSubtractedCurve,
                                                                                 autoRg=self.autoRg,
                                                                                 graphFormat=XSDataString("png"))
                 self.__edPluginSaxsAnalysis.connectSUCCESS(self.doSuccessSaxsAnalysis)
@@ -342,6 +342,10 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
             if self.__class__.lastSample is not None:
                 lastSample = self.__class__.lastSample
 
+	    subtractedCurve = None	
+            if self.xsdSubtractedCurve is not None:
+	        subtractedCurve = self.xsdSubtractedCurve
+
             xsdin = XSDataInputBioSaxsISPyBv1_0(sample=self.dataInput.sample,
                                                      autoRg=self.autoRg,
                                                      gnom=self.gnom,
@@ -359,7 +363,8 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
                                                      scatterPlot=self.xsScatterPlot,
                                                      guinierPlot=self.xsGuinierPlot,
                                                      kratkyPlot=self.xsKratkyPlot ,
-                                                     densityPlot=self.xsDensityPlot
+                                                     densityPlot=self.xsDensityPlot,
+						     subtractedFilePath=subtractedCurve
 #                                                     destination=self.dataInput.sample.ispybDestination #duplicate, already in sample
                                                )
             self.__edPluginSaxsISPyB.dataInput = xsdin

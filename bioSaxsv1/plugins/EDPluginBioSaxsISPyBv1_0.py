@@ -94,6 +94,11 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
 	self.lstAveraged = []
         self.averageFilePath = None
 
+	# For subtraction
+	self.bufferFrames = []
+        self.sampleFrames = [] 
+	self.subtractedFilePath = None
+
     def checkParameters(self):
         """
         Checks the mandatory parameters.
@@ -147,6 +152,14 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
 
 	if self.dataInput.averageFilePath is not None:
 	    self.averageFilePath = self.dataInput.averageFilePath.path.value
+
+	if self.dataInput.sampleFrames is not None:
+	    self.sampleFrames = self.dataInput.sampleFrames
+
+	if self.dataInput.bufferFrames is not None:
+	    self.bufferFrames = self.dataInput.bufferFrames
+	if self.dataInput.subtractedFilePath is not None:
+	    self.subtractedFilePath = self.dataInput.subtractedFilePath.path.value
 
         # Params to be sent and I dont know them
         if self.dataInput.volume:
@@ -240,16 +253,16 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
         try:
 	    
             if int(collectionOrder) == 2:
-		sampleAvgOneDimensionalFiles = [{'filePath': 'frameSample1.dat'}]
-		bufferAvgOneDimensionalFiles = [{'filePath': 'frameBuffer1.dat'}]
-	
-		subtractedFilePath = None
-		for filePath in self.pyarchcurves:
-			if "_averbuffer.dat" in filePath:
-				self.bestBuffer = filePath
-			if "sub.dat" in filePath:
-				subtractedFilePath = filePath
-			
+		sampleAvgOneDimensionalFiles = [] 
+		bufferAvgOneDimensionalFiles = [] 
+
+		for sampleFrameXSFile in self.sampleFrames:
+			sampleAvgOneDimensionalFiles.append({'filePath': str(self.copyfile(sampleFrameXSFile.path.value, self.getPyarchFolder()))})
+
+		for bufferFrameXSFile in self.bufferFrames:
+			bufferAvgOneDimensionalFiles.append({'filePath': str(self.copyfile(bufferFrameXSFile.path.value, self.getPyarchFolder()))})
+
+		self.subtractedFilePath = self.copyfile(self.subtractedFilePath, self.getPyarchFolder())
 
 		self.client.service.addSubtraction(
 						self.dataBioSaxsSample.measurementID.value,
@@ -269,7 +282,7 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
                                                 str(bufferAvgOneDimensionalFiles),
                                                 self.averageSample, 			#sampleAverageFilePath,
                                                 self.bestBuffer,			#bufferAverageFilePath,
-                                                subtractedFilePath, 			#subtractedFilePath,
+                                                self.subtractedFilePath, 		#subtractedFilePath,
                                                 self.scatterPlot,  			#experimentalDataPlotFilePath,
                                                 self.densityPlot, 			#densityPlotFilePath,
                                                 self.guinierPlot, 			#guinierPlotFilePath,
@@ -317,10 +330,13 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
 
         xsDataResult = XSDataResultBioSaxsISPyBv1_0(status=XSDataStatus(executiveSummary=XSDataString(os.linesep.join(self.lstError))))
         self.setDataOutput(xsDataResult)
-
+    
+    def getPyarchFolder(self):
+	return os.path.join(self.dataInput.sample.ispybDestination.path.value, "1d")
+ 
     def copy_to_pyarch(self):
         if self.dataInput.sample.ispybDestination:
-            pyarch = os.path.join(self.dataInput.sample.ispybDestination.path.value, "1d")
+            pyarch = self.getPyarchFolder()
             try:
                 if not os.path.isdir(pyarch):
                     os.makedirs(pyarch)
@@ -347,6 +363,8 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
             self.guinierPlot = self.copyfile(self.guinierPlot, pyarch)
             self.kratkyPlot = self.copyfile(self.kratkyPlot, pyarch)
             self.densityPlot = self.copyfile(self.densityPlot, pyarch)
+	    self.averageSample = self.copyfile(self.averageSample, pyarch)
+	
 
     def copyfile(self, afile, pyarch):
         if not pyarch:

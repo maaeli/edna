@@ -389,7 +389,7 @@ complex type XSDataInputBioSaxsISPyBv1_0 extends XSDataInput  {
 //	Subtractions
 	bufferFrames		: XSDataFile [] optional
 	sampleFrames		: XSDataFile [] optional
-
+	subtractedFilePath	: XSDataFile optional
 	bestBuffer		: XSDataFile optional
 	averageSample		: XSDataFile optional
 
