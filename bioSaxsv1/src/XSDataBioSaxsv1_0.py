@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Thu Dec 12 10:15::31 2013 by EDGenerateDS.
+# Generated Mon Jan 12 03:27::06 2015 by EDGenerateDS.
 #
 
 import os, sys
@@ -13,8 +13,9 @@ strEdnaHome = os.environ.get("EDNA_HOME", None)
 
 dictLocation = { \
  "XSDataCommon": "kernel/datamodel", \
- "XSDataEdnaSaxs": "ednaSaxs/datamodel", \
+  "XSDataEdnaSaxs": "ednaSaxs/datamodel"
 }
+
 
 try:
     from XSDataCommon import XSData
@@ -2512,7 +2513,7 @@ class XSDataInputBioSaxsISPyB_HPLCv1_0(XSDataInput):
 
 class XSDataInputBioSaxsISPyBv1_0(XSDataInput):
     """Input class for populating ISPyB"""
-    def __init__(self, configuration=None, densityPlot=None, kratkyPlot=None, guinierPlot=None, scatterPlot=None, bestBuffer=None, curves=None, frameMerged=None, frameAverage=None, volume=None, gnom=None, autoRg=None, sample=None):
+    def __init__(self, configuration=None, densityPlot=None, kratkyPlot=None, guinierPlot=None, scatterPlot=None, averageSample=None, bestBuffer=None, subtractedFilePath=None, sampleFrames=None, bufferFrames=None, averageFilePath=None, discardedFrames=None, averagedFrames=None, curves=None, frameMerged=None, frameAverage=None, volume=None, gnom=None, autoRg=None, sample=None):
         XSDataInput.__init__(self, configuration)
         if sample is None:
             self._sample = None
@@ -2563,12 +2564,61 @@ class XSDataInputBioSaxsISPyBv1_0(XSDataInput):
         else:
             strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0 constructor argument 'curves' is not list but %s" % self._curves.__class__.__name__
             raise BaseException(strMessage)
+        if averagedFrames is None:
+            self._averagedFrames = []
+        elif averagedFrames.__class__.__name__ == "list":
+            self._averagedFrames = averagedFrames
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0 constructor argument 'averagedFrames' is not list but %s" % self._averagedFrames.__class__.__name__
+            raise BaseException(strMessage)
+        if discardedFrames is None:
+            self._discardedFrames = []
+        elif discardedFrames.__class__.__name__ == "list":
+            self._discardedFrames = discardedFrames
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0 constructor argument 'discardedFrames' is not list but %s" % self._discardedFrames.__class__.__name__
+            raise BaseException(strMessage)
+        if averageFilePath is None:
+            self._averageFilePath = None
+        elif averageFilePath.__class__.__name__ == "XSDataFile":
+            self._averageFilePath = averageFilePath
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0 constructor argument 'averageFilePath' is not XSDataFile but %s" % self._averageFilePath.__class__.__name__
+            raise BaseException(strMessage)
+        if bufferFrames is None:
+            self._bufferFrames = []
+        elif bufferFrames.__class__.__name__ == "list":
+            self._bufferFrames = bufferFrames
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0 constructor argument 'bufferFrames' is not list but %s" % self._bufferFrames.__class__.__name__
+            raise BaseException(strMessage)
+        if sampleFrames is None:
+            self._sampleFrames = []
+        elif sampleFrames.__class__.__name__ == "list":
+            self._sampleFrames = sampleFrames
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0 constructor argument 'sampleFrames' is not list but %s" % self._sampleFrames.__class__.__name__
+            raise BaseException(strMessage)
+        if subtractedFilePath is None:
+            self._subtractedFilePath = None
+        elif subtractedFilePath.__class__.__name__ == "XSDataFile":
+            self._subtractedFilePath = subtractedFilePath
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0 constructor argument 'subtractedFilePath' is not XSDataFile but %s" % self._subtractedFilePath.__class__.__name__
+            raise BaseException(strMessage)
         if bestBuffer is None:
             self._bestBuffer = None
         elif bestBuffer.__class__.__name__ == "XSDataFile":
             self._bestBuffer = bestBuffer
         else:
             strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0 constructor argument 'bestBuffer' is not XSDataFile but %s" % self._bestBuffer.__class__.__name__
+            raise BaseException(strMessage)
+        if averageSample is None:
+            self._averageSample = None
+        elif averageSample.__class__.__name__ == "XSDataFile":
+            self._averageSample = averageSample
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0 constructor argument 'averageSample' is not XSDataFile but %s" % self._averageSample.__class__.__name__
             raise BaseException(strMessage)
         if scatterPlot is None:
             self._scatterPlot = None
@@ -2703,6 +2753,162 @@ class XSDataInputBioSaxsISPyBv1_0(XSDataInput):
         else:
             strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.addCurves argument is not XSDataFile but %s" % value.__class__.__name__
             raise BaseException(strMessage)
+    # Methods and properties for the 'averagedFrames' attribute
+    def getAveragedFrames(self): return self._averagedFrames
+    def setAveragedFrames(self, averagedFrames):
+        if averagedFrames is None:
+            self._averagedFrames = []
+        elif averagedFrames.__class__.__name__ == "list":
+            self._averagedFrames = averagedFrames
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.setAveragedFrames argument is not list but %s" % averagedFrames.__class__.__name__
+            raise BaseException(strMessage)
+    def delAveragedFrames(self): self._averagedFrames = None
+    averagedFrames = property(getAveragedFrames, setAveragedFrames, delAveragedFrames, "Property for averagedFrames")
+    def addAveragedFrames(self, value):
+        if value is None:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.addAveragedFrames argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._averagedFrames.append(value)
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.addAveragedFrames argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    def insertAveragedFrames(self, index, value):
+        if index is None:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.insertAveragedFrames argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.insertAveragedFrames argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._averagedFrames[index] = value
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.addAveragedFrames argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'discardedFrames' attribute
+    def getDiscardedFrames(self): return self._discardedFrames
+    def setDiscardedFrames(self, discardedFrames):
+        if discardedFrames is None:
+            self._discardedFrames = []
+        elif discardedFrames.__class__.__name__ == "list":
+            self._discardedFrames = discardedFrames
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.setDiscardedFrames argument is not list but %s" % discardedFrames.__class__.__name__
+            raise BaseException(strMessage)
+    def delDiscardedFrames(self): self._discardedFrames = None
+    discardedFrames = property(getDiscardedFrames, setDiscardedFrames, delDiscardedFrames, "Property for discardedFrames")
+    def addDiscardedFrames(self, value):
+        if value is None:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.addDiscardedFrames argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._discardedFrames.append(value)
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.addDiscardedFrames argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    def insertDiscardedFrames(self, index, value):
+        if index is None:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.insertDiscardedFrames argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.insertDiscardedFrames argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._discardedFrames[index] = value
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.addDiscardedFrames argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'averageFilePath' attribute
+    def getAverageFilePath(self): return self._averageFilePath
+    def setAverageFilePath(self, averageFilePath):
+        if averageFilePath is None:
+            self._averageFilePath = None
+        elif averageFilePath.__class__.__name__ == "XSDataFile":
+            self._averageFilePath = averageFilePath
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.setAverageFilePath argument is not XSDataFile but %s" % averageFilePath.__class__.__name__
+            raise BaseException(strMessage)
+    def delAverageFilePath(self): self._averageFilePath = None
+    averageFilePath = property(getAverageFilePath, setAverageFilePath, delAverageFilePath, "Property for averageFilePath")
+    # Methods and properties for the 'bufferFrames' attribute
+    def getBufferFrames(self): return self._bufferFrames
+    def setBufferFrames(self, bufferFrames):
+        if bufferFrames is None:
+            self._bufferFrames = []
+        elif bufferFrames.__class__.__name__ == "list":
+            self._bufferFrames = bufferFrames
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.setBufferFrames argument is not list but %s" % bufferFrames.__class__.__name__
+            raise BaseException(strMessage)
+    def delBufferFrames(self): self._bufferFrames = None
+    bufferFrames = property(getBufferFrames, setBufferFrames, delBufferFrames, "Property for bufferFrames")
+    def addBufferFrames(self, value):
+        if value is None:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.addBufferFrames argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._bufferFrames.append(value)
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.addBufferFrames argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    def insertBufferFrames(self, index, value):
+        if index is None:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.insertBufferFrames argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.insertBufferFrames argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._bufferFrames[index] = value
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.addBufferFrames argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'sampleFrames' attribute
+    def getSampleFrames(self): return self._sampleFrames
+    def setSampleFrames(self, sampleFrames):
+        if sampleFrames is None:
+            self._sampleFrames = []
+        elif sampleFrames.__class__.__name__ == "list":
+            self._sampleFrames = sampleFrames
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.setSampleFrames argument is not list but %s" % sampleFrames.__class__.__name__
+            raise BaseException(strMessage)
+    def delSampleFrames(self): self._sampleFrames = None
+    sampleFrames = property(getSampleFrames, setSampleFrames, delSampleFrames, "Property for sampleFrames")
+    def addSampleFrames(self, value):
+        if value is None:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.addSampleFrames argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._sampleFrames.append(value)
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.addSampleFrames argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    def insertSampleFrames(self, index, value):
+        if index is None:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.insertSampleFrames argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.insertSampleFrames argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataFile":
+            self._sampleFrames[index] = value
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.addSampleFrames argument is not XSDataFile but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'subtractedFilePath' attribute
+    def getSubtractedFilePath(self): return self._subtractedFilePath
+    def setSubtractedFilePath(self, subtractedFilePath):
+        if subtractedFilePath is None:
+            self._subtractedFilePath = None
+        elif subtractedFilePath.__class__.__name__ == "XSDataFile":
+            self._subtractedFilePath = subtractedFilePath
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.setSubtractedFilePath argument is not XSDataFile but %s" % subtractedFilePath.__class__.__name__
+            raise BaseException(strMessage)
+    def delSubtractedFilePath(self): self._subtractedFilePath = None
+    subtractedFilePath = property(getSubtractedFilePath, setSubtractedFilePath, delSubtractedFilePath, "Property for subtractedFilePath")
     # Methods and properties for the 'bestBuffer' attribute
     def getBestBuffer(self): return self._bestBuffer
     def setBestBuffer(self, bestBuffer):
@@ -2715,6 +2921,18 @@ class XSDataInputBioSaxsISPyBv1_0(XSDataInput):
             raise BaseException(strMessage)
     def delBestBuffer(self): self._bestBuffer = None
     bestBuffer = property(getBestBuffer, setBestBuffer, delBestBuffer, "Property for bestBuffer")
+    # Methods and properties for the 'averageSample' attribute
+    def getAverageSample(self): return self._averageSample
+    def setAverageSample(self, averageSample):
+        if averageSample is None:
+            self._averageSample = None
+        elif averageSample.__class__.__name__ == "XSDataFile":
+            self._averageSample = averageSample
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBv1_0.setAverageSample argument is not XSDataFile but %s" % averageSample.__class__.__name__
+            raise BaseException(strMessage)
+    def delAverageSample(self): self._averageSample = None
+    averageSample = property(getAverageSample, setAverageSample, delAverageSample, "Property for averageSample")
     # Methods and properties for the 'scatterPlot' attribute
     def getScatterPlot(self): return self._scatterPlot
     def setScatterPlot(self, scatterPlot):
@@ -2787,8 +3005,24 @@ class XSDataInputBioSaxsISPyBv1_0(XSDataInput):
             self.frameMerged.export(outfile, level, name_='frameMerged')
         for curves_ in self.getCurves():
             curves_.export(outfile, level, name_='curves')
+        for averagedFrames_ in self.getAveragedFrames():
+            averagedFrames_.export(outfile, level, name_='averagedFrames')
+        for discardedFrames_ in self.getDiscardedFrames():
+            discardedFrames_.export(outfile, level, name_='discardedFrames')
+        if self._averageFilePath is not None:
+            self.averageFilePath.export(outfile, level, name_='averageFilePath')
+        else:
+            warnEmptyAttribute("averageFilePath", "XSDataFile")
+        for bufferFrames_ in self.getBufferFrames():
+            bufferFrames_.export(outfile, level, name_='bufferFrames')
+        for sampleFrames_ in self.getSampleFrames():
+            sampleFrames_.export(outfile, level, name_='sampleFrames')
+        if self._subtractedFilePath is not None:
+            self.subtractedFilePath.export(outfile, level, name_='subtractedFilePath')
         if self._bestBuffer is not None:
             self.bestBuffer.export(outfile, level, name_='bestBuffer')
+        if self._averageSample is not None:
+            self.averageSample.export(outfile, level, name_='averageSample')
         if self._scatterPlot is not None:
             self.scatterPlot.export(outfile, level, name_='scatterPlot')
         if self._guinierPlot is not None:
@@ -2838,10 +3072,45 @@ class XSDataInputBioSaxsISPyBv1_0(XSDataInput):
             obj_.build(child_)
             self.curves.append(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'averagedFrames':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.averagedFrames.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'discardedFrames':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.discardedFrames.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'averageFilePath':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setAverageFilePath(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'bufferFrames':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.bufferFrames.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'sampleFrames':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.sampleFrames.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'subtractedFilePath':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setSubtractedFilePath(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'bestBuffer':
             obj_ = XSDataFile()
             obj_.build(child_)
             self.setBestBuffer(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'averageSample':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setAverageSample(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'scatterPlot':
             obj_ = XSDataFile()
