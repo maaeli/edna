@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Mon Jan 12 03:27::06 2015 by EDGenerateDS.
+# Generated Wed Jan 21 02:33::48 2015 by EDGenerateDS.
 #
 
 import os, sys
@@ -12,10 +12,10 @@ from xml.dom import Node
 strEdnaHome = os.environ.get("EDNA_HOME", None)
 
 dictLocation = { \
- "XSDataCommon": "kernel/datamodel", \
-  "XSDataEdnaSaxs": "ednaSaxs/datamodel"
+"XSDataCommon": "kernel/datamodel", \
+"XSDataEdnaSaxs": "ednaSaxs/datamodel"
 }
-
+ 
 
 try:
     from XSDataCommon import XSData
@@ -29,6 +29,7 @@ try:
     from XSDataCommon import XSDataString
     from XSDataEdnaSaxs import XSDataAutoRg
     from XSDataEdnaSaxs import XSDataGnom
+    from XSDataEdnaSaxs import XSDataRamboTainer
     from XSDataEdnaSaxs import XSDataSaxsModel
     from XSDataCommon import XSDataDoubleWithUnit
     from XSDataCommon import XSDataImage
@@ -56,6 +57,7 @@ from XSDataCommon import XSDataResult
 from XSDataCommon import XSDataString
 from XSDataEdnaSaxs import XSDataAutoRg
 from XSDataEdnaSaxs import XSDataGnom
+from XSDataEdnaSaxs import XSDataRamboTainer
 from XSDataEdnaSaxs import XSDataSaxsModel
 from XSDataCommon import XSDataDoubleWithUnit
 from XSDataCommon import XSDataImage
@@ -1136,223 +1138,6 @@ class XSDataFileSeries(XSData):
 # end class XSDataFileSeries
 
 
-class XSDataRamboTainer(XSData):
-    def __init__(self, dmass=None, dqr=None, dvc=None, mass=None, qr=None, vc=None):
-        XSData.__init__(self, )
-        if vc is None:
-            self._vc = None
-        elif vc.__class__.__name__ == "XSDataDouble":
-            self._vc = vc
-        else:
-            strMessage = "ERROR! XSDataRamboTainer constructor argument 'vc' is not XSDataDouble but %s" % self._vc.__class__.__name__
-            raise BaseException(strMessage)
-        if qr is None:
-            self._qr = None
-        elif qr.__class__.__name__ == "XSDataDouble":
-            self._qr = qr
-        else:
-            strMessage = "ERROR! XSDataRamboTainer constructor argument 'qr' is not XSDataDouble but %s" % self._qr.__class__.__name__
-            raise BaseException(strMessage)
-        if mass is None:
-            self._mass = None
-        elif mass.__class__.__name__ == "XSDataDouble":
-            self._mass = mass
-        else:
-            strMessage = "ERROR! XSDataRamboTainer constructor argument 'mass' is not XSDataDouble but %s" % self._mass.__class__.__name__
-            raise BaseException(strMessage)
-        if dvc is None:
-            self._dvc = None
-        elif dvc.__class__.__name__ == "XSDataDouble":
-            self._dvc = dvc
-        else:
-            strMessage = "ERROR! XSDataRamboTainer constructor argument 'dvc' is not XSDataDouble but %s" % self._dvc.__class__.__name__
-            raise BaseException(strMessage)
-        if dqr is None:
-            self._dqr = None
-        elif dqr.__class__.__name__ == "XSDataDouble":
-            self._dqr = dqr
-        else:
-            strMessage = "ERROR! XSDataRamboTainer constructor argument 'dqr' is not XSDataDouble but %s" % self._dqr.__class__.__name__
-            raise BaseException(strMessage)
-        if dmass is None:
-            self._dmass = None
-        elif dmass.__class__.__name__ == "XSDataDouble":
-            self._dmass = dmass
-        else:
-            strMessage = "ERROR! XSDataRamboTainer constructor argument 'dmass' is not XSDataDouble but %s" % self._dmass.__class__.__name__
-            raise BaseException(strMessage)
-    # Methods and properties for the 'vc' attribute
-    def getVc(self): return self._vc
-    def setVc(self, vc):
-        if vc is None:
-            self._vc = None
-        elif vc.__class__.__name__ == "XSDataDouble":
-            self._vc = vc
-        else:
-            strMessage = "ERROR! XSDataRamboTainer.setVc argument is not XSDataDouble but %s" % vc.__class__.__name__
-            raise BaseException(strMessage)
-    def delVc(self): self._vc = None
-    vc = property(getVc, setVc, delVc, "Property for vc")
-    # Methods and properties for the 'qr' attribute
-    def getQr(self): return self._qr
-    def setQr(self, qr):
-        if qr is None:
-            self._qr = None
-        elif qr.__class__.__name__ == "XSDataDouble":
-            self._qr = qr
-        else:
-            strMessage = "ERROR! XSDataRamboTainer.setQr argument is not XSDataDouble but %s" % qr.__class__.__name__
-            raise BaseException(strMessage)
-    def delQr(self): self._qr = None
-    qr = property(getQr, setQr, delQr, "Property for qr")
-    # Methods and properties for the 'mass' attribute
-    def getMass(self): return self._mass
-    def setMass(self, mass):
-        if mass is None:
-            self._mass = None
-        elif mass.__class__.__name__ == "XSDataDouble":
-            self._mass = mass
-        else:
-            strMessage = "ERROR! XSDataRamboTainer.setMass argument is not XSDataDouble but %s" % mass.__class__.__name__
-            raise BaseException(strMessage)
-    def delMass(self): self._mass = None
-    mass = property(getMass, setMass, delMass, "Property for mass")
-    # Methods and properties for the 'dvc' attribute
-    def getDvc(self): return self._dvc
-    def setDvc(self, dvc):
-        if dvc is None:
-            self._dvc = None
-        elif dvc.__class__.__name__ == "XSDataDouble":
-            self._dvc = dvc
-        else:
-            strMessage = "ERROR! XSDataRamboTainer.setDvc argument is not XSDataDouble but %s" % dvc.__class__.__name__
-            raise BaseException(strMessage)
-    def delDvc(self): self._dvc = None
-    dvc = property(getDvc, setDvc, delDvc, "Property for dvc")
-    # Methods and properties for the 'dqr' attribute
-    def getDqr(self): return self._dqr
-    def setDqr(self, dqr):
-        if dqr is None:
-            self._dqr = None
-        elif dqr.__class__.__name__ == "XSDataDouble":
-            self._dqr = dqr
-        else:
-            strMessage = "ERROR! XSDataRamboTainer.setDqr argument is not XSDataDouble but %s" % dqr.__class__.__name__
-            raise BaseException(strMessage)
-    def delDqr(self): self._dqr = None
-    dqr = property(getDqr, setDqr, delDqr, "Property for dqr")
-    # Methods and properties for the 'dmass' attribute
-    def getDmass(self): return self._dmass
-    def setDmass(self, dmass):
-        if dmass is None:
-            self._dmass = None
-        elif dmass.__class__.__name__ == "XSDataDouble":
-            self._dmass = dmass
-        else:
-            strMessage = "ERROR! XSDataRamboTainer.setDmass argument is not XSDataDouble but %s" % dmass.__class__.__name__
-            raise BaseException(strMessage)
-    def delDmass(self): self._dmass = None
-    dmass = property(getDmass, setDmass, delDmass, "Property for dmass")
-    def export(self, outfile, level, name_='XSDataRamboTainer'):
-        showIndent(outfile, level)
-        outfile.write(unicode('<%s>\n' % name_))
-        self.exportChildren(outfile, level + 1, name_)
-        showIndent(outfile, level)
-        outfile.write(unicode('</%s>\n' % name_))
-    def exportChildren(self, outfile, level, name_='XSDataRamboTainer'):
-        XSData.exportChildren(self, outfile, level, name_)
-        if self._vc is not None:
-            self.vc.export(outfile, level, name_='vc')
-        if self._qr is not None:
-            self.qr.export(outfile, level, name_='qr')
-        if self._mass is not None:
-            self.mass.export(outfile, level, name_='mass')
-        if self._dvc is not None:
-            self.dvc.export(outfile, level, name_='dvc')
-        if self._dqr is not None:
-            self.dqr.export(outfile, level, name_='dqr')
-        if self._dmass is not None:
-            self.dmass.export(outfile, level, name_='dmass')
-    def build(self, node_):
-        for child_ in node_.childNodes:
-            nodeName_ = child_.nodeName.split(':')[-1]
-            self.buildChildren(child_, nodeName_)
-    def buildChildren(self, child_, nodeName_):
-        if child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'vc':
-            obj_ = XSDataDouble()
-            obj_.build(child_)
-            self.setVc(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'qr':
-            obj_ = XSDataDouble()
-            obj_.build(child_)
-            self.setQr(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'mass':
-            obj_ = XSDataDouble()
-            obj_.build(child_)
-            self.setMass(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'dvc':
-            obj_ = XSDataDouble()
-            obj_.build(child_)
-            self.setDvc(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'dqr':
-            obj_ = XSDataDouble()
-            obj_.build(child_)
-            self.setDqr(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'dmass':
-            obj_ = XSDataDouble()
-            obj_.build(child_)
-            self.setDmass(obj_)
-        XSData.buildChildren(self, child_, nodeName_)
-    #Method for marshalling an object
-    def marshal( self ):
-        oStreamString = StringIO()
-        oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export( oStreamString, 0, name_="XSDataRamboTainer" )
-        oStringXML = oStreamString.getvalue()
-        oStreamString.close()
-        return oStringXML
-    #Only to export the entire XML tree to a file stream on disk
-    def exportToFile( self, _outfileName ):
-        outfile = open( _outfileName, "w" )
-        outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export( outfile, 0, name_='XSDataRamboTainer' )
-        outfile.close()
-    #Deprecated method, replaced by exportToFile
-    def outputFile( self, _outfileName ):
-        print("WARNING: Method outputFile in class XSDataRamboTainer is deprecated, please use instead exportToFile!")
-        self.exportToFile(_outfileName)
-    #Method for making a copy in a new instance
-    def copy( self ):
-        return XSDataRamboTainer.parseString(self.marshal())
-    #Static method for parsing a string
-    def parseString( _inString ):
-        doc = minidom.parseString(_inString)
-        rootNode = doc.documentElement
-        rootObj = XSDataRamboTainer()
-        rootObj.build(rootNode)
-        # Check that all minOccurs are obeyed by marshalling the created object
-        oStreamString = StringIO()
-        rootObj.export( oStreamString, 0, name_="XSDataRamboTainer" )
-        oStreamString.close()
-        return rootObj
-    parseString = staticmethod( parseString )
-    #Static method for parsing a file
-    def parseFile( _inFilePath ):
-        doc = minidom.parse(_inFilePath)
-        rootNode = doc.documentElement
-        rootObj = XSDataRamboTainer()
-        rootObj.build(rootNode)
-        return rootObj
-    parseFile = staticmethod( parseFile )
-# end class XSDataRamboTainer
-
-
 class XSDataInputBioSaxsAsciiExportv1_0(XSDataInput):
     def __init__(self, configuration=None, experimentSetup=None, sample=None, integratedCurve=None, integratedImage=None):
         XSDataInput.__init__(self, configuration)
@@ -1771,179 +1556,6 @@ class XSDataInputBioSaxsAzimutIntv1_0(XSDataInput):
         return rootObj
     parseFile = staticmethod( parseFile )
 # end class XSDataInputBioSaxsAzimutIntv1_0
-
-
-class XSDataInputBioSaxsISPyBHPLCv1_0(XSDataInput):
-    def __init__(self, configuration=None, experimentId=None, endFrame=None, startFrame=None, dataInputBioSaxs=None):
-        XSDataInput.__init__(self, configuration)
-        if dataInputBioSaxs is None:
-            self._dataInputBioSaxs = None
-        elif dataInputBioSaxs.__class__.__name__ == "XSDataInputBioSaxsISPyBv1_0":
-            self._dataInputBioSaxs = dataInputBioSaxs
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBHPLCv1_0 constructor argument 'dataInputBioSaxs' is not XSDataInputBioSaxsISPyBv1_0 but %s" % self._dataInputBioSaxs.__class__.__name__
-            raise BaseException(strMessage)
-        if startFrame is None:
-            self._startFrame = None
-        elif startFrame.__class__.__name__ == "XSDataString":
-            self._startFrame = startFrame
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBHPLCv1_0 constructor argument 'startFrame' is not XSDataString but %s" % self._startFrame.__class__.__name__
-            raise BaseException(strMessage)
-        if endFrame is None:
-            self._endFrame = None
-        elif endFrame.__class__.__name__ == "XSDataString":
-            self._endFrame = endFrame
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBHPLCv1_0 constructor argument 'endFrame' is not XSDataString but %s" % self._endFrame.__class__.__name__
-            raise BaseException(strMessage)
-        if experimentId is None:
-            self._experimentId = None
-        elif experimentId.__class__.__name__ == "XSDataInteger":
-            self._experimentId = experimentId
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBHPLCv1_0 constructor argument 'experimentId' is not XSDataInteger but %s" % self._experimentId.__class__.__name__
-            raise BaseException(strMessage)
-    # Methods and properties for the 'dataInputBioSaxs' attribute
-    def getDataInputBioSaxs(self): return self._dataInputBioSaxs
-    def setDataInputBioSaxs(self, dataInputBioSaxs):
-        if dataInputBioSaxs is None:
-            self._dataInputBioSaxs = None
-        elif dataInputBioSaxs.__class__.__name__ == "XSDataInputBioSaxsISPyBv1_0":
-            self._dataInputBioSaxs = dataInputBioSaxs
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBHPLCv1_0.setDataInputBioSaxs argument is not XSDataInputBioSaxsISPyBv1_0 but %s" % dataInputBioSaxs.__class__.__name__
-            raise BaseException(strMessage)
-    def delDataInputBioSaxs(self): self._dataInputBioSaxs = None
-    dataInputBioSaxs = property(getDataInputBioSaxs, setDataInputBioSaxs, delDataInputBioSaxs, "Property for dataInputBioSaxs")
-    # Methods and properties for the 'startFrame' attribute
-    def getStartFrame(self): return self._startFrame
-    def setStartFrame(self, startFrame):
-        if startFrame is None:
-            self._startFrame = None
-        elif startFrame.__class__.__name__ == "XSDataString":
-            self._startFrame = startFrame
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBHPLCv1_0.setStartFrame argument is not XSDataString but %s" % startFrame.__class__.__name__
-            raise BaseException(strMessage)
-    def delStartFrame(self): self._startFrame = None
-    startFrame = property(getStartFrame, setStartFrame, delStartFrame, "Property for startFrame")
-    # Methods and properties for the 'endFrame' attribute
-    def getEndFrame(self): return self._endFrame
-    def setEndFrame(self, endFrame):
-        if endFrame is None:
-            self._endFrame = None
-        elif endFrame.__class__.__name__ == "XSDataString":
-            self._endFrame = endFrame
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBHPLCv1_0.setEndFrame argument is not XSDataString but %s" % endFrame.__class__.__name__
-            raise BaseException(strMessage)
-    def delEndFrame(self): self._endFrame = None
-    endFrame = property(getEndFrame, setEndFrame, delEndFrame, "Property for endFrame")
-    # Methods and properties for the 'experimentId' attribute
-    def getExperimentId(self): return self._experimentId
-    def setExperimentId(self, experimentId):
-        if experimentId is None:
-            self._experimentId = None
-        elif experimentId.__class__.__name__ == "XSDataInteger":
-            self._experimentId = experimentId
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBHPLCv1_0.setExperimentId argument is not XSDataInteger but %s" % experimentId.__class__.__name__
-            raise BaseException(strMessage)
-    def delExperimentId(self): self._experimentId = None
-    experimentId = property(getExperimentId, setExperimentId, delExperimentId, "Property for experimentId")
-    def export(self, outfile, level, name_='XSDataInputBioSaxsISPyBHPLCv1_0'):
-        showIndent(outfile, level)
-        outfile.write(unicode('<%s>\n' % name_))
-        self.exportChildren(outfile, level + 1, name_)
-        showIndent(outfile, level)
-        outfile.write(unicode('</%s>\n' % name_))
-    def exportChildren(self, outfile, level, name_='XSDataInputBioSaxsISPyBHPLCv1_0'):
-        XSDataInput.exportChildren(self, outfile, level, name_)
-        if self._dataInputBioSaxs is not None:
-            self.dataInputBioSaxs.export(outfile, level, name_='dataInputBioSaxs')
-        else:
-            warnEmptyAttribute("dataInputBioSaxs", "XSDataInputBioSaxsISPyBv1_0")
-        if self._startFrame is not None:
-            self.startFrame.export(outfile, level, name_='startFrame')
-        else:
-            warnEmptyAttribute("startFrame", "XSDataString")
-        if self._endFrame is not None:
-            self.endFrame.export(outfile, level, name_='endFrame')
-        else:
-            warnEmptyAttribute("endFrame", "XSDataString")
-        if self._experimentId is not None:
-            self.experimentId.export(outfile, level, name_='experimentId')
-        else:
-            warnEmptyAttribute("experimentId", "XSDataInteger")
-    def build(self, node_):
-        for child_ in node_.childNodes:
-            nodeName_ = child_.nodeName.split(':')[-1]
-            self.buildChildren(child_, nodeName_)
-    def buildChildren(self, child_, nodeName_):
-        if child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'dataInputBioSaxs':
-            obj_ = XSDataInputBioSaxsISPyBv1_0()
-            obj_.build(child_)
-            self.setDataInputBioSaxs(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'startFrame':
-            obj_ = XSDataString()
-            obj_.build(child_)
-            self.setStartFrame(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'endFrame':
-            obj_ = XSDataString()
-            obj_.build(child_)
-            self.setEndFrame(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'experimentId':
-            obj_ = XSDataInteger()
-            obj_.build(child_)
-            self.setExperimentId(obj_)
-        XSDataInput.buildChildren(self, child_, nodeName_)
-    #Method for marshalling an object
-    def marshal( self ):
-        oStreamString = StringIO()
-        oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export( oStreamString, 0, name_="XSDataInputBioSaxsISPyBHPLCv1_0" )
-        oStringXML = oStreamString.getvalue()
-        oStreamString.close()
-        return oStringXML
-    #Only to export the entire XML tree to a file stream on disk
-    def exportToFile( self, _outfileName ):
-        outfile = open( _outfileName, "w" )
-        outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export( outfile, 0, name_='XSDataInputBioSaxsISPyBHPLCv1_0' )
-        outfile.close()
-    #Deprecated method, replaced by exportToFile
-    def outputFile( self, _outfileName ):
-        print("WARNING: Method outputFile in class XSDataInputBioSaxsISPyBHPLCv1_0 is deprecated, please use instead exportToFile!")
-        self.exportToFile(_outfileName)
-    #Method for making a copy in a new instance
-    def copy( self ):
-        return XSDataInputBioSaxsISPyBHPLCv1_0.parseString(self.marshal())
-    #Static method for parsing a string
-    def parseString( _inString ):
-        doc = minidom.parseString(_inString)
-        rootNode = doc.documentElement
-        rootObj = XSDataInputBioSaxsISPyBHPLCv1_0()
-        rootObj.build(rootNode)
-        # Check that all minOccurs are obeyed by marshalling the created object
-        oStreamString = StringIO()
-        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsISPyBHPLCv1_0" )
-        oStreamString.close()
-        return rootObj
-    parseString = staticmethod( parseString )
-    #Static method for parsing a file
-    def parseFile( _inFilePath ):
-        doc = minidom.parse(_inFilePath)
-        rootNode = doc.documentElement
-        rootObj = XSDataInputBioSaxsISPyBHPLCv1_0()
-        rootObj.build(rootNode)
-        return rootObj
-    parseFile = staticmethod( parseFile )
-# end class XSDataInputBioSaxsISPyBHPLCv1_0
 
 
 class XSDataInputBioSaxsISPyBModellingv1_0(XSDataInput):
@@ -3174,6 +2786,179 @@ class XSDataInputBioSaxsISPyBv1_0(XSDataInput):
         return rootObj
     parseFile = staticmethod( parseFile )
 # end class XSDataInputBioSaxsISPyBv1_0
+
+
+class XSDataInputBioSaxsISPyBHPLCv1_0(XSDataInput):
+    def __init__(self, configuration=None, experimentId=None, endFrame=None, startFrame=None, dataInputBioSaxs=None):
+        XSDataInput.__init__(self, configuration)
+        if dataInputBioSaxs is None:
+            self._dataInputBioSaxs = None
+        elif dataInputBioSaxs.__class__.__name__ == "XSDataInputBioSaxsISPyBv1_0":
+            self._dataInputBioSaxs = dataInputBioSaxs
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBHPLCv1_0 constructor argument 'dataInputBioSaxs' is not XSDataInputBioSaxsISPyBv1_0 but %s" % self._dataInputBioSaxs.__class__.__name__
+            raise BaseException(strMessage)
+        if startFrame is None:
+            self._startFrame = None
+        elif startFrame.__class__.__name__ == "XSDataString":
+            self._startFrame = startFrame
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBHPLCv1_0 constructor argument 'startFrame' is not XSDataString but %s" % self._startFrame.__class__.__name__
+            raise BaseException(strMessage)
+        if endFrame is None:
+            self._endFrame = None
+        elif endFrame.__class__.__name__ == "XSDataString":
+            self._endFrame = endFrame
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBHPLCv1_0 constructor argument 'endFrame' is not XSDataString but %s" % self._endFrame.__class__.__name__
+            raise BaseException(strMessage)
+        if experimentId is None:
+            self._experimentId = None
+        elif experimentId.__class__.__name__ == "XSDataInteger":
+            self._experimentId = experimentId
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBHPLCv1_0 constructor argument 'experimentId' is not XSDataInteger but %s" % self._experimentId.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'dataInputBioSaxs' attribute
+    def getDataInputBioSaxs(self): return self._dataInputBioSaxs
+    def setDataInputBioSaxs(self, dataInputBioSaxs):
+        if dataInputBioSaxs is None:
+            self._dataInputBioSaxs = None
+        elif dataInputBioSaxs.__class__.__name__ == "XSDataInputBioSaxsISPyBv1_0":
+            self._dataInputBioSaxs = dataInputBioSaxs
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBHPLCv1_0.setDataInputBioSaxs argument is not XSDataInputBioSaxsISPyBv1_0 but %s" % dataInputBioSaxs.__class__.__name__
+            raise BaseException(strMessage)
+    def delDataInputBioSaxs(self): self._dataInputBioSaxs = None
+    dataInputBioSaxs = property(getDataInputBioSaxs, setDataInputBioSaxs, delDataInputBioSaxs, "Property for dataInputBioSaxs")
+    # Methods and properties for the 'startFrame' attribute
+    def getStartFrame(self): return self._startFrame
+    def setStartFrame(self, startFrame):
+        if startFrame is None:
+            self._startFrame = None
+        elif startFrame.__class__.__name__ == "XSDataString":
+            self._startFrame = startFrame
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBHPLCv1_0.setStartFrame argument is not XSDataString but %s" % startFrame.__class__.__name__
+            raise BaseException(strMessage)
+    def delStartFrame(self): self._startFrame = None
+    startFrame = property(getStartFrame, setStartFrame, delStartFrame, "Property for startFrame")
+    # Methods and properties for the 'endFrame' attribute
+    def getEndFrame(self): return self._endFrame
+    def setEndFrame(self, endFrame):
+        if endFrame is None:
+            self._endFrame = None
+        elif endFrame.__class__.__name__ == "XSDataString":
+            self._endFrame = endFrame
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBHPLCv1_0.setEndFrame argument is not XSDataString but %s" % endFrame.__class__.__name__
+            raise BaseException(strMessage)
+    def delEndFrame(self): self._endFrame = None
+    endFrame = property(getEndFrame, setEndFrame, delEndFrame, "Property for endFrame")
+    # Methods and properties for the 'experimentId' attribute
+    def getExperimentId(self): return self._experimentId
+    def setExperimentId(self, experimentId):
+        if experimentId is None:
+            self._experimentId = None
+        elif experimentId.__class__.__name__ == "XSDataInteger":
+            self._experimentId = experimentId
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBHPLCv1_0.setExperimentId argument is not XSDataInteger but %s" % experimentId.__class__.__name__
+            raise BaseException(strMessage)
+    def delExperimentId(self): self._experimentId = None
+    experimentId = property(getExperimentId, setExperimentId, delExperimentId, "Property for experimentId")
+    def export(self, outfile, level, name_='XSDataInputBioSaxsISPyBHPLCv1_0'):
+        showIndent(outfile, level)
+        outfile.write(unicode('<%s>\n' % name_))
+        self.exportChildren(outfile, level + 1, name_)
+        showIndent(outfile, level)
+        outfile.write(unicode('</%s>\n' % name_))
+    def exportChildren(self, outfile, level, name_='XSDataInputBioSaxsISPyBHPLCv1_0'):
+        XSDataInput.exportChildren(self, outfile, level, name_)
+        if self._dataInputBioSaxs is not None:
+            self.dataInputBioSaxs.export(outfile, level, name_='dataInputBioSaxs')
+        else:
+            warnEmptyAttribute("dataInputBioSaxs", "XSDataInputBioSaxsISPyBv1_0")
+        if self._startFrame is not None:
+            self.startFrame.export(outfile, level, name_='startFrame')
+        else:
+            warnEmptyAttribute("startFrame", "XSDataString")
+        if self._endFrame is not None:
+            self.endFrame.export(outfile, level, name_='endFrame')
+        else:
+            warnEmptyAttribute("endFrame", "XSDataString")
+        if self._experimentId is not None:
+            self.experimentId.export(outfile, level, name_='experimentId')
+        else:
+            warnEmptyAttribute("experimentId", "XSDataInteger")
+    def build(self, node_):
+        for child_ in node_.childNodes:
+            nodeName_ = child_.nodeName.split(':')[-1]
+            self.buildChildren(child_, nodeName_)
+    def buildChildren(self, child_, nodeName_):
+        if child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'dataInputBioSaxs':
+            obj_ = XSDataInputBioSaxsISPyBv1_0()
+            obj_.build(child_)
+            self.setDataInputBioSaxs(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'startFrame':
+            obj_ = XSDataString()
+            obj_.build(child_)
+            self.setStartFrame(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'endFrame':
+            obj_ = XSDataString()
+            obj_.build(child_)
+            self.setEndFrame(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'experimentId':
+            obj_ = XSDataInteger()
+            obj_.build(child_)
+            self.setExperimentId(obj_)
+        XSDataInput.buildChildren(self, child_, nodeName_)
+    #Method for marshalling an object
+    def marshal( self ):
+        oStreamString = StringIO()
+        oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
+        self.export( oStreamString, 0, name_="XSDataInputBioSaxsISPyBHPLCv1_0" )
+        oStringXML = oStreamString.getvalue()
+        oStreamString.close()
+        return oStringXML
+    #Only to export the entire XML tree to a file stream on disk
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
+        outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
+        self.export( outfile, 0, name_='XSDataInputBioSaxsISPyBHPLCv1_0' )
+        outfile.close()
+    #Deprecated method, replaced by exportToFile
+    def outputFile( self, _outfileName ):
+        print("WARNING: Method outputFile in class XSDataInputBioSaxsISPyBHPLCv1_0 is deprecated, please use instead exportToFile!")
+        self.exportToFile(_outfileName)
+    #Method for making a copy in a new instance
+    def copy( self ):
+        return XSDataInputBioSaxsISPyBHPLCv1_0.parseString(self.marshal())
+    #Static method for parsing a string
+    def parseString( _inString ):
+        doc = minidom.parseString(_inString)
+        rootNode = doc.documentElement
+        rootObj = XSDataInputBioSaxsISPyBHPLCv1_0()
+        rootObj.build(rootNode)
+        # Check that all minOccurs are obeyed by marshalling the created object
+        oStreamString = StringIO()
+        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsISPyBHPLCv1_0" )
+        oStreamString.close()
+        return rootObj
+    parseString = staticmethod( parseString )
+    #Static method for parsing a file
+    def parseFile( _inFilePath ):
+        doc = minidom.parse(_inFilePath)
+        rootNode = doc.documentElement
+        rootObj = XSDataInputBioSaxsISPyBHPLCv1_0()
+        rootObj.build(rootNode)
+        return rootObj
+    parseFile = staticmethod( parseFile )
+# end class XSDataInputBioSaxsISPyBHPLCv1_0
 
 
 class XSDataInputBioSaxsNormalizev1_0(XSDataInput):
@@ -6583,7 +6368,7 @@ class XSDataResultBioSaxsSingleSamplev1_0(XSDataResult):
 
 
 class XSDataResultBioSaxsSmartMergev1_0(XSDataResult):
-    def __init__(self, status=None, sample=None, subtractedCurve=None, volume=None, gnom=None, autoRg=None, mergedCurve=None):
+    def __init__(self, status=None, sample=None, subtractedCurve=None, rti=None, volume=None, gnom=None, autoRg=None, mergedCurve=None):
         XSDataResult.__init__(self, status)
         if mergedCurve is None:
             self._mergedCurve = None
@@ -6612,6 +6397,13 @@ class XSDataResultBioSaxsSmartMergev1_0(XSDataResult):
             self._volume = volume
         else:
             strMessage = "ERROR! XSDataResultBioSaxsSmartMergev1_0 constructor argument 'volume' is not XSDataDoubleWithUnit but %s" % self._volume.__class__.__name__
+            raise BaseException(strMessage)
+        if rti is None:
+            self._rti = None
+        elif rti.__class__.__name__ == "XSDataRamboTainer":
+            self._rti = rti
+        else:
+            strMessage = "ERROR! XSDataResultBioSaxsSmartMergev1_0 constructor argument 'rti' is not XSDataRamboTainer but %s" % self._rti.__class__.__name__
             raise BaseException(strMessage)
         if subtractedCurve is None:
             self._subtractedCurve = None
@@ -6675,6 +6467,18 @@ class XSDataResultBioSaxsSmartMergev1_0(XSDataResult):
             raise BaseException(strMessage)
     def delVolume(self): self._volume = None
     volume = property(getVolume, setVolume, delVolume, "Property for volume")
+    # Methods and properties for the 'rti' attribute
+    def getRti(self): return self._rti
+    def setRti(self, rti):
+        if rti is None:
+            self._rti = None
+        elif rti.__class__.__name__ == "XSDataRamboTainer":
+            self._rti = rti
+        else:
+            strMessage = "ERROR! XSDataResultBioSaxsSmartMergev1_0.setRti argument is not XSDataRamboTainer but %s" % rti.__class__.__name__
+            raise BaseException(strMessage)
+    def delRti(self): self._rti = None
+    rti = property(getRti, setRti, delRti, "Property for rti")
     # Methods and properties for the 'subtractedCurve' attribute
     def getSubtractedCurve(self): return self._subtractedCurve
     def setSubtractedCurve(self, subtractedCurve):
@@ -6717,6 +6521,8 @@ class XSDataResultBioSaxsSmartMergev1_0(XSDataResult):
             self.gnom.export(outfile, level, name_='gnom')
         if self._volume is not None:
             self.volume.export(outfile, level, name_='volume')
+        if self._rti is not None:
+            self.rti.export(outfile, level, name_='rti')
         if self._subtractedCurve is not None:
             self.subtractedCurve.export(outfile, level, name_='subtractedCurve')
         if self._sample is not None:
@@ -6746,6 +6552,11 @@ class XSDataResultBioSaxsSmartMergev1_0(XSDataResult):
             obj_ = XSDataDoubleWithUnit()
             obj_.build(child_)
             self.setVolume(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'rti':
+            obj_ = XSDataRamboTainer()
+            obj_.build(child_)
+            self.setRti(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'subtractedCurve':
             obj_ = XSDataFile()
