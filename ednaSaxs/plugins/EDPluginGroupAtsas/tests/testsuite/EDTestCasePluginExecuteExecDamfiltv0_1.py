@@ -22,15 +22,15 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-__author__ = "irakli"
+__author__ = "irakli & Jerome Kieffer"
 __license__ = "GPLv3+"
-__copyright__ = "DLS"
+__copyright__ = "2010 DLS, 2014 ESRF"
 
 import os
 
 from EDTestCasePluginExecute             import EDTestCasePluginExecute
-
 from XSDataCommon                    import XSDataString
+from parse_atsas import get_ATSAS_version
 
 
 class EDTestCasePluginExecuteExecDamfiltv0_1(EDTestCasePluginExecute):

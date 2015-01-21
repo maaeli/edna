@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<XSDataResultAutoRg>
+    <autoRgOut>
+        <filename>
+            <path>
+                <value>${EDNA_TESTIMAGES}/autosubtracted.dat</value>
+            </path>
+        </filename>
+        <rg>
+            <value>2.9109799999999999e+00</value>
+        </rg>
+        <rgStdev>
+            <value>9.2685100000000006e-02</value>
+        </rgStdev>
+        <i0>
+            <value>3.2355700000000000e+06</value>
+        </i0>
+        <i0Stdev>
+            <value>2.3191900000000001e+03</value>
+        </i0Stdev>
+        <firstPointUsed>
+            <value>41</value>
+        </firstPointUsed>
+        <lastPointUsed>
+            <value>67</value>
+        </lastPointUsed>
+        <quality>
+            <value>6.9865600000000005e-01</value>
+        </quality>
+        <isagregated>
+            <value>false</value>
+        </isagregated>
+    </autoRgOut>
+</XSDataResultAutoRg>

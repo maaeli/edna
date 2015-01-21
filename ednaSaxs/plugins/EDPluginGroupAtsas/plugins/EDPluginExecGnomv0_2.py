@@ -30,6 +30,7 @@ from __future__ import with_statement
 __authors__ = ["irakli", "Jérôme Kieffer"]
 __license__ = "GPLv3+"
 __copyright__ = "2011 DLS, 2012 ESRF"
+__status__ = "deprecated"
 
 import os
 from StringIO import StringIO

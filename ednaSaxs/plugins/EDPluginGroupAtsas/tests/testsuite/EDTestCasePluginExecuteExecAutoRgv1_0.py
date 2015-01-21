@@ -34,6 +34,7 @@ from EDAssert                            import EDAssert
 from EDTestCasePluginExecute             import EDTestCasePluginExecute
 from XSDataEdnaSaxs import XSDataInputAutoRg as XSDataInput
 from XSDataEdnaSaxs import XSDataResultAutoRg as XSDataResult
+from parse_atsas import get_ATSAS_version
 
 class EDTestCasePluginExecuteExecAutoRgv1_0(EDTestCasePluginExecute):
     """
@@ -48,8 +49,11 @@ class EDTestCasePluginExecuteExecAutoRgv1_0(EDTestCasePluginExecute):
 #                                               "XSConfiguration_AutoRg.xml"))
         self.setDataInputFile(os.path.join(self.getPluginTestsDataHome(), \
                                            "XSDataInputAutoRg_reference.xml"))
-        self.setReferenceDataOutputFile(os.path.join(self.getPluginTestsDataHome(), \
-                                                     "XSDataResultAutoRg_reference.xml"))
+        if get_ATSAS_version<2962:
+            ref = "XSDataResultAutoRg_reference.xml"
+        else:
+            ref = "XSDataResultAutoRg_reference.xml.2962"
+        self.setReferenceDataOutputFile(os.path.join(self.getPluginTestsDataHome(), ref))
 
     def preProcess(self):
         """

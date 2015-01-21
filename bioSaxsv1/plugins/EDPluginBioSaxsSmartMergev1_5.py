@@ -74,8 +74,8 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
     # dictAve = {} #key=?; value=path to average file
     lastBuffer = None
     lastSample = None
-    __strControlledPluginDataver = "EDPluginExecDataverv1_0"
-    __strControlledPluginDatcmp = "EDPluginExecDatcmpv1_0"
+    __strControlledPluginDataver = "EDPluginExecDataverv2_0"
+    __strControlledPluginDatcmp = "EDPluginExecDatcmpv2_0"
     __strControlledPluginWaitFile = "EDPluginWaitMultiFile"
     __strControlledPluginAutoSub = "EDPluginAutoSubv1_0"
     __strControlledPluginSaxsAnalysis = "EDPluginControlSaxsAnalysisv1_1"
@@ -529,6 +529,9 @@ class EDPluginBioSaxsSmartMergev1_5(EDPluginControl):
         self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsSmartMergev1_5.doFailureExecAutoSub")
         self.retrieveMessages(_edPlugin)
         strErr = "Error in Processing of EDNA 'AutoSub'"
+        # clean up "EDNA memory"
+        self.__class__.lastBuffer = self.dataInput.mergedCurve
+        self.__class__.lastSample = None
         self.ERROR(strErr)
         self.addExecutiveSummaryLine(strErr)
         self.setFailure()

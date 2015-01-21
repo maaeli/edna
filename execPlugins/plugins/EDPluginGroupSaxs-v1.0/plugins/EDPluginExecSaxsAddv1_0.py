@@ -34,6 +34,7 @@ Add two images (taking into account variances ...)
 __author__ = "Jerome Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "2010 - ESRF"
+__status__ = "deprecated"
 
 import os
 from EDVerbose import EDVerbose

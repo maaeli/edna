@@ -139,6 +139,10 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
                 self.__strAngleUnit = "2"
         self.generateDamminScript()
 
+    # def process(self, _edObject=None):
+    #    EDPluginExecProcessScript.process(self)
+    #    self.DEBUG("EDPluginExecDammin0_2.process")
+
 
     def postProcess(self, _edObject=None):
         EDPluginExecProcessScript.postProcess(self)
@@ -212,8 +216,9 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
             commandString += self.returnModelDimensions()
 
         commandString += self.__strParticleShape
-        commandString.extend(5 * [''])                  # Just in case there are more default settings
+        commandString.extend(5 * [' '])                  # Just in case there are more default settings
 #        print commandString
+        # extra /n at the end seems to be necesarry for python script
         self.addListCommandExecution('\n'.join(commandString))
 
 

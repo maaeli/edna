@@ -719,3 +719,61 @@ Points   %i to %i (%i total)""" % (r["Rg"], r["deltaRg"], 100.0 * r["deltaRg"] /
                 else:
                     print("!! %s: No Rg, was %i %i.\t took %.3fs" % (afile, first_point, last_point, t1 - t0))
 
+
+def gnom(fname, Rg, I0):
+    """
+    Exploratory work for Gnom replacement
+    """
+    import numpy
+    M = numpy.loadtxt(fname)
+    q = M[:, 0]
+    I = M[:, i]
+    I = M[:, 1]
+    err = M[:, 2]
+#    semilogy(q,I)
+    qstep = q[1] - q[0]
+    q.max()
+    q.min()
+    rmax = 1. / q.min()
+    rmin = 1 / q.max()
+    rstep = rmin
+    lostep = int(numpy.ceil((rmin - 1e-08) / rstep))
+    histep = int(numpy.floor((rmax + 1e-08) / rstep)) + 1
+    qmaxrstep = numpy.pi / rstep
+    nbase = max((len(q), histep, qmaxrstep / qstep))
+    nlog2 = int(numpy.ceil(numpy.log2(nbase)))
+    nout = 2 ** nlog2
+    qmaxdb = 2 * nout * qstep
+    q_full = numpy.linspace(0, 6, nout)
+    guinier = I0 * numpy.exp(-Rg * Rg * q_full * q_full / 3)
+    I_interp = numpy.interp(q_full, q, I, 0, 0)
+    (np.log(I_interp) - np.log(guinier))
+    I_interp = numpy.interp(q_full, q, I, 0, 0)
+    delta = (np.log(I_interp) - np.log(guinier))
+    delta.min()
+    delta.max()
+    delta[delta == -numpy.inf] = delta.max()
+    switch = numpy.argmin(delta)
+    I_merge = guinier
+    I_merge[switch:] = I_interp[switch:]
+    crho = numpy.fft.ifft(I_merge) ** 2
+    plot(numpy.imag(crho))
+
+#        from numpy.fft import ifft
+#        lostep = int(numpy.ceil((self.rmin - 1e-08) / self.rstep))
+#        histep = int(numpy.floor((self.rmax + 1e-08) / self.rstep)) + 1
+#        self.xout = numpy.arange(lostep, histep) * self.rstep
+#        self.qstep = self.xin[1] - self.xin[0]
+#        self.qmaxrstep = numpy.pi / self.rstep
+#        nin = len(self.xin)
+#        nbase = max([nin, histep, self.qmaxrstep / self.qstep])
+#        nlog2 = int(numpy.ceil(numpy.log2(nbase)))
+#        nout = 2 ** nlog2
+#        qmaxdb = 2 * nout * self.qstep
+#        yindb = numpy.concatenate((self.yin, numpy.zeros(2 * nout - nin)))
+#        cyoutdb = ifft(yindb) * 2 / numpy.pi * qmaxdb
+#        youtdb = numpy.imag(cyoutdb)
+#        xstepfine = 2 * numpy.pi / qmaxdb
+#        xoutfine = numpy.arange(nout) * xstepfine
+#        youtfine = youtdb[:nout]
+#        self.yout = numpy.interp(self.xout, xoutfine, youtfine)
