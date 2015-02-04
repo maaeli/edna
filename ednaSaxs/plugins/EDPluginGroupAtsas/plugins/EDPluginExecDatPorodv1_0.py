@@ -75,7 +75,10 @@ class EDPluginExecDatPorodv1_0(EDPluginExecProcessScript):
         logfile = os.path.join(self.getWorkingDirectory(), self.getScriptLogFileName())
         out = open(logfile, "r").read().split()
         try:
-            res = float(out[0])
+            if len(out) > 2:
+                res = float(out[-2])
+            else:
+                res = float(out[0])
         except (ValueError, IndexError):
             self.error("Unable to read porod log file: " + logfile)
             self.setFailure()
