@@ -24,12 +24,12 @@
 #
 from __future__ import with_statement
 
-__author__ = "Jérôme Kieffer"
+__author__ = "Jérôme Kieffer, Alejandro Antolinos, Martha Brennich"
 __contact__ = "Jerome.Kieffer@esrf.fr"
 __license__ = "GPLv3+"
-__copyright__ = "2011, ESRF Grenoble"
-__date__ = "20130417"
-__status__ = "development"
+__copyright__ = "2015, ESRF Grenoble, EMBL Grenoble"
+__date__ = "20150117"
+__status__ = "production"
 
 import os, shutil, time
 from math import log

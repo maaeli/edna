@@ -58,9 +58,11 @@ complex type XSDataInputDatcmp extends XSDataInput {
 complex type XSDataResultDatcmp extends XSDataResult {
 	"Higher chi-values indicate dis-similarities in the input.\n
 	 Fidelity gives the likelihood of the two data sets being identical.
+	 fidelity is provided by all test methods, the other parameters only by some
 	"
-	chi: XSDataDouble
 	fidelity: XSDataDouble
+	chi: XSDataDouble optional	
+	nonadjustedFidelity: XSDataDouble optional
 }
 
 complex type XSDataInputDataver extends XSDataInput {

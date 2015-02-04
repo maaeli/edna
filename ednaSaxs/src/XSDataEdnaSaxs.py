@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Thu Jan 8 11:14::43 2015 by EDGenerateDS.
+# Generated Wed Feb 4 01:57::31 2015 by EDGenerateDS.
 #
 
 import os, sys
@@ -11,7 +11,7 @@ from xml.dom import Node
 
 strEdnaHome = os.environ.get("EDNA_HOME", None)
 
-dictLocation = {  "XSDataCommon": "kernel/datamodel", \
+dictLocation = { "XSDataCommon": "kernel/datamodel", \
 }
 
 try:
@@ -19,12 +19,12 @@ try:
     from XSDataCommon import XSDataArray
     from XSDataCommon import XSDataBoolean
     from XSDataCommon import XSDataDouble
+    from XSDataCommon import XSDataString
     from XSDataCommon import XSDataFile
     from XSDataCommon import XSDataInput
     from XSDataCommon import XSDataInteger
     from XSDataCommon import XSDataResult
     from XSDataCommon import XSDataRotation
-    from XSDataCommon import XSDataString
     from XSDataCommon import XSDataVectorDouble
     from XSDataCommon import XSDataDoubleWithUnit
     from XSDataCommon import XSDataImage
@@ -44,12 +44,12 @@ from XSDataCommon import XSData
 from XSDataCommon import XSDataArray
 from XSDataCommon import XSDataBoolean
 from XSDataCommon import XSDataDouble
+from XSDataCommon import XSDataString
 from XSDataCommon import XSDataFile
 from XSDataCommon import XSDataInput
 from XSDataCommon import XSDataInteger
 from XSDataCommon import XSDataResult
 from XSDataCommon import XSDataRotation
-from XSDataCommon import XSDataString
 from XSDataCommon import XSDataVectorDouble
 from XSDataCommon import XSDataDoubleWithUnit
 from XSDataCommon import XSDataImage
@@ -7862,16 +7862,10 @@ class XSDataResultDatcmp(XSDataResult):
     """Higher chi-values indicate dis-similarities in the input.
 
 	 Fidelity gives the likelihood of the two data sets being identical.
+	 fidelity is provided by all test methods, the other parameters only by some
 	"""
-    def __init__(self, status=None, fidelity=None, chi=None):
+    def __init__(self, status=None, nonadjustedFidelity=None, chi=None, fidelity=None):
         XSDataResult.__init__(self, status)
-        if chi is None:
-            self._chi = None
-        elif chi.__class__.__name__ == "XSDataDouble":
-            self._chi = chi
-        else:
-            strMessage = "ERROR! XSDataResultDatcmp constructor argument 'chi' is not XSDataDouble but %s" % self._chi.__class__.__name__
-            raise BaseException(strMessage)
         if fidelity is None:
             self._fidelity = None
         elif fidelity.__class__.__name__ == "XSDataDouble":
@@ -7879,18 +7873,20 @@ class XSDataResultDatcmp(XSDataResult):
         else:
             strMessage = "ERROR! XSDataResultDatcmp constructor argument 'fidelity' is not XSDataDouble but %s" % self._fidelity.__class__.__name__
             raise BaseException(strMessage)
-    # Methods and properties for the 'chi' attribute
-    def getChi(self): return self._chi
-    def setChi(self, chi):
         if chi is None:
             self._chi = None
         elif chi.__class__.__name__ == "XSDataDouble":
             self._chi = chi
         else:
-            strMessage = "ERROR! XSDataResultDatcmp.setChi argument is not XSDataDouble but %s" % chi.__class__.__name__
+            strMessage = "ERROR! XSDataResultDatcmp constructor argument 'chi' is not XSDataDouble but %s" % self._chi.__class__.__name__
             raise BaseException(strMessage)
-    def delChi(self): self._chi = None
-    chi = property(getChi, setChi, delChi, "Property for chi")
+        if nonadjustedFidelity is None:
+            self._nonadjustedFidelity = None
+        elif nonadjustedFidelity.__class__.__name__ == "XSDataDouble":
+            self._nonadjustedFidelity = nonadjustedFidelity
+        else:
+            strMessage = "ERROR! XSDataResultDatcmp constructor argument 'nonadjustedFidelity' is not XSDataDouble but %s" % self._nonadjustedFidelity.__class__.__name__
+            raise BaseException(strMessage)
     # Methods and properties for the 'fidelity' attribute
     def getFidelity(self): return self._fidelity
     def setFidelity(self, fidelity):
@@ -7903,6 +7899,30 @@ class XSDataResultDatcmp(XSDataResult):
             raise BaseException(strMessage)
     def delFidelity(self): self._fidelity = None
     fidelity = property(getFidelity, setFidelity, delFidelity, "Property for fidelity")
+    # Methods and properties for the 'chi' attribute
+    def getChi(self): return self._chi
+    def setChi(self, chi):
+        if chi is None:
+            self._chi = None
+        elif chi.__class__.__name__ == "XSDataDouble":
+            self._chi = chi
+        else:
+            strMessage = "ERROR! XSDataResultDatcmp.setChi argument is not XSDataDouble but %s" % chi.__class__.__name__
+            raise BaseException(strMessage)
+    def delChi(self): self._chi = None
+    chi = property(getChi, setChi, delChi, "Property for chi")
+    # Methods and properties for the 'nonadjustedFidelity' attribute
+    def getNonadjustedFidelity(self): return self._nonadjustedFidelity
+    def setNonadjustedFidelity(self, nonadjustedFidelity):
+        if nonadjustedFidelity is None:
+            self._nonadjustedFidelity = None
+        elif nonadjustedFidelity.__class__.__name__ == "XSDataDouble":
+            self._nonadjustedFidelity = nonadjustedFidelity
+        else:
+            strMessage = "ERROR! XSDataResultDatcmp.setNonadjustedFidelity argument is not XSDataDouble but %s" % nonadjustedFidelity.__class__.__name__
+            raise BaseException(strMessage)
+    def delNonadjustedFidelity(self): self._nonadjustedFidelity = None
+    nonadjustedFidelity = property(getNonadjustedFidelity, setNonadjustedFidelity, delNonadjustedFidelity, "Property for nonadjustedFidelity")
     def export(self, outfile, level, name_='XSDataResultDatcmp'):
         showIndent(outfile, level)
         outfile.write(unicode('<%s>\n' % name_))
@@ -7911,29 +7931,34 @@ class XSDataResultDatcmp(XSDataResult):
         outfile.write(unicode('</%s>\n' % name_))
     def exportChildren(self, outfile, level, name_='XSDataResultDatcmp'):
         XSDataResult.exportChildren(self, outfile, level, name_)
-        if self._chi is not None:
-            self.chi.export(outfile, level, name_='chi')
-        else:
-            warnEmptyAttribute("chi", "XSDataDouble")
         if self._fidelity is not None:
             self.fidelity.export(outfile, level, name_='fidelity')
         else:
             warnEmptyAttribute("fidelity", "XSDataDouble")
+        if self._chi is not None:
+            self.chi.export(outfile, level, name_='chi')
+        if self._nonadjustedFidelity is not None:
+            self.nonadjustedFidelity.export(outfile, level, name_='nonadjustedFidelity')
     def build(self, node_):
         for child_ in node_.childNodes:
             nodeName_ = child_.nodeName.split(':')[-1]
             self.buildChildren(child_, nodeName_)
     def buildChildren(self, child_, nodeName_):
         if child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'fidelity':
+            obj_ = XSDataDouble()
+            obj_.build(child_)
+            self.setFidelity(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'chi':
             obj_ = XSDataDouble()
             obj_.build(child_)
             self.setChi(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'fidelity':
+            nodeName_ == 'nonadjustedFidelity':
             obj_ = XSDataDouble()
             obj_.build(child_)
-            self.setFidelity(obj_)
+            self.setNonadjustedFidelity(obj_)
         XSDataResult.buildChildren(self, child_, nodeName_)
     #Method for marshalling an object
     def marshal( self ):

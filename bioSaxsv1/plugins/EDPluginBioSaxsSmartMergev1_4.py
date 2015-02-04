@@ -29,7 +29,7 @@ __contact__ = "Jerome.Kieffer@esrf.fr"
 __license__ = "GPLv3+"
 __copyright__ = "2011, ESRF Grenoble"
 __date__ = "20120918"
-__status__ = "Production"
+__status__ = "deprecated"
 
 import os, shutil, time
 from math import log

@@ -25,8 +25,8 @@
 
 __author__ = "Jérôme Kieffer, Martha Brennich"
 __license__ = "GPLv3+"
-__copyright__ = "2014, ESRF, Grenoble"
-__date__ = "2014-10-28"
+__copyright__ = "2015, ESRF, Grenoble"
+__date__ = "2015-02-04"
 
 import os
 from EDPluginExecProcessScript import EDPluginExecProcessScript
@@ -36,6 +36,8 @@ from XSDataEdnaSaxs import XSDataInputDatcmp, XSDataResultDatcmp, XSDataDouble
 class EDPluginExecDatcmpv2_0(EDPluginExecProcessScript):
     """
     Execution plugin to run datcmp: evaluation of the Similarity of two curves (in a 2-3 column ascii file)
+    Updated for ATSAS 2.6.0 CORMAP type test
+    Currently only supports pair-wise test
     """
 
 
@@ -46,8 +48,11 @@ class EDPluginExecDatcmpv2_0(EDPluginExecProcessScript):
         EDPluginExecProcessScript.__init__(self)
         self.setXSDataInputClass(XSDataInputDatcmp)
         self.listFiles = []
-        self.fChi = None
         self.fFidelity = None
+        self.naFidelity = None
+        self.testType = 'CORMAP'
+        self.outputType = 'full'
+        self.commandString = ""
 
 
     def checkParameters(self):
@@ -76,10 +81,10 @@ class EDPluginExecDatcmpv2_0(EDPluginExecProcessScript):
         if os.path.isfile(strResultFile):
             for line in open(strResultFile):
                 words = line.split()
-                if len(words) == 5:
+                if 'vs.' in words:
                     try:
-                        self.fChi = float(words[-2])
                         self.fFidelity = float(words[-1])
+                        self.naFidelity = float(words[-2])
                     except ValueError:
                         self.WARNING("Strange ouptut from %s:%s %s" % (strResultFile, os.linesep, line))
                     else:
@@ -87,8 +92,8 @@ class EDPluginExecDatcmpv2_0(EDPluginExecProcessScript):
 
         # Create some output data
         xsDataResult = XSDataResultDatcmp()
-        if self.fChi is not None:
-            xsDataResult.chi = XSDataDouble(self.fChi)
+        if self.naFidelity is not None:
+            xsDataResult.nonadjustedFidelity = XSDataDouble(self.naFidelity)
         if self.fFidelity is not None:
             xsDataResult.fidelity = XSDataDouble(self.fFidelity)
 
@@ -96,4 +101,9 @@ class EDPluginExecDatcmpv2_0(EDPluginExecProcessScript):
 
     def generateDatcmpScript(self):
         self.DEBUG("EDPluginExecDatcmpv1_0.generateScript")
-        self.setScriptCommandline("--test=CHI-SQUARE " + " ".join(self.listFiles[:2]))
+        self.commamdString = ""
+        self.commandString += "--test=" + self.testType
+        self.commandString += " --format="  +  self.outputType
+        self.commandString += " " + " ".join(self.listFiles[:])
+        self.setScriptCommandline(self.commandString)
+        
