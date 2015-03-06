@@ -27,6 +27,7 @@ __author__ = "Jérôme Kieffer, Martha Brennich"
 __license__ = "GPLv3+"
 __copyright__ = "2015, ESRF, Grenoble"
 __date__ = "2015-02-04"
+__status__ = "production"
 
 import os
 from EDPluginExecProcessScript import EDPluginExecProcessScript
@@ -83,8 +84,8 @@ class EDPluginExecDatcmpv2_0(EDPluginExecProcessScript):
                 words = line.split()
                 if 'vs.' in words:
                     try:
-                        self.fFidelity = float(words[-1])
-                        self.naFidelity = float(words[-2])
+                        self.fFidelity = float(words[-1].strip('*'))
+                        self.naFidelity = float(words[-2].strip('*'))
                     except ValueError:
                         self.WARNING("Strange ouptut from %s:%s %s" % (strResultFile, os.linesep, line))
                     else:

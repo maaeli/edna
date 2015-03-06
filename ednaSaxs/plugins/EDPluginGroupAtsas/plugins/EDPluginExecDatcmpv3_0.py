@@ -27,6 +27,7 @@ __author__ = "Jérôme Kieffer, Martha Brennich"
 __license__ = "GPLv3+"
 __copyright__ = "2014, ESRF, Grenoble"
 __date__ = "2014-11-28"
+__status__ = "deprecated"
 
 import os
 from EDPluginExecProcessScript import EDPluginExecProcessScript

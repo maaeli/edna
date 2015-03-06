@@ -604,7 +604,12 @@ class HPLCrun(object):
 
 
                     b, a = butter(first_butter_par, second_butter_par)
-                    fl = filtfilt(b, a, Ishort)
+                    #We should take care of the pading length to avoid errors
+                    if 3*max(len(a),len(b)) > Ishort:
+                        fl = filtfilt(b, a, Ishort)
+                    else:
+                        fl = filtfilt(b, a, Ishort,padlen = Ishort.shape[0]-2)
+
 
 
                     # The parameters for the peak finding

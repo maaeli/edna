@@ -24,7 +24,7 @@
         "DeviceType": "csr_ocl_gpu" 
     },
     "EDPluginBioSaxsHPLCv1_2":{
-        "similaritySample": 0.01,
+        "similaritySample": 0.001,
         "similarityBuffer": 0.1
     }
 }
