@@ -82,7 +82,7 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
     __strControlledPluginDatcmp = "EDPluginExecDatcmpv2_0"
     __strControlledPluginWaitFile = "EDPluginWaitMultiFile"
     __strControlledPluginAutoSub = "EDPluginAutoSubv1_0"
-    __strControlledPluginSaxsAnalysis = "EDPluginControlSaxsAnalysisv1_0"
+    __strControlledPluginSaxsAnalysis = "EDPluginControlSaxsAnalysisv1_1"
     __strControlledPluginSaxsISPyB = "EDPluginBioSaxsISPyBv1_0"
     cpRsync = "EDPluginExecRsync"
 
@@ -114,6 +114,7 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
         self.autoRg = None
         self.gnom = None
         self.volume = None
+	self.rti = None
         self.strRadiationDamage = None
         self.strMergedFile = None
         self.lstSub = []
@@ -126,6 +127,8 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
         self.xsScatterPlot = None
         self.xsGuinierPlot = None
         self.xsKratkyPlot = None
+	self.xsKratkyRgPlot = None
+	self.KratkyVcPlot = None
         self.xsDensityPlot = None
         self.xsdSubtractedCurve = None
         self.outdir = None #directory on rnice for analysis results to go to
@@ -413,6 +416,7 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
         self.xsDataResult.autoRg = self.autoRg
         self.xsDataResult.gnom = self.gnom
         self.xsDataResult.volume = self.volume
+	self.xsDataResult.rti = self.rti
 
     def finallyProcess(self, _edObject=None):
         EDPluginControl.finallyProcess(self)
@@ -630,9 +634,15 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
         self.retrieveMessages(_edPlugin)
         self.gnom = _edPlugin.dataOutput.gnom
         self.volume = _edPlugin.dataOutput.volume
+	self.rti = _edPlugin.dataOutput.rti
         self.xsScatterPlot = _edPlugin.dataOutput.scatterPlot
         self.xsGuinierPlot = _edPlugin.dataOutput.guinierPlot
         self.xsKratkyPlot = _edPlugin.dataOutput.kratkyPlot
+	if hasattr(_edPlugin.dataOutput, 'kratkyRgPlot'):
+	    self.xsKratkyRgPlot = _edPlugin.dataOutput.kratkyRgPlot
+	if hasattr(_edPlugin.dataOutput, 'kratkyVcPlot'):
+	    self.xsKratkyVcPlot = _edPlugin.dataOutput.kratkyVcPlot
+
         self.xsDensityPlot = _edPlugin.dataOutput.densityPlot
         self.addExecutiveSummaryLine(_edPlugin.dataOutput.status.executiveSummary.value)
 
