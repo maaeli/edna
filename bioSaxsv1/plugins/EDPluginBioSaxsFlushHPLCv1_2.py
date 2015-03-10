@@ -33,7 +33,7 @@ import traceback
 
 from EDPluginControl import EDPluginControl
 from EDFactoryPlugin import edFactoryPlugin
-edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
+edFactoryPlugin.loadModule("XSDataBioSaxsv1_1")
 edFactoryPlugin.loadModule("XSDataEdnaSaxs")
 
 from XSDataBioSaxsv1_0 import XSDataInputBioSaxsHPLCv1_0, XSDataResultBioSaxsHPLCv1_0, \
@@ -59,7 +59,7 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
     """
     strControlledPluginDatAver = "EDPluginExecDataverv2_0"
     strControlledPluginISPyB = "EDPluginBioSaxsISPyB_HPLCv1_0"
-    __strControlledPluginSaxsAnalysis = "EDPluginControlSaxsAnalysisv1_0"
+    __strControlledPluginSaxsAnalysis = "EDPluginControlSaxsAnalysisv1_1"
     __strControlledPluginSaxsModeling = "EDPluginBioSaxsToSASv1_1"
     __strControlledPluginISPyBAnalysis = "EDPluginHPLCPrimayDataISPyBv1_0"
 
@@ -128,6 +128,7 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
         executiveSummary = os.linesep.join(self.lstExecutiveSummary)
         self.xsDataResult.status = XSDataStatus(executiveSummary=XSDataString(executiveSummary))
         self.dataOutput = self.xsDataResult
+
 
     def processRun(self, run):
         run.dump_json()
@@ -256,10 +257,6 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
         run = EDPluginBioSaxsHPLCv1_2.dictHPLC[self.runId]
         curvename = _edPlugin.dataOutput.autoRg.filename.path.value
         run.merge_analysis[curvename] = _edPlugin.dataOutput
-#         run.merge_xsScatterPlot[curvename] = _edPlugin.dataOutput.scatterPlot
-#         run.merge_xsGuinierPlot[curvename] = _edPlugin.dataOutput.guinierPlot
-#         run.merge_xsKratkyPlot[curvename] = _edPlugin.dataOutput.kratkyPlot
-#         run.merge_xsDensityPlot[curvename] = _edPlugin.dataOutput.densityPlot
         self.addExecutiveSummaryLine(_edPlugin.dataOutput.status.executiveSummary.value)
 
     def doFailureSaxsAnalysis(self, _edPlugin=None):

@@ -31,16 +31,20 @@ __date__ = "2013-04-04"
 __status__ = "Development"
 
 import os, gc, sys
+
+
+from numpy import loadtxt
 from EDPluginControl import EDPluginControl
 from XSDataEdnaSaxs import XSDataInputSaxsAnalysis, XSDataResultSaxsAnalysis, \
                            XSDataInputAutoRg, XSDataInputDatGnom, XSDataInputDatPorod
-from XSDataCommon import XSDataString, XSDataFile, XSDataInteger, XSDataStatus
-from saxs_plotting import scatterPlot, guinierPlot, kartkyPlot, densityPlot
+from XSDataCommon import XSDataString, XSDataFile, XSDataInteger, XSDataStatus, XSDataDouble
+from XSDataBioSaxsv1_0 import XSDataRamboTainer
+from saxs_plotting import scatterPlot, guinierPlot, kartkyPlot, densityPlot, kratkyRgPlot, kratkyVcPlot
 
 from EDUtilsBioSaxs import RamboTainerInvariant
 
 
-class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
+class EDPluginControlSaxsAnalysisv1_1(EDPluginControl):
     """
     Executes the pipeline:
     * AutoRg -> Extract the Guinier region and measure Rg, I0
@@ -63,21 +67,22 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
         self.gnomFile = None
         self.autoRg = None
         self.gnom = None
-        self.xVolume = None
+        self.Volume = None
+        self.rti = None
         self.xsDataResult = XSDataResultSaxsAnalysis()
 
     def checkParameters(self):
         """
         Checks the mandatory parameters.
         """
-        self.DEBUG("EDPluginControlSaxsAnalysisv1_0.checkParameters")
+        self.DEBUG("EDPluginControlSaxsAnalysisv1_1.checkParameters")
         self.checkMandatoryParameters(self.dataInput, "Data Input is None")
         self.checkMandatoryParameters(self.dataInput.scatterCurve, "No scattering curve provided")
 
 
     def preProcess(self, _edObject=None):
         EDPluginControl.preProcess(self)
-        self.DEBUG("EDPluginControlSaxsAnalysisv1_0.preProcess")
+        self.DEBUG("EDPluginControlSaxsAnalysisv1_1.preProcess")
         self.scatterFile = self.dataInput.scatterCurve.path.value
         if self.dataInput.gnomFile is not None:
             self.gnomFile = self.dataInput.gnomFile.path.value
@@ -88,7 +93,7 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
 
     def process(self, _edObject=None):
         EDPluginControl.process(self)
-        self.DEBUG("EDPluginControlSaxsAnalysisv1_0.process")
+        self.DEBUG("EDPluginControlSaxsAnalysisv1_1.process")
         if self.autoRg is None:
             self.edPluginAutoRg = self.loadPlugin(self.cpAutoRg)
             self.edPluginAutoRg.dataInput = XSDataInputAutoRg(inputCurve=[self.dataInput.scatterCurve])
@@ -136,7 +141,7 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
                 if plt:
                     plt.close(guinierplot)
             except Exception as error:
-                self.ERROR("EDPluginControlSaxsAnalysisv1_0 in guinierplot: %s"%error)
+                self.ERROR("EDPluginControlSaxsAnalysisv1_1 in guinierplot: %s" % error)
             else:
                 self.xsDataResult.guinierPlot = XSDataFile(XSDataString(guinierfile))
 
@@ -148,9 +153,35 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
                 if plt:
                     plt.close(kratkyplot)
             except Exception as error:
-                self.ERROR("EDPluginControlSaxsAnalysisv1_0 in kratkyplot: %s"%error)
+                self.ERROR("EDPluginControlSaxsAnalysisv1_1 in kratkyplot: %s" % error)
             else:
                 self.xsDataResult.kratkyPlot = XSDataFile(XSDataString(kratkyfile))
+            if self.autoRg is not None:    
+                if self.autoRg.i0.value > 0 and self.autoRg.rg.value > 0:
+                    try:
+                        kratkyRgfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-KratkyRg" + ext)
+                        kratkyRgplot = kratkyRgPlot(self.scatterFile, self.autoRg.i0.value, self.autoRg.rg.value,
+                                                   filename=kratkyRgfile, format=ext[1:])
+                        kratkyRgplot.clf()
+                        if plt:
+                            plt.close(kratkyRgplot)
+                    except Exception as error:
+                        self.ERROR("EDPluginControlSaxsAnalysisv1_1 in kratkyRgplot: %s" % error)
+                    else:
+                        self.xsDataResult.kratkyRgPlot = XSDataFile(XSDataString(kratkyRgfile))       
+            if self.autoRg is not None and self.rti is not None:            
+                if self.autoRg.i0.value > 0 and self.rti.vc.value > 0:
+                    try:
+                        kratkyVcfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-KratkyVc" + ext)
+                        kratkyVcplot = kratkyVcPlot(self.scatterFile, self.autoRg.i0.value, self.rti.vc.value,
+                                                        filename=kratkyVcfile, format=ext[1:])
+                        kratkyVcplot.clf()
+                        if plt:
+                            plt.close(kratkyVcplot)
+                    except Exception as error:
+                        self.ERROR("EDPluginControlSaxsAnalysisv1_1 in kratkyVcplot: %s" % error)
+                    else:
+                        self.xsDataResult.kratkyVcPlot = XSDataFile(XSDataString(kratkyVcfile))
             try:
                 scatterplotfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-scattering" + ext)
                 scatterplot = scatterPlot(self.scatterFile, unit="nm", gnomfile=self.gnomFile,
@@ -159,7 +190,7 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
                 if plt:
                     plt.close(scatterplot)
             except Exception as error:
-                self.ERROR("EDPluginControlSaxsAnalysisv1_0 in scatterplot: %s"%error)
+                self.ERROR("EDPluginControlSaxsAnalysisv1_1 in scatterplot: %s" % error)
             else:
                 self.xsDataResult.scatterPlot = XSDataFile(XSDataString(scatterplotfile))
             try:
@@ -170,7 +201,7 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
                 if plt:
                     plt.close(densityplot)
             except Exception as error:
-                self.ERROR("EDPluginControlSaxsAnalysisv1_0 in scatterplot: %s"%error)
+                self.ERROR("EDPluginControlSaxsAnalysisv1_1 in scatterplot: %s" % error)
             else:
                 self.xsDataResult.densityPlot = XSDataFile(XSDataString(densityplotfile))
             gc.collect()
@@ -178,7 +209,7 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
 
     def postProcess(self, _edObject=None):
         EDPluginControl.postProcess(self)
-        self.DEBUG("EDPluginControlSaxsAnalysisv1_0.postProcess")
+        self.DEBUG("EDPluginControlSaxsAnalysisv1_1.postProcess")
         # Create some output data
         strLog = """Rg   =   %.2f +/- %2f
 I(0) =   %.2e +/- %.2e
@@ -204,45 +235,67 @@ Volume  =    %12.2f""" % (self.xVolume.value)
 
         self.xsDataResult.autoRg = self.autoRg
         self.xsDataResult.gnom = self.gnom
-        self.xsDataResult.volume = self.xVolume
+        self.xsDataResult.volume = self.Volume
+        self.xsDataResult.rti = self.rti
         self.xsDataResult.status = XSDataStatus(executiveSummary=XSDataString(strLog),
                                                 message=self.getXSDataMessage())
         self.setDataOutput(self.xsDataResult)
 
 
     def doSuccessRg(self, _edPlugin=None):
-        self.DEBUG("EDPluginControlSaxsAnalysisv1_0.doSuccessRg")
-        self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsAnalysisv1_0.doSuccessRg")
+        self.DEBUG("EDPluginControlSaxsAnalysisv1_1.doSuccessRg")
+        self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsAnalysisv1_1.doSuccessRg")
         self.retrieveMessages(_edPlugin)
         self.autoRg = _edPlugin.dataOutput.autoRgOut[0]
+        if self.scatterFile and os.path.exists(self.scatterFile):
+            self.subtracted_data = loadtxt(self.scatterFile)
+            if self.subtracted_data is not None and\
+                self.autoRg.rg and self.autoRg.rgStdev and self.autoRg.i0 and self.autoRg.i0Stdev:
+                dictRTI = RamboTainerInvariant(self.subtracted_data, self.autoRg.rg.value,
+                                               self.autoRg.rgStdev.value, self.autoRg.i0.value,
+                                               self.autoRg.i0Stdev.value, self.autoRg.firstPointUsed.value)
+#             {'Vc': vc[0], 'dVc': vc[1], 'Qr': qr, 'dQr': dqr, 'mass': mass, 'dmass': dmass}
+                Vc = dictRTI.get("Vc")
+                Vc_Stdev = dictRTI.get("dVc")
+                Qr = dictRTI.get("Qr")
+                Qr_Stdev = dictRTI.get("dQ")
+                mass = dictRTI.get("mass")
+                mass_Stdev = dictRTI.get("dmass")
+                xsdRTI = XSDataRamboTainer(vc=XSDataDouble(Vc),
+                                           qr=XSDataDouble(Qr),
+                                           mass=XSDataDouble(mass),
+                                           dvc=XSDataDouble(Vc_Stdev),
+                                           dqr=XSDataDouble(Qr_Stdev),
+                                           dmass=XSDataDouble(mass_Stdev))
+                self.rti = xsdRTI
 
     def doFailureRg(self, _edPlugin=None):
-        self.DEBUG("EDPluginControlSaxsAnalysisv1_0.doFailureRg")
-        self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsAnalysisv1_0.doFailureRg")
+        self.DEBUG("EDPluginControlSaxsAnalysisv1_1.doFailureRg")
+        self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsAnalysisv1_1.doFailureRg")
         self.retrieveMessages(_edPlugin)
         self.setFailure()
 
     def doSuccessGnom(self, _edPlugin=None):
-        self.DEBUG("EDPluginControlSaxsAnalysisv1_0.doSuccessGnom")
-        self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsAnalysisv1_0.doSuccessGnom")
+        self.DEBUG("EDPluginControlSaxsAnalysisv1_1.doSuccessGnom")
+        self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsAnalysisv1_1.doSuccessGnom")
         self.retrieveMessages(_edPlugin)
         self.gnom = _edPlugin.dataOutput.gnom
         self.gnomFile = self.gnom.gnomFile.path.value
 
     def doFailureGnom(self, _edPlugin=None):
-        self.DEBUG("EDPluginControlSaxsAnalysisv1_0.doFailureGnom")
-        self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsAnalysisv1_0.doFailureGnom")
+        self.DEBUG("EDPluginControlSaxsAnalysisv1_1.doFailureGnom")
+        self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsAnalysisv1_1.doFailureGnom")
         self.retrieveMessages(_edPlugin)
         #self.setFailure()
 
     def doSuccessPorod(self, _edPlugin=None):
-        self.DEBUG("EDPluginControlSaxsAnalysisv1_0.doSuccessPorod")
-        self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsAnalysisv1_0.doSuccessPorod")
+        self.DEBUG("EDPluginControlSaxsAnalysisv1_1.doSuccessPorod")
+        self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsAnalysisv1_1.doSuccessPorod")
         self.retrieveMessages(_edPlugin)
         self.xVolume = _edPlugin.dataOutput.volume
 
     def doFailurePorod(self, _edPlugin=None):
-        self.DEBUG("EDPluginControlSaxsAnalysisv1_0.doFailurePorod")
-        self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsAnalysisv1_0.doFailurePorod")
+        self.DEBUG("EDPluginControlSaxsAnalysisv1_1.doFailurePorod")
+        self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsAnalysisv1_1.doFailurePorod")
         self.retrieveMessages(_edPlugin)
         #self.setFailure()
