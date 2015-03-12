@@ -34,7 +34,6 @@ from XSDataEdnaSaxs import XSDataInputAutoRg, XSDataResultAutoRg, \
         XSDataLength, XSDataBoolean, XSDataInteger, XSDataAutoRg, \
         XSDataFile, XSDataDouble, XSDataString
 
-
 class EDPluginExecAutoRgv1_0(EDPluginExecProcessScript):
     """
     Execution plugin for AutoRg (part of Atsas package)

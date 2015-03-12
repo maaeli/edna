@@ -247,10 +247,13 @@ Volume  =    %12.2f""" % (self.xVolume.value)
         self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsAnalysisv1_1.doSuccessRg")
         self.retrieveMessages(_edPlugin)
         self.autoRg = _edPlugin.dataOutput.autoRgOut[0]
+        print "autorg success"
         if self.scatterFile and os.path.exists(self.scatterFile):
             self.subtracted_data = loadtxt(self.scatterFile)
+            print "Trying to calculate RTI"
             if self.subtracted_data is not None and\
                 self.autoRg.rg and self.autoRg.rgStdev and self.autoRg.i0 and self.autoRg.i0Stdev:
+                print "Trying to calculate RTI"
                 dictRTI = RamboTainerInvariant(self.subtracted_data, self.autoRg.rg.value,
                                                self.autoRg.rgStdev.value, self.autoRg.i0.value,
                                                self.autoRg.i0Stdev.value, self.autoRg.firstPointUsed.value)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Wed Jan 21 02:33::48 2015 by EDGenerateDS.
+# Generated Tue Mar 10 04:42::14 2015 by EDGenerateDS.
 #
 
 import os, sys
@@ -11,11 +11,12 @@ from xml.dom import Node
 
 strEdnaHome = os.environ.get("EDNA_HOME", None)
 
+
+
 dictLocation = { \
 "XSDataCommon": "kernel/datamodel", \
 "XSDataEdnaSaxs": "ednaSaxs/datamodel"
 }
- 
 
 try:
     from XSDataCommon import XSData
@@ -1558,571 +1559,6 @@ class XSDataInputBioSaxsAzimutIntv1_0(XSDataInput):
 # end class XSDataInputBioSaxsAzimutIntv1_0
 
 
-class XSDataInputBioSaxsISPyBModellingv1_0(XSDataInput):
-    """Input class for populating ISPyB"""
-    def __init__(self, configuration=None, nsdPlot=None, chiRfactorPlot=None, pdbSolventFile=None, pdbMoleculeFile=None, logFile=None, fitFile=None, damminModel=None, damstartModel=None, damfiltModel=None, damaverModel=None, dammifModels=None, sample=None):
-        XSDataInput.__init__(self, configuration)
-        if sample is None:
-            self._sample = None
-        elif sample.__class__.__name__ == "XSDataBioSaxsSample":
-            self._sample = sample
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'sample' is not XSDataBioSaxsSample but %s" % self._sample.__class__.__name__
-            raise BaseException(strMessage)
-        if dammifModels is None:
-            self._dammifModels = []
-        elif dammifModels.__class__.__name__ == "list":
-            self._dammifModels = dammifModels
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'dammifModels' is not list but %s" % self._dammifModels.__class__.__name__
-            raise BaseException(strMessage)
-        if damaverModel is None:
-            self._damaverModel = None
-        elif damaverModel.__class__.__name__ == "XSDataSaxsModel":
-            self._damaverModel = damaverModel
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'damaverModel' is not XSDataSaxsModel but %s" % self._damaverModel.__class__.__name__
-            raise BaseException(strMessage)
-        if damfiltModel is None:
-            self._damfiltModel = None
-        elif damfiltModel.__class__.__name__ == "XSDataSaxsModel":
-            self._damfiltModel = damfiltModel
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'damfiltModel' is not XSDataSaxsModel but %s" % self._damfiltModel.__class__.__name__
-            raise BaseException(strMessage)
-        if damstartModel is None:
-            self._damstartModel = None
-        elif damstartModel.__class__.__name__ == "XSDataSaxsModel":
-            self._damstartModel = damstartModel
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'damstartModel' is not XSDataSaxsModel but %s" % self._damstartModel.__class__.__name__
-            raise BaseException(strMessage)
-        if damminModel is None:
-            self._damminModel = None
-        elif damminModel.__class__.__name__ == "XSDataSaxsModel":
-            self._damminModel = damminModel
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'damminModel' is not XSDataSaxsModel but %s" % self._damminModel.__class__.__name__
-            raise BaseException(strMessage)
-        if fitFile is None:
-            self._fitFile = None
-        elif fitFile.__class__.__name__ == "XSDataFile":
-            self._fitFile = fitFile
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'fitFile' is not XSDataFile but %s" % self._fitFile.__class__.__name__
-            raise BaseException(strMessage)
-        if logFile is None:
-            self._logFile = None
-        elif logFile.__class__.__name__ == "XSDataFile":
-            self._logFile = logFile
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'logFile' is not XSDataFile but %s" % self._logFile.__class__.__name__
-            raise BaseException(strMessage)
-        if pdbMoleculeFile is None:
-            self._pdbMoleculeFile = None
-        elif pdbMoleculeFile.__class__.__name__ == "XSDataFile":
-            self._pdbMoleculeFile = pdbMoleculeFile
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'pdbMoleculeFile' is not XSDataFile but %s" % self._pdbMoleculeFile.__class__.__name__
-            raise BaseException(strMessage)
-        if pdbSolventFile is None:
-            self._pdbSolventFile = None
-        elif pdbSolventFile.__class__.__name__ == "XSDataFile":
-            self._pdbSolventFile = pdbSolventFile
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'pdbSolventFile' is not XSDataFile but %s" % self._pdbSolventFile.__class__.__name__
-            raise BaseException(strMessage)
-        if chiRfactorPlot is None:
-            self._chiRfactorPlot = None
-        elif chiRfactorPlot.__class__.__name__ == "XSDataFile":
-            self._chiRfactorPlot = chiRfactorPlot
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'chiRfactorPlot' is not XSDataFile but %s" % self._chiRfactorPlot.__class__.__name__
-            raise BaseException(strMessage)
-        if nsdPlot is None:
-            self._nsdPlot = None
-        elif nsdPlot.__class__.__name__ == "XSDataFile":
-            self._nsdPlot = nsdPlot
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'nsdPlot' is not XSDataFile but %s" % self._nsdPlot.__class__.__name__
-            raise BaseException(strMessage)
-    # Methods and properties for the 'sample' attribute
-    def getSample(self): return self._sample
-    def setSample(self, sample):
-        if sample is None:
-            self._sample = None
-        elif sample.__class__.__name__ == "XSDataBioSaxsSample":
-            self._sample = sample
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setSample argument is not XSDataBioSaxsSample but %s" % sample.__class__.__name__
-            raise BaseException(strMessage)
-    def delSample(self): self._sample = None
-    sample = property(getSample, setSample, delSample, "Property for sample")
-    # Methods and properties for the 'dammifModels' attribute
-    def getDammifModels(self): return self._dammifModels
-    def setDammifModels(self, dammifModels):
-        if dammifModels is None:
-            self._dammifModels = []
-        elif dammifModels.__class__.__name__ == "list":
-            self._dammifModels = dammifModels
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setDammifModels argument is not list but %s" % dammifModels.__class__.__name__
-            raise BaseException(strMessage)
-    def delDammifModels(self): self._dammifModels = None
-    dammifModels = property(getDammifModels, setDammifModels, delDammifModels, "Property for dammifModels")
-    def addDammifModels(self, value):
-        if value is None:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.addDammifModels argument is None"
-            raise BaseException(strMessage)            
-        elif value.__class__.__name__ == "XSDataSaxsModel":
-            self._dammifModels.append(value)
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.addDammifModels argument is not XSDataSaxsModel but %s" % value.__class__.__name__
-            raise BaseException(strMessage)
-    def insertDammifModels(self, index, value):
-        if index is None:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.insertDammifModels argument 'index' is None"
-            raise BaseException(strMessage)            
-        if value is None:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.insertDammifModels argument 'value' is None"
-            raise BaseException(strMessage)            
-        elif value.__class__.__name__ == "XSDataSaxsModel":
-            self._dammifModels[index] = value
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.addDammifModels argument is not XSDataSaxsModel but %s" % value.__class__.__name__
-            raise BaseException(strMessage)
-    # Methods and properties for the 'damaverModel' attribute
-    def getDamaverModel(self): return self._damaverModel
-    def setDamaverModel(self, damaverModel):
-        if damaverModel is None:
-            self._damaverModel = None
-        elif damaverModel.__class__.__name__ == "XSDataSaxsModel":
-            self._damaverModel = damaverModel
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setDamaverModel argument is not XSDataSaxsModel but %s" % damaverModel.__class__.__name__
-            raise BaseException(strMessage)
-    def delDamaverModel(self): self._damaverModel = None
-    damaverModel = property(getDamaverModel, setDamaverModel, delDamaverModel, "Property for damaverModel")
-    # Methods and properties for the 'damfiltModel' attribute
-    def getDamfiltModel(self): return self._damfiltModel
-    def setDamfiltModel(self, damfiltModel):
-        if damfiltModel is None:
-            self._damfiltModel = None
-        elif damfiltModel.__class__.__name__ == "XSDataSaxsModel":
-            self._damfiltModel = damfiltModel
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setDamfiltModel argument is not XSDataSaxsModel but %s" % damfiltModel.__class__.__name__
-            raise BaseException(strMessage)
-    def delDamfiltModel(self): self._damfiltModel = None
-    damfiltModel = property(getDamfiltModel, setDamfiltModel, delDamfiltModel, "Property for damfiltModel")
-    # Methods and properties for the 'damstartModel' attribute
-    def getDamstartModel(self): return self._damstartModel
-    def setDamstartModel(self, damstartModel):
-        if damstartModel is None:
-            self._damstartModel = None
-        elif damstartModel.__class__.__name__ == "XSDataSaxsModel":
-            self._damstartModel = damstartModel
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setDamstartModel argument is not XSDataSaxsModel but %s" % damstartModel.__class__.__name__
-            raise BaseException(strMessage)
-    def delDamstartModel(self): self._damstartModel = None
-    damstartModel = property(getDamstartModel, setDamstartModel, delDamstartModel, "Property for damstartModel")
-    # Methods and properties for the 'damminModel' attribute
-    def getDamminModel(self): return self._damminModel
-    def setDamminModel(self, damminModel):
-        if damminModel is None:
-            self._damminModel = None
-        elif damminModel.__class__.__name__ == "XSDataSaxsModel":
-            self._damminModel = damminModel
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setDamminModel argument is not XSDataSaxsModel but %s" % damminModel.__class__.__name__
-            raise BaseException(strMessage)
-    def delDamminModel(self): self._damminModel = None
-    damminModel = property(getDamminModel, setDamminModel, delDamminModel, "Property for damminModel")
-    # Methods and properties for the 'fitFile' attribute
-    def getFitFile(self): return self._fitFile
-    def setFitFile(self, fitFile):
-        if fitFile is None:
-            self._fitFile = None
-        elif fitFile.__class__.__name__ == "XSDataFile":
-            self._fitFile = fitFile
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setFitFile argument is not XSDataFile but %s" % fitFile.__class__.__name__
-            raise BaseException(strMessage)
-    def delFitFile(self): self._fitFile = None
-    fitFile = property(getFitFile, setFitFile, delFitFile, "Property for fitFile")
-    # Methods and properties for the 'logFile' attribute
-    def getLogFile(self): return self._logFile
-    def setLogFile(self, logFile):
-        if logFile is None:
-            self._logFile = None
-        elif logFile.__class__.__name__ == "XSDataFile":
-            self._logFile = logFile
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setLogFile argument is not XSDataFile but %s" % logFile.__class__.__name__
-            raise BaseException(strMessage)
-    def delLogFile(self): self._logFile = None
-    logFile = property(getLogFile, setLogFile, delLogFile, "Property for logFile")
-    # Methods and properties for the 'pdbMoleculeFile' attribute
-    def getPdbMoleculeFile(self): return self._pdbMoleculeFile
-    def setPdbMoleculeFile(self, pdbMoleculeFile):
-        if pdbMoleculeFile is None:
-            self._pdbMoleculeFile = None
-        elif pdbMoleculeFile.__class__.__name__ == "XSDataFile":
-            self._pdbMoleculeFile = pdbMoleculeFile
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setPdbMoleculeFile argument is not XSDataFile but %s" % pdbMoleculeFile.__class__.__name__
-            raise BaseException(strMessage)
-    def delPdbMoleculeFile(self): self._pdbMoleculeFile = None
-    pdbMoleculeFile = property(getPdbMoleculeFile, setPdbMoleculeFile, delPdbMoleculeFile, "Property for pdbMoleculeFile")
-    # Methods and properties for the 'pdbSolventFile' attribute
-    def getPdbSolventFile(self): return self._pdbSolventFile
-    def setPdbSolventFile(self, pdbSolventFile):
-        if pdbSolventFile is None:
-            self._pdbSolventFile = None
-        elif pdbSolventFile.__class__.__name__ == "XSDataFile":
-            self._pdbSolventFile = pdbSolventFile
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setPdbSolventFile argument is not XSDataFile but %s" % pdbSolventFile.__class__.__name__
-            raise BaseException(strMessage)
-    def delPdbSolventFile(self): self._pdbSolventFile = None
-    pdbSolventFile = property(getPdbSolventFile, setPdbSolventFile, delPdbSolventFile, "Property for pdbSolventFile")
-    # Methods and properties for the 'chiRfactorPlot' attribute
-    def getChiRfactorPlot(self): return self._chiRfactorPlot
-    def setChiRfactorPlot(self, chiRfactorPlot):
-        if chiRfactorPlot is None:
-            self._chiRfactorPlot = None
-        elif chiRfactorPlot.__class__.__name__ == "XSDataFile":
-            self._chiRfactorPlot = chiRfactorPlot
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setChiRfactorPlot argument is not XSDataFile but %s" % chiRfactorPlot.__class__.__name__
-            raise BaseException(strMessage)
-    def delChiRfactorPlot(self): self._chiRfactorPlot = None
-    chiRfactorPlot = property(getChiRfactorPlot, setChiRfactorPlot, delChiRfactorPlot, "Property for chiRfactorPlot")
-    # Methods and properties for the 'nsdPlot' attribute
-    def getNsdPlot(self): return self._nsdPlot
-    def setNsdPlot(self, nsdPlot):
-        if nsdPlot is None:
-            self._nsdPlot = None
-        elif nsdPlot.__class__.__name__ == "XSDataFile":
-            self._nsdPlot = nsdPlot
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setNsdPlot argument is not XSDataFile but %s" % nsdPlot.__class__.__name__
-            raise BaseException(strMessage)
-    def delNsdPlot(self): self._nsdPlot = None
-    nsdPlot = property(getNsdPlot, setNsdPlot, delNsdPlot, "Property for nsdPlot")
-    def export(self, outfile, level, name_='XSDataInputBioSaxsISPyBModellingv1_0'):
-        showIndent(outfile, level)
-        outfile.write(unicode('<%s>\n' % name_))
-        self.exportChildren(outfile, level + 1, name_)
-        showIndent(outfile, level)
-        outfile.write(unicode('</%s>\n' % name_))
-    def exportChildren(self, outfile, level, name_='XSDataInputBioSaxsISPyBModellingv1_0'):
-        XSDataInput.exportChildren(self, outfile, level, name_)
-        if self._sample is not None:
-            self.sample.export(outfile, level, name_='sample')
-        else:
-            warnEmptyAttribute("sample", "XSDataBioSaxsSample")
-        for dammifModels_ in self.getDammifModels():
-            dammifModels_.export(outfile, level, name_='dammifModels')
-        if self._damaverModel is not None:
-            self.damaverModel.export(outfile, level, name_='damaverModel')
-        if self._damfiltModel is not None:
-            self.damfiltModel.export(outfile, level, name_='damfiltModel')
-        if self._damstartModel is not None:
-            self.damstartModel.export(outfile, level, name_='damstartModel')
-        if self._damminModel is not None:
-            self.damminModel.export(outfile, level, name_='damminModel')
-        if self._fitFile is not None:
-            self.fitFile.export(outfile, level, name_='fitFile')
-        if self._logFile is not None:
-            self.logFile.export(outfile, level, name_='logFile')
-        if self._pdbMoleculeFile is not None:
-            self.pdbMoleculeFile.export(outfile, level, name_='pdbMoleculeFile')
-        if self._pdbSolventFile is not None:
-            self.pdbSolventFile.export(outfile, level, name_='pdbSolventFile')
-        if self._chiRfactorPlot is not None:
-            self.chiRfactorPlot.export(outfile, level, name_='chiRfactorPlot')
-        if self._nsdPlot is not None:
-            self.nsdPlot.export(outfile, level, name_='nsdPlot')
-    def build(self, node_):
-        for child_ in node_.childNodes:
-            nodeName_ = child_.nodeName.split(':')[-1]
-            self.buildChildren(child_, nodeName_)
-    def buildChildren(self, child_, nodeName_):
-        if child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'sample':
-            obj_ = XSDataBioSaxsSample()
-            obj_.build(child_)
-            self.setSample(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'dammifModels':
-            obj_ = XSDataSaxsModel()
-            obj_.build(child_)
-            self.dammifModels.append(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'damaverModel':
-            obj_ = XSDataSaxsModel()
-            obj_.build(child_)
-            self.setDamaverModel(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'damfiltModel':
-            obj_ = XSDataSaxsModel()
-            obj_.build(child_)
-            self.setDamfiltModel(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'damstartModel':
-            obj_ = XSDataSaxsModel()
-            obj_.build(child_)
-            self.setDamstartModel(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'damminModel':
-            obj_ = XSDataSaxsModel()
-            obj_.build(child_)
-            self.setDamminModel(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'fitFile':
-            obj_ = XSDataFile()
-            obj_.build(child_)
-            self.setFitFile(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'logFile':
-            obj_ = XSDataFile()
-            obj_.build(child_)
-            self.setLogFile(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'pdbMoleculeFile':
-            obj_ = XSDataFile()
-            obj_.build(child_)
-            self.setPdbMoleculeFile(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'pdbSolventFile':
-            obj_ = XSDataFile()
-            obj_.build(child_)
-            self.setPdbSolventFile(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'chiRfactorPlot':
-            obj_ = XSDataFile()
-            obj_.build(child_)
-            self.setChiRfactorPlot(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'nsdPlot':
-            obj_ = XSDataFile()
-            obj_.build(child_)
-            self.setNsdPlot(obj_)
-        XSDataInput.buildChildren(self, child_, nodeName_)
-    #Method for marshalling an object
-    def marshal( self ):
-        oStreamString = StringIO()
-        oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export( oStreamString, 0, name_="XSDataInputBioSaxsISPyBModellingv1_0" )
-        oStringXML = oStreamString.getvalue()
-        oStreamString.close()
-        return oStringXML
-    #Only to export the entire XML tree to a file stream on disk
-    def exportToFile( self, _outfileName ):
-        outfile = open( _outfileName, "w" )
-        outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export( outfile, 0, name_='XSDataInputBioSaxsISPyBModellingv1_0' )
-        outfile.close()
-    #Deprecated method, replaced by exportToFile
-    def outputFile( self, _outfileName ):
-        print("WARNING: Method outputFile in class XSDataInputBioSaxsISPyBModellingv1_0 is deprecated, please use instead exportToFile!")
-        self.exportToFile(_outfileName)
-    #Method for making a copy in a new instance
-    def copy( self ):
-        return XSDataInputBioSaxsISPyBModellingv1_0.parseString(self.marshal())
-    #Static method for parsing a string
-    def parseString( _inString ):
-        doc = minidom.parseString(_inString)
-        rootNode = doc.documentElement
-        rootObj = XSDataInputBioSaxsISPyBModellingv1_0()
-        rootObj.build(rootNode)
-        # Check that all minOccurs are obeyed by marshalling the created object
-        oStreamString = StringIO()
-        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsISPyBModellingv1_0" )
-        oStreamString.close()
-        return rootObj
-    parseString = staticmethod( parseString )
-    #Static method for parsing a file
-    def parseFile( _inFilePath ):
-        doc = minidom.parse(_inFilePath)
-        rootNode = doc.documentElement
-        rootObj = XSDataInputBioSaxsISPyBModellingv1_0()
-        rootObj.build(rootNode)
-        return rootObj
-    parseFile = staticmethod( parseFile )
-# end class XSDataInputBioSaxsISPyBModellingv1_0
-
-
-class XSDataInputBioSaxsISPyB_HPLCv1_0(XSDataInput):
-    """Input class for populating ISPyB"""
-    def __init__(self, configuration=None, hplcPlot=None, jsonFile=None, hdf5File=None, sample=None):
-        XSDataInput.__init__(self, configuration)
-        if sample is None:
-            self._sample = None
-        elif sample.__class__.__name__ == "XSDataBioSaxsSample":
-            self._sample = sample
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0 constructor argument 'sample' is not XSDataBioSaxsSample but %s" % self._sample.__class__.__name__
-            raise BaseException(strMessage)
-        if hdf5File is None:
-            self._hdf5File = None
-        elif hdf5File.__class__.__name__ == "XSDataFile":
-            self._hdf5File = hdf5File
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0 constructor argument 'hdf5File' is not XSDataFile but %s" % self._hdf5File.__class__.__name__
-            raise BaseException(strMessage)
-        if jsonFile is None:
-            self._jsonFile = None
-        elif jsonFile.__class__.__name__ == "XSDataFile":
-            self._jsonFile = jsonFile
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0 constructor argument 'jsonFile' is not XSDataFile but %s" % self._jsonFile.__class__.__name__
-            raise BaseException(strMessage)
-        if hplcPlot is None:
-            self._hplcPlot = None
-        elif hplcPlot.__class__.__name__ == "XSDataFile":
-            self._hplcPlot = hplcPlot
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0 constructor argument 'hplcPlot' is not XSDataFile but %s" % self._hplcPlot.__class__.__name__
-            raise BaseException(strMessage)
-    # Methods and properties for the 'sample' attribute
-    def getSample(self): return self._sample
-    def setSample(self, sample):
-        if sample is None:
-            self._sample = None
-        elif sample.__class__.__name__ == "XSDataBioSaxsSample":
-            self._sample = sample
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0.setSample argument is not XSDataBioSaxsSample but %s" % sample.__class__.__name__
-            raise BaseException(strMessage)
-    def delSample(self): self._sample = None
-    sample = property(getSample, setSample, delSample, "Property for sample")
-    # Methods and properties for the 'hdf5File' attribute
-    def getHdf5File(self): return self._hdf5File
-    def setHdf5File(self, hdf5File):
-        if hdf5File is None:
-            self._hdf5File = None
-        elif hdf5File.__class__.__name__ == "XSDataFile":
-            self._hdf5File = hdf5File
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0.setHdf5File argument is not XSDataFile but %s" % hdf5File.__class__.__name__
-            raise BaseException(strMessage)
-    def delHdf5File(self): self._hdf5File = None
-    hdf5File = property(getHdf5File, setHdf5File, delHdf5File, "Property for hdf5File")
-    # Methods and properties for the 'jsonFile' attribute
-    def getJsonFile(self): return self._jsonFile
-    def setJsonFile(self, jsonFile):
-        if jsonFile is None:
-            self._jsonFile = None
-        elif jsonFile.__class__.__name__ == "XSDataFile":
-            self._jsonFile = jsonFile
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0.setJsonFile argument is not XSDataFile but %s" % jsonFile.__class__.__name__
-            raise BaseException(strMessage)
-    def delJsonFile(self): self._jsonFile = None
-    jsonFile = property(getJsonFile, setJsonFile, delJsonFile, "Property for jsonFile")
-    # Methods and properties for the 'hplcPlot' attribute
-    def getHplcPlot(self): return self._hplcPlot
-    def setHplcPlot(self, hplcPlot):
-        if hplcPlot is None:
-            self._hplcPlot = None
-        elif hplcPlot.__class__.__name__ == "XSDataFile":
-            self._hplcPlot = hplcPlot
-        else:
-            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0.setHplcPlot argument is not XSDataFile but %s" % hplcPlot.__class__.__name__
-            raise BaseException(strMessage)
-    def delHplcPlot(self): self._hplcPlot = None
-    hplcPlot = property(getHplcPlot, setHplcPlot, delHplcPlot, "Property for hplcPlot")
-    def export(self, outfile, level, name_='XSDataInputBioSaxsISPyB_HPLCv1_0'):
-        showIndent(outfile, level)
-        outfile.write(unicode('<%s>\n' % name_))
-        self.exportChildren(outfile, level + 1, name_)
-        showIndent(outfile, level)
-        outfile.write(unicode('</%s>\n' % name_))
-    def exportChildren(self, outfile, level, name_='XSDataInputBioSaxsISPyB_HPLCv1_0'):
-        XSDataInput.exportChildren(self, outfile, level, name_)
-        if self._sample is not None:
-            self.sample.export(outfile, level, name_='sample')
-        else:
-            warnEmptyAttribute("sample", "XSDataBioSaxsSample")
-        if self._hdf5File is not None:
-            self.hdf5File.export(outfile, level, name_='hdf5File')
-        if self._jsonFile is not None:
-            self.jsonFile.export(outfile, level, name_='jsonFile')
-        if self._hplcPlot is not None:
-            self.hplcPlot.export(outfile, level, name_='hplcPlot')
-    def build(self, node_):
-        for child_ in node_.childNodes:
-            nodeName_ = child_.nodeName.split(':')[-1]
-            self.buildChildren(child_, nodeName_)
-    def buildChildren(self, child_, nodeName_):
-        if child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'sample':
-            obj_ = XSDataBioSaxsSample()
-            obj_.build(child_)
-            self.setSample(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'hdf5File':
-            obj_ = XSDataFile()
-            obj_.build(child_)
-            self.setHdf5File(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'jsonFile':
-            obj_ = XSDataFile()
-            obj_.build(child_)
-            self.setJsonFile(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'hplcPlot':
-            obj_ = XSDataFile()
-            obj_.build(child_)
-            self.setHplcPlot(obj_)
-        XSDataInput.buildChildren(self, child_, nodeName_)
-    #Method for marshalling an object
-    def marshal( self ):
-        oStreamString = StringIO()
-        oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
-        self.export( oStreamString, 0, name_="XSDataInputBioSaxsISPyB_HPLCv1_0" )
-        oStringXML = oStreamString.getvalue()
-        oStreamString.close()
-        return oStringXML
-    #Only to export the entire XML tree to a file stream on disk
-    def exportToFile( self, _outfileName ):
-        outfile = open( _outfileName, "w" )
-        outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
-        self.export( outfile, 0, name_='XSDataInputBioSaxsISPyB_HPLCv1_0' )
-        outfile.close()
-    #Deprecated method, replaced by exportToFile
-    def outputFile( self, _outfileName ):
-        print("WARNING: Method outputFile in class XSDataInputBioSaxsISPyB_HPLCv1_0 is deprecated, please use instead exportToFile!")
-        self.exportToFile(_outfileName)
-    #Method for making a copy in a new instance
-    def copy( self ):
-        return XSDataInputBioSaxsISPyB_HPLCv1_0.parseString(self.marshal())
-    #Static method for parsing a string
-    def parseString( _inString ):
-        doc = minidom.parseString(_inString)
-        rootNode = doc.documentElement
-        rootObj = XSDataInputBioSaxsISPyB_HPLCv1_0()
-        rootObj.build(rootNode)
-        # Check that all minOccurs are obeyed by marshalling the created object
-        oStreamString = StringIO()
-        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsISPyB_HPLCv1_0" )
-        oStreamString.close()
-        return rootObj
-    parseString = staticmethod( parseString )
-    #Static method for parsing a file
-    def parseFile( _inFilePath ):
-        doc = minidom.parse(_inFilePath)
-        rootNode = doc.documentElement
-        rootObj = XSDataInputBioSaxsISPyB_HPLCv1_0()
-        rootObj.build(rootNode)
-        return rootObj
-    parseFile = staticmethod( parseFile )
-# end class XSDataInputBioSaxsISPyB_HPLCv1_0
-
-
 class XSDataInputBioSaxsISPyBv1_0(XSDataInput):
     """Input class for populating ISPyB"""
     def __init__(self, configuration=None, densityPlot=None, kratkyPlot=None, guinierPlot=None, scatterPlot=None, averageSample=None, bestBuffer=None, subtractedFilePath=None, sampleFrames=None, bufferFrames=None, averageFilePath=None, discardedFrames=None, averagedFrames=None, curves=None, frameMerged=None, frameAverage=None, volume=None, gnom=None, autoRg=None, sample=None):
@@ -2959,6 +2395,571 @@ class XSDataInputBioSaxsISPyBHPLCv1_0(XSDataInput):
         return rootObj
     parseFile = staticmethod( parseFile )
 # end class XSDataInputBioSaxsISPyBHPLCv1_0
+
+
+class XSDataInputBioSaxsISPyBModellingv1_0(XSDataInput):
+    """Input class for populating ISPyB"""
+    def __init__(self, configuration=None, nsdPlot=None, chiRfactorPlot=None, pdbSolventFile=None, pdbMoleculeFile=None, logFile=None, fitFile=None, damminModel=None, damstartModel=None, damfiltModel=None, damaverModel=None, dammifModels=None, sample=None):
+        XSDataInput.__init__(self, configuration)
+        if sample is None:
+            self._sample = None
+        elif sample.__class__.__name__ == "XSDataBioSaxsSample":
+            self._sample = sample
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'sample' is not XSDataBioSaxsSample but %s" % self._sample.__class__.__name__
+            raise BaseException(strMessage)
+        if dammifModels is None:
+            self._dammifModels = []
+        elif dammifModels.__class__.__name__ == "list":
+            self._dammifModels = dammifModels
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'dammifModels' is not list but %s" % self._dammifModels.__class__.__name__
+            raise BaseException(strMessage)
+        if damaverModel is None:
+            self._damaverModel = None
+        elif damaverModel.__class__.__name__ == "XSDataSaxsModel":
+            self._damaverModel = damaverModel
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'damaverModel' is not XSDataSaxsModel but %s" % self._damaverModel.__class__.__name__
+            raise BaseException(strMessage)
+        if damfiltModel is None:
+            self._damfiltModel = None
+        elif damfiltModel.__class__.__name__ == "XSDataSaxsModel":
+            self._damfiltModel = damfiltModel
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'damfiltModel' is not XSDataSaxsModel but %s" % self._damfiltModel.__class__.__name__
+            raise BaseException(strMessage)
+        if damstartModel is None:
+            self._damstartModel = None
+        elif damstartModel.__class__.__name__ == "XSDataSaxsModel":
+            self._damstartModel = damstartModel
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'damstartModel' is not XSDataSaxsModel but %s" % self._damstartModel.__class__.__name__
+            raise BaseException(strMessage)
+        if damminModel is None:
+            self._damminModel = None
+        elif damminModel.__class__.__name__ == "XSDataSaxsModel":
+            self._damminModel = damminModel
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'damminModel' is not XSDataSaxsModel but %s" % self._damminModel.__class__.__name__
+            raise BaseException(strMessage)
+        if fitFile is None:
+            self._fitFile = None
+        elif fitFile.__class__.__name__ == "XSDataFile":
+            self._fitFile = fitFile
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'fitFile' is not XSDataFile but %s" % self._fitFile.__class__.__name__
+            raise BaseException(strMessage)
+        if logFile is None:
+            self._logFile = None
+        elif logFile.__class__.__name__ == "XSDataFile":
+            self._logFile = logFile
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'logFile' is not XSDataFile but %s" % self._logFile.__class__.__name__
+            raise BaseException(strMessage)
+        if pdbMoleculeFile is None:
+            self._pdbMoleculeFile = None
+        elif pdbMoleculeFile.__class__.__name__ == "XSDataFile":
+            self._pdbMoleculeFile = pdbMoleculeFile
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'pdbMoleculeFile' is not XSDataFile but %s" % self._pdbMoleculeFile.__class__.__name__
+            raise BaseException(strMessage)
+        if pdbSolventFile is None:
+            self._pdbSolventFile = None
+        elif pdbSolventFile.__class__.__name__ == "XSDataFile":
+            self._pdbSolventFile = pdbSolventFile
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'pdbSolventFile' is not XSDataFile but %s" % self._pdbSolventFile.__class__.__name__
+            raise BaseException(strMessage)
+        if chiRfactorPlot is None:
+            self._chiRfactorPlot = None
+        elif chiRfactorPlot.__class__.__name__ == "XSDataFile":
+            self._chiRfactorPlot = chiRfactorPlot
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'chiRfactorPlot' is not XSDataFile but %s" % self._chiRfactorPlot.__class__.__name__
+            raise BaseException(strMessage)
+        if nsdPlot is None:
+            self._nsdPlot = None
+        elif nsdPlot.__class__.__name__ == "XSDataFile":
+            self._nsdPlot = nsdPlot
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0 constructor argument 'nsdPlot' is not XSDataFile but %s" % self._nsdPlot.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'sample' attribute
+    def getSample(self): return self._sample
+    def setSample(self, sample):
+        if sample is None:
+            self._sample = None
+        elif sample.__class__.__name__ == "XSDataBioSaxsSample":
+            self._sample = sample
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setSample argument is not XSDataBioSaxsSample but %s" % sample.__class__.__name__
+            raise BaseException(strMessage)
+    def delSample(self): self._sample = None
+    sample = property(getSample, setSample, delSample, "Property for sample")
+    # Methods and properties for the 'dammifModels' attribute
+    def getDammifModels(self): return self._dammifModels
+    def setDammifModels(self, dammifModels):
+        if dammifModels is None:
+            self._dammifModels = []
+        elif dammifModels.__class__.__name__ == "list":
+            self._dammifModels = dammifModels
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setDammifModels argument is not list but %s" % dammifModels.__class__.__name__
+            raise BaseException(strMessage)
+    def delDammifModels(self): self._dammifModels = None
+    dammifModels = property(getDammifModels, setDammifModels, delDammifModels, "Property for dammifModels")
+    def addDammifModels(self, value):
+        if value is None:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.addDammifModels argument is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataSaxsModel":
+            self._dammifModels.append(value)
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.addDammifModels argument is not XSDataSaxsModel but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    def insertDammifModels(self, index, value):
+        if index is None:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.insertDammifModels argument 'index' is None"
+            raise BaseException(strMessage)            
+        if value is None:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.insertDammifModels argument 'value' is None"
+            raise BaseException(strMessage)            
+        elif value.__class__.__name__ == "XSDataSaxsModel":
+            self._dammifModels[index] = value
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.addDammifModels argument is not XSDataSaxsModel but %s" % value.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'damaverModel' attribute
+    def getDamaverModel(self): return self._damaverModel
+    def setDamaverModel(self, damaverModel):
+        if damaverModel is None:
+            self._damaverModel = None
+        elif damaverModel.__class__.__name__ == "XSDataSaxsModel":
+            self._damaverModel = damaverModel
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setDamaverModel argument is not XSDataSaxsModel but %s" % damaverModel.__class__.__name__
+            raise BaseException(strMessage)
+    def delDamaverModel(self): self._damaverModel = None
+    damaverModel = property(getDamaverModel, setDamaverModel, delDamaverModel, "Property for damaverModel")
+    # Methods and properties for the 'damfiltModel' attribute
+    def getDamfiltModel(self): return self._damfiltModel
+    def setDamfiltModel(self, damfiltModel):
+        if damfiltModel is None:
+            self._damfiltModel = None
+        elif damfiltModel.__class__.__name__ == "XSDataSaxsModel":
+            self._damfiltModel = damfiltModel
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setDamfiltModel argument is not XSDataSaxsModel but %s" % damfiltModel.__class__.__name__
+            raise BaseException(strMessage)
+    def delDamfiltModel(self): self._damfiltModel = None
+    damfiltModel = property(getDamfiltModel, setDamfiltModel, delDamfiltModel, "Property for damfiltModel")
+    # Methods and properties for the 'damstartModel' attribute
+    def getDamstartModel(self): return self._damstartModel
+    def setDamstartModel(self, damstartModel):
+        if damstartModel is None:
+            self._damstartModel = None
+        elif damstartModel.__class__.__name__ == "XSDataSaxsModel":
+            self._damstartModel = damstartModel
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setDamstartModel argument is not XSDataSaxsModel but %s" % damstartModel.__class__.__name__
+            raise BaseException(strMessage)
+    def delDamstartModel(self): self._damstartModel = None
+    damstartModel = property(getDamstartModel, setDamstartModel, delDamstartModel, "Property for damstartModel")
+    # Methods and properties for the 'damminModel' attribute
+    def getDamminModel(self): return self._damminModel
+    def setDamminModel(self, damminModel):
+        if damminModel is None:
+            self._damminModel = None
+        elif damminModel.__class__.__name__ == "XSDataSaxsModel":
+            self._damminModel = damminModel
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setDamminModel argument is not XSDataSaxsModel but %s" % damminModel.__class__.__name__
+            raise BaseException(strMessage)
+    def delDamminModel(self): self._damminModel = None
+    damminModel = property(getDamminModel, setDamminModel, delDamminModel, "Property for damminModel")
+    # Methods and properties for the 'fitFile' attribute
+    def getFitFile(self): return self._fitFile
+    def setFitFile(self, fitFile):
+        if fitFile is None:
+            self._fitFile = None
+        elif fitFile.__class__.__name__ == "XSDataFile":
+            self._fitFile = fitFile
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setFitFile argument is not XSDataFile but %s" % fitFile.__class__.__name__
+            raise BaseException(strMessage)
+    def delFitFile(self): self._fitFile = None
+    fitFile = property(getFitFile, setFitFile, delFitFile, "Property for fitFile")
+    # Methods and properties for the 'logFile' attribute
+    def getLogFile(self): return self._logFile
+    def setLogFile(self, logFile):
+        if logFile is None:
+            self._logFile = None
+        elif logFile.__class__.__name__ == "XSDataFile":
+            self._logFile = logFile
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setLogFile argument is not XSDataFile but %s" % logFile.__class__.__name__
+            raise BaseException(strMessage)
+    def delLogFile(self): self._logFile = None
+    logFile = property(getLogFile, setLogFile, delLogFile, "Property for logFile")
+    # Methods and properties for the 'pdbMoleculeFile' attribute
+    def getPdbMoleculeFile(self): return self._pdbMoleculeFile
+    def setPdbMoleculeFile(self, pdbMoleculeFile):
+        if pdbMoleculeFile is None:
+            self._pdbMoleculeFile = None
+        elif pdbMoleculeFile.__class__.__name__ == "XSDataFile":
+            self._pdbMoleculeFile = pdbMoleculeFile
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setPdbMoleculeFile argument is not XSDataFile but %s" % pdbMoleculeFile.__class__.__name__
+            raise BaseException(strMessage)
+    def delPdbMoleculeFile(self): self._pdbMoleculeFile = None
+    pdbMoleculeFile = property(getPdbMoleculeFile, setPdbMoleculeFile, delPdbMoleculeFile, "Property for pdbMoleculeFile")
+    # Methods and properties for the 'pdbSolventFile' attribute
+    def getPdbSolventFile(self): return self._pdbSolventFile
+    def setPdbSolventFile(self, pdbSolventFile):
+        if pdbSolventFile is None:
+            self._pdbSolventFile = None
+        elif pdbSolventFile.__class__.__name__ == "XSDataFile":
+            self._pdbSolventFile = pdbSolventFile
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setPdbSolventFile argument is not XSDataFile but %s" % pdbSolventFile.__class__.__name__
+            raise BaseException(strMessage)
+    def delPdbSolventFile(self): self._pdbSolventFile = None
+    pdbSolventFile = property(getPdbSolventFile, setPdbSolventFile, delPdbSolventFile, "Property for pdbSolventFile")
+    # Methods and properties for the 'chiRfactorPlot' attribute
+    def getChiRfactorPlot(self): return self._chiRfactorPlot
+    def setChiRfactorPlot(self, chiRfactorPlot):
+        if chiRfactorPlot is None:
+            self._chiRfactorPlot = None
+        elif chiRfactorPlot.__class__.__name__ == "XSDataFile":
+            self._chiRfactorPlot = chiRfactorPlot
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setChiRfactorPlot argument is not XSDataFile but %s" % chiRfactorPlot.__class__.__name__
+            raise BaseException(strMessage)
+    def delChiRfactorPlot(self): self._chiRfactorPlot = None
+    chiRfactorPlot = property(getChiRfactorPlot, setChiRfactorPlot, delChiRfactorPlot, "Property for chiRfactorPlot")
+    # Methods and properties for the 'nsdPlot' attribute
+    def getNsdPlot(self): return self._nsdPlot
+    def setNsdPlot(self, nsdPlot):
+        if nsdPlot is None:
+            self._nsdPlot = None
+        elif nsdPlot.__class__.__name__ == "XSDataFile":
+            self._nsdPlot = nsdPlot
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyBModellingv1_0.setNsdPlot argument is not XSDataFile but %s" % nsdPlot.__class__.__name__
+            raise BaseException(strMessage)
+    def delNsdPlot(self): self._nsdPlot = None
+    nsdPlot = property(getNsdPlot, setNsdPlot, delNsdPlot, "Property for nsdPlot")
+    def export(self, outfile, level, name_='XSDataInputBioSaxsISPyBModellingv1_0'):
+        showIndent(outfile, level)
+        outfile.write(unicode('<%s>\n' % name_))
+        self.exportChildren(outfile, level + 1, name_)
+        showIndent(outfile, level)
+        outfile.write(unicode('</%s>\n' % name_))
+    def exportChildren(self, outfile, level, name_='XSDataInputBioSaxsISPyBModellingv1_0'):
+        XSDataInput.exportChildren(self, outfile, level, name_)
+        if self._sample is not None:
+            self.sample.export(outfile, level, name_='sample')
+        else:
+            warnEmptyAttribute("sample", "XSDataBioSaxsSample")
+        for dammifModels_ in self.getDammifModels():
+            dammifModels_.export(outfile, level, name_='dammifModels')
+        if self._damaverModel is not None:
+            self.damaverModel.export(outfile, level, name_='damaverModel')
+        if self._damfiltModel is not None:
+            self.damfiltModel.export(outfile, level, name_='damfiltModel')
+        if self._damstartModel is not None:
+            self.damstartModel.export(outfile, level, name_='damstartModel')
+        if self._damminModel is not None:
+            self.damminModel.export(outfile, level, name_='damminModel')
+        if self._fitFile is not None:
+            self.fitFile.export(outfile, level, name_='fitFile')
+        if self._logFile is not None:
+            self.logFile.export(outfile, level, name_='logFile')
+        if self._pdbMoleculeFile is not None:
+            self.pdbMoleculeFile.export(outfile, level, name_='pdbMoleculeFile')
+        if self._pdbSolventFile is not None:
+            self.pdbSolventFile.export(outfile, level, name_='pdbSolventFile')
+        if self._chiRfactorPlot is not None:
+            self.chiRfactorPlot.export(outfile, level, name_='chiRfactorPlot')
+        if self._nsdPlot is not None:
+            self.nsdPlot.export(outfile, level, name_='nsdPlot')
+    def build(self, node_):
+        for child_ in node_.childNodes:
+            nodeName_ = child_.nodeName.split(':')[-1]
+            self.buildChildren(child_, nodeName_)
+    def buildChildren(self, child_, nodeName_):
+        if child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'sample':
+            obj_ = XSDataBioSaxsSample()
+            obj_.build(child_)
+            self.setSample(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'dammifModels':
+            obj_ = XSDataSaxsModel()
+            obj_.build(child_)
+            self.dammifModels.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'damaverModel':
+            obj_ = XSDataSaxsModel()
+            obj_.build(child_)
+            self.setDamaverModel(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'damfiltModel':
+            obj_ = XSDataSaxsModel()
+            obj_.build(child_)
+            self.setDamfiltModel(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'damstartModel':
+            obj_ = XSDataSaxsModel()
+            obj_.build(child_)
+            self.setDamstartModel(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'damminModel':
+            obj_ = XSDataSaxsModel()
+            obj_.build(child_)
+            self.setDamminModel(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'fitFile':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setFitFile(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'logFile':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setLogFile(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'pdbMoleculeFile':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setPdbMoleculeFile(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'pdbSolventFile':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setPdbSolventFile(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'chiRfactorPlot':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setChiRfactorPlot(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'nsdPlot':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setNsdPlot(obj_)
+        XSDataInput.buildChildren(self, child_, nodeName_)
+    #Method for marshalling an object
+    def marshal( self ):
+        oStreamString = StringIO()
+        oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
+        self.export( oStreamString, 0, name_="XSDataInputBioSaxsISPyBModellingv1_0" )
+        oStringXML = oStreamString.getvalue()
+        oStreamString.close()
+        return oStringXML
+    #Only to export the entire XML tree to a file stream on disk
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
+        outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
+        self.export( outfile, 0, name_='XSDataInputBioSaxsISPyBModellingv1_0' )
+        outfile.close()
+    #Deprecated method, replaced by exportToFile
+    def outputFile( self, _outfileName ):
+        print("WARNING: Method outputFile in class XSDataInputBioSaxsISPyBModellingv1_0 is deprecated, please use instead exportToFile!")
+        self.exportToFile(_outfileName)
+    #Method for making a copy in a new instance
+    def copy( self ):
+        return XSDataInputBioSaxsISPyBModellingv1_0.parseString(self.marshal())
+    #Static method for parsing a string
+    def parseString( _inString ):
+        doc = minidom.parseString(_inString)
+        rootNode = doc.documentElement
+        rootObj = XSDataInputBioSaxsISPyBModellingv1_0()
+        rootObj.build(rootNode)
+        # Check that all minOccurs are obeyed by marshalling the created object
+        oStreamString = StringIO()
+        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsISPyBModellingv1_0" )
+        oStreamString.close()
+        return rootObj
+    parseString = staticmethod( parseString )
+    #Static method for parsing a file
+    def parseFile( _inFilePath ):
+        doc = minidom.parse(_inFilePath)
+        rootNode = doc.documentElement
+        rootObj = XSDataInputBioSaxsISPyBModellingv1_0()
+        rootObj.build(rootNode)
+        return rootObj
+    parseFile = staticmethod( parseFile )
+# end class XSDataInputBioSaxsISPyBModellingv1_0
+
+
+class XSDataInputBioSaxsISPyB_HPLCv1_0(XSDataInput):
+    """Input class for populating ISPyB"""
+    def __init__(self, configuration=None, hplcPlot=None, jsonFile=None, hdf5File=None, sample=None):
+        XSDataInput.__init__(self, configuration)
+        if sample is None:
+            self._sample = None
+        elif sample.__class__.__name__ == "XSDataBioSaxsSample":
+            self._sample = sample
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0 constructor argument 'sample' is not XSDataBioSaxsSample but %s" % self._sample.__class__.__name__
+            raise BaseException(strMessage)
+        if hdf5File is None:
+            self._hdf5File = None
+        elif hdf5File.__class__.__name__ == "XSDataFile":
+            self._hdf5File = hdf5File
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0 constructor argument 'hdf5File' is not XSDataFile but %s" % self._hdf5File.__class__.__name__
+            raise BaseException(strMessage)
+        if jsonFile is None:
+            self._jsonFile = None
+        elif jsonFile.__class__.__name__ == "XSDataFile":
+            self._jsonFile = jsonFile
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0 constructor argument 'jsonFile' is not XSDataFile but %s" % self._jsonFile.__class__.__name__
+            raise BaseException(strMessage)
+        if hplcPlot is None:
+            self._hplcPlot = None
+        elif hplcPlot.__class__.__name__ == "XSDataFile":
+            self._hplcPlot = hplcPlot
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0 constructor argument 'hplcPlot' is not XSDataFile but %s" % self._hplcPlot.__class__.__name__
+            raise BaseException(strMessage)
+    # Methods and properties for the 'sample' attribute
+    def getSample(self): return self._sample
+    def setSample(self, sample):
+        if sample is None:
+            self._sample = None
+        elif sample.__class__.__name__ == "XSDataBioSaxsSample":
+            self._sample = sample
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0.setSample argument is not XSDataBioSaxsSample but %s" % sample.__class__.__name__
+            raise BaseException(strMessage)
+    def delSample(self): self._sample = None
+    sample = property(getSample, setSample, delSample, "Property for sample")
+    # Methods and properties for the 'hdf5File' attribute
+    def getHdf5File(self): return self._hdf5File
+    def setHdf5File(self, hdf5File):
+        if hdf5File is None:
+            self._hdf5File = None
+        elif hdf5File.__class__.__name__ == "XSDataFile":
+            self._hdf5File = hdf5File
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0.setHdf5File argument is not XSDataFile but %s" % hdf5File.__class__.__name__
+            raise BaseException(strMessage)
+    def delHdf5File(self): self._hdf5File = None
+    hdf5File = property(getHdf5File, setHdf5File, delHdf5File, "Property for hdf5File")
+    # Methods and properties for the 'jsonFile' attribute
+    def getJsonFile(self): return self._jsonFile
+    def setJsonFile(self, jsonFile):
+        if jsonFile is None:
+            self._jsonFile = None
+        elif jsonFile.__class__.__name__ == "XSDataFile":
+            self._jsonFile = jsonFile
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0.setJsonFile argument is not XSDataFile but %s" % jsonFile.__class__.__name__
+            raise BaseException(strMessage)
+    def delJsonFile(self): self._jsonFile = None
+    jsonFile = property(getJsonFile, setJsonFile, delJsonFile, "Property for jsonFile")
+    # Methods and properties for the 'hplcPlot' attribute
+    def getHplcPlot(self): return self._hplcPlot
+    def setHplcPlot(self, hplcPlot):
+        if hplcPlot is None:
+            self._hplcPlot = None
+        elif hplcPlot.__class__.__name__ == "XSDataFile":
+            self._hplcPlot = hplcPlot
+        else:
+            strMessage = "ERROR! XSDataInputBioSaxsISPyB_HPLCv1_0.setHplcPlot argument is not XSDataFile but %s" % hplcPlot.__class__.__name__
+            raise BaseException(strMessage)
+    def delHplcPlot(self): self._hplcPlot = None
+    hplcPlot = property(getHplcPlot, setHplcPlot, delHplcPlot, "Property for hplcPlot")
+    def export(self, outfile, level, name_='XSDataInputBioSaxsISPyB_HPLCv1_0'):
+        showIndent(outfile, level)
+        outfile.write(unicode('<%s>\n' % name_))
+        self.exportChildren(outfile, level + 1, name_)
+        showIndent(outfile, level)
+        outfile.write(unicode('</%s>\n' % name_))
+    def exportChildren(self, outfile, level, name_='XSDataInputBioSaxsISPyB_HPLCv1_0'):
+        XSDataInput.exportChildren(self, outfile, level, name_)
+        if self._sample is not None:
+            self.sample.export(outfile, level, name_='sample')
+        else:
+            warnEmptyAttribute("sample", "XSDataBioSaxsSample")
+        if self._hdf5File is not None:
+            self.hdf5File.export(outfile, level, name_='hdf5File')
+        if self._jsonFile is not None:
+            self.jsonFile.export(outfile, level, name_='jsonFile')
+        if self._hplcPlot is not None:
+            self.hplcPlot.export(outfile, level, name_='hplcPlot')
+    def build(self, node_):
+        for child_ in node_.childNodes:
+            nodeName_ = child_.nodeName.split(':')[-1]
+            self.buildChildren(child_, nodeName_)
+    def buildChildren(self, child_, nodeName_):
+        if child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'sample':
+            obj_ = XSDataBioSaxsSample()
+            obj_.build(child_)
+            self.setSample(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'hdf5File':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setHdf5File(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'jsonFile':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setJsonFile(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'hplcPlot':
+            obj_ = XSDataFile()
+            obj_.build(child_)
+            self.setHplcPlot(obj_)
+        XSDataInput.buildChildren(self, child_, nodeName_)
+    #Method for marshalling an object
+    def marshal( self ):
+        oStreamString = StringIO()
+        oStreamString.write(unicode('<?xml version="1.0" ?>\n'))
+        self.export( oStreamString, 0, name_="XSDataInputBioSaxsISPyB_HPLCv1_0" )
+        oStringXML = oStreamString.getvalue()
+        oStreamString.close()
+        return oStringXML
+    #Only to export the entire XML tree to a file stream on disk
+    def exportToFile( self, _outfileName ):
+        outfile = open( _outfileName, "w" )
+        outfile.write(unicode('<?xml version=\"1.0\" ?>\n'))
+        self.export( outfile, 0, name_='XSDataInputBioSaxsISPyB_HPLCv1_0' )
+        outfile.close()
+    #Deprecated method, replaced by exportToFile
+    def outputFile( self, _outfileName ):
+        print("WARNING: Method outputFile in class XSDataInputBioSaxsISPyB_HPLCv1_0 is deprecated, please use instead exportToFile!")
+        self.exportToFile(_outfileName)
+    #Method for making a copy in a new instance
+    def copy( self ):
+        return XSDataInputBioSaxsISPyB_HPLCv1_0.parseString(self.marshal())
+    #Static method for parsing a string
+    def parseString( _inString ):
+        doc = minidom.parseString(_inString)
+        rootNode = doc.documentElement
+        rootObj = XSDataInputBioSaxsISPyB_HPLCv1_0()
+        rootObj.build(rootNode)
+        # Check that all minOccurs are obeyed by marshalling the created object
+        oStreamString = StringIO()
+        rootObj.export( oStreamString, 0, name_="XSDataInputBioSaxsISPyB_HPLCv1_0" )
+        oStreamString.close()
+        return rootObj
+    parseString = staticmethod( parseString )
+    #Static method for parsing a file
+    def parseFile( _inFilePath ):
+        doc = minidom.parse(_inFilePath)
+        rootNode = doc.documentElement
+        rootObj = XSDataInputBioSaxsISPyB_HPLCv1_0()
+        rootObj.build(rootNode)
+        return rootObj
+    parseFile = staticmethod( parseFile )
+# end class XSDataInputBioSaxsISPyB_HPLCv1_0
 
 
 class XSDataInputBioSaxsNormalizev1_0(XSDataInput):

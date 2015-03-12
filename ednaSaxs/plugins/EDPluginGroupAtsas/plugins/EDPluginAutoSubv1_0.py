@@ -36,7 +36,8 @@ import shutil
 from EDPluginControl import EDPluginControl
 from XSDataCommon import XSDataFile, XSDataString, XSDataStatus
 from XSDataEdnaSaxs import XSDataInputAutoSub, XSDataInputDataver, \
-    XSDataInputDatcmp, XSDataInputAutoRg, XSDataInputDatop
+    XSDataInputDatcmp, XSDataInputAutoRg, XSDataInputDatop, XSDataAutoRg, \
+    XSDataLength, XSDataBoolean, XSDataInteger, XSDataDouble
 from XSDataEdnaSaxs import XSDataResultAutoSub
 from EDThreading import Semaphore
 _sem = Semaphore()
