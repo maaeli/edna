@@ -605,7 +605,7 @@ class HPLCrun(object):
 
                     b, a = butter(first_butter_par, second_butter_par)
                     #We should take care of the pading length to avoid errors
-                    if 3*max(len(a),len(b)) > Ishort:
+                    if 3*max(len(a),len(b)) > len(Ishort):
                         fl = filtfilt(b, a, Ishort)
                     else:
                         fl = filtfilt(b, a, Ishort,padlen = Ishort.shape[0]-2)
