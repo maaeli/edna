@@ -56,6 +56,15 @@ import collections
 import functools
 from threading import Semaphore
 
+figureSize = (12,10) #global size of figures, in inch
+figureSize = (3.6,3) 
+
+
+
+matplotlib.rcParams.update({'font.size': 8})
+
+
+
 def timeit(func):
     def wrapper(*arg, **kw):
         '''This is the docstring of timeit:
@@ -179,7 +188,7 @@ def densityPlot(gnomfile, filename=None, format="png", unit="nm"):
     @return: the matplotlib figure
     """
     out = loadGnomFile(gnomfile)
-    fig1 = plt.figure(figsize=(12, 10))
+    fig1 = plt.figure(figsize=figureSize)
     ax1 = fig1.add_subplot(1, 1, 1)
     ax1.errorbar(out["r"], out["P(r)"], out["P(r)_err"], label="Density")
     ax1.set_ylabel('$\\rho (r)$')
@@ -226,7 +235,7 @@ def scatterPlot(curve_file, first_point=None, last_point=None, filename=None, fo
         last_point = -1
     rng = numpy.arange(len(q))
 
-    fig1 = plt.figure(figsize=(12, 10))
+    fig1 = plt.figure(figsize=figureSize)
     ax1 = fig1.add_subplot(1, 1, 1)
     if std is not None:
         ax1.errorbar(q, I, std, label="Experimental curve")
@@ -245,6 +254,7 @@ def scatterPlot(curve_file, first_point=None, last_point=None, filename=None, fo
     ax1.set_title("Scattering curve")
     ax1.set_yscale("log")
     ax1.legend()
+    plt.tight_layout(pad=0.5, h_pad=0.5, w_pad=0.5)
 #    ax1.legend(loc=3)
     if filename:
         if format:
@@ -292,7 +302,7 @@ def guinierPlot(curve_file, first_point=None, last_point=None, filename=None, fo
     logI = logI[:end]
 
 
-    fig1 = plt.figure(figsize=(12, 10))
+    fig1 = plt.figure(figsize=figureSize)
     ax1 = fig1.add_subplot(1, 1, 1)
     ax1.plot(q2, logI, label="Experimental curve")
     ax1.plot(q2[first_point:last_point], logI[first_point:last_point], marker='D', markersize=5, label="Guinier region")
@@ -306,6 +316,7 @@ def guinierPlot(curve_file, first_point=None, last_point=None, filename=None, fo
     ax1.set_xlabel('$q^2$ (%s$^{-2}$)' % unit)
     ax1.set_title("Guinier plot: $Rg=$%.1f %s $I0=$%.1f" % (Rg, unit, I0))
     ax1.legend(loc=3)
+    plt.tight_layout(pad=0.5, h_pad=0.5, w_pad=0.5)
     if filename:
         if format:
             fig1.savefig(filename, format=format)
@@ -326,7 +337,7 @@ def kartkyPlot(curve_file, filename=None, format="png", unit="nm"):
     q = data[:, 0]
     I = data[:, 1]
     q2I = q * q * I
-    fig1 = plt.figure(figsize=(12, 10))
+    fig1 = plt.figure(figsize=figureSize)
     ax1 = fig1.add_subplot(1, 1, 1)
     ax1.plot(q, q2I, label="Experimental curve")
     ax1.set_ylabel('$q^2I (%s^2)$' % unit)
@@ -356,7 +367,7 @@ def kratkyRgPlot(curve_file, I0, Rg, filename=None, format="png"):
     I = data[:, 1]
     xdata = q * Rg
     ydata = xdata * xdata * I / I0
-    fig1 = plt.figure(figsize=(12, 10))
+    fig1 = plt.figure(figsize=figureSize)
     ax1 = fig1.add_subplot(1, 1, 1)
     dplot = ax1.plot(xdata, ydata, label="Experimental curve")
     ax1.set_ylabel('$(qR_{G})^2 I/I_{0}$')
@@ -367,6 +378,7 @@ def kratkyRgPlot(curve_file, I0, Rg, filename=None, format="png"):
     ax1.set_ylim(ymin=-0.01, ymax=3.5)
     ax1.set_title("Dimensionless Kratky plot - $R_{G}$ ")
     ax1.legend([dplot[0]], [ dplot[0].get_label()], loc=0)
+    plt.tight_layout(pad=0.5, h_pad=0.5, w_pad=0.5)
     if filename:
         if format:
             fig1.savefig(filename, format=format)
@@ -390,7 +402,7 @@ def kratkyVcPlot(curve_file, I0, Vc, filename=None, format="png"):
     I = data[:, 1]
     xdata = q * q * Vc
     ydata = xdata * I / I0
-    fig1 = plt.figure(figsize=(12, 10))
+    fig1 = plt.figure(figsize=figureSize)
     ax1 = fig1.add_subplot(1, 1, 1)
     dplot = ax1.plot(xdata, ydata, label="Experimental curve")
     ax1.set_ylabel('$q^{2}V_{C}I/I_{0}$')
@@ -401,6 +413,7 @@ def kratkyVcPlot(curve_file, I0, Vc, filename=None, format="png"):
     ax1.set_ylim(ymin=-0.01, ymax=0.9)
     ax1.set_title("Dimensionless Kratky plot - $V_{c}$ ")
     ax1.legend([dplot[0]], [ dplot[0].get_label()], loc=0)
+    plt.tight_layout(pad=0.5, h_pad=0.5, w_pad=0.5)
     if filename:
         if format:
             fig1.savefig(filename, format=format)
