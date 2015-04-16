@@ -36,12 +36,14 @@ import os, gc, sys
 from numpy import loadtxt
 from EDPluginControl import EDPluginControl
 from XSDataEdnaSaxs import XSDataInputSaxsAnalysis, XSDataResultSaxsAnalysis, \
-                           XSDataInputAutoRg, XSDataInputDatGnom, XSDataInputDatPorod
-from XSDataCommon import XSDataString, XSDataFile, XSDataInteger, XSDataStatus, XSDataDouble
-from XSDataBioSaxsv1_0 import XSDataRamboTainer
+                           XSDataInputAutoRg, XSDataInputDatGnom, XSDataInputDatPorod#, XSDataRamboTainer
+from XSDataCommon import XSDataString, XSDataFile, XSDataInteger, XSDataStatus, XSDataDouble 
+from EDFactoryPlugin import edFactoryPlugin
+edFactoryPlugin.loadModule("XSDataBioSaxs")
+#from XSDataBioSaxs import XSDataRamboTainer
 from saxs_plotting import scatterPlot, guinierPlot, kartkyPlot, densityPlot, kratkyRgPlot, kratkyVcPlot
 
-from EDUtilsBioSaxs import RamboTainerInvariant
+#from EDUtilsBioSaxs import RamboTainerInvariant
 
 
 class EDPluginControlSaxsAnalysisv1_1(EDPluginControl):
@@ -251,26 +253,26 @@ Volume  =    %12.2f""" % (self.xVolume.value)
         if self.scatterFile and os.path.exists(self.scatterFile):
             self.subtracted_data = loadtxt(self.scatterFile)
             print "Trying to calculate RTI"
-            if self.subtracted_data is not None and\
-                self.autoRg.rg and self.autoRg.rgStdev and self.autoRg.i0 and self.autoRg.i0Stdev:
-                print "Trying to calculate RTI"
-                dictRTI = RamboTainerInvariant(self.subtracted_data, self.autoRg.rg.value,
-                                               self.autoRg.rgStdev.value, self.autoRg.i0.value,
-                                               self.autoRg.i0Stdev.value, self.autoRg.firstPointUsed.value)
-#             {'Vc': vc[0], 'dVc': vc[1], 'Qr': qr, 'dQr': dqr, 'mass': mass, 'dmass': dmass}
-                Vc = dictRTI.get("Vc")
-                Vc_Stdev = dictRTI.get("dVc")
-                Qr = dictRTI.get("Qr")
-                Qr_Stdev = dictRTI.get("dQ")
-                mass = dictRTI.get("mass")
-                mass_Stdev = dictRTI.get("dmass")
-                xsdRTI = XSDataRamboTainer(vc=XSDataDouble(Vc),
-                                           qr=XSDataDouble(Qr),
-                                           mass=XSDataDouble(mass),
-                                           dvc=XSDataDouble(Vc_Stdev),
-                                           dqr=XSDataDouble(Qr_Stdev),
-                                           dmass=XSDataDouble(mass_Stdev))
-                self.rti = xsdRTI
+#             if self.subtracted_data is not None and\
+#                 self.autoRg.rg and self.autoRg.rgStdev and self.autoRg.i0 and self.autoRg.i0Stdev:
+#                 print "Trying to calculate RTI"
+#                 dictRTI = RamboTainerInvariant(self.subtracted_data, self.autoRg.rg.value,
+#                                                self.autoRg.rgStdev.value, self.autoRg.i0.value,
+#                                                self.autoRg.i0Stdev.value, self.autoRg.firstPointUsed.value)
+# #             {'Vc': vc[0], 'dVc': vc[1], 'Qr': qr, 'dQr': dqr, 'mass': mass, 'dmass': dmass}
+#                 Vc = dictRTI.get("Vc")
+#                 Vc_Stdev = dictRTI.get("dVc")
+#                 Qr = dictRTI.get("Qr")
+#                 Qr_Stdev = dictRTI.get("dQ")
+#                 mass = dictRTI.get("mass")
+#                 mass_Stdev = dictRTI.get("dmass")
+#                 xsdRTI = XSDataRamboTainer(vc=XSDataDouble(Vc),
+#                                            qr=XSDataDouble(Qr),
+#                                            mass=XSDataDouble(mass),
+#                                            dvc=XSDataDouble(Vc_Stdev),
+#                                            dqr=XSDataDouble(Qr_Stdev),
+#                                            dmass=XSDataDouble(mass_Stdev))
+#                 self.rti = xsdRTI
 
     def doFailureRg(self, _edPlugin=None):
         self.DEBUG("EDPluginControlSaxsAnalysisv1_1.doFailureRg")

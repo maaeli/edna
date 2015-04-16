@@ -52,7 +52,7 @@ class EDPluginControlSaxsAnalysisModelingv1_0(EDPluginControl):
         * Damstart
         * Dammin
     """
-    cpAnalysis = "EDPluginControlSaxsAnalysisv1_0"
+    cpAnalysis = "EDPluginControlSaxsAnalysisv1_1"
     cpModeling = "EDPluginControlSaxsModelingv1_0"
 
     def __init__(self):

@@ -197,6 +197,7 @@ def densityPlot(gnomfile, filename=None, format="png", unit="nm"):
 #    ax1.set_yscale("log")
     ax1.legend()
 #    ax1.legend(loc=3)
+    plt.tight_layout(pad=0.5, h_pad=0.5, w_pad=0.5)
     if filename:
         if format:
             fig1.savefig(filename, format=format)
@@ -253,7 +254,7 @@ def scatterPlot(curve_file, first_point=None, last_point=None, filename=None, fo
     ax1.set_xlabel('$q$ (%s$^{-1}$)' % unit)
     ax1.set_title("Scattering curve")
     ax1.set_yscale("log")
-    ax1.legend()
+    ax1.legend(loc=3)
     plt.tight_layout(pad=0.5, h_pad=0.5, w_pad=0.5)
 #    ax1.legend(loc=3)
     if filename:
@@ -315,7 +316,7 @@ def guinierPlot(curve_file, first_point=None, last_point=None, filename=None, fo
     ax1.set_ylabel('ln[$I(q)$]')
     ax1.set_xlabel('$q^2$ (%s$^{-2}$)' % unit)
     ax1.set_title("Guinier plot: $Rg=$%.1f %s $I0=$%.1f" % (Rg, unit, I0))
-    ax1.legend(loc=3)
+    ax1.legend(loc=1)
     plt.tight_layout(pad=0.5, h_pad=0.5, w_pad=0.5)
     if filename:
         if format:

@@ -24,6 +24,7 @@
 #
 
 from __future__ import with_statement
+from saxs_plotting import figureSize
 __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
@@ -63,6 +64,12 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
     strPluginExecDamstart = "EDPluginExecDamstartv0_3"
     strPluginExecDammin = "EDPluginExecDamminv0_2"
     Rg_min = 0.5  # nm
+    
+    figureSize = (15,10)
+    figureSize = (7.12,4.75 )        
+    matplotlib.rcParams.update({'font.size': 8})
+    matplotlib.rcParams.update({'axes.titlesize':8})
+    
     def __init__(self):
         """
         """
@@ -82,6 +89,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.mask2d = None
         self.arrayNSD = None
         self.ref = None   # reference frame number (starting ar 0)
+
 
     def checkParameters(self):
         """
@@ -449,12 +457,12 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
 
 
     def chi2plot(self, filename=None, close=True):
-
+        
         chi2 = numpy.array([ plg.dataOutput.chiSqrt.value for plg in self.dammif_plugins])
         chi2max = chi2.mean() + 2 * chi2.std()
 
         xticks = 1 + numpy.arange(self.dammif_jobs)
-        fig = plt.figure(figsize=(15, 10))
+        fig = plt.figure(figsize=figureSize)
         ax1 = fig.add_subplot(1, 2, 1)
         ax1.bar(xticks - 0.5, chi2)
         ax1.set_ylabel(u"$\sqrt{\u03C7}$")
@@ -492,7 +500,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
 
     def makeNSDarray(self, filename=None, close=True):
         self.arrayNSD = numpy.zeros(self.mask2d.shape, numpy.float32)
-        fig = plt.figure(figsize=(15, 10))
+        fig = plt.figure(figsize=figureSize)
         ax1 = fig.add_subplot(1, 2, 1)
         # for now just an empty figure but a placeholder
         ax1.imshow(self.arrayNSD, interpolation="nearest", origin="upper")
@@ -505,8 +513,10 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
             self.arrayNSD[i0, i1] = nsd
             self.arrayNSD[i1, i0] = nsd
             lnsd.append(nsd)
-            ax1.text(i0, i1, "%.2f" % nsd, ha="center", va="center", size=12 * 8 // self.dammif_jobs)
-            ax1.text(i1, i0, "%.2f" % nsd, ha="center", va="center", size=12 * 8 // self.dammif_jobs)
+            #ax1.text(i0, i1, "%.2f" % nsd, ha="center", va="center", size=12 * 8 // self.dammif_jobs)
+            #ax1.text(i1, i0, "%.2f" % nsd, ha="center", va="center", size=12 * 8 // self.dammif_jobs)
+            ax1.text(i0, i1, "%.2f" % nsd, ha="center", va="center", size= 4 )
+            ax1.text(i1, i0, "%.2f" % nsd, ha="center", va="center", size=4 )
         lnsd = numpy.array(lnsd)
 #        print lnsd
 #        print lnsd.mean() , lnsd.std(), lnsd.mean() + 2 * lnsd.std()
@@ -540,6 +550,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         ax2.legend(loc=8)
         self.valid *= (data < nsd_max)
         bbox_props = dict(fc="pink", ec="r", lw=1)
+        plt.tight_layout()
         for i in range(self.dammif_jobs):
             if not self.valid[i]:
                 ax2.text(i + 0.95, data[self.ref] / 2, "Discarded", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)
