@@ -66,7 +66,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
     Rg_min = 0.5  # nm
     
     figureSize = (15,10)
-    figureSize = (7.12,4.75 )        
+    figureSize = (7.12,3)        
     matplotlib.rcParams.update({'font.size': 8})
     matplotlib.rcParams.update({'axes.titlesize':8})
     
@@ -501,7 +501,11 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
     def makeNSDarray(self, filename=None, close=True):
         self.arrayNSD = numpy.zeros(self.mask2d.shape, numpy.float32)
         fig = plt.figure(figsize=figureSize)
-        ax1 = fig.add_subplot(1, 2, 1)
+        #ax1 = fig.add_subplot(1, 2, 1)
+        
+        ax1 = plt.subplot2grid((2,7), (0,0), colspan=4, rowspan=2)
+        ax2 = plt.subplot2grid((2,7), (0,4), colspan=3, rowspan=2)
+  
         # for now just an empty figure but a placeholder
         ax1.imshow(self.arrayNSD, interpolation="nearest", origin="upper")
 
@@ -538,22 +542,25 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         ax1.set_yticklabels([str(i) for i in range(1, 1 + self.dammif_jobs)])
         ax1.set_xlabel(u"Model number")
         ax1.set_ylabel(u"Model number")
-        ax2 = fig.add_subplot(1, 2, 2)
+        #ax2 = fig.add_subplot(1, 2, 2)
         ax2.bar(xticks - 0.5, data)
         ax2.plot([0.5, self.dammif_jobs + 0.5], [nsd_max, nsd_max], "-r", label=u"NSD$_{max}$ = %.2f" % nsd_max)
-        ax2.set_title(u"NSD between any model and all others")
+        ax2.set_title(u"NSD between any model \n and all others", multialignment='center')
         ax2.set_ylabel("Normalized Spatial Discrepancy")
         ax2.set_xlabel(u"Model number")
         ax2.set_xticks(xticks)
+        ax2.tick_params(axis='y', labelsize=8)
         bbox_props = dict(fc="cyan", ec="b", lw=1)
-        ax2.text(self.ref + 0.95, data[self.ref] / 2, "Reference", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)
-        ax2.legend(loc=8)
+       # ax2.text(self.ref + 0.95, data[self.ref] / 2, "Reference", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)
+        ax2.text(self.ref + 0.95, data[self.ref] / 2, "Reference", ha="center", va="center", rotation=90, size=8, bbox=bbox_props)
+        ax2.legend(loc=8, prop={'size':8})
         self.valid *= (data < nsd_max)
         bbox_props = dict(fc="pink", ec="r", lw=1)
         plt.tight_layout()
         for i in range(self.dammif_jobs):
             if not self.valid[i]:
-                ax2.text(i + 0.95, data[self.ref] / 2, "Discarded", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)
+           #     ax2.text(i + 0.95, data[self.ref] / 2, "Discarded", ha="center", va="center", rotation=90, size=10, bbox=bbox_props)
+                 ax2.text(i + 0.95, data[self.ref] / 2, "Discarded", ha="center", va="center", rotation=90, size=8, bbox=bbox_props)
 #        print self.valid
 #        print self.ref
         if filename:
