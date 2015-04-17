@@ -63,6 +63,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
     strPluginExecDamstart = "EDPluginExecDamstartv0_3"
     strPluginExecDammin = "EDPluginExecDamminv0_2"
     Rg_min = 0.5  # nm
+    activateDammin = False
     def __init__(self):
         """
         """
@@ -286,7 +287,6 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         ########################################################################
         # Finally call dammin
         ########################################################################
-
         dammin = self.loadPlugin(self.strPluginExecDammin)
         dammin.dataInput = XSDataInputDammin(pdbInputFile=damstart.dataOutput.outputPdbFile,
                                              gnomOutputFile=self.xsGnomFile,
@@ -295,6 +295,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         dammin.connectSUCCESS(self.doSuccessExecDammin)
         dammin.connectFAILURE(self.doFailureExecDammin)
         dammin.executeSynchronous()
+
         #Dammin takes as lot of time ... wait here for completion
 
     def postProcess(self, _edObject=None):
@@ -423,7 +424,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.DEBUG("EDPluginControlSaxsModelingv1_0.doFailureExecDammin")
         self.retrieveMessages(_edPlugin)
         self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureExecDammin")
-        self.setFailure()
+        #self.setFailure()
 
 
     def bestDammif(self):

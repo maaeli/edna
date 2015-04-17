@@ -162,19 +162,27 @@ class EDPluginBioSaxsFlushHPLCv1_3 (EDPluginControl):
         self.json = os.path.splitext(hdf5)[0] + ".json"
         self.xsDataResult.hplcFile = XSDataFile(XSDataString(hdf5))
         self.xsDataResult.hplcImage = XSDataFile(XSDataString(run.make_plot()))
-        for group in run.analyse():
-            self.lstExecutiveSummary.append("Merging frames from %s to %s" % (group[0], group[-1]))
-            xsdFrames = [XSDataFile(XSDataString(run.frames[i].subtracted)) for i in group]
-            outname = os.path.splitext(run.frames[group[0]].subtracted)[0] + "_aver_%s.dat" % group[-1]
-            edpugin = self.loadPlugin(self.strControlledPluginDatAver)
-            edpugin.dataInput = XSDataInputDataver(outputCurve=XSDataFile(XSDataString(outname)), inputCurve=xsdFrames)
-            edpugin.connectSUCCESS(self.doSuccessDatAver)
-            edpugin.connectFAILURE(self.doFailureDatAver)
-            edpugin.execute()
-            run.merge_curves.append(outname)
-            run.merge_analysis[outname] = None
-            run.merge_Rg[outname] = None
-            run.merge_framesDIC[outname] = [group[0], group[-1]]
+        try:
+            peaks = run.analyse()
+            for group in peaks:
+                self.lstExecutiveSummary.append("Merging frames from %s to %s" % (group[0], group[-1]))
+                xsdFrames = [XSDataFile(XSDataString(run.frames[i].subtracted)) for i in group]
+                outname = os.path.splitext(run.frames[group[0]].subtracted)[0] + "_aver_%s.dat" % group[-1]
+                edpugin = self.loadPlugin(self.strControlledPluginDatAver)
+                edpugin.dataInput = XSDataInputDataver(outputCurve=XSDataFile(XSDataString(outname)), inputCurve=xsdFrames)
+                edpugin.connectSUCCESS(self.doSuccessDatAver)
+                edpugin.connectFAILURE(self.doFailureDatAver)
+                edpugin.execute()
+                run.merge_curves.append(outname)
+                run.merge_analysis[outname] = None
+                run.merge_Rg[outname] = None
+                run.merge_framesDIC[outname] = [group[0], group[-1]]
+        except ValueError:
+            traceback.print_stack()
+            self.ERROR("EDPluginBioSaxsFlushHPLCv1_3: ValueError Error in analysing run")
+        except Exception as error:
+            traceback.print_stack()
+            self.ERROR("EDPluginBioSaxsFlushHPLCv1_3:  Error in analysing run" % error)
         # Append to hdf5
         run.append_hdf5()
 

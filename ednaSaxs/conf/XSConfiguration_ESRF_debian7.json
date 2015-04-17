@@ -32,7 +32,7 @@
         "execProcessScriptVersionString": "", 
         "execProcessScriptExecutable": "/usr/bin/dammin", 
         "execProcessScriptShell": "python", 
-        "timeOut": 1500
+        "timeOut": 15
     },  
    "EDPluginExecDatOpv2_0": {}   
 }

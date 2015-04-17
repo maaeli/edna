@@ -202,18 +202,19 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
         self.setDataOutput(xsDataResult)
 
     def copyCustomFile(self, model, key, targetFileName):
+        pyarch = os.path.join(self.dataInput.sample.ispybDestination.path.value, str(self.dataInput.sample.measurementID.value))
         if model.get(key) is not None:
-		afile = model.get(key)
-	    	model[key] = self.copyfile(afile, pyarch, targetFileName)
+            afile = model.get(key)
+            model[key] = self.copyfile(afile, pyarch, targetFileName)
     
     def copyModelFile(self, model, i):
     	#afile = model.get("pdbFile")I
     	#if afile:
 	#    amodel["pdbFile"] = self.copyfile(afile, pyarch, "model_%02i.pdb" % i)
-	copyCustomFile(model, "pdbFile", "model_%02i.pdb" % i)
-	copyCustomFile(model, "fitFile", "model_%02i.fit" % i)
-	copyCustomFile(model, "firFile", "model_%02i.fir" % i)
-	copyCustomFile(model, "logFile", "model_%02i.log" % i)
+        self.copyCustomFile(model, "pdbFile", "model_%02i.pdb" % i)
+        self.copyCustomFile(model, "fitFile", "model_%02i.fit" % i)
+        self.copyCustomFile(model, "firFile", "model_%02i.fir" % i)
+        self.copyCustomFile(model, "logFile", "model_%02i.log" % i)
 	
 
     def copy_to_pyarch(self):
@@ -228,7 +229,7 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
                 self.ERROR(ermsg)
 
             for i in range(0, len(self.models)):
-	    	copyModelFile(self.models[i], i)
+	    	    self.copyModelFile(self.models[i], i)
 		
 
 
@@ -241,7 +242,8 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
             self.nsdPlot = self.copyfile(self.nsdPlot, pyarch)
             self.chi2plot = self.copyfile(self.chi2plot, pyarch)
 
-	    
+
+
 
     def copyfile(self, afile, pyarch, dest=None):
         fullname = None
