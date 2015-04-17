@@ -66,7 +66,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
     Rg_min = 0.5  # nm
     
     figureSize = (15,10)
-    figureSize = (7.12,3)        
+    figureSize = (7.12,2)        
     matplotlib.rcParams.update({'font.size': 8})
     matplotlib.rcParams.update({'axes.titlesize':8})
     
@@ -503,8 +503,8 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         fig = plt.figure(figsize=figureSize)
         #ax1 = fig.add_subplot(1, 2, 1)
         
-        ax1 = plt.subplot2grid((2,7), (0,0), colspan=4, rowspan=2)
-        ax2 = plt.subplot2grid((2,7), (0,4), colspan=3, rowspan=2)
+        ax1 = plt.subplot2grid((1,7), (0,0), colspan=4)
+        ax2 = plt.subplot2grid((1,7), (0,4), colspan=3)
   
         # for now just an empty figure but a placeholder
         ax1.imshow(self.arrayNSD, interpolation="nearest", origin="upper")
