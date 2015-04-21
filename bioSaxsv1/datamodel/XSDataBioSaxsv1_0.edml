@@ -282,7 +282,7 @@ complex type XSDataInputBioSaxsHPLCv1_0 extends XSDataInputBioSaxsProcessOneFile
 	hplcFile: XSDataFile optional
 }
 
-complex type XSDataRamboTainer extends XSData{
+complex type XSDataRamboTainer extends XSDataResult{
 	vc: XSDataDouble optional
 	qr: XSDataDouble optional
 	mass: XSDataDouble optional

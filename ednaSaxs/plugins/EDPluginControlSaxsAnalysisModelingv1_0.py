@@ -148,6 +148,7 @@ Volume  =    %12.2f""" % (self.xVolume.value)
         self.xsDataResult.autoRg = self.autoRg
         self.xsDataResult.gnom = self.gnom
         self.xsDataResult.volume = self.xVolume
+        self.xsDataResult.rti = self.rti
         self.xsDataResult.status = XSDataStatus(message=self.getXSDataMessage(),
                                           executiveSummary=XSDataString(os.linesep.join(self.getListExecutiveSummaryLines())))
 
@@ -163,6 +164,7 @@ Volume  =    %12.2f""" % (self.xVolume.value)
             self.gnom = _edPlugin.dataOutput.gnom
             self.gnomFile = self.gnom.gnomFile.path.value
             self.xVolume = _edPlugin.dataOutput.volume
+            self.rti = _edPlugin.dataOutput.rti
             self.xsDataResult.scatterPlot= _edPlugin.dataOutput.scatterPlot
             self.xsDataResult.guinierPlot= _edPlugin.dataOutput.guinierPlot
             self.xsDataResult.kratkyPlot= _edPlugin.dataOutput.kratkyPlot

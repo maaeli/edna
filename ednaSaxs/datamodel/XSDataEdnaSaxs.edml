@@ -17,6 +17,7 @@ import XSDataCommon.XSDataRotation
 import XSDataCommon.XSDataVectorDouble
 import XSDataCommon.XSDataArray
 import XSDataCommon.XSDataDoubleWithUnit
+import XSDataBioSaxs.XSDataRamboTainer 
 /*******************************************
   *  Common types used only in EdnaSaxs
   ********************************************/
@@ -183,6 +184,7 @@ complex type XSDataResultSaxsAnalysis extends XSDataResult{
 	guinierPlot: XSDataFile optional
 	kratkyPlot: XSDataFile optional
 	densityPlot: XSDataFile optional
+	rti: XSDataRamboTainer optional
 }
 
 complex type XSDataInputSaxsModeling extends XSDataInput{
@@ -235,7 +237,7 @@ complex type XSDataResultSaxsAnalysisModeling extends XSDataResult{
 	guinierPlot: XSDataFile optional
 	kratkyPlot: XSDataFile optional
 	densityPlot: XSDataFile optional
-
+    rti: XSDataRamboTainer optional
 	dammifModels: XSDataSaxsModel [] optional
 	damaverModel: XSDataSaxsModel  optional
 	damfiltModel: XSDataSaxsModel  optional
