@@ -2,19 +2,19 @@
     "EDPluginExecDamfiltv0_3": {
         "execProcessScriptVersionString": "", 
         "execProcessScriptExecutable": "/usr/bin/damfilt", 
-        "execProcessScriptShell": "/bin/dash", 
+        "execProcessScriptShell": "python", 
         "timeOut": 60
     },    
     "EDPluginExecDamstartv0_3": {
         "execProcessScriptVersionString": "", 
         "execProcessScriptExecutable": "/usr/bin/damstart", 
-        "execProcessScriptShell": "/bin/dash", 
+        "execProcessScriptShell": "python", 
         "timeOut": 60
     }, 
     "EDPluginExecDamaverv0_3": {
         "execProcessScriptVersionString": "", 
         "execProcessScriptExecutable": "/usr/bin/damaver", 
-        "execProcessScriptShell": "/bin/dash", 
+        "execProcessScriptShell": "python", 
         "timeOut": 600
     },
     "EDPluginExecDataverv2_0": {},
@@ -25,8 +25,14 @@
   "EDPluginExecSupcombv0_3": {
         "execProcessScriptVersionString": "", 
         "execProcessScriptExecutable": "/usr/bin/supcomb", 
-        "execProcessScriptShell": "/bin/dash", 
+        "execProcessScriptShell": "python", 
         "timeOut": 60
     },
+    "EDPluginExecDamminv0_2": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/usr/bin/dammin", 
+        "execProcessScriptShell": "python", 
+        "timeOut": 1500
+    },  
    "EDPluginExecDatOpv2_0": {}   
 }

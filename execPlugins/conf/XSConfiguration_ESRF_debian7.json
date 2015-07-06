@@ -6,7 +6,7 @@
     }, 
     "EDPluginExecRsync": {
         "execProcessScriptExecutable": "/usr/bin/rsync", 
-        "execProcessScriptShell": "/bin/sh"
+        "execProcessScriptShell": "python"
     }, 
     "EDPluginExecShiftImagev1_0": {
         "writeXMLOutput": 0

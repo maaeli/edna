@@ -90,6 +90,7 @@ class EDPluginAutoSubv1_0(EDPluginControl):
         self.bestBuffer = None
         self.averBuffer = None
         self.actualBestBuffer = None
+	self.bestBufferType = "" #"average" or the file name of the best buffer
         self.fidelity = None
         self.lstProcessLog = []
         self.dictRg = {} #key: filename, value = (Rg,I0)
@@ -131,6 +132,7 @@ class EDPluginAutoSubv1_0(EDPluginControl):
             copy(name, os.path.join(self.outdir, "%s_buf%i.dat" % (basename, idx)))
         if len(self.buffers) == 1:
             self.actualBestBuffer = self.buffers[0]
+	    self.bestBufferType = str(self.actualBestBuffer)
         else:
             self.__edPluginDataver.dataInput = XSDataInputDataver(inputCurve=self.dataInput.buffers,
                                                                   outputCurve=XSDataFile(XSDataString(self.averBuffer)))
@@ -154,8 +156,10 @@ class EDPluginAutoSubv1_0(EDPluginControl):
                     edpluginRg.connectFAILURE(self.doFailureExecAutoRg)
                     edpluginRg.executeSynchronous()
                     self.actualBestBuffer = self.dictRg.keys()[self.dictRg.values().index(min(self.dictRg.values()))]
+		    self.bestBufferType = str(self.actualBestBuffer)
                 else:
                     self.actualBestBuffer = self.averBuffer
+		    self.bestBufferType = "average"
             else:
                 self.synchronizePlugins()
                 strError = "You should specify exactly 2 buffers for guessing best buffer, I got: " + ", ".join(self.buffers)
@@ -191,6 +195,7 @@ class EDPluginAutoSubv1_0(EDPluginControl):
 
         self.xsDataResult.status = XSDataStatus(executiveSummary=XSDataString(os.linesep.join(self.lstProcessLog)))
         self.xsDataResult.subtractedCurve = XSDataFile(XSDataString(self.subtractedCurve))
+	self.xsDataResult.bestBufferType = XSDataString(self.bestBufferType)
         if self.actualBestBuffer:
             self.xsDataResult.bestBuffer = XSDataFile(XSDataString(self.actualBestBuffer))
         self.dataOutput = self.xsDataResult
@@ -218,7 +223,6 @@ class EDPluginAutoSubv1_0(EDPluginControl):
     def doSuccessExecAutoRg(self, _edPlugin=None):
         self.DEBUG("EDPluginAutoSubv1_0.doSuccessExecAutoRg")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginAutoSubv1_0.doSuccessExecAutoRg")
-
         for data in _edPlugin.dataOutput.autoRgOut:
             self.dictRg[data.filename.path.value] = (data.rg.value, data.i0.value)
 
@@ -251,10 +255,23 @@ class EDPluginAutoSubv1_0(EDPluginControl):
         self.DEBUG("EDPluginAutoSubv1_0.doFailureExecAutoRg")
         self.retrieveFailureMessages(_edPlugin, "EDPluginAutoSubv1_0.doFailureExecAutoRg")
         self.lstProcessLog.append("Failure in AutoRg")
-        if (_edPlugin.dataInput.inputCurve) == 2: 
+        if len(_edPlugin.dataInput.inputCurve) == 2:
             # we were comparing 2 buffers but were analyzed by AutoRg
             for fn in self.buffers:
                 self.dictRg[fn] = (0, numpy.loadtxt(fn, unpack=True)[1].sum())
+        elif os.path.exists(self.subtractedCurve):
+            #we don't want to fail the subtraction plugin because the result has no Rg - default to 0
+            res = XSDataAutoRg()
+            res.rg = XSDataLength(0.0)
+            res.rgStdev = XSDataLength(0.0)
+            res.i0 = XSDataDouble(0.0)
+            res.i0Stdev = XSDataDouble(0.0)
+            res.firstPointUsed = XSDataInteger(0)
+            res.lastPointUsed = XSDataInteger(0)
+            res.quality = XSDataDouble(0.0)
+            res.isagregated = XSDataBoolean(bool(0))
+            res.filename = XSDataFile(XSDataString(self.subtractedCurve))
+            self.xsDataResult.autoRg  = res
         else:
             self.setFailure()
 
