@@ -10,7 +10,7 @@
 				</XSParamItem>
 				<XSParamItem>
 					<name>dammifJobs</name>
-					<value>12</value>
+					<value>16</value>
 				</XSParamItem>
 			</XSParamList>
 		</XSPluginItem>
@@ -23,7 +23,7 @@
 				</XSParamItem>
 				<XSParamItem>
 					<name>dammifJobs</name>
-					<value>12</value>
+					<value>16</value>
 				</XSParamItem>
 			</XSParamList>
 		</XSPluginItem>
