@@ -190,9 +190,9 @@ class EDPluginControlSaxsModelingv1_1(EDPluginControl):
         self.result.pdbSolventFile = self.dammif.dataOutput.pdbSolventFile
 
         # align models, compute NSD and choose the reference model
-        align = AlignModels()
+        inputfiles = [self.dammif_plugins[idx].dataOutput.pdbMoleculeFile.path.value for idx in range(self.dammif_jobs)]
+        align = AlignModels(inputfiles, slow=False)
         
-        align.inputfiles = [self.dammif_plugins[idx].dataOutput.pdbMoleculeFile.path.value for idx in range(self.dammif_jobs)]
         outputfiles = []
         for i in range(self.dammif_jobs):
             outputfiles.append(os.path.join(self.getWorkingDirectory(), "model-%02i.pdb" % (i+1)))
