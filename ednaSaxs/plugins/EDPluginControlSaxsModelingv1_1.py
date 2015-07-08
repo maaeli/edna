@@ -422,7 +422,7 @@ class EDPluginControlSaxsModelingv1_1(EDPluginControl):
         ax1.bar(xticks - 0.5, chi2)
         ax1.set_ylabel(u"$\sqrt{\u03C7}$")
         ax1.set_xlabel(u"Model number")
-        ax1.plot([0.5, self.dammif_jobs + 0.5], [chi2max, chi2max], "-r", label=u"$\sqrt{\u03C7}$$_{max}$ = %.3f" % chi2max)
+        ax1.plot([0.5, self.dammif_jobs + 0.5], [chi2max, chi2max], "-r", label=u"${\u03C7}^2$$_{max}$ = %.3f" % chi2max)
         ax1.set_xticks(xticks)
         ax1.legend(loc=8)
         R = numpy.array([ plg.dataOutput.rfactor.value for plg in self.dammif_plugins])
