@@ -53,7 +53,7 @@ class EDPluginControlSaxsModelingv1_1(EDPluginControl):
     classlock = Semaphore()
     configured = False
     cluster_size = 2  # duplicate from ControlPlugin
-    dammif_jobs = 10  # number of dammif job to run
+    dammif_jobs = 16  # number of dammif job to run
     unit = "NANOMETER"  # unit of the GNOM file
     symmetry = "P1"  #
     mode = "fast"  #
