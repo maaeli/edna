@@ -58,6 +58,7 @@ from threading import Semaphore
 
 figureSize = (12,10) #global size of figures, in inch
 figureSize = (3.6,3) 
+labelSize = 8
 
 
 
@@ -191,8 +192,10 @@ def densityPlot(gnomfile, filename=None, format="png", unit="nm"):
     fig1 = plt.figure(figsize=figureSize)
     ax1 = fig1.add_subplot(1, 1, 1)
     ax1.errorbar(out["r"], out["P(r)"], out["P(r)_err"], label="Density")
-    ax1.set_ylabel('$\\rho (r)$')
-    ax1.set_xlabel('$r$ (%s)' % unit)
+    ax1.set_ylabel('$\\rho (r)$', fontsize=11)
+    ax1.set_xlabel('$r$ (%s)' % unit,fontsize=11 )
+    ax1.tick_params(axis='x', labelsize=labelSize)
+    ax1.tick_params(axis='y', labelsize=labelSize)
     ax1.set_title("Pair distribution function")
 #    ax1.set_yscale("log")
     ax1.legend()
@@ -250,11 +253,13 @@ def scatterPlot(curve_file, first_point=None, last_point=None, filename=None, fo
     if gnomfile:
         gnom = loadGnomFile(gnomfile)
         ax1.plot(gnom["q_fit"], gnom["I_fit"], label="GNOM fitted curve")
-    ax1.set_ylabel('$I(q)$')
-    ax1.set_xlabel('$q$ (%s$^{-1}$)' % unit)
+    ax1.set_ylabel('$I(q)$', fontsize=11)
+    ax1.set_xlabel('$q$ (%s$^{-1}$)' % unit, fontsize=11)
     ax1.set_title("Scattering curve")
     ax1.set_yscale("log")
     ax1.legend(loc=3)
+    ax1.tick_params(axis='x', labelsize=labelSize)
+    ax1.tick_params(axis='y', labelsize=labelSize)
     plt.tight_layout(pad=0.5, h_pad=0.5, w_pad=0.5)
 #    ax1.legend(loc=3)
     if filename:
@@ -313,10 +318,12 @@ def guinierPlot(curve_file, first_point=None, last_point=None, filename=None, fo
          textcoords='data')
 
     ax1.plot(q2, intercept + slope * q2, label="ln[$I(q)$] = %.2f %.2f * $q^2$" % (intercept, slope))
-    ax1.set_ylabel('ln[$I(q)$]')
-    ax1.set_xlabel('$q^2$ (%s$^{-2}$)' % unit)
+    ax1.set_ylabel('ln[$I(q)$]', fontsize = 11 )
+    ax1.set_xlabel('$q^2$ (%s$^{-2}$)' % unit,fontsize = 11  )
     ax1.set_title("Guinier plot: $Rg=$%.1f %s $I0=$%.1f" % (Rg, unit, I0))
     ax1.legend(loc=1)
+    ax1.tick_params(axis='x', labelsize=labelSize)
+    ax1.tick_params(axis='y', labelsize=labelSize)
     plt.tight_layout(pad=0.5, h_pad=0.5, w_pad=0.5)
     if filename:
         if format:
@@ -341,9 +348,11 @@ def kartkyPlot(curve_file, filename=None, format="png", unit="nm"):
     fig1 = plt.figure(figsize=figureSize)
     ax1 = fig1.add_subplot(1, 1, 1)
     ax1.plot(q, q2I, label="Experimental curve")
-    ax1.set_ylabel('$q^2I (%s^2)$' % unit)
-    ax1.set_xlabel('$q$ (%s$^{-1}$)' % unit)
+    ax1.set_ylabel('$q^2I (%s^2)$' % unit, fontsize = 11 )
+    ax1.set_xlabel('$q$ (%s$^{-1}$)' % unit,fontsize = 11  )
     ax1.set_title("Kratky plot")
+    ax1.tick_params(axis='x', labelsize=labelSize)
+    ax1.tick_params(axis='y', labelsize=labelSize)
     ax1.legend(loc=0)
     if filename:
         if format:
@@ -371,14 +380,16 @@ def kratkyRgPlot(curve_file, I0, Rg, filename=None, format="png"):
     fig1 = plt.figure(figsize=figureSize)
     ax1 = fig1.add_subplot(1, 1, 1)
     dplot = ax1.plot(xdata, ydata, label="Experimental curve")
-    ax1.set_ylabel('$(qR_{G})^2 I/I_{0}$')
-    ax1.set_xlabel('$qR_{G}$')
+    ax1.set_ylabel('$(qR_{G})^2 I/I_{0}$', fontsize = 11 )
+    ax1.set_xlabel('$qR_{G}$', fontsize = 11 )
     ax1.hlines(3.0 * numpy.exp(-1), xmin=-0.05, xmax=max(xdata), color='0.75', linewidth=1.0)
     ax1.vlines(numpy.sqrt(3.0), ymin=-0.01, ymax=max(ydata), color='0.75', linewidth=1.0)
     ax1.set_xlim(xmin=-0.05, xmax=8.5)
     ax1.set_ylim(ymin=-0.01, ymax=3.5)
     ax1.set_title("Dimensionless Kratky plot - $R_{G}$ ")
     ax1.legend([dplot[0]], [ dplot[0].get_label()], loc=0)
+    ax1.tick_params(axis='x', labelsize=labelSize)
+    ax1.tick_params(axis='y', labelsize=labelSize)
     plt.tight_layout(pad=0.5, h_pad=0.5, w_pad=0.5)
     if filename:
         if format:
@@ -406,14 +417,16 @@ def kratkyVcPlot(curve_file, I0, Vc, filename=None, format="png"):
     fig1 = plt.figure(figsize=figureSize)
     ax1 = fig1.add_subplot(1, 1, 1)
     dplot = ax1.plot(xdata, ydata, label="Experimental curve")
-    ax1.set_ylabel('$q^{2}V_{C}I/I_{0}$')
-    ax1.set_xlabel('$q^{2}V_{C}$')
+    ax1.set_ylabel('$q^{2}V_{C}I/I_{0}$', fontsize = 11 )
+    ax1.set_xlabel('$q^{2}V_{C}$', fontsize = 11 )
     ax1.hlines(0.82, xmin=-0.05, xmax=max(xdata), color='0.75', linewidth=1.0)
     ax1.vlines(numpy.sqrt(3.0), ymin=-0.01, ymax=max(ydata), color='0.75', linewidth=1.0)
     ax1.set_xlim(xmin=-0.05, xmax=19)
     ax1.set_ylim(ymin=-0.01, ymax=0.9)
     ax1.set_title("Dimensionless Kratky plot - $V_{c}$ ")
     ax1.legend([dplot[0]], [ dplot[0].get_label()], loc=0)
+    ax1.tick_params(axis='x', labelsize=labelSize)
+    ax1.tick_params(axis='y', labelsize=labelSize)
     plt.tight_layout(pad=0.5, h_pad=0.5, w_pad=0.5)
     if filename:
         if format:

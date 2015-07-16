@@ -519,8 +519,8 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
             lnsd.append(nsd)
             #ax1.text(i0, i1, "%.2f" % nsd, ha="center", va="center", size=12 * 8 // self.dammif_jobs)
             #ax1.text(i1, i0, "%.2f" % nsd, ha="center", va="center", size=12 * 8 // self.dammif_jobs)
-            ax1.text(i0, i1, "%.2f" % nsd, ha="center", va="center", size= 4 )
-            ax1.text(i1, i0, "%.2f" % nsd, ha="center", va="center", size=4 )
+            ax1.text(i0, i1, "%.2f" % nsd, ha="center", va="center", size= 4, color = 'white', weight =  'demibold')
+            ax1.text(i1, i0, "%.2f" % nsd, ha="center", va="center", size=4, color = 'white' , weight =  'demibold')
         lnsd = numpy.array(lnsd)
 #        print lnsd
 #        print lnsd.mean() , lnsd.std(), lnsd.mean() + 2 * lnsd.std()
@@ -566,7 +566,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         if filename:
             filename = os.path.join(self.getWorkingDirectory(), filename)
             self.log("Wrote %s" % filename)
-            fig.savefig(filename)
+            fig.savefig(filename, dpi=1200)
         if close:
             fig.clf()
             plt.close(fig)

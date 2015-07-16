@@ -257,6 +257,7 @@ def split_name(name):
         run = int(run)
         frame = int(frame)
     except Exception:
+       
         print("Filename %s does not match format dir/prefix_run_frame.dat" % name)
         return
     return {"dirname":dirname,
