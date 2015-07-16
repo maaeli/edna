@@ -244,6 +244,7 @@ Volume  =    %12.2f""" % (self.xVolume.value)
                                            dqr=XSDataDouble(Qr_Stdev),
                                            dmass=XSDataDouble(mass_Stdev))
                 print "Mass", mass
+                print "Vc", Vc
                 self.rti = xsdRTI
 
     def doFailureRg(self, _edPlugin=None):
