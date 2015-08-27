@@ -32,7 +32,7 @@ import os
 from EDVerbose                           import EDVerbose
 from EDAssert                            import EDAssert
 from EDTestCasePluginExecute             import EDTestCasePluginExecute
-from XSDataEdnaSaxs                         import XSDataResultDatcmp
+from XSDataEdnaSaxs                      import XSDataResultDatcmp
 
 
 class EDTestCasePluginExecuteExecDatcmpv2_0(EDTestCasePluginExecute):
@@ -46,10 +46,9 @@ class EDTestCasePluginExecuteExecDatcmpv2_0(EDTestCasePluginExecute):
         EDTestCasePluginExecute.__init__(self, "EDPluginExecDatcmpv2_0")
 #        self.setConfigurationFile(os.path.join(self.getPluginTestsDataHome(),
 #                                               "XSConfiguration_Datcmp.xml"))
+
         self.setDataInputFile(os.path.join(self.getPluginTestsDataHome(), \
                                            "XSDataInputDatcmp_reference.xml"))
-        self.setReferenceDataOutputFile(os.path.join(self.getPluginTestsDataHome(), \
-                                                     "XSDataResultDatcmp_reference.xml"))
 
     def preProcess(self):
         """
@@ -57,6 +56,9 @@ class EDTestCasePluginExecuteExecDatcmpv2_0(EDTestCasePluginExecute):
         """
         EDTestCasePluginExecute.preProcess(self)
         self.loadTestImage([ "noise1.dat", "noise2.dat" ])
+        self.setReferenceDataOutputFile(os.path.join(self.getPluginTestsDataHome(), \
+         "XSDataResultDatcmp_reference.xml-" + self.plugin.config.get("atsasVersion", "2.5.2")))
+
 
 
     def testExecute(self):

@@ -3,8 +3,6 @@
 #    Project: ExecPlugins/GroupAtsas
 #             http://www.edna-site.org
 #
-#    File: "$Id$"
-#
 #    Copyright (C) 2011, ESRF, Grenoble
 #
 #    Principal author:       Jérôme Kieffer
@@ -26,7 +24,7 @@
 __author__ = "Jérôme Kieffer, Martha Brennich"
 __license__ = "GPLv3+"
 __copyright__ = "2014, ESRF, Grenoble"
-__date__ = "2014-10-28"
+__date__ = "27/08/2015"
 
 import os
 from EDPluginExecProcessScript import EDPluginExecProcessScript
@@ -38,7 +36,6 @@ class EDPluginExecDatcmpv2_0(EDPluginExecProcessScript):
     Execution plugin to run datcmp: evaluation of the Similarity of two curves (in a 2-3 column ascii file)
     """
 
-
     def __init__(self):
         """
         Constructor of EDPluginExecDatcmpv2_0
@@ -48,37 +45,44 @@ class EDPluginExecDatcmpv2_0(EDPluginExecProcessScript):
         self.listFiles = []
         self.fChi = None
         self.fFidelity = None
-
+        self.atsasVersion = "2.6.1"
 
     def checkParameters(self):
         """
         Checks the mandatory parameters.
         """
-        self.DEBUG("EDPluginExecDatcmpv1_0.checkParameters")
+        self.DEBUG("EDPluginExecDatcmpv2_0.checkParameters")
         self.checkMandatoryParameters(self.getDataInput(), "Data Input is None")
         self.checkMandatoryParameters(self.getDataInput().inputCurve, "No input 1D curves file provided")
 
-
     def preProcess(self, _edObject=None):
         EDPluginExecProcessScript.preProcess(self)
-        self.DEBUG("EDPluginExecDatcmpv1_0.preProcess")
+        self.DEBUG("EDPluginExecDatcmpv2_0.preProcess")
         self.listFiles = [i.path.value for i in self.getDataInput().inputCurve if os.path.isfile(i.path.value)]
         if len(self.listFiles) != 2:
             self.WARNING("You did not provide the right number of valid files !!! %s" % " ".join(self.listFiles))
         self.generateDatcmpScript()
-
+        self.atsasVersion = self.config.get("atsasVersion", self.atsasVersion)
 
     def postProcess(self, _edObject=None):
         EDPluginExecProcessScript.postProcess(self)
-        self.DEBUG("EDPluginExecDatcmpv1_0.postProcess")
+        self.DEBUG("EDPluginExecDatcmpv2_0.postProcess")
 
         strResultFile = os.path.join(os.path.dirname(self.getScriptFilePath()), self.getScriptLogFileName())
         if os.path.isfile(strResultFile):
             for line in open(strResultFile):
                 words = line.split()
-                if len(words) == 5:
+                if (self.atsasVersion == "2.5.2") and (len(words) == 5):
                     try:
                         self.fChi = float(words[-2])
+                        self.fFidelity = float(words[-1])
+                    except ValueError:
+                        self.WARNING("Strange ouptut from %s:%s %s" % (strResultFile, os.linesep, line))
+                    else:
+                        break
+                if (self.atsasVersion == "2.6.1") and (len(words) == 6):
+                    try:
+                        self.fChi = float(words[-3]) ** 0.5
                         self.fFidelity = float(words[-1])
                     except ValueError:
                         self.WARNING("Strange ouptut from %s:%s %s" % (strResultFile, os.linesep, line))
@@ -95,5 +99,5 @@ class EDPluginExecDatcmpv2_0(EDPluginExecProcessScript):
         self.setDataOutput(xsDataResult)
 
     def generateDatcmpScript(self):
-        self.DEBUG("EDPluginExecDatcmpv1_0.generateScript")
+        self.DEBUG("EDPluginExecDatcmpv2_0.generateScript")
         self.setScriptCommandline("--test=CHI-SQUARE " + " ".join(self.listFiles[:2]))
