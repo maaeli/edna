@@ -44,6 +44,8 @@ class EDTestCasePluginExecuteControlSaxsAnalysisv1_0(EDTestCasePluginExecute):
 #                                               "XSConfiguration_SaxsAnalysis.xml"))
         self.setDataInputFile(os.path.join(self.getPluginTestsDataHome(), \
                                            "XSDataInputSaxsAnalysisv1_0_reference.xml"))
+        self.setReferenceDataOutputFile(os.path.join(self.getPluginTestsDataHome(), \
+                                            "XSDataResultSaxsAnalysisv1_0_reference.xml"))
 
     def preProcess(self):
         """
@@ -53,13 +55,12 @@ class EDTestCasePluginExecuteControlSaxsAnalysisv1_0(EDTestCasePluginExecute):
         self.loadTestImage(["autosubtracted.dat"])
         version = self.plugin.config.get("atsasVersion", "2.4.0")
         if version < "2.5":
-            res = "XSDataResultSaxsAnalysisv1_0_reference.xml-2.4.0"
+            res = self.getReferenceDataOutputFile() + "-2.4.0"
         elif version < "2.6":
-            res = "XSDataResultSaxsAnalysisv1_0_reference.xml-2.5.2"
+            res = self.getReferenceDataOutputFile() + "-2.5.2"
         else:
-            res = "XSDataResultSaxsAnalysisv1_0_reference.xml-2.6.1"
-        self.setReferenceDataOutputFile(os.path.join(self.getPluginTestsDataHome(), res))
-
+            res = self.getReferenceDataOutputFile() + "-2.6.1"
+        self.setReferenceDataOutputFile(res)
 
     def testExecute(self):
         """
