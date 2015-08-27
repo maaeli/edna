@@ -35,5 +35,8 @@
         "execProcessScriptShell": "python", 
         "timeOut": 1500
     },  
-   "EDPluginExecDatOpv2_0": {}   
+   "EDPluginExecDatOpv2_0": {},
+   "EDPluginControlSaxsAnalysisv1_0":{
+       "atsasVersion": "2.6.1"
+   }
 }

@@ -1,9 +1,7 @@
 # coding: utf-8
 #
-#    Project: EdnaSaxs    
+#    Project: EdnaSaxs
 #             http://www.edna-site.org
-#
-#    File: "$Id$"
 #
 #    Copyright (C) 2012 ESRF
 #
@@ -26,8 +24,8 @@
 __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
-__date__ = "201208031"
-__status__ = "development"
+__date__ = "27/08/2015"
+__status__ = "production"
 import os
 
 from EDVerbose                           import EDVerbose
@@ -46,12 +44,6 @@ class EDTestCasePluginExecuteControlSaxsAnalysisv1_0(EDTestCasePluginExecute):
 #                                               "XSConfiguration_SaxsAnalysis.xml"))
         self.setDataInputFile(os.path.join(self.getPluginTestsDataHome(), \
                                            "XSDataInputSaxsAnalysisv1_0_reference.xml"))
-        version = get_ATSAS_version()
-        if version<3709:
-            res =  "XSDataResultSaxsAnalysisv1_0_reference.xml"
-        else:
-            res = "XSDataResultSaxsAnalysisv1_0_reference.xml.3709"
-        self.setReferenceDataOutputFile(os.path.join(self.getPluginTestsDataHome(), res ))
 
     def preProcess(self):
         """
@@ -59,6 +51,15 @@ class EDTestCasePluginExecuteControlSaxsAnalysisv1_0(EDTestCasePluginExecute):
         """
         EDTestCasePluginExecute.preProcess(self)
         self.loadTestImage(["autosubtracted.dat"])
+        version = self.plugin.config.get("atsasVersion", "2.4.0")
+        if version < "2.5":
+            res = "XSDataResultSaxsAnalysisv1_0_reference.xml-2.4.0"
+        elif version < "2.6":
+            res = "XSDataResultSaxsAnalysisv1_0_reference.xml-2.5.2"
+        else:
+            res = "XSDataResultSaxsAnalysisv1_0_reference.xml-2.6.1"
+        self.setReferenceDataOutputFile(os.path.join(self.getPluginTestsDataHome(), res))
+
 
     def testExecute(self):
         """

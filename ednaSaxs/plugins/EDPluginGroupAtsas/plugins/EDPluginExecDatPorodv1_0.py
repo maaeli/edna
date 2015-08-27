@@ -67,7 +67,6 @@ class EDPluginExecDatPorodv1_0(EDPluginExecProcessScript):
         self.gnomFile = self.dataInput.gnomFile.path.value
         self.generateCommandLineOptions()
         self.atsasVersion = self.config.get("atsasVersion", "2.5.2")
-        print(self.atsasVersion)
 
     def postProcess(self, _edObject=None):
         EDPluginExecProcessScript.postProcess(self)
