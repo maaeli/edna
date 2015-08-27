@@ -53,7 +53,7 @@ class EDPluginControlSaxsModelingv1_1(EDPluginControl):
     classlock = Semaphore()
     configured = False
     cluster_size = 2  # duplicate from ControlPlugin
-    dammif_jobs = 10  # number of dammif job to run
+    dammif_jobs = 16  # number of dammif job to run
     unit = "NANOMETER"  # unit of the GNOM file
     symmetry = "P1"  #
     mode = "fast"  #
@@ -190,9 +190,9 @@ class EDPluginControlSaxsModelingv1_1(EDPluginControl):
         self.result.pdbSolventFile = self.dammif.dataOutput.pdbSolventFile
 
         # align models, compute NSD and choose the reference model
-        align = AlignModels()
+        inputfiles = [self.dammif_plugins[idx].dataOutput.pdbMoleculeFile.path.value for idx in range(self.dammif_jobs)]
+        align = AlignModels(inputfiles, slow=False)
         
-        align.inputfiles = [self.dammif_plugins[idx].dataOutput.pdbMoleculeFile.path.value for idx in range(self.dammif_jobs)]
         outputfiles = []
         for i in range(self.dammif_jobs):
             outputfiles.append(os.path.join(self.getWorkingDirectory(), "model-%02i.pdb" % (i+1)))
@@ -422,7 +422,7 @@ class EDPluginControlSaxsModelingv1_1(EDPluginControl):
         ax1.bar(xticks - 0.5, chi2)
         ax1.set_ylabel(u"$\sqrt{\u03C7}$")
         ax1.set_xlabel(u"Model number")
-        ax1.plot([0.5, self.dammif_jobs + 0.5], [chi2max, chi2max], "-r", label=u"$\sqrt{\u03C7}$$_{max}$ = %.3f" % chi2max)
+        ax1.plot([0.5, self.dammif_jobs + 0.5], [chi2max, chi2max], "-r", label=u"${\u03C7}^2$$_{max}$ = %.3f" % chi2max)
         ax1.set_xticks(xticks)
         ax1.legend(loc=8)
         R = numpy.array([ plg.dataOutput.rfactor.value for plg in self.dammif_plugins])
