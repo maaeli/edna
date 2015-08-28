@@ -4,9 +4,7 @@
 #    Project: Tango Device Server
 #             http://www.edna-site.org
 #
-#    File: "$Id$"
-#
-#    Copyright (C)2010 ESRF
+#    Copyright (C)2010-2015 ESRF
 #
 #    Principal author:        Matias GUIJARRO (Matias.GUIJARRO@esrf.eu)
 #                             Jérôme Kieffer  (jerome.kieffer@esrf.eu)
@@ -24,7 +22,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-from __future__ import with_statement
+from __future__ import with_statement, print_function
 
 __authors__ = [ "Matias GUIJARRO", "Jérôme Kieffer", "Cyril Guilloud" ]
 __contact__ = "jerome.kieffer@esrf.eu"
@@ -81,12 +79,18 @@ class EdnaDS(PyTango.Device_4Impl, EDLogging):
             self.__semaphoreNbThreads = threading.Semaphore(iNbCpu)
         else:
             self.__semaphoreNbThreads = threading.Semaphore(EDUtilsParallel.detectNumberOfCPUs())
-        self.jobQueue = Queue()
-        self.processingSem = threading.Semaphore()
+        self.quit = False
+        self.jobQueue = Queue()  # queue containing jobs to process
+        self.eventQueue = Queue()  # queue containing finished jobs
         self.statLock = threading.Lock()
         self.lastStatistics = "No statistics collected yet, please use the 'collectStatistics' method first"
         self.lastFailure = "No job Failed (yet)"
         self.lastSuccess = "No job succeeded (yet)"
+        self.processingThread = threading.Thread(target=self.startProcessing)
+        self.processingThread.start()
+        self.finishingThread = threading.Thread(target=self.process_event)
+        self.finishingThread.start()
+
 
     def delete_device(self):
         self.DEBUG("[Device delete_device method] for device %s" % self.get_name())
@@ -131,8 +135,25 @@ class EdnaDS(PyTango.Device_4Impl, EDLogging):
     def abort(self, jobId):
         pass
 
-    def quitEdna(self):
+    def quitEdna(self, delay=10):
+        """
+        Try to quit properly
+        
+        @param: delay for finishing jobs
+        """
+        self.quit = True
         self.DEBUG("In %s.quitEdna()" % self.get_name())
+        self.screen("QuitEdna: Close input pipe" % delay)
+        self.processingThread.join(delay)
+        self.screen("QuitEdna: Finish the processing (timeout = 10s)")
+        t0 = time.time()
+        remaining = EDJob.countRunning()
+        while (remaining > 0) and (time.time() < t0 + delay):
+            self.screen("%i remaining jobs" % remaining)
+            time.sleep(1)
+            remaining = EDJob.countRunning()
+        self.screen("QuitEdna: Close output pipe (timeout = 10s)")
+        self.finishingThread.join(delay)
         self.screen("Quitting tango-EdnaDS")
         sys.exit()
 
@@ -151,22 +172,18 @@ class EdnaDS(PyTango.Device_4Impl, EDLogging):
         jobId = edJob.getJobId()
         edJob.setDataInput(xsd)
         self.jobQueue.put(edJob)
-        if self.processingSem._Semaphore__value > 0 :
-            t = threading.Thread(target=self.startProcessing)
-            t.start()
         return jobId
 
     def startProcessing(self):
         """
         Process all jobs in the queue.
         """
-        with self.processingSem:
-            while not self.jobQueue.empty():
-                self.__semaphoreNbThreads.acquire()
-                edJob = self.jobQueue.get()
-                edJob.connectSUCCESS(self.successJobExecution)
-                edJob.connectFAILURE(self.failureJobExecution)
-                edJob.execute()
+        while not self.quit:
+            edJob = self.jobQueue.get()
+            self.__semaphoreNbThreads.acquire()
+            edJob.connectSUCCESS(self.successJobExecution)
+            edJob.connectFAILURE(self.failureJobExecution)
+            edJob.execute()
 
     def successJobExecution(self, jobId):
         self.DEBUG("In %s.successJobExecution(%s)" % (self.get_name(), jobId))
@@ -174,8 +191,8 @@ class EdnaDS(PyTango.Device_4Impl, EDLogging):
             self.__semaphoreNbThreads.release()
             EDJob.cleanJobfromID(jobId, False)
             self.lastSuccess = jobId
-            self.push_change_event("jobSuccess", jobId)
             gc.collect()
+            self.eventQueue.put(jobId)
 
     def failureJobExecution(self, jobId):
         self.DEBUG("In %s.failureJobExecution(%s)" % (self.get_name(), jobId))
@@ -183,10 +200,23 @@ class EdnaDS(PyTango.Device_4Impl, EDLogging):
             self.__semaphoreNbThreads.release()
             EDJob.cleanJobfromID(jobId, False)
             self.lastFailure = jobId
-            self.push_change_event("jobFailure", jobId)
             sys.stdout.flush()
             sys.stderr.flush()
             gc.collect()
+            self.eventQueue.put(jobId)
+
+    def process_event(self):
+        """
+        process finished jobs on the tango side (issue with tango locks)
+        """
+
+        while not self.quit:
+            jobid = self.eventQueue.get()
+            status = EDJob.getStatusFromID(jobid)
+            if status == EDJob.PLUGIN_STATE_SUCCESS:
+                self.push_change_event("jobSuccess", jobid)
+            else:
+                self.push_change_event("jobFailure", jobid)
 
     def getRunning(self):
         """
@@ -312,10 +342,10 @@ if __name__ == '__main__':
            ltangoParam.append(oneArg)
     EDUtilsParallel.initializeNbThread()
     try:
-        print ltangoParam
+        print(ltangoParam)
         py = PyTango.Util(ltangoParam)
         py.add_TgClass(EdnaDSClass, EdnaDS, 'EdnaDS')
-        U = py.instance() #PyTango.Util.instance()
+        U = py.instance()  # PyTango.Util.instance()
         U.server_init()
         U.server_run()
     except PyTango.DevFailed, e:
