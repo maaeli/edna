@@ -35,6 +35,7 @@ if not os.environ.has_key("EDNA_HOME"):
 sys.path.append(os.path.join(os.environ["EDNA_HOME"], "kernel", "src"))
 from EDFactoryPlugin import edFactoryPlugin
 edFactoryPlugin.loadModule("XSDataEdnaSaxs")
+edFactoryPlugin.loadModule("XSDataBioSaxs")
 from XSDataCommon import XSDataDouble, XSDataFile, XSDataString
 from XSDataEdnaSaxs import XSDataInputSaxsAnalysisModeling
 from EDLogging import EDLogging

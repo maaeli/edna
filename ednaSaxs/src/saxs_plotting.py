@@ -56,6 +56,13 @@ import collections
 import functools
 from threading import Semaphore
 
+figureSize = (12,10) #global size of figures, in inch
+#figureSize = (3.6,3) 
+labelSize = 8
+
+matplotlib.rcParams.update({'font.size': 8})
+
+
 def timeit(func):
     def wrapper(*arg, **kw):
         '''This is the docstring of timeit:
@@ -180,7 +187,7 @@ def densityPlot(gnomfile, filename=None, format="png", unit="nm"):
     @return: the matplotlib figure
     """
     out = loadGnomFile(gnomfile)
-    fig1 = plt.figure(figsize=(12, 10))
+    fig1 = plt.figure(figsize=figureSize)
     ax1 = fig1.add_subplot(1, 1, 1)
     ax1.errorbar(out["r"], out["P(r)"], out["P(r)_err"], label="Density")
     ax1.set_ylabel('$\\rho (r)$')
@@ -227,7 +234,7 @@ def scatterPlot(curve_file, first_point=None, last_point=None, filename=None, fo
         last_point = -1
 #     rng = numpy.arange(len(q))
 
-    fig1 = plt.figure(figsize=(12, 10))
+    fig1 = plt.figure(figsize=figureSize)
     ax1 = fig1.add_subplot(1, 1, 1)
     if std is not None:
         ax1.errorbar(q, I, std, label="Experimental curve")
@@ -253,6 +260,7 @@ def scatterPlot(curve_file, first_point=None, last_point=None, filename=None, fo
         else:
             fig1.savefig(filename)
     return fig1
+
 
 
 def guinierPlot(curve_file, first_point=None, last_point=None, filename=None, format="png", unit="nm"):
@@ -292,7 +300,7 @@ def guinierPlot(curve_file, first_point=None, last_point=None, filename=None, fo
     logI = logI[:end]
 
 
-    fig1 = plt.figure(figsize=(12, 10))
+    fig1 = plt.figure(figsize=figureSize)
     ax1 = fig1.add_subplot(1, 1, 1)
     ax1.plot(q2, logI, label="Experimental curve")
     ax1.plot(q2[first_point:last_point], logI[first_point:last_point], marker='D', markersize=5, label="Guinier region")
@@ -327,7 +335,7 @@ def kartkyPlot(curve_file, filename=None, format="png", unit="nm"):
     q = data[:, 0]
     I = data[:, 1]
     q2I = q * q * I
-    fig1 = plt.figure(figsize=(12, 10))
+    fig1 = plt.figure(figsize=figureSize)
     ax1 = fig1.add_subplot(1, 1, 1)
     ax1.plot(q, q2I, label="Experimental curve")
     ax1.set_ylabel('$q^2I (%s^2)$' % unit)
@@ -341,6 +349,79 @@ def kartkyPlot(curve_file, filename=None, format="png", unit="nm"):
             fig1.savefig(filename)
     return fig1
 
+def kratkyRgPlot(curve_file, I0, Rg, filename=None, format="png"):
+    """
+    Generate a normalized Kratky: q2Rg2I(q)/I0 vs qRg
+    @param curve_file: name of the saxs curve file
+    @param I0: forward scattering intensity
+    @param Rg: radius of gyration
+    @param: first_point,last point: integers, by default 0 and -1
+    @param  filename: name of the file where the curve should be saved
+    @param format: image format
+    @return: the matplotlib figure
+    """
+    data = numpy.loadtxt(curve_file)
+    q = data[:, 0]
+    I = data[:, 1]
+    xdata = q * Rg
+    ydata = xdata * xdata * I / I0
+    fig1 = plt.figure(figsize=figureSize)
+    ax1 = fig1.add_subplot(1, 1, 1)
+    dplot = ax1.plot(xdata, ydata, label="Experimental curve")
+    ax1.set_ylabel('$(qR_{G})^2 I/I_{0}$', fontsize = 11 )
+    ax1.set_xlabel('$qR_{G}$', fontsize = 11 )
+    ax1.hlines(3.0 * numpy.exp(-1), xmin=-0.05, xmax=max(xdata), color='0.75', linewidth=1.0)
+    ax1.vlines(numpy.sqrt(3.0), ymin=-0.01, ymax=max(ydata), color='0.75', linewidth=1.0)
+    ax1.set_xlim(xmin=-0.05, xmax=8.5)
+    ax1.set_ylim(ymin=-0.01, ymax=3.5)
+    ax1.set_title("Dimensionless Kratky plot - $R_{G}$ ")
+    ax1.legend([dplot[0]], [ dplot[0].get_label()], loc=0)
+    ax1.tick_params(axis='x', labelsize=labelSize)
+    ax1.tick_params(axis='y', labelsize=labelSize)
+    plt.tight_layout(pad=0.5, h_pad=0.5, w_pad=0.5)
+    if filename:
+        if format:
+            fig1.savefig(filename, format=format)
+        else:
+            fig1.savefig(filename)
+    return fig1
+
+def kratkyVcPlot(curve_file, I0, Vc, filename=None, format="png"):
+    """
+    Generate a normalized Kratky: q2Rg2I(q)/I0 vs qRg
+    @param curve_file: name of the saxs curve file
+    @param I0: forward scattering intensity
+    @param Vc: correlation Volume according to Rambo & Tainer
+    @param: first_point,last point: integers, by default 0 and -1
+    @param  filename: name of the file where the curve should be saved
+    @param format: image format
+    @return: the matplotlib figure
+    """
+    data = numpy.loadtxt(curve_file)
+    q = data[:, 0]
+    I = data[:, 1]
+    xdata = q * q * Vc
+    ydata = xdata * I / I0
+    fig1 = plt.figure(figsize=figureSize)
+    ax1 = fig1.add_subplot(1, 1, 1)
+    dplot = ax1.plot(xdata, ydata, label="Experimental curve")
+    ax1.set_ylabel('$q^{2}V_{C}I/I_{0}$', fontsize = 11 )
+    ax1.set_xlabel('$q^{2}V_{C}$', fontsize = 11 )
+    ax1.hlines(0.82, xmin=-0.05, xmax=max(xdata), color='0.75', linewidth=1.0)
+    ax1.vlines(numpy.sqrt(3.0), ymin=-0.01, ymax=max(ydata), color='0.75', linewidth=1.0)
+    ax1.set_xlim(xmin=-0.05, xmax=19)
+    ax1.set_ylim(ymin=-0.01, ymax=0.9)
+    ax1.set_title("Dimensionless Kratky plot - $V_{c}$ ")
+    ax1.legend([dplot[0]], [ dplot[0].get_label()], loc=0)
+    ax1.tick_params(axis='x', labelsize=labelSize)
+    ax1.tick_params(axis='y', labelsize=labelSize)
+    plt.tight_layout(pad=0.5, h_pad=0.5, w_pad=0.5)
+    if filename:
+        if format:
+            fig1.savefig(filename, format=format)
+        else:
+            fig1.savefig(filename)
+    return fig1
 
 class AutoRg(object):
     """

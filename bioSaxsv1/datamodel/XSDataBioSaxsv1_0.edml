@@ -243,6 +243,7 @@ complex type XSDataResultBioSaxsSmartMergev1_0 extends XSDataResult {
 	autoRg: XSDataAutoRg optional
 	gnom: XSDataGnom optional 
 	volume: XSDataDoubleWithUnit optional
+	rti: XSDataRamboTainer optional	
 	subtractedCurve: XSDataFile optional
 	sample: XSDataBioSaxsSample optional
 }
@@ -282,7 +283,7 @@ complex type XSDataInputBioSaxsHPLCv1_0 extends XSDataInputBioSaxsProcessOneFile
 	hplcFile: XSDataFile optional
 }
 
-complex type XSDataRamboTainer extends XSDataResult{
+complex type XSDataRamboTainer extends XSData{
 	vc: XSDataDouble optional
 	qr: XSDataDouble optional
 	mass: XSDataDouble optional

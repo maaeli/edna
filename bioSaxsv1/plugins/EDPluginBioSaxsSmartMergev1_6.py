@@ -35,14 +35,17 @@ import os, shutil, time
 from math import log
 from EDPluginControl import EDPluginControl
 from EDFactoryPluginStatic import EDFactoryPluginStatic
+from EDFactoryPlugin        import edFactoryPlugin
+edFactoryPlugin.loadModule("XSDataExecCommandLine")
 EDFactoryPluginStatic.loadModule("XSDataEdnaSaxs")
 EDFactoryPluginStatic.loadModule("XSDataBioSaxsv1_0")
 EDFactoryPluginStatic.loadModule("XSDataWaitFilev1_0")
-from XSDataCommon       import XSDataString, XSDataStatus, XSDataFile, XSDataTime, XSDataInteger
-from XSDataBioSaxsv1_0  import XSDataInputBioSaxsSmartMergev1_0, XSDataResultBioSaxsSmartMergev1_0, \
+from XSDataCommon           import XSDataString, XSDataStatus, XSDataFile, XSDataTime, XSDataInteger
+from XSDataBioSaxsv1_0      import XSDataInputBioSaxsSmartMergev1_0, XSDataResultBioSaxsSmartMergev1_0, \
                             XSDataInputBioSaxsISPyBv1_0
-from XSDataEdnaSaxs     import XSDataInputDatcmp, XSDataInputDataver, XSDataInputAutoSub, XSDataInputDatop, XSDataInputSaxsAnalysis
-from XSDataWaitFilev1_0 import XSDataInputWaitMultiFile
+from XSDataEdnaSaxs         import XSDataInputDatcmp, XSDataInputDataver, XSDataInputAutoSub, XSDataInputDatop, XSDataInputSaxsAnalysis
+from XSDataWaitFilev1_0     import XSDataInputWaitMultiFile
+from XSDataExecCommandLine  import XSDataInputRsync
 
 def cmp(a, b):
     """
@@ -79,8 +82,9 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
     __strControlledPluginDatcmp = "EDPluginExecDatcmpv2_0"
     __strControlledPluginWaitFile = "EDPluginWaitMultiFile"
     __strControlledPluginAutoSub = "EDPluginAutoSubv1_0"
-    __strControlledPluginSaxsAnalysis = "EDPluginControlSaxsAnalysisv1_0"
+    __strControlledPluginSaxsAnalysis = "EDPluginControlSaxsAnalysisv1_1"
     __strControlledPluginSaxsISPyB = "EDPluginBioSaxsISPyBv1_0"
+    cpRsync = "EDPluginExecRsync"
 
 
 
@@ -99,9 +103,9 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
         self.__edPluginExecDatCmp = None
         self.lstInput = []
         self.curves = []
-	self.forgetLastSample = False
+        self.forgetLastSample = False
         self.lstMerged = []
-	self.lstDiscarded = []
+        self.lstDiscarded = []
         self.lstXsdInput = []
         self.absoluteFidelity = None
         self.relativeFidelity = None
@@ -110,6 +114,7 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
         self.autoRg = None
         self.gnom = None
         self.volume = None
+	self.rti = None
         self.strRadiationDamage = None
         self.strMergedFile = None
         self.lstSub = []
@@ -117,13 +122,16 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
         self.fConcentration = None
         self.xsDataResult = XSDataResultBioSaxsSmartMergev1_0()
         self.xsBestBuffer = None
-	self.bestBufferType = ""
-	self.bufferFrames = []
+        self.bestBufferType = ""
+        self.bufferFrames = []
         self.xsScatterPlot = None
         self.xsGuinierPlot = None
         self.xsKratkyPlot = None
+	self.xsKratkyRgPlot = None
+	self.KratkyVcPlot = None
         self.xsDensityPlot = None
-	self.xsdSubtractedCurve = None
+        self.xsdSubtractedCurve = None
+        self.outdir = None #directory on rnice for analysis results to go to
 
     def checkParameters(self):
         """
@@ -161,21 +169,21 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
                 os.mkdir(dirname)
 
     def getFramesByFilename(self, filename):
-    	if filename is not None:
-	    if filename in self.__class__.dictFrames.keys():
-		return self.__class__.dictFrames[filename]
-	return {
+        if filename is not None:
+            if filename in self.__class__.dictFrames.keys():
+                return self.__class__.dictFrames[filename]
+        return {
 		"averaged" : [],
 		"discarded": []
-	}
+	    }
 
     def getAveragedFrameByFilename(self, filename):
-    	frames = self.getFramesByFilename(filename)
-	if frames is not None:
-	    return frames["averaged"]
-	return []
+        frames = self.getFramesByFilename(filename)
+        if frames is not None:
+            return frames["averaged"]
+        return []
 
-    	
+
     def process(self, _edObject=None):
         EDPluginControl.process(self)
         self.DEBUG("EDPluginBioSaxsSmartMergev1_6.process")
@@ -342,9 +350,9 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
             if self.__class__.lastSample is not None:
                 lastSample = self.__class__.lastSample
 
-	    subtractedCurve = None	
+            subtractedCurve = None	
             if self.xsdSubtractedCurve is not None:
-	        subtractedCurve = self.xsdSubtractedCurve
+                subtractedCurve = self.xsdSubtractedCurve
 
             xsdin = XSDataInputBioSaxsISPyBv1_0(sample=self.dataInput.sample,
                                                      autoRg=self.autoRg,
@@ -371,9 +379,31 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
             self.__edPluginSaxsISPyB.connectSUCCESS(self.doSuccessISPyB)
             self.__edPluginSaxsISPyB.connectFAILURE(self.doFailureISPyB)
             self.__edPluginSaxsISPyB.execute()
+            
+        
+       # transfer analysis data to correct location on nice
+        if self.gnom is not None:
+            self.outdir = os.path.join(os.path.dirname(os.path.dirname(self.lstStrInput[0])), "ednaAnalysis")
+            basename = os.path.basename(os.path.splitext(self.gnom.gnomFile.path.value)[0])
+            self.outdir = os.path.join(self.outdir, basename)
+            if not os.path.isdir(self.outdir):
+                os.makedirs(self.outdir)
+             #self.outFile = os.path.join(outdir, "NoResults.html")
+            workingdir = os.path.dirname(self.gnom.gnomFile.path.value)
+     
+            self.pluginRsync = self.loadPlugin(self.cpRsync)
+            self.pluginRsync.dataInput = XSDataInputRsync(source=XSDataFile(XSDataString(workingdir)) ,
+                                                                       destination=XSDataFile(XSDataString(self.outdir)),
+                                                                       options=XSDataString("-avx"))
+     
+            self.pluginRsync.connectSUCCESS(self.doSuccessExecRsync)
+            self.pluginRsync.connectFAILURE(self.doFailureExecRsync)
+            self.pluginRsync.executeSynchronous()
+    
+            
 
         if self.forgetLastSample:
-	    #Also redefine dictionary to contain the buffer just processed?
+        #Also redefine dictionary to contain the buffer just processed?
             self.__class__.lastSample = None
 
     def postProcess(self, _edObject=None):
@@ -386,6 +416,7 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
         self.xsDataResult.autoRg = self.autoRg
         self.xsDataResult.gnom = self.gnom
         self.xsDataResult.volume = self.volume
+	self.xsDataResult.rti = self.rti
 
     def finallyProcess(self, _edObject=None):
         EDPluginControl.finallyProcess(self)
@@ -568,18 +599,17 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
             if os.path.exists(subcurve.path.value):
                 self.strSubFile = subcurve.path.value
         self.xsBestBuffer = _edPlugin.dataOutput.bestBuffer
-	self.bestBufferType = _edPlugin.dataOutput.bestBufferType.value
+        self.bestBufferType = _edPlugin.dataOutput.bestBufferType.value
         if self.bestBufferType == 'average':
             self.bufferFrames = self.lstMerged
-	    #if self.__class__.dictFrames[self.__class__.lastBuffer] is not None:
-	    #	if self.__class__.dictFrames[self.__class__.lastBuffer]['averaged'] is not None:
-	    #	    self.bufferFrames = self.bufferFrames + self.__class__.dictFrames[self.__class__.lastBuffer]['averaged'] 
+#if self.__class__.dictFrames[self.__class__.lastBuffer] is not None:
+#   self.bufferFrames = self.bufferFrames + self.__class__.dictFrames[self.__class__.lastBuffer]['averaged'] 
             self.bufferFrames = self.bufferFrames + self.getAveragedFrameByFilename(self.__class__.lastBuffer)
 
         elif self.bestBufferType == self.__class__.lastBuffer:
             #if self.__class__.dictFrames[self.__class__.lastBuffer] is not None:
-	    #    if self.__class__.dictFrames[self.__class__.lastBuffer]['averaged'] is not None:
-	    #        self.bufferFrames = self.__class__.dictFrames[self.__class__.lastBuffer]['averaged']
+    #    if self.__class__.dictFrames[self.__class__.lastBuffer]['averaged'] is not None:
+#        self.bufferFrames = self.__class__.dictFrames[self.__class__.lastBuffer]['averaged']
             self.bufferFrames = self.getAveragedFrameByFilename(self.__class__.lastBuffer)
         else:
             self.bufferFrames = self.lstMerged
@@ -604,9 +634,15 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
         self.retrieveMessages(_edPlugin)
         self.gnom = _edPlugin.dataOutput.gnom
         self.volume = _edPlugin.dataOutput.volume
+	self.rti = _edPlugin.dataOutput.rti
         self.xsScatterPlot = _edPlugin.dataOutput.scatterPlot
         self.xsGuinierPlot = _edPlugin.dataOutput.guinierPlot
         self.xsKratkyPlot = _edPlugin.dataOutput.kratkyPlot
+	if hasattr(_edPlugin.dataOutput, 'kratkyRgPlot'):
+	    self.xsKratkyRgPlot = _edPlugin.dataOutput.kratkyRgPlot
+	if hasattr(_edPlugin.dataOutput, 'kratkyVcPlot'):
+	    self.xsKratkyVcPlot = _edPlugin.dataOutput.kratkyVcPlot
+
         self.xsDensityPlot = _edPlugin.dataOutput.densityPlot
         self.addExecutiveSummaryLine(_edPlugin.dataOutput.status.executiveSummary.value)
 
@@ -628,3 +664,17 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
         self.DEBUG("EDPluginBioSaxsSmartMergev1_6.doFailureISPyB")
         self.addExecutiveSummaryLine("Failed to registered in ISPyB")
         self.retrieveMessages(_edPlugin)
+
+
+    def doSuccessExecRsync(self, _edPlugin=None):
+        self.DEBUG("EDPluginBioSaxsSmartMergev1_6.doSuccessExecRsync")
+        self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsSmartMergev1_6.doSuccessExecRsync")
+        self.retrieveMessages(_edPlugin)
+        self.gnom.gnomFile = XSDataFile(XSDataString(os.path.join(self.outdir,os.path.split(self.gnom.gnomFile.path.value)[1])))
+
+
+    def doFailureExecRsync(self, _edPlugin=None):
+        self.DEBUG("EDPluginBioSaxsSmartMergev1_6.doFailureExecRsync")
+        self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsSmartMergev1_6.doFailureExecRsync")
+        self.retrieveMessages(_edPlugin)
+        self.setFailure()

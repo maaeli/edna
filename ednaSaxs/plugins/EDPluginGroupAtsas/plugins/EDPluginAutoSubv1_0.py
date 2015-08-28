@@ -29,16 +29,16 @@ __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "2011 ESRF"
 __status__ = "production"
-__date__ = "20150607"
+__date__ = "28/08/2015"
 
 import os
 import shutil
 from EDPluginControl import EDPluginControl
-from XSDataCommon import XSDataFile, XSDataString, XSDataStatus, XSDataLength, \
-    XSDataBoolean, XSDataDouble, XSDataInteger
+from XSDataCommon import XSDataFile, XSDataString, XSDataStatus
 from XSDataEdnaSaxs import XSDataInputAutoSub, XSDataInputDataver, \
     XSDataInputDatcmp, XSDataInputAutoRg, XSDataInputDatop, XSDataAutoRg, \
-    XSDataResultAutoSub
+    XSDataLength, XSDataBoolean, XSDataInteger, XSDataDouble
+from XSDataEdnaSaxs import XSDataResultAutoSub
 from EDThreading import Semaphore
 _sem = Semaphore()
 import numpy
@@ -91,11 +91,12 @@ class EDPluginAutoSubv1_0(EDPluginControl):
         self.outdir = None
         self.bestBuffer = None
         self.averBuffer = None
+        self.tempSub = [] #Subtraction for finding best buffer
         self.actualBestBuffer = None
-        self.bestBufferType = ""  # "average" or the file name of the best buffer
+        self.bestBufferType = "" #"average" or the file name of the best buffer
         self.fidelity = None
         self.lstProcessLog = []
-        self.dictRg = {}  # key: filename, value = (Rg,I0)
+        self.dictRg = {} #key: filename, value = (Rg,I0)
         self.fConcentration = -1
         self.headers = {}
 
@@ -151,9 +152,20 @@ class EDPluginAutoSubv1_0(EDPluginControl):
                 if self.isFailure() or (self.fidelity is None):
                     return
                 if self.fidelity < self.BUFFER_SIMILARITY:
-                    # buffer are not the same: keeping the one with lowest Rg/I0
+                    # buffer are not the same: keeping the one with lowest Rg/I0 for the subtraction
+                    for buff in self.buffers:
+                        print buff 
+                        edPluginDatop = self.loadPlugin(self.__strPluginDatop)
+                        edPluginDatop.dataInput = XSDataInputDatop(operation=XSDataString("SUB"),
+                                   outputCurve=XSDataFile(XSDataString(os.path.splitext(buff)[0] + '.sub')),
+                                   inputCurve=[XSDataFile(XSDataString(self.sampleCurve)), XSDataFile(XSDataString(buff))])
+                        edPluginDatop.connectSUCCESS(self.doSuccessExecDatop)
+                        edPluginDatop.connectFAILURE(self.doFailureExecDatop)
+                        edPluginDatop.executeSynchronous()
+                        self.tempSub += [XSDataFile(XSDataString(os.path.splitext(buff)[0] + '.sub'))]
+                    
                     edpluginRg = self.loadPlugin(self.__strPluginAutoRg)
-                    edpluginRg.dataInput = XSDataInputAutoRg(inputCurve=self.dataInput.buffers)
+                    edpluginRg.dataInput = XSDataInputAutoRg(inputCurve=self.tempSub)
                     edpluginRg.connectSUCCESS(self.doSuccessExecAutoRg)
                     edpluginRg.connectFAILURE(self.doFailureExecAutoRg)
                     edpluginRg.executeSynchronous()
@@ -175,9 +187,8 @@ class EDPluginAutoSubv1_0(EDPluginControl):
             return
         edPluginDatop = self.loadPlugin(self.__strPluginDatop)
         edPluginDatop.dataInput = XSDataInputDatop(operation=XSDataString("SUB"),
-                                                   outputCurve=XSDataFile(XSDataString(self.subtractedCurve)),
-                                                   inputCurve=[XSDataFile(XSDataString(self.sampleCurve)),
-                                                               XSDataFile(XSDataString(self.bestBuffer))])
+                               outputCurve=XSDataFile(XSDataString(self.subtractedCurve)),
+                               inputCurve=[XSDataFile(XSDataString(self.sampleCurve)), XSDataFile(XSDataString(self.bestBuffer))])
         edPluginDatop.connectSUCCESS(self.doSuccessExecDatop)
         edPluginDatop.connectFAILURE(self.doFailureExecDatop)
         edPluginDatop.executeSynchronous()
@@ -231,7 +242,7 @@ class EDPluginAutoSubv1_0(EDPluginControl):
 
         if (len(_edPlugin.dataOutput.autoRgOut) == 1) and os.path.exists(self.subtractedCurve):  # rewrite Headers
             res = _edPlugin.dataOutput.autoRgOut[0]
-            # Scale I0 by concentration
+            #Scale I0 by concentration
             if self.fConcentration > 1e-6:
                 res.i0.value = res.i0.value / self.fConcentration
                 res.i0Stdev.value = res.i0Stdev.value / self.fConcentration
@@ -241,7 +252,7 @@ class EDPluginAutoSubv1_0(EDPluginControl):
             else:
                 lstRg.append("AutoRg: Rg   =   %.4f +/- %.2f ( %.1f%%)" % (res.rg.value, res.rgStdev.value, 100. * res.rgStdev.value / res.rg.value))
             lstRg.append("AutoRg: I(0) =   %.2f +/- %.4f" % (res.i0.value, res.i0Stdev.value))
-            lstRg.append("AutoRg: Points   %i to %i ( %i total)" % (res.firstPointUsed.value, res.lastPointUsed.value, 1 + res.lastPointUsed.value - res.firstPointUsed.value))
+            lstRg.append("AutoRg: Points   %i to %i ( %i total)" % (res.firstPointUsed.value, res.lastPointUsed.value , 1 + res.lastPointUsed.value - res.firstPointUsed.value))
             lstRg.append("AutoRg: Quality: %.1f%%" % (res.quality.value * 100.0))
 
             self.rewriteHeader(output=self.subtractedCurve,
@@ -263,7 +274,7 @@ class EDPluginAutoSubv1_0(EDPluginControl):
             for fn in self.buffers:
                 self.dictRg[fn] = (0, numpy.loadtxt(fn, unpack=True)[1].sum())
         elif os.path.exists(self.subtractedCurve):
-            # we don't want to fail the subtraction plugin because the result has no Rg - default to 0
+            #we don't want to fail the subtraction plugin because the result has no Rg - default to 0
             res = XSDataAutoRg()
             res.rg = XSDataLength(0.0)
             res.rgStdev = XSDataLength(0.0)
