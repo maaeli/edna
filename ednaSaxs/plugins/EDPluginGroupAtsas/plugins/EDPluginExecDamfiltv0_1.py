@@ -25,6 +25,7 @@
 __author__ = "irakli"
 __license__ = "GPLv3+"
 __copyright__ = "DLS"
+__status__ = "deprecated"
 
 import os
 

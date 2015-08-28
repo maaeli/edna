@@ -201,6 +201,22 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
         xsDataResult = XSDataResultBioSaxsISPyBModellingv1_0(status=XSDataStatus(executiveSummary=XSDataString(os.linesep.join(self.lstError))))
         self.setDataOutput(xsDataResult)
 
+    def copyCustomFile(self, model, key, targetFileName):
+        pyarch = os.path.join(self.dataInput.sample.ispybDestination.path.value, str(self.dataInput.sample.measurementID.value))
+        if model.get(key) is not None:
+            afile = model.get(key)
+            model[key] = self.copyfile(afile, pyarch, targetFileName)
+    
+    def copyModelFile(self, model, i):
+    	#afile = model.get("pdbFile")I
+    	#if afile:
+	#    amodel["pdbFile"] = self.copyfile(afile, pyarch, "model_%02i.pdb" % i)
+        self.copyCustomFile(model, "pdbFile", "model_%02i.pdb" % i)
+        self.copyCustomFile(model, "fitFile", "model_%02i.fit" % i)
+        self.copyCustomFile(model, "firFile", "model_%02i.fir" % i)
+        self.copyCustomFile(model, "logFile", "model_%02i.log" % i)
+	
+
     def copy_to_pyarch(self):
         if self.dataInput.sample.ispybDestination:
             pyarch = os.path.join(self.dataInput.sample.ispybDestination.path.value, str(self.dataInput.sample.measurementID.value))
@@ -212,10 +228,10 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
                 self.lstError.append(ermsg)
                 self.ERROR(ermsg)
 
-            for amodel in self.models:
-                afile = amodel.get("pdbFile")
-                if afile:
-                    amodel["pdbFile"] = self.copyfile(afile, pyarch, "model")
+            for i in range(0, len(self.models)):
+	    	    self.copyModelFile(self.models[i], i)
+		
+
 
             self.damaver["pdbFile"] = self.copyfile(self.damaver.get("pdbFile"), pyarch, "damaver.pdb")
             self.damfilt["pdbFile"] = self.copyfile(self.damfilt.get("pdbFile"), pyarch, "damfilt.pdb")
@@ -225,6 +241,8 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
             self.dammin["logFile"] = self.copyfile(self.dammin.get("logFile"), pyarch, "dammin.log")
             self.nsdPlot = self.copyfile(self.nsdPlot, pyarch)
             self.chi2plot = self.copyfile(self.chi2plot, pyarch)
+
+
 
 
     def copyfile(self, afile, pyarch, dest=None):

@@ -60,6 +60,9 @@ import json
 matplotlib.use('Agg')
 from matplotlib import pylab
 import scipy.integrate as scint
+from signalProcessing import find_peaks_cwt
+from scipy.signal import medfilt, butter, filtfilt
+from math import floor as mfloor
 
 
 class EDUtilsBioSaxs(EDObject):
@@ -298,6 +301,10 @@ def label(a):
             last = cnt
     return out
 
+def datasmoothness(raw, filtered):
+    return ((raw - filtered) * (raw - filtered)).mean() * 1.0 / raw.mean() ** 2
+
+
 
 class HPLCrun(object):
     def __init__(self, runId, first_curve=None):
@@ -523,34 +530,144 @@ class HPLCrun(object):
         fig.savefig(os.path.splitext(self.hdf5_filename)[0] + ".svg", transparent=True, bbox_inches='tight', pad_inches=0)
         return pngFile
 
-    def analyse(self):
-        """
-        Look for curves to merge...
-        """
-        lab = label(self.I0)
-        res = []
+#     def analyse(self):
+#         """
+#         Look for curves to merge...
+#         """
+#         lab = label(self.I0)
+#         res = []
+#         self.merge_frames = []
+#         for i in range(1, int(lab.max() + 1)):
+#             loc = (lab == i)
+#             c = loc.sum()
+#             if c > 10:
+#                 idx = numpy.where(loc)[0]
+#                 start = idx[0]
+#                 stop = idx[-1]
+#                 maxi = self.I0[start: stop + 1].argmax() + start
+#                 rg0 = self.Rg[maxi]
+#                 sg0 = self.Rg_Stdev[maxi]
+#                 good = (abs(self.Rg - rg0) < sg0) #keep curves with same Rg within +/- 1 stdev
+#                 good[:start] = 0
+#                 good[stop:] = 0
+#                 lg = label(good[start:stop + 1])
+#                 lv = lg[maxi - start]
+#                 resl = numpy.where(lg == lv)[0] + start
+#                 if len(resl) > 1:
+#                     res.append(numpy.where(lg == lv)[0] + start)
+#                     self.merge_frames.append([resl[0], resl[-1]])
 
+#        return res
+
+    def analyse(self):
+        # Note: This algorithm was tested with data acquired at BM29 in late 2012, early 2013
+        # Changes in the acquisition protocol might require adaption of parameters
+
+        # paramterers for finding ROIs:
+        smoothing_degree = 9
+
+        # parameters for smoothing for peak finding
+        nyf = 0.5
+        first_butter_par = 4
+        second_butter_par = 0.1 / nyf
+
+        # parameters for peak finding algorithm
+        window_min_size = 1
+        window_max_size_rel = 0.2  # to be multiplied by size of ROI
+
+        Ismooth = medfilt(self.I0, smoothing_degree)
+        lab = label(Ismooth)
+        Rgsmooth = medfilt(self.Rg, smoothing_degree)
+        res = []
         self.merge_frames = []
+
         for i in range(1, int(lab.max() + 1)):
             loc = (lab == i)
             c = loc.sum()
+            # Only analyse peak regions of at leat 10 subsequent frames
             if c > 10:
                 idx = numpy.where(loc)[0]
                 start = idx[0]
                 stop = idx[-1]
-                maxi = self.I0[start: stop + 1].argmax() + start
-                rg0 = self.Rg[maxi]
-                sg0 = self.Rg_Stdev[maxi]
-                good = (abs(self.Rg - rg0) < sg0) #keep curves with same Rg within +/- 1 stdev
-                good[:start] = 0
-                good[stop:] = 0
-                lg = label(good[start:stop + 1])
-                lv = lg[maxi - start]
-                resl = numpy.where(lg == lv)[0] + start
-                if len(resl) > 1:
-                    res.append(numpy.where(lg == lv)[0] + start)
-                    self.merge_frames.append([resl[0], resl[-1]])
+                Ishort = self.I0[start:stop]
+                I0med = Ismooth[start:stop]
+
+                Rgmed = Rgsmooth[start:stop]
+                Rg_Stdshort = self.Rg_Stdev[start:stop]
+                Rgshort = self.Rg[start:stop]
+                # This is an attempt to remove "dirt" - long broad peaks with no real peeak structure, noise on short timescales
+                # Test this with Ishort vs I0med
+                if datasmoothness(Ishort, I0med) < 0.25:
+    #
+
+                    # we smooth the data with a butterworth filter to remove high-frequency noise
+
+
+                    b, a = butter(first_butter_par, second_butter_par)
+                    fl = filtfilt(b, a, Ishort)
+
+
+                    # The parameters for the peak finding
+                    window_max_size = mfloor(window_max_size_rel * len(numpy.where(fl)[0]))
+                    peaks = find_peaks_cwt(fl, numpy.arange(window_min_size, window_max_size))
+
+
+
+
+                    for i in range(len(peaks)):
+                        peak = peaks[i]
+
+                        if peaks[i - 1] < peak:
+                            minindex = (peaks[i - 1] + peak) / 2
+                        else:
+                            minindex = 0
+
+                        if i < len(peaks) - 1:
+                            maxindex = (peaks[i + 1] + peak) / 2
+                        else:
+                            maxindex = stop - start - 1
+
+
+                        if peak < maxindex and len(I0med[peak:maxindex])>1:                               
+                            maxindex = I0med[peak:maxindex].argmin() + peak
+                        if minindex < peak  and len(I0med[minindex:peak + 1])>1 :
+                            minindex = I0med[minindex:peak + 1].argmin() + minindex
+                        maxi = I0med[minindex:maxindex].argmax() + minindex
+
+
+                        if datasmoothness(Ishort[minindex:maxindex], I0med[minindex:maxindex]) < 0.3:
+                            if  I0med[peak] >= I0med[maxindex] and I0med[peak] >= I0med[minindex] and maxindex - minindex > 10:
+
+
+
+                                rg0 = Rgmed[maxi]
+                                srg0 = Rg_Stdshort[maxi]
+
+                                good = ((abs(Rgmed - rg0) < srg0))
+                                good[maxindex] = False
+
+                                if not (len(numpy.where(good[minindex:maxi] == False)[0]) == 0):
+
+                                    regionstart = numpy.where(good[minindex:maxi] == False)[0].max() + minindex
+                                else:
+                                    regionstart = minindex
+                                if not (len(numpy.where(good[maxi:maxindex] == False)[0]) == 0):
+                                    regionend = numpy.where(good[maxi:maxindex] == False)[0].min() + maxi
+                                else:
+                                    regionend = maxindex
+
+                                if regionend - regionstart > 5:
+                                    good[:regionstart] = 0
+                                    good[regionend:] = 0
+                                    lg = label(good)
+                                    lv = lg[maxi]
+                                    region = numpy.where(lg == lv)[0] + start
+                                    res.append(region)
+
+                                    self.merge_frames.append([region[0], region[-1]])
         return res
+
+
 
     def extract_merges(self):
         self.buffer_I = numpy.zeros(self.size, dtype=numpy.float32)

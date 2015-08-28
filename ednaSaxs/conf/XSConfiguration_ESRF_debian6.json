@@ -97,7 +97,8 @@
     "EDPluginExecDatPorodv1_0": {
         "execProcessScriptExecutable": "/usr/bin/datporod", 
         "execProcessScriptShell": "python", 
-        "timeOut": 60
+        "timeOut": 60,
+        "atsasVersion": "2.6.1"
     }, 
     "EDPluginExecDamfiltv0_1": {
         "execProcessScriptVersionString": "", 

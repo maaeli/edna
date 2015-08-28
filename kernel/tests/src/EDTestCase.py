@@ -9,7 +9,7 @@
 #                            Grenoble, France
 #
 #    Principal authors: Marie-Francoise Incardona (incardon@esrf.fr)
-#                       Olof Svensson (svensson@esrf.fr) 
+#                       Olof Svensson (svensson@esrf.fr)
 #                       Jérôme Kieffer (jerome.kieffer@esrf.fr)
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 #    GNU Lesser General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
-#    and the GNU Lesser General Public License  along with this program.  
+#    and the GNU Lesser General Public License  along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 """
@@ -32,11 +32,11 @@ EDNA test Case module ...
 a TestCase is a single test, either an unit test or an execution test.
 """
 
-__authors__ = "Marie-Francoise Incardona, Olof Svensson, Jerome Kieffer"
+__authors__ = ["Marie-Francoise Incardona", "Olof Svensson", "Jerome Kieffer"]
 __contact__ = "svensson@esrf.eu"
 __license__ = "LGPLv3+"
 __copyright__ = "European Synchrotron Radiation Facility, Grenoble, France"
-__date__ = "20120216"
+__date__ = "20141117"
 
 from EDTest            import EDTest
 from EDVerbose         import EDVerbose
@@ -60,7 +60,7 @@ class EDTestCase(EDTest):
         self.__iNumberTestMethodSuccess = 0
         self.__iNumberTestMethodFailure = 0
         self.__dictMethodFailureMessages = {}
-
+        self._deactivated = False
 
     def processKernel(self):
         """
@@ -112,8 +112,6 @@ class EDTestCase(EDTest):
                 self.__bIsExecuted = True
                 self.setTimeEnd()
 
-
-
     def postProcess(self):
         """
         Writes out a summary of the test case.
@@ -141,7 +139,6 @@ class EDTestCase(EDTest):
             EDVerbose.unitTest()
             EDVerbose.unitTest("===================================================================")
 
-
     def getMethodFailureMessages(self):
         """
         This method returns a dictionary with the failure messages:
@@ -152,7 +149,6 @@ class EDTestCase(EDTest):
         """
         return self.__dictMethodFailureMessages
 
-
     def setTestSuiteName(self, _strTestSuiteName):
         """
         Used by EDTestSuite: Sets the name of the test suite invoking the test case.
@@ -160,8 +156,6 @@ class EDTestCase(EDTest):
         @type _strTestSuiteName: string
         """
         self.__strTestSuiteName = _strTestSuiteName
-
-
 
     def getTestSuiteName(self):
         """
@@ -171,7 +165,6 @@ class EDTestCase(EDTest):
         @rtype: string
         """
         return self.__strTestSuiteName
-
 
     def setReasonForNotBeingExectuted(self, _strValue):
         """
@@ -183,7 +176,6 @@ class EDTestCase(EDTest):
         """
         self.__strReasonForNotBeingExecuted = _strValue
 
-
     def getReasonForNotBeingExectuted(self):
         """
         Returns a string describing why the test case shouldn't be executed.
@@ -194,7 +186,6 @@ class EDTestCase(EDTest):
         """
         return self.__strReasonForNotBeingExecuted
 
-
     def getTestsHome(self):
         """
         Returns the Test home directory
@@ -202,7 +193,6 @@ class EDTestCase(EDTest):
         @rtype: string
         """
         return EDUtilsPath.EDNA_TESTS
-
 
     def getTestsDataHome(self):
         """
@@ -212,7 +202,6 @@ class EDTestCase(EDTest):
         """
         return EDUtilsPath.EDNA_TESTDATA
 
-
     def getTestsDataImagesHome(self):
         """
         Returns the Test data home directory
@@ -220,8 +209,6 @@ class EDTestCase(EDTest):
         @rtype: string
         """
         return EDUtilsPath.EDNA_TESTIMAGES
-
-
 
     def getNumberTestMethodSuccess(self):
         """
@@ -231,7 +218,6 @@ class EDTestCase(EDTest):
         """
         return self.__iNumberTestMethodSuccess
 
-
     def getNumberTestMethodFailure(self):
         """
         The number of test methods executed with failure.
@@ -239,7 +225,6 @@ class EDTestCase(EDTest):
         @rtype: integer
         """
         return self.__iNumberTestMethodFailure
-
 
     def isExecuted(self):
         """

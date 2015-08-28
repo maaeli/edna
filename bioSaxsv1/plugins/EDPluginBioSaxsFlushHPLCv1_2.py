@@ -57,7 +57,7 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
     v1.2:
     * adapt for version HPLC plugin v1.2
     """
-    strControlledPluginDatAver = "EDPluginExecDataverv1_0"
+    strControlledPluginDatAver = "EDPluginExecDataverv2_0"
     strControlledPluginISPyB = "EDPluginBioSaxsISPyB_HPLCv1_0"
     strControlledPluginSaxsAnalysis = "EDPluginControlSaxsAnalysisv1_0"
     strControlledPluginSaxsModeling = "EDPluginBioSaxsToSASv1_1"
@@ -240,7 +240,7 @@ class EDPluginBioSaxsFlushHPLCv1_2 (EDPluginControl):
     def doFailureDatAver(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsFlushHPLCv1_2.doFailureDatAver")
         self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsFlushHPLCv1_2.doFailureDatAver")
-        if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.status and  _edPlugin.dataOutput.status.executiveSummary:
+        if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.status and _edPlugin.dataOutput.status.executiveSummary:
             self.lstExecutiveSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
         else:
             self.lstExecutiveSummary.append("Edna plugin DatAver failed.")

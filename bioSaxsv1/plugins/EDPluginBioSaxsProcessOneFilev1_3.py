@@ -28,7 +28,7 @@ __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
 __date__ = "20130110"
-__status__ = "development"
+__status__ = "deprecated"
 
 import os, time
 from EDVerbose              import EDVerbose
@@ -46,7 +46,7 @@ import fabio
 import numpy
 import pyFAI
 
-if pyFAI.version <= "0.8":
+if [int(i) for i in pyFAI.version.split(".")[:2]] <= [0,8]:
     EDVerbose.ERROR("Too old version of pyFAI detected ... expect to fail !")
 
 

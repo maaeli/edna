@@ -1,4 +1,4 @@
-#! coding: utf-8
+# ! coding: utf-8
 #
 #    Project: EdnaSaxs/Atsas
 #             http://www.edna-site.org
@@ -25,13 +25,15 @@
 
 __authors__ = ["irakli", "Jérôme Kieffer"]
 __license__ = "GPLv3+"
-__copyright__ = "2010 DLS, 2013 ESRF"
+__copyright__ = "2010 DLS, 2013-2015 ESRF"
 
 import os
+import time
 from EDPluginExecProcessScript import EDPluginExecProcessScript
 from XSDataEdnaSaxs import XSDataInputDammif, XSDataResultDammif, XSDataSaxsModel
 from XSDataCommon import XSDataString, XSDataFile, XSDataDouble, XSDataStatus
 import parse_atsas
+
 
 class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
     """
@@ -59,7 +61,6 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
         self.Rg = None
         self.Dmax = None
 
-
     def checkParameters(self):
         """
         Checks the mandatory parameters.
@@ -75,7 +76,6 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
         self.checkDammifConstant()
         self.checkDammifChained()
 
-
     def checkDammifModeInput(self):
         if self.dataInput.mode:
             self.DEBUG("EDPluginExecDammifv0_2.checkDammifMode")
@@ -84,7 +84,6 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
                     self.mode = self.dataInput.mode.value.lower()
             except Exception as error:
                 self.ERROR("Running DAMMIF in fast mode by default (%s)" % error)
-
 
     def checkDammifUnitInput(self):
         if self.dataInput.unit:
@@ -95,7 +94,6 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
             except Exception as error:
                 self.ERROR("Using A-1 units for q-axis values by default (%s)" % error)
 
-
     def checkDammifSymmetryInput(self):
         if self.dataInput.symmetry:
             self.DEBUG("EDPluginExecDammifv0_2.checkDammifSymmetryInput")
@@ -104,7 +102,6 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
                     self.symmetry = self.dataInput.symmetry.value
             except Exception as error:
                 self.ERROR("Symmetry wasn't specified. Setting symmetry to P1 (%s)" % error)
-
 
     def checkDammifParticleShapeInput(self):
         if self.dataInput.expectedParticleShape:
@@ -116,7 +113,6 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
                 except Exception as error:
                     self.ERROR("Using Unknown particle shape (%s)" % error)
 
-
     def checkDammifConstant(self):
         if self.dataInput.constant:
             try:
@@ -124,24 +120,23 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
             except Exception as error:
                 self.ERROR("Constant to subtract will be defined automatically (%s)" % error)
 
-
     def checkDammifChained(self):
-        if  self.dataInput.chained:
+        if self.dataInput.chained:
             try:
                 if self.dataInput.chained.value:
                     self.chained = '--chained'
             except Exception as error:
                 self.ERROR("Atoms in the output model are not chained (%s)" % error)
 
-
     def preProcess(self, _edObject=None):
         EDPluginExecProcessScript.preProcess(self)
         self.DEBUG("EDPluginExecDammifv0_2.preProcess")
         if self.dataInput.order:
-            self.name = "dammif-%s" % self.dataInput.order.value #I know I only modify the instance variable, not the class one
+            self.name = "dammif-%s" % self.dataInput.order.value  # I know I only modify the instance variable, not the class one
 
         self.generateDammifScript()
- 
+        # in order avoid 2 dammif starting at the same milisecond, we sleep for up to 64 ms
+        time.sleep(1e-3 * (self.getId() % 64))
 
     def postProcess(self, _edObject=None):
         EDPluginExecProcessScript.postProcess(self)
@@ -175,24 +170,23 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
             model.firfile = XSDataFile(XSDataString(pathFirFile))
             xsDataResult.chiSqrt = model.chiSqrt = self.returnDammifChiSqrt()
         if os.path.exists(pathMoleculeFile):
-            xsDataResult.pdbMoleculeFile = model.pdbFile = XSDataFile(XSDataString(pathMoleculeFile))    
+            xsDataResult.pdbMoleculeFile = model.pdbFile = XSDataFile(XSDataString(pathMoleculeFile))
         if os.path.exists(pathSolventFile):
             xsDataResult.pdbSolventFile = XSDataFile(XSDataString(pathSolventFile))
         if os.path.exists(pathFirFile):
             model.firFile = XSDataFile(XSDataString(pathFirFile))
-        
+
         if self.volume:
             model.volume = XSDataDouble(self.volume)
         if self.Rg:
-            model.rg= XSDataDouble(self.Rg)
+            model.rg = XSDataDouble(self.Rg)
         if self.Dmax:
             model.dmax = XSDataDouble(self.Dmax)
 
         self.generateExecutiveSummary()
         xsDataResult.status = XSDataStatus(message=self.getXSDataMessage(),
-                                          executiveSummary=XSDataString(os.linesep.join(self.getListExecutiveSummaryLines())))
+                                           executiveSummary=XSDataString(os.linesep.join(self.getListExecutiveSummaryLines())))
         self.dataOutput = xsDataResult
-
 
     def generateDammifScript(self):
         self.DEBUG("EDPluginExecDammifv0_2.generateDammifScript")
@@ -202,24 +196,22 @@ class EDPluginExecDammifv0_2(EDPluginExecProcessScript):
         tmpInputFileName = self.dataInput.gnomOutputFile.path.value
         self.symlink(tmpInputFileName, "dammif.out")
 
-        commandLine = ['--mode', self.mode, \
-                       '--unit', self.unit, \
-                       '--symmetry', self.symmetry, \
-                       '--anisometry', self.particleShape, \
+        commandLine = ['--mode', self.mode,
+                       '--unit', self.unit,
+                       '--symmetry', self.symmetry,
+                       '--anisometry', self.particleShape,
                        self.constant, self.chained, 'dammif.out']
 
         self.setScriptCommandline(' '.join(commandLine))
-
 
     def returnDammifChiSqrt(self):
         try:
             self.sqrtChi = parse_atsas.SqrtChi(os.path.join(self.getWorkingDirectory(), "dammif.fir"))
         except Exception as error:
-            self.ERROR("EDPluginExecDammifv0_2:returnDammifChiSqrt: %s"%error)
+            self.ERROR("EDPluginExecDammifv0_2:returnDammifChiSqrt: %s" % error)
             return
         else:
             return XSDataDouble(self.sqrtChi)
-
 
     def generateExecutiveSummary(self, __edPlugin=None):
         tmpDammif = "Results of %s: " % self.name

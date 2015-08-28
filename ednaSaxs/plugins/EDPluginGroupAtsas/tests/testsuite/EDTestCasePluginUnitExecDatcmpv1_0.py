@@ -23,9 +23,9 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-__author__ = "Jérôme Kieffer"
+__author__ = "Jérôme Kieffer, Martha Brennich"
 __license__ = "GPLv3+"
-__copyright__ = "2011, ESRF, Grenoble"
+__copyright__ = "2014, ESRF, Grenoble"
 
 from EDVerbose import EDVerbose
 from EDTestCasePluginUnit import EDTestCasePluginUnit

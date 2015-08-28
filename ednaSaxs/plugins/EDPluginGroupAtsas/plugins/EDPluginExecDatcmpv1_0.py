@@ -27,6 +27,7 @@ __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "2011, ESRF, Grenoble"
 __date__ = "2011-05-17"
+__status__ = "deprecated"
 
 import os
 from EDPluginExecProcessScript import EDPluginExecProcessScript
