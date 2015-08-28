@@ -32,15 +32,6 @@ __status__ = "Development"
 
 import os, gc
 import numpy
-from EDPluginControl import EDPluginControl
-from EDFactoryPlugin import edFactoryPlugin
-edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
-edFactoryPlugin.loadModule("XSDataEdnaSaxs")
-from XSDataEdnaSaxs import XSDataInputSaxsAnalysis, XSDataResultSaxsAnalysis, \
-                           XSDataInputAutoRg, XSDataInputDatGnom, XSDataInputDatPorod
-from XSDataCommon import XSDataString, XSDataFile, XSDataInteger, XSDataStatus
-from saxs_plotting import scatterPlot, guinierPlot, kartkyPlot, densityPlot
-
 try: 
     import matplotlib
 except ImportError:
@@ -48,6 +39,16 @@ except ImportError:
 else:    
     matplotlib.use('Agg')
     from matplotlib import pyplot as plt
+
+from EDPluginControl import EDPluginControl
+from EDFactoryPlugin import edFactoryPlugin
+edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
+edFactoryPlugin.loadModule("XSDataEdnaSaxs")
+from XSDataEdnaSaxs import XSDataInputSaxsAnalysis, XSDataResultSaxsAnalysis, \
+                           XSDataInputAutoRg, XSDataInputDatGnom, XSDataInputDatPorod, XSDataRamboTainer
+from XSDataCommon import XSDataString, XSDataFile, XSDataInteger, XSDataStatus, XSDataDouble
+from saxs_plotting import scatterPlot, guinierPlot, kartkyPlot, densityPlot, kratkyRgPlot, kratkyVcPlot 
+from EDUtilsBioSaxs import RamboTainerInvariant
 
 class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
     """
@@ -163,6 +164,33 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
                 self.ERROR("EDPluginControlSaxsAnalysisv1_0 in kratkyplot: %s"%error)
             else:
                 self.xsDataResult.kratkyPlot = XSDataFile(XSDataString(kratkyfile))
+            if self.autoRg is not None:    
+                if self.autoRg.i0.value > 0 and self.autoRg.rg.value > 0:
+                    try:
+                        kratkyRgfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-KratkyRg" + ext)
+                        kratkyRgplot = kratkyRgPlot(self.scatterFile, self.autoRg.i0.value, self.autoRg.rg.value,
+                                                   filename=kratkyRgfile, format=ext[1:])
+                        kratkyRgplot.clf()
+                        if plt:
+                            plt.close(kratkyRgplot)
+                    except Exception as error:
+                        self.ERROR("EDPluginControlSaxsAnalysisv1_1 in kratkyRgplot: %s" % error)
+                    else:
+                        self.xsDataResult.kratkyRgPlot = XSDataFile(XSDataString(kratkyRgfile))       
+            if self.autoRg is not None and self.rti is not None:            
+                if self.autoRg.i0.value > 0 and self.rti.vc.value > 0:
+                    try:
+                        kratkyVcfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-KratkyVc" + ext)
+                        kratkyVcplot = kratkyVcPlot(self.scatterFile, self.autoRg.i0.value, self.rti.vc.value,
+                                                        filename=kratkyVcfile, format=ext[1:])
+                        kratkyVcplot.clf()
+                        if plt:
+                            plt.close(kratkyVcplot)
+                    except Exception as error:
+                        self.ERROR("EDPluginControlSaxsAnalysisv1_1 in kratkyVcplot: %s" % error)
+                    else:
+                        self.xsDataResult.kratkyVcPlot = XSDataFile(XSDataString(kratkyVcfile))
+
             try:
                 scatterplotfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-scattering" + ext)
                 scatterplot = scatterPlot(self.scatterFile, unit="nm", gnomfile=self.gnomFile,
@@ -217,6 +245,7 @@ Volume  =    %12.2f""" % (self.xVolume.value)
         self.xsDataResult.autoRg = self.autoRg
         self.xsDataResult.gnom = self.gnom
         self.xsDataResult.volume = self.xVolume
+        self.xsDataResult.rti = self.rti
         self.xsDataResult.status = XSDataStatus(executiveSummary=XSDataString(strLog),
                                                 message=self.getXSDataMessage())
         self.setDataOutput(self.xsDataResult)
@@ -258,3 +287,24 @@ Volume  =    %12.2f""" % (self.xVolume.value)
         self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsAnalysisv1_0.doFailurePorod")
         self.retrieveMessages(_edPlugin)
         #self.setFailure()
+
+    def calculateRTI(self,autorg, scatterfile):
+        if scatterfile is not None and\
+            autorg.rg and autorg.rgStdev and autorg.i0 and autorg.i0Stdev:
+            self.screen("Trying to calculate RTI")
+            dictRTI = RamboTainerInvariant(numpy.loadtxt(scatterfile), autorg.rg.value,
+                                           autorg.rgStdev.value, autorg.i0.value,
+                                           autorg.i0Stdev.value, autorg.firstPointUsed.value)
+            Vc = dictRTI.get("Vc")
+            Vc_Stdev = dictRTI.get("dVc")
+            Qr = dictRTI.get("Qr")
+            Qr_Stdev = dictRTI.get("dQ")
+            mass = dictRTI.get("mass")
+            mass_Stdev = dictRTI.get("dmass")
+            xsdRTI = XSDataRamboTainer(vc=XSDataDouble(Vc),
+                                       qr=XSDataDouble(Qr),
+                                       mass=XSDataDouble(mass),
+                                       dvc=XSDataDouble(Vc_Stdev),
+                                       dqr=XSDataDouble(Qr_Stdev),
+                                       dmass=XSDataDouble(mass_Stdev))
+            self.rti = xsdRTI
