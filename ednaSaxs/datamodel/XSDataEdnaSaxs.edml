@@ -16,8 +16,7 @@ import XSDataCommon.XSDataWavelength
 import XSDataCommon.XSDataRotation
 import XSDataCommon.XSDataVectorDouble
 import XSDataCommon.XSDataArray
-import XSDataCommon.XSDataDoubleWithUnit
-import XSDataBioSaxs.XSDataRamboTainer 
+import XSDataCommon.XSDataDoubleWithUnit 
 /*******************************************
   *  Common types used only in EdnaSaxs
   ********************************************/
@@ -128,6 +127,15 @@ complex type XSDataAutoRg extends XSData{
 
 complex type XSDataResultAutoRg extends XSDataResult{
 	autoRgOut: XSDataAutoRg[]
+}
+
+complex type XSDataRamboTainer extends XSDataResult{
+	vc: XSDataDouble optional
+	qr: XSDataDouble optional
+	mass: XSDataDouble optional
+	dvc: XSDataDouble optional
+	dqr: XSDataDouble optional
+	dmass: XSDataDouble optional	
 }
 
 complex type XSDataBioSaxsExperimentSetup extends XSData{

@@ -248,7 +248,10 @@ def split_name(name):
     try:
         dirname, basename = os.path.split(name)
         root, ext = os.path.splitext(basename)
-        prefix, run, frame = root.split("_", 2)
+        prefix = '_'.join(root.split("_")[:-2])
+
+        run, frame = root.split("_")[-2:]
+
         run = int(run)
         frame = int(frame)
     except Exception:

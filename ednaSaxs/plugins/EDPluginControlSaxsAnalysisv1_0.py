@@ -37,14 +37,14 @@ from EDFactoryPlugin import edFactoryPlugin
 edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
 edFactoryPlugin.loadModule("XSDataEdnaSaxs")
 from XSDataEdnaSaxs import XSDataInputSaxsAnalysis, XSDataResultSaxsAnalysis, \
-                           XSDataInputAutoRg, XSDataInputDatGnom, XSDataInputDatPorod
+                           XSDataInputAutoRg, XSDataInputDatGnom, XSDataInputDatPorod, XSDataRamboTainer
 from XSDataCommon import XSDataString, XSDataFile, XSDataInteger, XSDataStatus, XSDataDouble
 from saxs_plotting import scatterPlot, guinierPlot, kartkyPlot, densityPlot
-from XSDataBioSaxsv1_0 import XSDataRamboTainer
                             
-from EDUtilsBioSaxs import RamboTainerInvariant                            
+from EDUtilsBioSaxs import RamboTainerInvariant                           
 
-class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
+class EDPluginControlSaxsAnalysisv1_0(EDPluginControl): 
+
     """
     Executes the pipeline:
     * AutoRg -> Extract the Guinier region and measure Rg, I0
@@ -67,6 +67,7 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
         self.gnomFile = None
         self.autoRg = None
         self.gnom = None
+        self.rti = None
         self.xVolume = None
         self.xsDataResult = XSDataResultSaxsAnalysis()
 
@@ -99,12 +100,19 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
             self.edPluginAutoRg.connectSUCCESS(self.doSuccessRg)
             self.edPluginAutoRg.connectFAILURE(self.doFailureRg)
             self.edPluginAutoRg.executeSynchronous()
+        else:
+            print self.autoRg
+            print self.scatterFile
+            self.calculateRTI(self.autoRg, self.scatterFile)
+            
 
         if self.autoRg is None:
             self.setFailure()
 
         if self.isFailure():
             return
+        
+        print self.rti
 
         self.edPluginDatGnom = self.loadPlugin(self.cpDatGnom)
         self.edPluginDatGnom.dataInput = XSDataInputDatGnom(inputCurve=self.dataInput.scatterCurve,
@@ -209,7 +217,7 @@ Volume  =    %12.2f""" % (self.xVolume.value)
         self.xsDataResult.autoRg = self.autoRg
         self.xsDataResult.gnom = self.gnom
         self.xsDataResult.volume = self.xVolume
-        self.xsDataResult.rti = self.rti
+        #self.xsDataResult.rti = self.rti
         self.xsDataResult.status = XSDataStatus(executiveSummary=XSDataString(strLog),
                                                 message=self.getXSDataMessage())
         self.setDataOutput(self.xsDataResult)
@@ -220,32 +228,8 @@ Volume  =    %12.2f""" % (self.xVolume.value)
         self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsAnalysisv1_0.doSuccessRg")
         self.retrieveMessages(_edPlugin)
         self.autoRg = _edPlugin.dataOutput.autoRgOut[0]
-        """
-        Calculate the invariants Vc and Qr from the Rambo&Tainer 2013 Paper,
-        also the the mass estimate based on Qr for proteins
-        """
-        if self.scatterFile and os.path.exists(self.scatterFile):
-            subtracted_data = numpy.loadtxt(self.scatterFile)
-            if subtracted_data is not None and  self.autoRg.rg.value: # and self.frame.Rg_Stdev and self.frame.I0 and self.frame.I0_Stdev:
-                dictRTI = RamboTainerInvariant(subtracted_data, self.autoRg.rg.value,
-                                               self.autoRg.rgStdev.value, self.autoRg.i0.value,
-                                               self.autoRg.i0Stdev.value, self.autoRg.firstPointUsed.value)
-#             {'Vc': vc[0], 'dVc': vc[1], 'Qr': qr, 'dQr': dqr, 'mass': mass, 'dmass': dmass}
-                Vc = dictRTI.get("Vc")
-                Vc_Stdev = dictRTI.get("dVc")
-                Qr = dictRTI.get("Qr")
-                Qr_Stdev = dictRTI.get("dQ")
-                mass = dictRTI.get("mass")
-                mass_Stdev = dictRTI.get("dmass")
-                xsdRTI = XSDataRamboTainer(vc=XSDataDouble(Vc),
-                                           qr=XSDataDouble(Qr),
-                                           mass=XSDataDouble(mass),
-                                           dvc=XSDataDouble(Vc_Stdev),
-                                           dqr=XSDataDouble(Qr_Stdev),
-                                           dmass=XSDataDouble(mass_Stdev))
-                print "Mass", mass
-                print "Vc", Vc
-                self.rti = xsdRTI
+        self.calculateRTI(self.autoRg,self.scatterFile)
+        
 
     def doFailureRg(self, _edPlugin=None):
         self.DEBUG("EDPluginControlSaxsAnalysisv1_0.doFailureRg")
@@ -277,3 +261,33 @@ Volume  =    %12.2f""" % (self.xVolume.value)
         self.retrieveFailureMessages(_edPlugin, "EDPluginControlSaxsAnalysisv1_0.doFailurePorod")
         self.retrieveMessages(_edPlugin)
         #self.setFailure()
+
+    def calculateRTI(self, autoRg, scatterFile):
+        """
+        Calculate the invariants Vc and Qr from the Rambo&Tainer 2013 Paper,
+        also the the mass estimate based on Qr for proteins
+        """
+        if scatterFile and os.path.exists(scatterFile):
+            "Print in RTI"
+            subtracted_data = numpy.loadtxt(scatterFile)
+            if subtracted_data is not None and autoRg.rg.value: # and self.frame.Rg_Stdev and self.frame.I0 and self.frame.I0_Stdev:
+                dictRTI = RamboTainerInvariant(subtracted_data, autoRg.rg.value,
+                                               autoRg.rgStdev.value, autoRg.i0.value,
+                                               autoRg.i0Stdev.value, autoRg.firstPointUsed.value)
+#             {'Vc': vc[0], 'dVc': vc[1], 'Qr': qr, 'dQr': dqr, 'mass': mass, 'dmass': dmass}
+                Vc = dictRTI.get("Vc")
+                Vc_Stdev = dictRTI.get("dVc")
+                Qr = dictRTI.get("Qr")
+                Qr_Stdev = dictRTI.get("dQ")
+                mass = dictRTI.get("mass")
+                mass_Stdev = dictRTI.get("dmass")
+                xsdRTI = XSDataRamboTainer(vc=XSDataDouble(Vc),
+                                           qr=XSDataDouble(Qr),
+                                           mass=XSDataDouble(mass),
+                                           dvc=XSDataDouble(Vc_Stdev),
+                                           dqr=XSDataDouble(Qr_Stdev),
+                                           dmass=XSDataDouble(mass_Stdev))
+                print "Mass", mass
+                print "Vc", Vc
+                self.rti = xsdRTI
+

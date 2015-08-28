@@ -21,7 +21,7 @@ import XSDataEdnaSaxs.XSDataGnom
 import XSDataEdnaSaxs.XSDataResultDatGnom
 import XSDataEdnaSaxs.XSDataResultDatPorod
 import XSDataEdnaSaxs.XSDataSaxsModel
-
+import XSDataEdnaSaxs.XSDataRamboTainer
 /*******************************************
   *  Common types used only in BioSaxs
   ********************************************/
