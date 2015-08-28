@@ -24,7 +24,7 @@
 #
 
 from __future__ import with_statement
-from saxs_plotting import figureSize
+
 __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
@@ -35,7 +35,7 @@ import numpy
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-
+from saxs_plotting import figureSize
 from EDThreading import Semaphore
 from EDPluginControl import EDPluginControl
 from EDActionCluster import EDActionCluster
@@ -52,7 +52,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
     classlock = Semaphore()
     configured = False
     cluster_size = 2     # duplicate from ControlPlugin
-    dammif_jobs = 10     # number of dammif job to run
+    dammif_jobs = 16     # number of dammif job to run
     unit = "NANOMETER"   # unit of the GNOM file
     symmetry = "P1"      #
     mode = "fast"        #
@@ -65,10 +65,6 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
     strPluginExecDammin = "EDPluginExecDamminv0_2"
     Rg_min = 0.5  # nm
     
-    figureSize = (15,10)
-    figureSize = (7.12,2)        
-    matplotlib.rcParams.update({'font.size': 8})
-    matplotlib.rcParams.update({'axes.titlesize':8})
     
     def __init__(self):
         """

@@ -248,7 +248,7 @@ class EDPluginControlSaxsModelingv1_1(EDPluginControl):
         ########################################################################
         # Finally call dammin
         ########################################################################
-        if self.config.get("do_dammin") in ["False", "0", False]:
+        if self.config.get("do_dammin") in ["False", "0", False, 0]:
             return
         dammin = self.loadPlugin(self.strPluginExecDammin)
         dammin.dataInput = XSDataInputDammin(pdbInputFile=damstart.dataOutput.outputPdbFile,
