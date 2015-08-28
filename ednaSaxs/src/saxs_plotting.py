@@ -80,9 +80,9 @@ class memoized(object):
         self.sem = Semaphore()
     def __call__(self, *args):
         if not isinstance(args, collections.Hashable):
-           # uncacheable. a list, for instance.
-           # better to not cache than blow up.
-           return self.func(*args)
+            # uncacheable. a list, for instance.
+            # better to not cache than blow up.
+            return self.func(*args)
         if args in self.cache:
             value = self.cache[args]
         else:
@@ -97,11 +97,11 @@ class memoized(object):
                 self.cache.pop(rm)
             return value
     def __repr__(self):
-       '''Return the function's docstring.'''
-       return self.func.__doc__
+        '''Return the function's docstring.'''
+        return self.func.__doc__
     def __get__(self, obj, objtype):
-       '''Support instance methods.'''
-       return functools.partial(self.__call__, obj)
+        '''Support instance methods.'''
+        return functools.partial(self.__call__, obj)
 
 @memoized
 def load_saxs(filename):
@@ -144,7 +144,7 @@ def loadGnomFile(filename):
     do_reg = False
     out = {}
     with open(filename, "r") as logLines:
-        for idx, line in enumerate(logLines):
+        for line in logLines:
             words = line.split()
             if "Total  estimate" in line:
                 out["fit_quality"] = float(words[3])
@@ -170,6 +170,7 @@ def loadGnomFile(filename):
     out["q_fit"], out["I_fit"] = numpy.loadtxt(reg, unpack=True, dtype="float32")
     out["r"], out["P(r)"], out["P(r)_err"] = numpy.loadtxt(pr, unpack=True, dtype="float32")
     return out
+
 
 def densityPlot(gnomfile, filename=None, format="png", unit="nm"):
     """
@@ -224,7 +225,7 @@ def scatterPlot(curve_file, first_point=None, last_point=None, filename=None, fo
         first_point = 0
     if last_point is None:
         last_point = -1
-    rng = numpy.arange(len(q))
+#     rng = numpy.arange(len(q))
 
     fig1 = plt.figure(figsize=(12, 10))
     ax1 = fig1.add_subplot(1, 1, 1)
@@ -252,7 +253,6 @@ def scatterPlot(curve_file, first_point=None, last_point=None, filename=None, fo
         else:
             fig1.savefig(filename)
     return fig1
-
 
 
 def guinierPlot(curve_file, first_point=None, last_point=None, filename=None, format="png", unit="nm"):
@@ -313,6 +313,7 @@ def guinierPlot(curve_file, first_point=None, last_point=None, filename=None, fo
             fig1.savefig(filename)
     return fig1
 
+
 def kartkyPlot(curve_file, filename=None, format="png", unit="nm"):
     """
     Generate a Kratky: q2I(q) vs q
@@ -339,6 +340,7 @@ def kartkyPlot(curve_file, filename=None, format="png", unit="nm"):
         else:
             fig1.savefig(filename)
     return fig1
+
 
 class AutoRg(object):
     """

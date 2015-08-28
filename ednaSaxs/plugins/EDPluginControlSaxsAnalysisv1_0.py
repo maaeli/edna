@@ -3,9 +3,7 @@
 #    Project: Edna Saxs
 #             http://www.edna-site.org
 #
-#    File: "$Id$"
-#
-#    Copyright (C) 2012 ESRF
+#    Copyright (C) 2012-2015 ESRF
 #
 #    Principal author: Jerome Kieffer
 #
@@ -24,13 +22,15 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+from __future__ import print_function, with_statement
+
 __authors__ = ["Jérôme Kieffer"]
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
-__date__ = "2013-04-04"
+__date__ = "28/08/2015"
 __status__ = "Development"
 
-import os, gc, sys
+import os, gc
 import numpy
 from EDPluginControl import EDPluginControl
 from EDFactoryPlugin import edFactoryPlugin
@@ -39,8 +39,17 @@ edFactoryPlugin.loadModule("XSDataEdnaSaxs")
 from XSDataEdnaSaxs import XSDataInputSaxsAnalysis, XSDataResultSaxsAnalysis, \
                            XSDataInputAutoRg, XSDataInputDatGnom, XSDataInputDatPorod, XSDataRamboTainer
 from XSDataCommon import XSDataString, XSDataFile, XSDataInteger, XSDataStatus, XSDataDouble
-from saxs_plotting import scatterPlot, guinierPlot, kartkyPlot, densityPlot
-                            
+
+try: 
+    import matplotlib
+except ImportError:
+    plt = None
+else:    
+    matplotlib.use('Agg')
+    from matplotlib import pyplot as plt
+
+from saxs_plotting import scatterPlot, guinierPlot, kartkyPlot, densityPlot, 
+                      
 from EDUtilsBioSaxs import RamboTainerInvariant                           
 
 class EDPluginControlSaxsAnalysisv1_0(EDPluginControl): 
@@ -100,19 +109,15 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
             self.edPluginAutoRg.connectSUCCESS(self.doSuccessRg)
             self.edPluginAutoRg.connectFAILURE(self.doFailureRg)
             self.edPluginAutoRg.executeSynchronous()
-        else:
-            print self.autoRg
-            print self.scatterFile
-            self.calculateRTI(self.autoRg, self.scatterFile)
-            
 
         if self.autoRg is None:
             self.setFailure()
-
+        else:
+            self.screen("autorg %s scatter %s"%(self.autoRg, self.scatterFile))
+            self.calculateRTI(self.autoRg, self.scatterFile)
+            self.screen("RTI: %s"%self.rti)
         if self.isFailure():
             return
-        
-        print self.rti
 
         self.edPluginDatGnom = self.loadPlugin(self.cpDatGnom)
         self.edPluginDatGnom.dataInput = XSDataInputDatGnom(inputCurve=self.dataInput.scatterCurve,
@@ -136,7 +141,6 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
             ext = self.dataInput.graphFormat.value
             if not ext.startswith("."):
                 ext = "." + ext
-            plt = sys.modules.get("matplotlib.pyplot")
             try:
                 guinierfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-Guinier" + ext)
 #                 guinierplot = guinierPlot(self.scatterFile, unit="nm",
@@ -227,9 +231,7 @@ Volume  =    %12.2f""" % (self.xVolume.value)
         self.DEBUG("EDPluginControlSaxsAnalysisv1_0.doSuccessRg")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsAnalysisv1_0.doSuccessRg")
         self.retrieveMessages(_edPlugin)
-        self.autoRg = _edPlugin.dataOutput.autoRgOut[0]
-        self.calculateRTI(self.autoRg,self.scatterFile)
-        
+        self.autoRg = _edPlugin.dataOutput.autoRgOut[0]        
 
     def doFailureRg(self, _edPlugin=None):
         self.DEBUG("EDPluginControlSaxsAnalysisv1_0.doFailureRg")

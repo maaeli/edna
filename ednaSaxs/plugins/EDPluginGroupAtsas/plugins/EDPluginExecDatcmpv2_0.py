@@ -92,21 +92,21 @@ class EDPluginExecDatcmpv2_0(EDPluginExecProcessScript):
                         break
                 elif (self.atsasVersion == "2.6.1") and (len(words) == 6) and ('vs.' in words):
                     if self.testType == 'CHI-SQUARE':
-		                try:
-		                    self.fChi = float(words[-3].strip('*')) ** 0.5
-		                    self.fFidelity = float(words[-1].strip('*'))
-		                except ValueError:
-		                    self.WARNING("Strange ouptut from %s:%s %s" % (strResultFile, os.linesep, line))
-		                else:
-		                    break
-					else:
-		                try:
-		                    self.fFidelity = float(words[-1].strip('*'))
-		                    self.naFidelity = float(words[-2].strip('*'))
-		                except ValueError:
-		                    self.WARNING("Strange ouptut from %s:%s %s" % (strResultFile, os.linesep, line))
-		                else:
-		                    break
+                        try:
+                            self.fChi = float(words[-3].strip('*')) ** 0.5
+                            self.fFidelity = float(words[-1].strip('*'))
+                        except ValueError:
+                            self.WARNING("Strange ouptut from %s:%s %s" % (strResultFile, os.linesep, line))
+                        else:
+                            break
+                    else:
+                        try:
+                            self.fFidelity = float(words[-1].strip('*'))
+                            self.naFidelity = float(words[-2].strip('*'))
+                        except ValueError:
+                            self.WARNING("Strange ouptut from %s:%s %s" % (strResultFile, os.linesep, line))
+                        else:
+                            break
 
         # Create some output data
         xsDataResult = XSDataResultDatcmp()
