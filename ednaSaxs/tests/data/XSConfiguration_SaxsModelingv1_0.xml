@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<XSConfiguration> 
+	<XSPluginList>
+		<XSPluginItem>
+			<name>EDPluginControlSaxsModelingv1_0</name>  
+			<XSParamList>
+				<XSParamItem>
+					<name>do_dammin</name>
+					<value>False</value>
+				</XSParamItem>
+				<XSParamItem>
+					<name>dammifJobs</name>
+					<value>16</value>
+				</XSParamItem>
+			</XSParamList>
+		</XSPluginItem>
+		<XSPluginItem>
+			<name>EDPluginControlSaxsModelingv1_1</name>  
+			<XSParamList>
+				<XSParamItem>
+					<name>do_dammin</name>
+					<value>False</value>
+				</XSParamItem>
+				<XSParamItem>
+					<name>dammifJobs</name>
+					<value>16</value>
+				</XSParamItem>
+			</XSParamList>
+		</XSPluginItem>
+	</XSPluginList> 
+</XSConfiguration> 

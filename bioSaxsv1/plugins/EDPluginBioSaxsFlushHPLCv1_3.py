@@ -162,7 +162,7 @@ class EDPluginBioSaxsFlushHPLCv1_3 (EDPluginControl):
         self.json = os.path.splitext(hdf5)[0] + ".json"
         self.xsDataResult.hplcFile = XSDataFile(XSDataString(hdf5))
         self.xsDataResult.hplcImage = XSDataFile(XSDataString(run.make_plot()))
-        try: 
+        try:
             peaks = run.analyse()
             for group in peaks:
                 self.lstExecutiveSummary.append("Merging frames from %s to %s" % (group[0], group[-1]))
@@ -177,13 +177,13 @@ class EDPluginBioSaxsFlushHPLCv1_3 (EDPluginControl):
                 run.merge_analysis[outname] = None
                 run.merge_Rg[outname] = None
                 run.merge_framesDIC[outname] = [group[0], group[-1]]
-            # Append to hdf5
-        except ValueError: 
+        except ValueError:
             traceback.print_stack()
             self.ERROR("EDPluginBioSaxsFlushHPLCv1_3: ValueError Error in analysing run")
         except Exception as error:
             traceback.print_stack()
             self.ERROR("EDPluginBioSaxsFlushHPLCv1_3:  Error in analysing run" % error)
+        # Append to hdf5
         run.append_hdf5()
 
     def processMerges(self, run):

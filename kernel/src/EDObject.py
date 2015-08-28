@@ -8,8 +8,8 @@
 #    Copyright (C) 2010-2010 European Synchrotron Radiation Facility
 #                            Grenoble, France
 #
-#    Principal authors: 
-#                       Olof Svensson (svensson@esrf.fr) 
+#    Principal authors:
+#                       Olof Svensson (svensson@esrf.fr)
 #                       Jérôme Kieffer (jerome.kieffer@esrf.fr)
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 #    GNU Lesser General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
-#    and the GNU Lesser General Public License  along with this program.  
+#    and the GNU Lesser General Public License  along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 
@@ -43,6 +43,7 @@ __copyright__ = "European Synchrotron Radiation Facility, Grenoble, France"
 
 import time
 from EDThreading import Semaphore
+
 
 class EDObject(object):
     """
@@ -68,10 +69,8 @@ class EDObject(object):
         self.__fTimeEnd = None
         self.__classname = None
 
-
     def getId(self):
         return self.__iId
-
 
     def getClassName(self):
         """
@@ -81,7 +80,6 @@ class EDObject(object):
         """
         return self.__class__.__name__
 
-
     def synchronizeOn(self):
         """
         This method must be used in together with the method synchronizeOff().
@@ -90,13 +88,11 @@ class EDObject(object):
         """
         self.__semaphore.acquire()
 
-
     def synchronizeOff(self):
         """
         This method must be used in together with the method synchronizeOn().
         """
         self.__semaphore.release()
-
 
     def getSemaphoreValue(self):
         """
@@ -105,12 +101,11 @@ class EDObject(object):
         @rtype: integer
         """
         iValue = self.__semaphore._Semaphore__value
-        #EDVerbose.WARNING("DEBUG INFO: The value of semaphore for instance of class %s with hash %s is %i" % (self.getClassName(), hash(self), iValue))
+        # EDVerbose.WARNING("DEBUG INFO: The value of semaphore for instance of class %s with hash %s is %i" % (self.getClassName(), hash(self), iValue))
         return iValue
 
     def locked(self):
         return self.__semaphore
-
 
     def setTimeInit(self):
         """
@@ -118,9 +113,6 @@ class EDObject(object):
         """
         if self.__fTimeInit is None:
             self.__fTimeInit = time.time()
-
-
-
 
     def getTimeInit(self):
         """
@@ -130,14 +122,12 @@ class EDObject(object):
         """
         return self.__fTimeInit
 
-
     def setTimeEnd(self):
         """
         Set the end of calculation time for the given object
         """
         if self.__fTimeEnd is None:
             self.__fTimeEnd = time.time()
-
 
     def getTimeEnd(self):
         """
@@ -159,5 +149,3 @@ class EDObject(object):
             else:
                 fRetrunRunTime = self.__fTimeEnd - self.__fTimeInit
         return fRetrunRunTime
-
-

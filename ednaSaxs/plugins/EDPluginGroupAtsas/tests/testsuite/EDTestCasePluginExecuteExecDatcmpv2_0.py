@@ -32,8 +32,7 @@ import os
 from EDVerbose                           import EDVerbose
 from EDAssert                            import EDAssert
 from EDTestCasePluginExecute             import EDTestCasePluginExecute
-from XSDataEdnaSaxs                         import XSDataResultDatcmp
-from parse_atsas import get_ATSAS_version
+from XSDataEdnaSaxs                      import XSDataResultDatcmp
 
 
 class EDTestCasePluginExecuteExecDatcmpv2_0(EDTestCasePluginExecute):
@@ -47,6 +46,7 @@ class EDTestCasePluginExecuteExecDatcmpv2_0(EDTestCasePluginExecute):
         EDTestCasePluginExecute.__init__(self, "EDPluginExecDatcmpv2_0")
 #        self.setConfigurationFile(os.path.join(self.getPluginTestsDataHome(),
 #                                               "XSConfiguration_Datcmp.xml"))
+
         self.setDataInputFile(os.path.join(self.getPluginTestsDataHome(), \
                                            "XSDataInputDatcmp_reference.xml"))
         self.setReferenceDataOutputFile(os.path.join(self.getPluginTestsDataHome(), \
@@ -58,6 +58,9 @@ class EDTestCasePluginExecuteExecDatcmpv2_0(EDTestCasePluginExecute):
         """
         EDTestCasePluginExecute.preProcess(self)
         self.loadTestImage([ "noise1.dat", "noise2.dat" ])
+        self.setReferenceDataOutputFile(os.path.join(self.getPluginTestsDataHome(), \
+         "XSDataResultDatcmp_reference.xml-" + self.plugin.config.get("atsasVersion", "2.5.2")))
+
 
 
     def testExecute(self):
@@ -65,18 +68,10 @@ class EDTestCasePluginExecuteExecDatcmpv2_0(EDTestCasePluginExecute):
         """
         self.run()
         xsdOut = self.getPlugin().getDataOutput()
-        if get_ATSAS_version<4556:
-            ref = "XSDataResultDatcmp_reference.xml"
-        else:
-            ref = "XSDataResultDatcmp_reference.xml.4556"
-        self.setReferenceDataOutputFile(os.path.join(self.getPluginTestsDataHome(), ref))    
         EDAssert.strAlmostEqual(XSDataResultDatcmp.parseFile(self.getReferenceDataOutputFile()).marshal(),
                                 xsdOut.marshal() , "XSData are almost the same", _fAbsError=0.1)
-        if get_ATSAS_version<4556:
-            EDAssert.lowerThan(xsdOut.chi.value, 1.0, "Chi2 is lower than 1")       
-            EDAssert.equal(xsdOut.fidelity.value, 1.0, "Fidelity is 1")
-        else: 
-            EDAssert.lowerThan(xsdOut.fidelity.value, 1.0, "Fidelity is lower than 1")
+        EDAssert.lowerThan(xsdOut.chi.value, 1.0, "Chi2 is lower than 1")
+        EDAssert.equal(xsdOut.fidelity.value, 1.0, "Fidelity is 1")
 
     def process(self):
         """

@@ -20,7 +20,8 @@
     "EDPluginExecDataverv2_0": {},
     "EDPluginExecDatcmpv2_0": {
         "execProcessScriptExecutable": "/usr/bin/datcmp", 
-        "execProcessScriptShell": "python"
+        "execProcessScriptShell": "python",
+        "atsasVersion": "2.6.1"
     },
     "EDPluginExecDatcmpv3_0": {
         "execProcessScriptExecutable": "/usr/bin/datcmp", 
@@ -36,7 +37,20 @@
         "execProcessScriptVersionString": "", 
         "execProcessScriptExecutable": "/usr/bin/dammin", 
         "execProcessScriptShell": "python", 
-        "timeOut": 1500
+        "timeOut": 15
     },  
-   "EDPluginExecDatOpv2_0": {}   
+   "EDPluginExecDatOpv2_0": {},
+   "EDPluginControlSaxsAnalysisv1_0":{
+       "atsasVersion": "2.6.1"
+   },
+    "EDPluginControlSaxsModelingv1_0":{
+        "do_dammin": 0,
+        "dammifJobs": 8,
+        "timeOut": 1000,
+        "clusterSize": 8,
+        "unit": "nanometer",
+                "symmetry": "P1",
+                "mode": "fast"
+    }
+
 }

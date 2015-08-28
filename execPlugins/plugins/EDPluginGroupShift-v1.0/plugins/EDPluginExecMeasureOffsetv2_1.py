@@ -54,13 +54,25 @@ numpy = EDFactoryPluginStatic.preImport("numpy", numpyPath)
 Image = EDFactoryPluginStatic.preImport("Image", imagingPath)
 fabio = EDFactoryPluginStatic.preImport("fabio", fabioPath)
 feature = EDFactoryPluginStatic.preImport("feature")
-sift_pyocl = EDFactoryPluginStatic.preImport("sift")
+sift_pyocl = EDFactoryPluginStatic.preImport("sift_pyocl")
+if not sift_pyocl:
+    EDVerbose.WARNING("Try to load sift_pyocl from sift: You should update your sift installation")
+    sift_pyocl = EDFactoryPluginStatic.preImport("sift")
 #
-if (feature or sift_pyocl) is None :
+if (feature or sift_pyocl) is None:
     strErr = "Error in loading feature (https://github.com/kif/imageAlignment) AND sift_pyocl (https://github.com/kif/sift_pyocl)"
     EDVerbose.ERROR(strErr)
     raise ImportError(strErr)
+import scipy.interpolate
 
+srcDir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src")
+try:
+    import imp
+    MeasureOffset = imp.load_module(*(("MeasureOffset",) + imp.find_module("MeasureOffset", [srcDir])))
+except ImportError, error:
+    strErr = "Unable to load the MeasureOffset module from %s; %s" % (srcDir, error)
+    EDVerbose.ERROR(strErr)
+    raise ImportError(strErr)
 
 class EDPluginExecMeasureOffsetv2_1(EDPluginExec):
     """
@@ -68,10 +80,10 @@ class EDPluginExecMeasureOffsetv2_1(EDPluginExec):
     
     New in version 2.1: Compatible with SIFT_pyocl running on GPU 
     """
-    use_sift_pyocl=None
+    use_sift_pyocl = None
     sift_keypoints = None
     sift_match = None
-    keyindex = {} #key = md5 of the image; value = keypoint (as numpy recordarray)
+    keyindex = {}  # key = md5 of the image; value = keypoint (as numpy recordarray)
     config_lock = Semaphore()
 
     def __init__(self):
@@ -149,19 +161,19 @@ class EDPluginExecMeasureOffsetv2_1(EDPluginExec):
             raise RuntimeError(strError)
 
         crop = sdi.cropBorders
-        if len(crop) > 1 :
-            self.tCrop = tuple([ i.value for i in crop ])
+        if len(crop) > 1:
+            self.tCrop = tuple([i.value for i in crop])
         elif len(crop) == 1:
             self.tCrop = (crop[0].value, crop[0].value)
 
         center = sdi.center
         if len(center) > 1:
-            self.tCenter = tuple([ i.value for i in center ])
+            self.tCenter = tuple([i.value for i in center])
         elif len(center) == 1:
             self.tCenter = (center[0].value, center[0].value)
 
         width = sdi.width
-        if len(width) > 1 :
+        if len(width) > 1:
             self.tWidth = tuple([i.value for i in width])
         elif len(width) == 1:
             self.tWidth = (width[0].value, width[0].value)
@@ -177,7 +189,7 @@ class EDPluginExecMeasureOffsetv2_1(EDPluginExec):
 
         if sdi.sobelFilter is not None:
             self.sobel = (sdi.sobelFilter in [1, True, "true"])
-        EDAssert.equal(self.npaIm1.shape , self.npaIm2.shape, "Images have the same size")
+        EDAssert.equal(self.npaIm1.shape, self.npaIm2.shape, "Images have the same size")
 
     def process(self, _edObject=None):
         EDPluginExec.process(self)
@@ -196,8 +208,8 @@ class EDPluginExecMeasureOffsetv2_1(EDPluginExec):
             d1max = shape[1]
 
         if self.tCenter is None:
-            #the default center is the geometry center of the image ...
-            self.tCenter = [ i // 2 for i in shape ]
+            # the default center is the geometry center of the image ...
+            self.tCenter = [i // 2 for i in shape]
         if self.tWidth is not None:
             d0min = max(0, self.tCenter[0] - (self.tWidth[0] // 2))
             d0max = min(shape[0], d0min + self.tWidth[0])
@@ -206,9 +218,9 @@ class EDPluginExecMeasureOffsetv2_1(EDPluginExec):
             shape = (d0max - d0min, d1max - d1min)
         if shape != self.npaIm1.shape:
             self.DEBUG("Redefining ROI to %s - %s ; %s - %s as crop=%s, center=%s and width=%s" % (d0min, d0max, d1min, d1max, self.tCrop, self.tCenter, self.tWidth))
-            #array contiguity is needed for checksum calculation
+            # array contiguity is needed for checksum calculation
             self.npaIm1 = numpy.ascontiguousarray(self.npaIm1[d0min:d0max, d1min:d1max])
-            self.npaIm2 = numpy.ascontiguousarray(self.npaIm2[ d0min:d0max, d1min:d1max])
+            self.npaIm2 = numpy.ascontiguousarray(self.npaIm2[d0min:d0max, d1min:d1max])
             shape = self.npaIm1.shape
             self.DEBUG("After Crop, images have shape : %s and %s " % (self.npaIm1.shape, self.npaIm2.shape))
 
@@ -242,7 +254,6 @@ class EDPluginExecMeasureOffsetv2_1(EDPluginExec):
         v0 = data[:, 0].y - data[:, 1].y
         v1 = data[:, 0].x - data[:, 1].x
         self.tOffset = [XSDataDouble(numpy.median(v0)), XSDataDouble(numpy.median(v1))]
-
 
     def postProcess(self, _edObject=None):
         EDPluginExec.postProcess(self)

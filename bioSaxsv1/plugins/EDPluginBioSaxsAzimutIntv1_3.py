@@ -28,7 +28,7 @@ from __future__ import with_statement
 __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
-__date__ = "20120824"
+__date__ = "28/08/2015"
 __status__ = "development"
 
 import os
@@ -54,7 +54,10 @@ numpyPath = os.path.join(EDUtilsPath.EDNA_HOME, "libraries", "20090405-Numpy-1.3
 numpy = EDFactoryPluginStatic.preImport("numpy", numpyPath)
 Image = EDFactoryPluginStatic.preImport("Image", imagingPath)
 fabio = EDFactoryPluginStatic.preImport("fabio", fabioPath)
+import matplotlib
+matplotlib.use("Agg") # unless pyFAI initializes another backend !
 import pyFAI
+
 
 class EDPluginBioSaxsAzimutIntv1_3(EDPluginControl):
     """

@@ -3,8 +3,6 @@
 #    Project: ExecPlugins/GroupAtsas
 #             http://www.edna-site.org
 #
-#    File: "$Id$"
-#
 #    Copyright (C) 2011, ESRF, Grenoble
 #
 #    Principal author:       Jérôme Kieffer
@@ -25,8 +23,8 @@
 
 __author__ = "Jérôme Kieffer, Martha Brennich"
 __license__ = "GPLv3+"
-__copyright__ = "2015, ESRF, Grenoble"
-__date__ = "2015-02-04"
+__copyright__ = "2014, ESRF, Grenoble"
+__date__ = "28/08/2015"
 __status__ = "production"
 
 import os
@@ -49,10 +47,12 @@ class EDPluginExecDatcmpv2_0(EDPluginExecProcessScript):
         EDPluginExecProcessScript.__init__(self)
         self.setXSDataInputClass(XSDataInputDatcmp)
         self.listFiles = []
+        self.fChi = None
         self.fFidelity = None
         self.naFidelity = None
-        self.testType = 'CORMAP'
-        self.outputType = 'full'
+        self.atsasVersion = "2.6.1"
+        self.testType = 'CHI-SQUARE' #CORMAP'
+        self.outputType = 'FULL'
         self.commandString = ""
 
 
@@ -60,48 +60,66 @@ class EDPluginExecDatcmpv2_0(EDPluginExecProcessScript):
         """
         Checks the mandatory parameters.
         """
-        self.DEBUG("EDPluginExecDatcmpv1_0.checkParameters")
+        self.DEBUG("EDPluginExecDatcmpv2_0.checkParameters")
         self.checkMandatoryParameters(self.getDataInput(), "Data Input is None")
         self.checkMandatoryParameters(self.getDataInput().inputCurve, "No input 1D curves file provided")
 
 
     def preProcess(self, _edObject=None):
         EDPluginExecProcessScript.preProcess(self)
-        self.DEBUG("EDPluginExecDatcmpv1_0.preProcess")
+        self.DEBUG("EDPluginExecDatcmpv2_0.preProcess")
         self.listFiles = [i.path.value for i in self.getDataInput().inputCurve if os.path.isfile(i.path.value)]
         if len(self.listFiles) != 2:
             self.WARNING("You did not provide the right number of valid files !!! %s" % " ".join(self.listFiles))
         self.generateDatcmpScript()
-
+        self.atsasVersion = self.config.get("atsasVersion", self.atsasVersion)
 
     def postProcess(self, _edObject=None):
         EDPluginExecProcessScript.postProcess(self)
-        self.DEBUG("EDPluginExecDatcmpv1_0.postProcess")
+        self.DEBUG("EDPluginExecDatcmpv2_0.postProcess")
 
         strResultFile = os.path.join(os.path.dirname(self.getScriptFilePath()), self.getScriptLogFileName())
         if os.path.isfile(strResultFile):
             for line in open(strResultFile):
                 words = line.split()
-                if 'vs.' in words:
+                if (self.atsasVersion == "2.5.2") and (len(words) == 5):
                     try:
-                        self.fFidelity = float(words[-1].strip('*'))
-                        self.naFidelity = float(words[-2].strip('*'))
+                        self.fChi = float(words[-2])
+                        self.fFidelity = float(words[-1])
                     except ValueError:
                         self.WARNING("Strange ouptut from %s:%s %s" % (strResultFile, os.linesep, line))
                     else:
                         break
+                elif (self.atsasVersion == "2.6.1") and (len(words) == 6) and ('vs.' in words):
+                    if self.testType == 'CHI-SQUARE':
+		                try:
+		                    self.fChi = float(words[-3].strip('*')) ** 0.5
+		                    self.fFidelity = float(words[-1].strip('*'))
+		                except ValueError:
+		                    self.WARNING("Strange ouptut from %s:%s %s" % (strResultFile, os.linesep, line))
+		                else:
+		                    break
+					else:
+		                try:
+		                    self.fFidelity = float(words[-1].strip('*'))
+		                    self.naFidelity = float(words[-2].strip('*'))
+		                except ValueError:
+		                    self.WARNING("Strange ouptut from %s:%s %s" % (strResultFile, os.linesep, line))
+		                else:
+		                    break
 
         # Create some output data
         xsDataResult = XSDataResultDatcmp()
-        if self.naFidelity is not None:
-            xsDataResult.nonadjustedFidelity = XSDataDouble(self.naFidelity)
+        if self.fChi is not None:
+            xsDataResult.chi = XSDataDouble(self.fChi)
         if self.fFidelity is not None:
             xsDataResult.fidelity = XSDataDouble(self.fFidelity)
-
+        if self.naFidelity is not None:
+            xsDataResult.nonadjustedFidelity = XSDataDouble(self.naFidelity)
         self.setDataOutput(xsDataResult)
 
     def generateDatcmpScript(self):
-        self.DEBUG("EDPluginExecDatcmpv1_0.generateScript")
+        self.DEBUG("EDPluginExecDatcmpv2_0.generateScript")
         self.commamdString = ""
         self.commandString += "--test=" + self.testType
         self.commandString += " --format="  +  self.outputType

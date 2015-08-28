@@ -27,8 +27,8 @@
 __authors__ = ["Jérôme Kieffer"]
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
-__date__ = "2013-04-16"
-__status__ = "Development"
+__date__ = "27/08/2015"
+__status__ = "Production"
 
 import os
 from EDPluginControl import EDPluginControl
@@ -53,7 +53,7 @@ class EDPluginControlSaxsAnalysisModelingv1_0(EDPluginControl):
         * Dammin
     """
     cpAnalysis = "EDPluginControlSaxsAnalysisv1_0"
-    cpModeling = "EDPluginControlSaxsModelingv1_0"
+    cpModeling = "EDPluginControlSaxsModelingv1_1"
 
     def __init__(self):
         """
