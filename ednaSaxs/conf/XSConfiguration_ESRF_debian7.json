@@ -38,5 +38,15 @@
    "EDPluginExecDatOpv2_0": {},
    "EDPluginControlSaxsAnalysisv1_0":{
        "atsasVersion": "2.6.1"
-   }
+   },
+    "EDPluginControlSaxsModelingv1_0":{
+        "do_dammin": 0,
+        "dammifJobs": 8,
+        "timeOut": 1000,
+        "clusterSize": 8,
+        "unit": "nanometer",
+                "symmetry": "P1",
+                "mode": "fast"
+    }
+
 }
