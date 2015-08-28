@@ -27,8 +27,8 @@
 __authors__ = ["Jérôme Kieffer"]
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
-__date__ = "2013-04-16"
-__status__ = "Development"
+__date__ = "27/08/2015"
+__status__ = "Production"
 
 import os
 from EDPluginControl import EDPluginControl
@@ -53,7 +53,7 @@ class EDPluginControlSaxsAnalysisModelingv1_0(EDPluginControl):
         * Dammin
     """
     cpAnalysis = "EDPluginControlSaxsAnalysisv1_0"
-    cpModeling = "EDPluginControlSaxsModelingv1_0"
+    cpModeling = "EDPluginControlSaxsModelingv1_1"
 
     def __init__(self):
         """
@@ -163,10 +163,10 @@ Volume  =    %12.2f""" % (self.xVolume.value)
             self.gnom = _edPlugin.dataOutput.gnom
             self.gnomFile = self.gnom.gnomFile.path.value
             self.xVolume = _edPlugin.dataOutput.volume
-            self.xsDataResult.scatterPlot= _edPlugin.dataOutput.scatterPlot
-            self.xsDataResult.guinierPlot= _edPlugin.dataOutput.guinierPlot
-            self.xsDataResult.kratkyPlot= _edPlugin.dataOutput.kratkyPlot
-            self.xsDataResult.densityPlot=_edPlugin.dataOutput.densityPlot
+            self.xsDataResult.scatterPlot = _edPlugin.dataOutput.scatterPlot
+            self.xsDataResult.guinierPlot = _edPlugin.dataOutput.guinierPlot
+            self.xsDataResult.kratkyPlot = _edPlugin.dataOutput.kratkyPlot
+            self.xsDataResult.densityPlot = _edPlugin.dataOutput.densityPlot
 
         except Exception as error:
             self.ERROR("Error in doSuccessAnalysis: %s" % error)
@@ -184,7 +184,7 @@ Volume  =    %12.2f""" % (self.xVolume.value)
         self.DEBUG("EDPluginControlSaxsAnalysisModelingv1_0.doSuccessModeling")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsAnalysisModelingv1_0.doSuccessModeling")
         self.retrieveMessages(_edPlugin)
-        try:    
+        try:
             self.xsDataResult.dammifModels = _edPlugin.dataOutput.dammifModels
             self.xsDataResult.damaverModel = _edPlugin.dataOutput.damaverModel
             self.xsDataResult.damfiltModel = _edPlugin.dataOutput.damfiltModel
