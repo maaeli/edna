@@ -26,14 +26,14 @@
 __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "2012, ESRF Grenoble"
-__date__ = "2012-08-31"
-__status__ = "Development"
+__date__ = "27/08/2015"
+__status__ = "Production"
 
 import os
 from EDPluginExecProcessScript import EDPluginExecProcessScript
 from XSDataEdnaSaxs import XSDataInputDatPorod, XSDataResultDatPorod
-from XSDataCommon import XSDataString, XSDataDouble, XSDataFile, XSDataLength, \
-    XSDataDoubleWithUnit
+from XSDataCommon import XSDataDoubleWithUnit
+
 
 class EDPluginExecDatPorodv1_0(EDPluginExecProcessScript):
     """
@@ -45,13 +45,13 @@ class EDPluginExecDatPorodv1_0(EDPluginExecProcessScript):
     where K is a constant determined to ensure the asymptotical intensity decay proportional to s-4 at higher angles
     """
 
-
     def __init__(self):
         """
         """
         EDPluginExecProcessScript.__init__(self)
         self.setXSDataInputClass(XSDataInputDatPorod)
         self.gnomFile = None
+        self.atsasVersion = "2.5.2"
 
     def checkParameters(self):
         """
@@ -66,7 +66,7 @@ class EDPluginExecDatPorodv1_0(EDPluginExecProcessScript):
         self.DEBUG("EDPluginExecDatPorodv1_0.preProcess")
         self.gnomFile = self.dataInput.gnomFile.path.value
         self.generateCommandLineOptions()
-
+        self.atsasVersion = self.config.get("atsasVersion", "2.5.2")
 
     def postProcess(self, _edObject=None):
         EDPluginExecProcessScript.postProcess(self)
@@ -74,14 +74,24 @@ class EDPluginExecDatPorodv1_0(EDPluginExecProcessScript):
         # Create some output data
         logfile = os.path.join(self.getWorkingDirectory(), self.getScriptLogFileName())
         out = open(logfile, "r").read().split()
-        try:
-            res = float(out[0])
-        except (ValueError, IndexError):
-            self.error("Unable to read porod log file: " + logfile)
-            self.setFailure()
+        if self.atsasVersion < "2.6":
+            try:
+                res = float(out[0])
+            except (ValueError, IndexError):
+                self.error("Unable to read porod log file: " + logfile)
+                self.setFailure()
+            else:
+                xsDataResult = XSDataResultDatPorod(volume=XSDataDoubleWithUnit(value=res))
+                self.setDataOutput(xsDataResult)
         else:
-            xsDataResult = XSDataResultDatPorod(volume=XSDataDoubleWithUnit(value=res))
-            self.setDataOutput(xsDataResult)
+            try:
+                res = float(out[2])
+            except (ValueError, IndexError):
+                self.error("Unable to read porod log file: " + logfile)
+                self.setFailure()
+            else:
+                xsDataResult = XSDataResultDatPorod(volume=XSDataDoubleWithUnit(value=res))
+                self.setDataOutput(xsDataResult)
 
     def generateCommandLineOptions(self):
         self.setScriptCommandline(self.gnomFile)

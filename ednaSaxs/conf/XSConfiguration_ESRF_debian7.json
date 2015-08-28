@@ -20,7 +20,8 @@
     "EDPluginExecDataverv2_0": {},
     "EDPluginExecDatcmpv2_0": {
         "execProcessScriptExecutable": "/usr/bin/datcmp", 
-        "execProcessScriptShell": "python"
+        "execProcessScriptShell": "python",
+        "atsasVersion": "2.6.1"
     },
   "EDPluginExecSupcombv0_3": {
         "execProcessScriptVersionString": "", 
@@ -34,5 +35,8 @@
         "execProcessScriptShell": "python", 
         "timeOut": 15
     },  
-   "EDPluginExecDatOpv2_0": {}   
+   "EDPluginExecDatOpv2_0": {},
+   "EDPluginControlSaxsAnalysisv1_0":{
+       "atsasVersion": "2.6.1"
+   }
 }

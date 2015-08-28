@@ -63,7 +63,6 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
     strPluginExecDamstart = "EDPluginExecDamstartv0_3"
     strPluginExecDammin = "EDPluginExecDamminv0_2"
     Rg_min = 0.5  # nm
-    activateDammin = False
     def __init__(self):
         """
         """
@@ -79,10 +78,10 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         self.dammif = None
         self.supcomb_plugins = {}
         self.actclust_supcomb = None
-        self.valid = None #index of valid damif models
+        self.valid = None  # index of valid damif models
         self.mask2d = None
         self.arrayNSD = None
-        self.ref = None   # reference frame number (starting ar 0)
+        self.ref = None  # reference frame number (starting ar 0)
 
     def checkParameters(self):
         """
@@ -176,19 +175,19 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         if self.isFailure():
             return
 
-        #retrieve results from best dammif
+        # retrieve results from best dammif
         self.dammif = self.bestDammif()
 
         self.chi2plot("chi2_R.png")
         self.result.chiRfactorPlot = XSDataFile(XSDataString(os.path.join(self.getWorkingDirectory(), "chi2_R.png")))
 
-        #temporary results: use best dammif
+        # temporary results: use best dammif
         self.result.fitFile = self.dammif.dataOutput.fitFile
         self.result.logFile = self.dammif.dataOutput.logFile
         self.result.pdbMoleculeFile = self.dammif.dataOutput.pdbMoleculeFile
         self.result.pdbSolventFile = self.dammif.dataOutput.pdbSolventFile
 
-        #prepare an action cluster with all supcomb plugins
+        # prepare an action cluster with all supcomb plugins
         self.actclust_supcomb = EDActionCluster(self.cluster_size)
         for idx in range(self.dammif_jobs):
             if self.valid[idx]:
@@ -287,6 +286,8 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         ########################################################################
         # Finally call dammin
         ########################################################################
+        if self.config.get("do_dammin") in ["False", "0", False]:
+            return
         dammin = self.loadPlugin(self.strPluginExecDammin)
         dammin.dataInput = XSDataInputDammin(pdbInputFile=damstart.dataOutput.outputPdbFile,
                                              gnomOutputFile=self.xsGnomFile,
@@ -295,8 +296,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
         dammin.connectSUCCESS(self.doSuccessExecDammin)
         dammin.connectFAILURE(self.doFailureExecDammin)
         dammin.executeSynchronous()
-
-        #Dammin takes as lot of time ... wait here for completion
+        # Dammin takes as lot of time ... wait here for completion
 
     def postProcess(self, _edObject=None):
         EDPluginControl.postProcess(self)
@@ -330,7 +330,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
             self.retrieveSuccessMessages(_edPlugin, "EDPluginControlSaxsModelingv1_0.doFailureExecDammif")
             try:
                 self.result.dammifModels.append(_edPlugin.dataOutput.model)
-                #this has to be done only for the best model (once determined) !
+                # this has to be done only for the best model (once determined) !
 #                self.result.pdbMoleculeFile = _edPlugin.dataOutput.pdbMoleculeFile
 #                self.result.pdbSolventFile = _edPlugin.dataOutput.pdbSolventFile
 #                self.result.fitFile = _edPlugin.dataOutput.fitFile
@@ -512,7 +512,7 @@ class EDPluginControlSaxsModelingv1_0(EDPluginControl):
 #        print lnsd
 #        print lnsd.mean() , lnsd.std(), lnsd.mean() + 2 * lnsd.std()
         nsd_max = lnsd.mean() + lnsd.std()
-        data = self.arrayNSD.sum(axis= -1) / self.mask2d.sum(axis= -1)
+        data = self.arrayNSD.sum(axis=-1) / self.mask2d.sum(axis=-1)
         best_val = data[data > 0].min()
 #        print data
 #        print best_val

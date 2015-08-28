@@ -23,7 +23,7 @@
 #    GNU Lesser General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
-#    and the GNU Lesser General Public License  along with this program.  
+#    and the GNU Lesser General Public License  along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 from __future__ import with_statement
@@ -42,7 +42,7 @@ from EDFactoryPlugin        import EDFactoryPlugin
 from EDLogging              import EDLogging
 from EDSlot                 import EDSlot
 from EDThreading import Semaphore
-#asizeof does not work with Jython not with PyPy
+# asizeof does not work with Jython not with PyPy
 if  (os.name == "java") or ("PyPy" in sys.version):
     asizeof = None
 else:
@@ -117,7 +117,6 @@ class EDJob(EDLogging):
         else:
             self.__status = EDJob.PLUGIN_STATE_UNITIALIZED
 
-
     def setDataInput(self, _oDataInput, _strDataInputKey=None):
         """
         Sets the job (plugin) input data.
@@ -147,8 +146,6 @@ class EDJob(EDLogging):
                 else:
                     self.WARNING("Setting DataInput for uninstanciated plugin %s." % self.__strPluginName)
 
-
-
     def getDataInput(self, _strDataInputKey=None):
         """
         Returns the Plugin Input Data for a particular key.
@@ -162,14 +159,13 @@ class EDJob(EDLogging):
             self.WARNING("Getting DataInput for uninstanciated plugin %s." % self.__strPluginName)
     dataInput = property(getDataInput, setDataInput)
 
-
     def getDataOutput(self, _strDataOutputKey=None, _bWait=True):
         """
         Returns the Plugin Output Data
         @param _bWait: shall we wait for the plugin to finish to retrieve output data: Yes by default.
         @type _bWait: boolean
         """
-        if _bWait: #Wait for plugin to finish befor returning data output
+        if _bWait:  # Wait for plugin to finish befor returning data output
             self.synchronize()
         if (self.__edPlugin is not None):
             return self.__edPlugin.getDataOutput(_strDataOutputKey).marshal()
@@ -198,7 +194,6 @@ class EDJob(EDLogging):
         else:
             self.WARNING("Trying to run a plugin that does not exist: %s " % self.__strPluginName)
 
-
     def synchronize(self):
         """
         Synchronize the execution of the job with the calling thread.
@@ -212,7 +207,6 @@ class EDJob(EDLogging):
         else:
             self.DEBUG("Unable to synchronize %s jobs" % strStatus)
 
-
     @classmethod
     def synchronizeAll(cls):
         """
@@ -225,7 +219,6 @@ class EDJob(EDLogging):
             job.synchronize()
         if len(cls.__dictJobs) != len(listJob):
             EDVerbose.WARNING("EDJob.synchronizeAll: New jobs have been launched while synchronizing")
-
 
     def successPluginExecution(self, _edObject=None):
         """
@@ -245,7 +238,6 @@ class EDJob(EDLogging):
             self.ERROR("Error in execution of Common call-back (after success) for %s" % self.__jobId)
             self.writeErrorTrace()
 
-
     def failurePluginExecution(self, _edObject=None):
         """
         Method called when the execution of the plugin failed 
@@ -264,7 +256,6 @@ class EDJob(EDLogging):
             self.ERROR("Error in execution of Common call-back (after failure) for %s" % self.__jobId)
             self.writeErrorTrace()
 
-
     def connectSUCCESS(self, _oMethod):
         """
         @param _oMethod: function or method to be called - back
@@ -274,7 +265,6 @@ class EDJob(EDLogging):
             if (_oMethod != None):
                 self.__edSlotSUCCESS.connect(_oMethod)
 
-
     def connectFAILURE(self, _oMethod):
         """
         @param _oMethod: function or method to be called - back
@@ -283,7 +273,6 @@ class EDJob(EDLogging):
             if (_oMethod != None):
                 self.__edSlotFAILURE.connect(_oMethod)
 
-
     def connectCallBack(self, _oMethod):
         """
         @param _oMethod: function or method to be called - back
@@ -291,7 +280,6 @@ class EDJob(EDLogging):
         with self.locked():
             if (_oMethod != None):
                 self.__edSlotCallBack.connect(_oMethod)
-
 
     def getJobId(self):
         """
@@ -302,7 +290,6 @@ class EDJob(EDLogging):
     jobId = property(getJobId, "EDJob.jobId: read-only property")
     getJobID = getJobId
 
-
     def getPluginName(self):
         """
         @return: Name of the plugin
@@ -310,7 +297,6 @@ class EDJob(EDLogging):
         """
         return self.__strPluginName
     pluginName = property(getPluginName, "EDJob.pluginName: read-only property")
-
 
     def getPlugin(self):
         """
@@ -320,7 +306,6 @@ class EDJob(EDLogging):
         return self.__edPlugin
     plugin = property(getPlugin, "EDJob.plugin: read-only property")
 
-
     def getStatus(self):
         """
         @return: status of the Job
@@ -328,7 +313,6 @@ class EDJob(EDLogging):
         """
         return self.__status
     status = property(getStatus, "EDJob.status: read-only property")
-
 
     def getName(self):
         return self.__name
@@ -339,8 +323,6 @@ class EDJob(EDLogging):
             self.WARNING("EDJob.setName: One cannot rename a Job !!!")
     name = property(getName, setName, "EDJob.name: nickname of the job")
 
-
-
     def getMemSize(self):
         """
         try to guess the size in memory of a job
@@ -348,7 +330,6 @@ class EDJob(EDLogging):
         """
         if asizeof is not None:
             return asizeof.asizeof(self)
-
 
     @classmethod
     def getStatusFromID(cls, jobId):
@@ -368,7 +349,6 @@ class EDJob(EDLogging):
         return strRet
     getStatusFromId = getStatusFromID
 
-
     @classmethod
     def getJobFromID(cls, jobId):
         """
@@ -385,12 +365,10 @@ class EDJob(EDLogging):
             EDVerbose.WARNING("Unable to retrieve such EDJob: %s" % jobId)
     getJobFromId = getJobFromID
 
-
     @classmethod
     def getMemoryFootprint(cls):
         if asizeof is not None:
             return asizeof.asizesof(cls.__dictJobs)
-
 
     def cleanJob(self, forceGC=True):
         """
@@ -407,7 +385,6 @@ class EDJob(EDLogging):
                 self.__edPlugin = None
         if forceGC:
             gc.collect()
-
 
     @classmethod
     def cleanJobfromId(cls, jobId, forceGC=True):
@@ -429,7 +406,6 @@ class EDJob(EDLogging):
         return strRet
     cleanJobfromID = cleanJobfromId
 
-
     @classmethod
     def getDataOutputFromId(cls, jobId):
         """
@@ -444,7 +420,6 @@ class EDJob(EDLogging):
             output = job.getDataOutput()
         return output or ""
     getDataOutputFromID = getDataOutputFromId
-
 
     @classmethod
     def getDataInputFromId(cls, jobId):
@@ -461,6 +436,16 @@ class EDJob(EDLogging):
         return output or ""
     getDataInputFromID = getDataInputFromId
 
+    @classmethod
+    def countRunning(cls):
+        """
+        return the number of jobs still running.
+        """
+        running = 0
+        for jobid in list(cls.__dictJobs.keys()):  # python3 !
+            running += (cls.__dictJobs[jobid].__status == cls.PLUGIN_STATE_RUNNING)
+        return running
+
 
     @classmethod
     def stats(cls):
@@ -472,7 +457,7 @@ class EDJob(EDLogging):
         fExecTime = time.time() - cls.__fStartTime
         keys = cls.__dictJobs.keys()
         keys.sort()
-        for num, key in enumerate(keys) :
+        for num, key in enumerate(keys):
             job = cls.__dictJobs[key]
             if job.getPlugin() is None:
                 runtime = job.__runtime
