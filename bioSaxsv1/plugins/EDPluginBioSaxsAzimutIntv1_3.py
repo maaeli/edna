@@ -233,11 +233,11 @@ class EDPluginBioSaxsAzimutIntv1_3(EDPluginControl):
         with EDUtilsParallel.getSemaphoreNbThreads():
             img = fabio.open(self.normalizedImage)
             variance = img.next()
-            q, I, std = self.integrator.saxs(data=img.data, nbPt=max(img.dim1, img.dim2),
-                                       correctSolidAngle=True,
-                                       variance=variance.data,
-                                       dummy= -2, delta_dummy=1.1,
-                                       method="splitBBox")
+            q, I, std = self.integrator.saxs(img.data, max(img.dim1, img.dim2),
+                                             correctSolidAngle=True,
+                                             variance=variance.data,
+                                             dummy= -2, delta_dummy=1.1,
+                                             method="splitBBox")
         return q, I, std
     def write3ColumnAscii(self, npaQ, npaI, npaStd=None, outputCurve="output.dat", hdr="#", linesep=os.linesep):
         """

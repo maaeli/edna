@@ -11,23 +11,7 @@ from xml.dom import Node
 
 strEdnaHome = os.environ.get("EDNA_HOME", None)
 
-dictLocation = { \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
- "XSDataCommon": "workspace/edna/kernel/datamodel", \
-}
+dictLocation = {  "XSDataCommon": "kernel/datamodel"}
 
 try:
     from XSDataCommon import XSData
