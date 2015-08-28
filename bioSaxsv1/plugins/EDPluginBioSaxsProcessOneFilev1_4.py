@@ -27,7 +27,7 @@ from __future__ import with_statement
 __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
-__date__ = "20140923"
+__date__ = "28/08/2015"
 __status__ = "production"
 
 import os, time
@@ -43,6 +43,8 @@ edFactoryPlugin.loadModule("XSDataWaitFilev1_0")
 from XSDataWaitFilev1_0     import XSDataInputWaitFile
 from XSDataBioSaxsv1_0      import XSDataInputBioSaxsProcessOneFilev1_0, XSDataResultBioSaxsProcessOneFilev1_0
 from XSDataCommon           import XSDataStatus, XSDataString, XSDataFile, XSDataInteger, XSDataTime
+import matplotlib
+matplotlib.use("Agg") # unless pyFAI initializes another backend !
 import fabio
 import numpy
 import pyFAI

@@ -28,8 +28,8 @@ __authors__ = [ "Matias GUIJARRO", "Jérôme Kieffer", "Cyril Guilloud" ]
 __contact__ = "jerome.kieffer@esrf.eu"
 __license__ = "GPLv3+"
 __copyright__ = "European Synchrotron Radiation Facility, Grenoble, France"
-__date__ = "20110919"
-__status__ = "beta"
+__date__ = "28/08/2015"
+__status__ = "production"
 
 import sys, os, threading, gc, time
 import PyTango
@@ -65,6 +65,13 @@ from EDUtilsParallel        import EDUtilsParallel
 from EDStatus               import EDStatus
 from EDFactoryPluginStatic  import EDFactoryPluginStatic
 
+# Server mode: Be sure any plots go to a figure not on the screen
+try:
+    import matplotlib
+except ImportError:
+    pass
+else:
+    matplotlib.use("Agg")
 
 class EdnaDS(PyTango.Device_4Impl, EDLogging):
     """

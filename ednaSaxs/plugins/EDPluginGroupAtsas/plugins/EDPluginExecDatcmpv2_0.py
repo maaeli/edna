@@ -83,9 +83,9 @@ class EDPluginExecDatcmpv2_0(EDPluginExecProcessScript):
                 if (self.atsasVersion == "2.6.1") and (len(words) == 6):
                     try:
                         self.fChi = float(words[-3]) ** 0.5
-                        self.fFidelity = float(words[-1])
+                        self.fFidelity = float(words[-1].strip('*'))
                     except ValueError:
-                        self.WARNING("Strange ouptut from %s:%s %s" % (strResultFile, os.linesep, line))
+                        self.DEBUG("Strange ouptut from %s:%s %s" % (strResultFile, os.linesep, line))
                     else:
                         break
 
