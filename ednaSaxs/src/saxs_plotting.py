@@ -4,35 +4,38 @@
 #    Project: Edna Saxs
 #             http://www.edna-site.org
 #
-#    File: "$Id$"
 #
-#    Copyright (C) 2012 ESRF
+#    Copyright (C) 2012-2015 ESRF
 #
 #    Principal author: Jérôme Kieffer
 #
 #
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
+#    The MIT License (MIT)
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from __future__ import with_statement
 
 __authors__ = ["Jérôme Kieffer"]
-__license__ = "GPLv3+"
+__license__ = "MIT"
 __copyright__ = "ESRF"
-__date__ = "20130124"
+__date__ = "15/09/2015"
 __status__ = "Development"
-__version__ = "0.1"
+__version__ = "0.2"
 
 import os, sys, time, logging
 from StringIO import  StringIO
@@ -41,7 +44,7 @@ import numpy
 from scipy import stats
 import matplotlib
 exe = sys.argv[0].lower()
-if "autorg" in exe  or "testall" in exe:
+if "autorg" in exe  or "testall" in exe or "plotting" in exe:
     matplotlib.use('Qt4Agg')
 else:
     matplotlib.use('Agg')
@@ -56,6 +59,7 @@ import collections
 import functools
 from threading import Semaphore
 
+
 def timeit(func):
     def wrapper(*arg, **kw):
         '''This is the docstring of timeit:
@@ -67,6 +71,7 @@ def timeit(func):
     wrapper.__name__ = func.__name__
     wrapper.__doc__ = func.__doc__
     return wrapper
+
 
 class memoized(object):
     '''Decorator. Caches a function's return value each time it is called.
@@ -80,9 +85,9 @@ class memoized(object):
         self.sem = Semaphore()
     def __call__(self, *args):
         if not isinstance(args, collections.Hashable):
-           # uncacheable. a list, for instance.
-           # better to not cache than blow up.
-           return self.func(*args)
+            # uncacheable. a list, for instance.
+            # better to not cache than blow up.
+            return self.func(*args)
         if args in self.cache:
             value = self.cache[args]
         else:
@@ -97,18 +102,20 @@ class memoized(object):
                 self.cache.pop(rm)
             return value
     def __repr__(self):
-       '''Return the function's docstring.'''
-       return self.func.__doc__
+        '''Return the function's docstring.'''
+        return self.func.__doc__
     def __get__(self, obj, objtype):
-       '''Support instance methods.'''
-       return functools.partial(self.__call__, obj)
+        '''Support instance methods.'''
+        return functools.partial(self.__call__, obj)
+
 
 @memoized
 def load_saxs(filename):
     """
-    return q, I, stderr
+    return q, I, stderr as a dict
     """
     data = None
+    res = {}
     for i in range(10):  # skip up to 10 comments lines
         try:
             data = numpy.loadtxt(filename, skiprows=i)
@@ -119,25 +126,27 @@ def load_saxs(filename):
     if data == None:
         raise RuntimeError("Unable to read input file")
     if data.ndim == 2 and data.shape[1] == 2:
-        q = data[:, 0]
-        I = data[:, 1]
-        std = None
+        res["q"] = data[:, 0]
+        res["I"] = data[:, 1]
     elif  data.ndim == 2 and data.shape[1] == 3:
-        q = data[:, 0]
-        I = data[:, 1]
-        std = data[:, 2]
+        res["q"] = data[:, 0]
+        res["I"] = data[:, 1]
+        res["std"] = data[:, 2]
     else:
         raise RuntimeError("Unable to find columns in data file")
-    return q, I, std
+
+    return res
 
 @memoized
-def loadGnomFile(filename):
+def load_gnom(filename):
     """
 
     @param filename: path of the Gnom output File
     @return: dict with many parameters: gnomRg, gnomRg_err, gnomI0, gnomI0_err, q_fit, I_fit, r, P(r), P(r)_err
 
     """
+    if isinstance(filename, dict):
+        return filename
     pr = StringIO("")
     reg = StringIO("")
     do_pr = False
@@ -170,33 +179,41 @@ def loadGnomFile(filename):
     out["q_fit"], out["I_fit"] = numpy.loadtxt(reg, unpack=True, dtype="float32")
     out["r"], out["P(r)"], out["P(r)_err"] = numpy.loadtxt(pr, unpack=True, dtype="float32")
     return out
+loadGnomFile = load_gnom
 
-def densityPlot(gnomfile, filename=None, format="png", unit="nm"):
+def density_plot(gnomfile, filename=None, format="png", unit="nm", ax=None):
     """
     Generate a density plot P = f(r) 
 
     @param gnomfile: name of the GNOM output file
+    @param  filename: name of the file where the cuve should be saved
+    @param format: image format
+    @param ax: subplotib where to plot in
     @return: the matplotlib figure
     """
-    out = loadGnomFile(gnomfile)
-    fig1 = plt.figure(figsize=(12, 10))
-    ax1 = fig1.add_subplot(1, 1, 1)
-    ax1.errorbar(out["r"], out["P(r)"], out["P(r)_err"], label="Density")
-    ax1.set_ylabel('$\\rho (r)$')
-    ax1.set_xlabel('$r$ (%s)' % unit)
-    ax1.set_title("Pair distribution function")
-#    ax1.set_yscale("log")
-    ax1.legend()
-#    ax1.legend(loc=3)
+    out = load_gnom(gnomfile)
+    if ax:
+        fig = ax.figure
+    else:
+        fig = plt.figure(figsize=(12, 10))
+        ax = fig.add_subplot(1, 1, 1)
+    ax.errorbar(out["r"], out["P(r)"], out["P(r)_err"], label="Density", capsize=0, color="blue", ecolor="lightblue")
+    ax.set_ylabel('$\\rho (r)$')
+    ax.set_xlabel('$r$ (%s)' % unit)
+    ax.set_title("Pair distribution function")
+#    ax.set_yscale("log")
+    ax.legend()
+#    ax.legend(loc=3)
     if filename:
         if format:
-            fig1.savefig(filename, format=format)
+            fig.savefig(filename, format=format)
         else:
-            fig1.savefig(filename)
-    return fig1
+            fig.savefig(filename)
+    return fig
+densityPlot = density_plot
 
 
-def scatterPlot(curve_file, first_point=None, last_point=None, filename=None, format="png", unit="nm", gnomfile=None):
+def scatter_plot(curve_file, first_point=None, last_point=None, filename=None, format="png", unit="nm", gnomfile=None, ax=None):
     """
     Generate a scattering plot I = f(q) in semi log.
 
@@ -204,15 +221,13 @@ def scatterPlot(curve_file, first_point=None, last_point=None, filename=None, fo
     @param: first_point,last point: integers, by default 0 and -1
     @param  filename: name of the file where the cuve should be saved
     @param format: image format
+    @param ax: subplot where to plot in
     @return: the matplotlib figure
     """
-    data = numpy.loadtxt(curve_file)
-    q = data[:, 0]
-    I = data[:, 1]
-    if data.shape[1] == 3:
-        std = data[:, 2]
-    else:
-        std = None
+    data = load_saxs(curve_file)
+    q = data.get("q")
+    I = data.get("I")
+    std = data.get("std")
     if (first_point is None) and (last_point is None):
         for line in open(curve_file):
             if "# AutoRg: Points" in line:
@@ -224,49 +239,52 @@ def scatterPlot(curve_file, first_point=None, last_point=None, filename=None, fo
         first_point = 0
     if last_point is None:
         last_point = -1
-    rng = numpy.arange(len(q))
 
-    fig1 = plt.figure(figsize=(12, 10))
-    ax1 = fig1.add_subplot(1, 1, 1)
-    if std is not None:
-        ax1.errorbar(q, I, std, label="Experimental curve")
+    if ax:
+        fig = ax.figure
     else:
-        ax1.plot(q, I, label="Experimental curve")
+        fig = plt.figure(figsize=(12, 10))
+        ax = fig.add_subplot(1, 1, 1)
+    if std is not None:
+        ax.errorbar(q, I, std, label="Experimental curve", capsize=0, color="blue", ecolor="lightblue")
+    else:
+        ax.plot(q, I, label="Experimental curve", color = "blue")
     if first_point is not None:
         if std is not None:
-            ax1.errorbar(q[first_point:], I[first_point:], std[first_point:], label="Experimental curve (cropped)")
+            ax.errorbar(q[first_point:], I[first_point:], std[first_point:], label="Experimental curve (cropped)", capsize=0, color="green", ecolor="lightgreen")
         else:
-            ax1.plot(q[first_point:], I[first_point:], label="Experimental curve (cropped)")
+            ax.plot(q[first_point:], I[first_point:], label="Experimental curve (cropped)", color = "green")
     if gnomfile:
-        gnom = loadGnomFile(gnomfile)
-        ax1.plot(gnom["q_fit"], gnom["I_fit"], label="GNOM fitted curve")
-    ax1.set_ylabel('$I(q)$')
-    ax1.set_xlabel('$q$ (%s$^{-1}$)' % unit)
-    ax1.set_title("Scattering curve")
-    ax1.set_yscale("log")
-    ax1.legend()
-#    ax1.legend(loc=3)
+        gnom = load_gnom(gnomfile)
+        ax.plot(gnom["q_fit"], gnom["I_fit"], label="GNOM fitted curve", color="red")
+    ax.set_ylabel('$I(q)$')
+    ax.set_xlabel('$q$ (%s$^{-1}$)' % unit)
+    ax.set_title("Scattering curve")
+    ax.set_yscale("log")
+    ax.legend()
+#    ax.legend(loc=3)
     if filename:
         if format:
-            fig1.savefig(filename, format=format)
+            fig.savefig(filename, format=format)
         else:
-            fig1.savefig(filename)
-    return fig1
+            fig.savefig(filename)
+    return fig
+scatterPlot = scatter_plot
 
-
-
-def guinierPlot(curve_file, first_point=None, last_point=None, filename=None, format="png", unit="nm"):
+def guinier_plot(curve_file, first_point=None, last_point=None, filename=None, format="png", unit="nm", ax=None):
     """
     Generate a Guinier plot Ln(I) vs q**2
     @param curve_file: name of the saxs curve file
     @param: first_point,last point: integers, by default 0 and -1
     @param  filename: name of the file where the cuve should be saved
     @param format: image format
+    @param: ax: subplot where to plot in
     @return: the matplotlib figure
     """
-    data = numpy.loadtxt(curve_file)
-    q = data[:, 0]
-    I = data[:, 1]
+    data = load_saxs(curve_file)
+    q = data.get("q")
+    I = data.get("I")
+    std = data.get("std")
     if (first_point is None) and (last_point is None):
         for line in open(curve_file):
             if "# AutoRg: Points" in line:
@@ -291,54 +309,66 @@ def guinierPlot(curve_file, first_point=None, last_point=None, filename=None, fo
     q2 = q2[:end]
     logI = logI[:end]
 
-
-    fig1 = plt.figure(figsize=(12, 10))
-    ax1 = fig1.add_subplot(1, 1, 1)
-    ax1.plot(q2, logI, label="Experimental curve")
-    ax1.plot(q2[first_point:last_point], logI[first_point:last_point], marker='D', markersize=5, label="Guinier region")
-    ax1.annotate("qRg$_{min}$=%.1f" % (Rg * q[first_point]), (q2[first_point], logI[first_point]), xytext=None, xycoords='data',
+    if ax:
+        fig = ax.figure
+    else:
+        fig = plt.figure(figsize=(12, 10))
+        ax = fig.add_subplot(1, 1, 1)
+    ax.plot(q2, logI, label="Experimental curve")
+    ax.plot(q2[first_point:last_point], logI[first_point:last_point], marker='D', markersize=5, label="Guinier region")
+    ax.annotate("qRg$_{min}$=%.1f" % (Rg * q[first_point]), (q2[first_point], logI[first_point]), xytext=None, xycoords='data',
          textcoords='data')
-    ax1.annotate("qRg$_{max}$=%.1f" % (Rg * q[last_point]), (q2[last_point], logI[last_point]), xytext=None, xycoords='data',
+    ax.annotate("qRg$_{max}$=%.1f" % (Rg * q[last_point]), (q2[last_point], logI[last_point]), xytext=None, xycoords='data',
          textcoords='data')
 
-    ax1.plot(q2, intercept + slope * q2, label="ln[$I(q)$] = %.2f %.2f * $q^2$" % (intercept, slope))
-    ax1.set_ylabel('ln[$I(q)$]')
-    ax1.set_xlabel('$q^2$ (%s$^{-2}$)' % unit)
-    ax1.set_title("Guinier plot: $Rg=$%.1f %s $I0=$%.1f" % (Rg, unit, I0))
-    ax1.legend(loc=3)
+    ax.plot(q2, intercept + slope * q2, label="ln[$I(q)$] = %.2f %.2f * $q^2$" % (intercept, slope))
+    ax.set_ylabel('ln[$I(q)$]')
+    ax.set_xlabel('$q^2$ (%s$^{-2}$)' % unit)
+    ax.set_title("Guinier plot: $Rg=$%.1f %s $I0=$%.1f" % (Rg, unit, I0))
+    ax.legend(loc=3)
     if filename:
         if format:
-            fig1.savefig(filename, format=format)
+            fig.savefig(filename, format=format)
         else:
-            fig1.savefig(filename)
-    return fig1
+            fig.savefig(filename)
+    return fig
+guinierPlot = guinier_plot
 
-def kartkyPlot(curve_file, filename=None, format="png", unit="nm"):
+
+def kartky_plot(curve_file, filename=None, format="png", unit="nm", ax = None):
     """
     Generate a Kratky: q2I(q) vs q
     @param curve_file: name of the saxs curve file
     @param: first_point,last point: integers, by default 0 and -1
     @param  filename: name of the file where the cuve should be saved
     @param format: image format
+    @param ax: subplot to display in 
     @return: the matplotlib figure
     """
-    data = numpy.loadtxt(curve_file)
-    q = data[:, 0]
-    I = data[:, 1]
+    data = load_saxs(curve_file)
+    q = data.get("q")
+    I = data.get("I")
+    std = data.get("std")
     q2I = q * q * I
-    fig1 = plt.figure(figsize=(12, 10))
-    ax1 = fig1.add_subplot(1, 1, 1)
-    ax1.plot(q, q2I, label="Experimental curve")
-    ax1.set_ylabel('$q^2I (%s^2)$' % unit)
-    ax1.set_xlabel('$q$ (%s$^{-1}$)' % unit)
-    ax1.set_title("Kratky plot")
-    ax1.legend(loc=0)
+    if ax:
+        has_subplot = True
+    if has_subplot:
+        fig = ax.figure
+    else:
+        fig = plt.figure(figsize=(12, 10))
+        ax = fig.add_subplot(1, 1, 1)
+    ax.plot(q, q2I, label="Experimental curve")
+    ax.set_ylabel('$q^2I (%s^2)$' % unit)
+    ax.set_xlabel('$q$ (%s$^{-1}$)' % unit)
+    ax.set_title("Kratky plot")
+    ax.legend(loc=0)
     if filename:
         if format:
-            fig1.savefig(filename, format=format)
+            fig.savefig(filename, format=format)
         else:
-            fig1.savefig(filename)
-    return fig1
+            fig.savefig(filename)
+    return fig
+kartkyPlot = kartky_plot
 
 class AutoRg(object):
     """
@@ -349,7 +379,10 @@ class AutoRg(object):
         self.I = I
         self.std = std
         if (q is None) or (I is None) and datfile:
-            self.q, self.I, self.std = load_saxs(datfile)
+            dico = load_saxs(datfile)
+            self.q = dico.get("q") 
+            self.I = dico.get("I")
+            self.std = dico.get("std")
 
         self.mininterval = mininterval
         self.qminRg = qminRg
@@ -566,8 +599,93 @@ def autoRg(q=None, I=None, std=None, datfile=None, mininterval=10, qminRg=1.0, q
 
     return ag.finish()
 
+def gnom(fname, Rg, I0):
+    """
+    Exploratory work for Gnom replacement
+    """
+    data = load_saxs(curve_file)
+    q = data.get("q")
+    I = data.get("I")
+    err = data.get("std")
+    qstep = q[1] - q[0]
+    q.max()
+    q.min()
+    rmax = 1. / q.min()
+    rmin = 1 / q.max()
+    rstep = rmin
+    lostep = int(numpy.ceil((rmin - 1e-08) / rstep))
+    histep = int(numpy.floor((rmax + 1e-08) / rstep)) + 1
+    qmaxrstep = numpy.pi / rstep
+    nbase = max((len(q), histep, qmaxrstep / qstep))
+    nlog2 = int(numpy.ceil(numpy.log2(nbase)))
+    nout = 2 ** nlog2
+    qmaxdb = 2 * nout * qstep
+    q_full = numpy.linspace(0, 6, nout)
+    guinier = I0 * numpy.exp(-Rg * Rg * q_full * q_full / 3)
+    I_interp = numpy.interp(q_full, q, I, 0, 0)
+    (numpy.log(I_interp) - numpy.log(guinier))
+    I_interp = numpy.interp(q_full, q, I, 0, 0)
+    delta = (numpy.log(I_interp) - numpy.log(guinier))
+    delta.min()
+    delta.max()
+    delta[delta == -numpy.inf] = delta.max()
+    switch = numpy.argmin(delta)
+    I_merge = guinier
+    I_merge[switch:] = I_interp[switch:]
+    crho = numpy.fft.ifft(I_merge) ** 2
+    plot(numpy.imag(crho))
 
-if __name__ == "__main__":
+#        from numpy.fft import ifft
+#        lostep = int(numpy.ceil((self.rmin - 1e-08) / self.rstep))
+#        histep = int(numpy.floor((self.rmax + 1e-08) / self.rstep)) + 1
+#        self.xout = numpy.arange(lostep, histep) * self.rstep
+#        self.qstep = self.xin[1] - self.xin[0]
+#        self.qmaxrstep = numpy.pi / self.rstep
+#        nin = len(self.xin)
+#        nbase = max([nin, histep, self.qmaxrstep / self.qstep])
+#        nlog2 = int(numpy.ceil(numpy.log2(nbase)))
+#        nout = 2 ** nlog2
+#        qmaxdb = 2 * nout * self.qstep
+#        yindb = numpy.concatenate((self.yin, numpy.zeros(2 * nout - nin)))
+#        cyoutdb = ifft(yindb) * 2 / numpy.pi * qmaxdb
+#        youtdb = numpy.imag(cyoutdb)
+#        xstepfine = 2 * numpy.pi / qmaxdb
+#        xoutfine = numpy.arange(nout) * xstepfine
+#        youtfine = youtdb[:nout]
+#        self.yout = numpy.interp(self.xout, xoutfine, youtfine)
+
+
+def plotting(curve_file, gnom_file=None, filename=None, format="png", unit="nm"):
+    """
+    Generate a plot with scattering, Guinier plot, Kratky, anf Gnom plot.
+    
+    @param curve_file: name of the saxs curve file
+    @param filename: name of the file where the cuve should be saved
+    @param format: image format
+    @return: the matplotlib figure
+    """
+    if gnom_file is None and os.path.exists(curve_file[:-3]+"out"):
+        gnom_file = curve_file[:-3]+"out"
+    fig = plt.figure(figsize=(12,10))
+    sp_scat = fig.add_subplot(2,2,1)
+    scatter_plot(curve_file, gnomfile=gnom_file, ax=sp_scat)
+    sp_krat = fig.add_subplot(2,2,2)
+    kartky_plot(curve_file, ax=sp_krat)
+    sp_guin = fig.add_subplot(2,2,3)
+    guinier_plot(curve_file, ax=sp_guin)
+    sp_gnom = fig.add_subplot(2,2,4)
+    density_plot(gnomfile=gnom_file, ax=sp_gnom)
+    if filename:
+        if format:
+            fig.savefig(filename, format=format)
+        else:
+            fig.savefig(filename)
+    elif matplotlib.get_backend()!="Agg":
+        fig.show()
+    return fig
+
+
+def main(exe):
     if "autorg" in exe:
             usage = """autorg.py [OPTIONS] <DATAFILE(S)>
 
@@ -622,7 +740,7 @@ Points   %i to %i (%i total)""" % (r["Rg"], r["deltaRg"], 100.0 * r["deltaRg"] /
                         print "No Rg found for '%s'." % afile
 
 
-#                    fig = guinierPlot(curve_file=afile)
+#                    fig = guinier_plot(curve_file=afile)
 
                 else:
                     print("No such file %s" % afile)
@@ -650,62 +768,11 @@ Points   %i to %i (%i total)""" % (r["Rg"], r["deltaRg"], 100.0 * r["deltaRg"] /
                     print("OK %s: No Rg, was %i %i.\t took %.3fs" % (afile, first_point, last_point, t1 - t0))
                 else:
                     print("!! %s: No Rg, was %i %i.\t took %.3fs" % (afile, first_point, last_point, t1 - t0))
+    elif "plotting" in exe:
+        for afile in sys.argv[1:]:
+            plotting(afile)
+        raw_input("Enter to quit")
 
-
-def gnom(fname, Rg, I0):
-    """
-    Exploratory work for Gnom replacement
-    """
-    import numpy
-    M = numpy.loadtxt(fname)
-    q = M[:, 0]
-    I = M[:, i]
-    I = M[:, 1]
-    err = M[:, 2]
-#    semilogy(q,I)
-    qstep = q[1] - q[0]
-    q.max()
-    q.min()
-    rmax = 1. / q.min()
-    rmin = 1 / q.max()
-    rstep = rmin
-    lostep = int(numpy.ceil((rmin - 1e-08) / rstep))
-    histep = int(numpy.floor((rmax + 1e-08) / rstep)) + 1
-    qmaxrstep = numpy.pi / rstep
-    nbase = max((len(q), histep, qmaxrstep / qstep))
-    nlog2 = int(numpy.ceil(numpy.log2(nbase)))
-    nout = 2 ** nlog2
-    qmaxdb = 2 * nout * qstep
-    q_full = numpy.linspace(0, 6, nout)
-    guinier = I0 * numpy.exp(-Rg * Rg * q_full * q_full / 3)
-    I_interp = numpy.interp(q_full, q, I, 0, 0)
-    (np.log(I_interp) - np.log(guinier))
-    I_interp = numpy.interp(q_full, q, I, 0, 0)
-    delta = (np.log(I_interp) - np.log(guinier))
-    delta.min()
-    delta.max()
-    delta[delta == -numpy.inf] = delta.max()
-    switch = numpy.argmin(delta)
-    I_merge = guinier
-    I_merge[switch:] = I_interp[switch:]
-    crho = numpy.fft.ifft(I_merge) ** 2
-    plot(numpy.imag(crho))
-
-#        from numpy.fft import ifft
-#        lostep = int(numpy.ceil((self.rmin - 1e-08) / self.rstep))
-#        histep = int(numpy.floor((self.rmax + 1e-08) / self.rstep)) + 1
-#        self.xout = numpy.arange(lostep, histep) * self.rstep
-#        self.qstep = self.xin[1] - self.xin[0]
-#        self.qmaxrstep = numpy.pi / self.rstep
-#        nin = len(self.xin)
-#        nbase = max([nin, histep, self.qmaxrstep / self.qstep])
-#        nlog2 = int(numpy.ceil(numpy.log2(nbase)))
-#        nout = 2 ** nlog2
-#        qmaxdb = 2 * nout * self.qstep
-#        yindb = numpy.concatenate((self.yin, numpy.zeros(2 * nout - nin)))
-#        cyoutdb = ifft(yindb) * 2 / numpy.pi * qmaxdb
-#        youtdb = numpy.imag(cyoutdb)
-#        xstepfine = 2 * numpy.pi / qmaxdb
-#        xoutfine = numpy.arange(nout) * xstepfine
-#        youtfine = youtdb[:nout]
-#        self.yout = numpy.interp(self.xout, xoutfine, youtfine)
+if __name__ == "__main__":
+    main(exe)
+    
