@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# coding: utf8
+# coding: utf-8
 #
 #    Project: Edna Saxs
 #             http://www.edna-site.org
@@ -30,11 +30,15 @@ from __future__ import with_statement
 __authors__ = ["Jérôme Kieffer"]
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
-__date__ = "20130415"
+__date__ = "20141027"
 __status__ = "Development"
 __version__ = "0.1"
 __doc__ = "parse some of the atsas files"
-import os, sys, time, logging
+import os
+import sys
+import time
+import logging
+import subprocess
 # from StringIO import  StringIO
 
 PDB_Keywords = ['HEADER', 'TITLE', 'COMPND', 'SOURCE',
@@ -118,6 +122,8 @@ def parsePDB(pdbFile=None, outPDB=None, purge=False):
                     res["Rg"] = float(line.split(":")[-1])
                 elif "Maximum phase diameter" in line:
                     res["Dmax"] = float(line.split(":")[-1])
+                elif "NSD" in line:
+                    res["NSD"] = float(line.split(":")[-1])
             elif "Excluded volume" in line:
                 res["volume"] = float(line.split(":")[-1])
             elif "Radius of the coordination sphere" in line:
@@ -130,6 +136,30 @@ def parsePDB(pdbFile=None, outPDB=None, purge=False):
                 res["Dmax"] = float(line.split(":")[-1])
             elif "Total excluded DAM volume" in line:
                 res["volume"] = float(line.split(":")[-1])
+#     print(res)
     if purge and pdbFile != outPDB:
         os.unlink(pdbFile)
     return res
+
+def get_ATSAS_version():
+    """
+    @return: the version number of ATSAS (SVN version number) 
+    """
+    plugin = "EDPluginExecAutoRgv1_0"
+    import EDConfigurationStatic
+    res = EDConfigurationStatic.EDConfigurationStatic.loadPluginConfig(plugin)
+    if res and 'execProcessScriptExecutable' in res:
+        exe = res['execProcessScriptExecutable']
+
+    subp = subprocess.Popen([exe,"--version"],stdout=subprocess.PIPE)
+    res = [i.strip() for i in subp.stdout.read().split("\n")]
+    rev = 0
+    if len(res)>=1:
+        pos = res[0].find("(r")       
+        if pos>=0:
+            tmp = res[0][pos+2:]
+            try:
+                rev = int(tmp[:tmp.index(")")]) 
+            except:
+                pass
+    return rev

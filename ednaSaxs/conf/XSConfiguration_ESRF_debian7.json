@@ -1,0 +1,52 @@
+{    "__extend__": ["XSConfiguration_ESRF_debian6.json"],
+    "EDPluginExecDamfiltv0_3": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/usr/bin/damfilt", 
+        "execProcessScriptShell": "python", 
+        "timeOut": 60
+    },    
+    "EDPluginExecDamstartv0_3": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/usr/bin/damstart", 
+        "execProcessScriptShell": "python", 
+        "timeOut": 60
+    }, 
+    "EDPluginExecDamaverv0_3": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/usr/bin/damaver", 
+        "execProcessScriptShell": "python", 
+        "timeOut": 600
+    },
+    "EDPluginExecDataverv2_0": {},
+    "EDPluginExecDatcmpv2_0": {
+        "execProcessScriptExecutable": "/usr/bin/datcmp", 
+        "execProcessScriptShell": "python",
+        "atsasVersion": "2.6.1"
+    },
+  "EDPluginExecSupcombv0_3": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/usr/bin/supcomb", 
+        "execProcessScriptShell": "python", 
+        "timeOut": 60
+    },
+    "EDPluginExecDamminv0_2": {
+        "execProcessScriptVersionString": "", 
+        "execProcessScriptExecutable": "/usr/bin/dammin", 
+        "execProcessScriptShell": "python", 
+        "timeOut": 15
+    },  
+   "EDPluginExecDatOpv2_0": {},
+   "EDPluginControlSaxsAnalysisv1_0":{
+       "atsasVersion": "2.6.1"
+   },
+    "EDPluginControlSaxsModelingv1_0":{
+        "do_dammin": 0,
+        "dammifJobs": 8,
+        "timeOut": 1000,
+        "clusterSize": 8,
+        "unit": "nanometer",
+                "symmetry": "P1",
+                "mode": "fast"
+    }
+
+}

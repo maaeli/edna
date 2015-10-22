@@ -1,4 +1,4 @@
-#coding: utf8
+#coding: utf-8
 #
 #    Project: Full Field XRay Absorption Spectroscopy
 #             http://www.edna-site.org

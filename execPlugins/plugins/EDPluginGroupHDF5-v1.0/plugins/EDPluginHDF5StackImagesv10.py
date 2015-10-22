@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: Exec Plugin: HDF5 writers
 #             http://www.edna-site.org
@@ -54,12 +54,11 @@ class EDPluginHDF5StackImagesv10(EDPluginHDF5):
     """
     HDF5_GROUP_HEADERS = "headers"
     HDF5_DATASET_IMAGE_FILENAMES = "filenames"
-    HDF5_DATASET_STACKIMAGE_ATTRIBUTES = {#"creator":"EDNA",
+    HDF5_DATASET_STACKIMAGE_ATTRIBUTES = {  # "creator":"EDNA",
 #                               "NX_class":"NXdata",
-                               "interpretation": "image", # "spectrum", "scalar", "image" or "vertex"
-                               "signal":"1",
+                               "interpretation": "image",  # "spectrum", "scalar", "image" or "vertex"
+                               "signal": "1",
                                }
-
 
     def __init__(self):
         """
@@ -72,8 +71,7 @@ class EDPluginHDF5StackImagesv10(EDPluginHDF5):
         self.listImageDates = []
         self.listArray = []
         self.bDeleteImage = False
-        self.hdf5group = None #Name of the group(directory) where we will work
-
+        self.hdf5group = None  # Name of the group(directory) where we will work
 
     def preProcess(self, _edObject=None):
         EDPluginHDF5.preProcess(self)
@@ -104,10 +102,9 @@ class EDPluginHDF5StackImagesv10(EDPluginHDF5):
         if self.listForcedPositions != []:
             EDAssert.equal(len(self.listForcedPositions), max(len(self.listImageFilenames), len(self.listArray)), "Forced position list has a good length")
         if self.listImageDates != []:
-            EDAssert.equal(len(self.listImageDates) , len(self.listImageFilenames), "listImageDates has the same size as listImageFilenames")
+            EDAssert.equal(len(self.listImageDates), len(self.listImageFilenames), "listImageDates has the same size as listImageFilenames")
 
         self.hdf5group = EDPluginHDF5.createStructure(self.strHDF5Filename, self.strHDF5Path, self.dictExtraAttributes)
-
 
     def process(self, _edObject=None):
         EDPluginHDF5.process(self)
@@ -132,7 +129,6 @@ class EDPluginHDF5StackImagesv10(EDPluginHDF5):
                     self.DEBUG("Writing image from array at position %i" % (self.listForcedPositions[i]))
                     self.processOneImage(self.listArray[i], self.listForcedPositions[i])
 
-
     def postProcess(self, _edObject=None):
         EDPluginHDF5.postProcess(self)
         self.DEBUG("EDPluginHDF5StackImagesv10.postProcess")
@@ -148,13 +144,11 @@ class EDPluginHDF5StackImagesv10(EDPluginHDF5):
             for oneImage in self.listImageFilenames:
                 os.remove(oneImage)
 
-        #De-allocate memory no more used.
+        # De-allocate memory no more used.
         self.listImageFilenames = []
         self.listForcedPositions = []
         self.listImageDates = []
         self.listArray = []
-
-
 
     def processOneImage(self, npaArray, position=None, filename=None, dictHeaders=None):
         """
@@ -176,7 +170,7 @@ class EDPluginHDF5StackImagesv10(EDPluginHDF5):
         if (self.dtype is not None) and (numpy.dtype(self.dtype) != npaArray.dtype):
             npaArray = npaArray.astype(self.dtype)
         iMaxSize = 0
-        dSizeOfDataSets = {} #key=h5path, value=int:len of dataset 
+        dSizeOfDataSets = {}  # key=h5path, value=int:len of dataset
         with self.__class__.getFileLock(self.strHDF5Filename):
 #        self.lockFile(self.strHDF5Filename)
     ################################################################################
@@ -211,7 +205,6 @@ class EDPluginHDF5StackImagesv10(EDPluginHDF5):
             if position is not None:
                 iMaxSize = position
 
-
     ################################################################################
     # Treatement of the filenames
     ################################################################################
@@ -233,7 +226,7 @@ class EDPluginHDF5StackImagesv10(EDPluginHDF5):
                     dSizeOfDataSets.pop(self.HDF5_DATASET_IMAGE_FILENAMES)
 
     ################################################################################
-    #   Treatement of all metadata, stored in datasets of strings (numpy array of strings) 
+    #   Treatement of all metadata, stored in datasets of strings (numpy array of strings)
     ################################################################################
             if dictHeaders:
                 self.hdf5group.require_group(self.HDF5_GROUP_HEADERS)
@@ -259,7 +252,7 @@ class EDPluginHDF5StackImagesv10(EDPluginHDF5):
                     dSizeOfDataSets.pop(path)
 
     ################################################################################
-    # END of metadata treatment 
+    # END of metadata treatment
     ################################################################################
     # Start of data treatment
     ################################################################################
@@ -307,7 +300,7 @@ class EDPluginHDF5StackImagesv10(EDPluginHDF5):
     ################################################################################
     # END of data teatement
     ################################################################################
-            #     And finally we append white space at the end (or reset)  when no metadata keys were in the input file.        
+            #     And finally we append white space at the end (or reset)  when no metadata keys were in the input file.
             for oneItem in dSizeOfDataSets:
                 self.DEBUG("Warning probably un-consistent dataset for " + oneItem)
                 oneMetaDataset = self.hdf5group[oneItem]

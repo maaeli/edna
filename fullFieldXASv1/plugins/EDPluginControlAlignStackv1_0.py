@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: PROJECT Full Field XAS
 #             http://www.edna-site.org

@@ -1,9 +1,7 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: EdnaSaxs / Atsas
 #             http://www.edna-site.org
-#
-#    File: "$Id$"
 #
 #    Copyright (C) EMBL + ESRF + DLS
 #
@@ -26,7 +24,7 @@
 __author__ = "Jerome Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
-__date__ = "20120831"
+__date__ = "27/08/2015"
 
 import os
 
@@ -49,8 +47,6 @@ class EDTestCasePluginExecuteExecDatPorodv1_0(EDTestCasePluginExecute):
 #                                               "XSConfiguration_DatPorod.xml"))
         self.setDataInputFile(os.path.join(self.getPluginTestsDataHome(), \
                                            "XSDataInputDatPorod_reference.xml"))
-        self.setReferenceDataOutputFile(os.path.join(self.getPluginTestsDataHome(), \
-                                                     "XSDataResultDatPorod_reference.xml"))
 
     def preProcess(self):
         """
@@ -58,6 +54,8 @@ class EDTestCasePluginExecuteExecDatPorodv1_0(EDTestCasePluginExecute):
         """
         EDTestCasePluginExecute.preProcess(self)
         self.loadTestImage(["datgnom.out"])
+        self.setReferenceDataOutputFile(os.path.join(self.getPluginTestsDataHome(), \
+         "XSDataResultDatPorod_reference.xml-" + self.plugin.config.get("atsasVersion", "2.5.2")))
 
     def testExecute(self):
         """

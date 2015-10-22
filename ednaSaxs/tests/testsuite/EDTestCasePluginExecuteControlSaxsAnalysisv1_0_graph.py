@@ -1,6 +1,6 @@
-# coding: utf8
+# coding: utf-8
 #
-#    Project: EdnaSaxs    
+#    Project: EdnaSaxs
 #             http://www.edna-site.org
 #
 #    File: "$Id$"

@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: General purpose plugins
 #             http://www.edna-site.org

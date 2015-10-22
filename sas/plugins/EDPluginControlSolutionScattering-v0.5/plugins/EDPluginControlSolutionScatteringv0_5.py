@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: Solution Scattring pipeline
 #             http://www.edna-site.org

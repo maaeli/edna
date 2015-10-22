@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #
 #    Project: execPlugins
@@ -59,6 +59,16 @@ if feature is None:
     EDVerbose.ERROR(strErr)
     raise ImportError(strErr)
 
+import scipy.interpolate
+
+srcDir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src")
+try:
+    import imp
+    MeasureOffset = imp.load_module(*(("MeasureOffset",) + imp.find_module("MeasureOffset", [srcDir])))
+except ImportError, error:
+    strErr = "Unable to load the MeasureOffset module from %s; %s" % (srcDir, error)
+    EDVerbose.ERROR(strErr)
+    raise ImportError(strErr)
 
 class EDPluginExecMeasureOffsetv2_0(EDPluginExec):
     """
@@ -66,7 +76,7 @@ class EDPluginExecMeasureOffsetv2_0(EDPluginExec):
     """
 
     sift = feature.SiftAlignment()
-    keyindex = {} #key = md5 of the image; value = idex of the keypoints of the image in the SIFT object
+    keyindex = {}  # key = md5 of the image; value = idex of the keypoints of the image in the SIFT object
 
     def __init__(self):
         """
@@ -161,7 +171,7 @@ class EDPluginExecMeasureOffsetv2_0(EDPluginExec):
             d1max = shape[1]
 
         if self.tCenter is None:
-            #the default center is the geometry center of the image ... 
+            # the default center is the geometry center of the image ...
             self.tCenter = [ i // 2 for i in shape ]
         if self.tWidth is not None:
             d0min = max(0, self.tCenter[0] - (self.tWidth[0] // 2))
@@ -171,7 +181,7 @@ class EDPluginExecMeasureOffsetv2_0(EDPluginExec):
             shape = (d0max - d0min, d1max - d1min)
         if shape != self.npaIm1.shape:
             self.DEBUG("Redefining ROI to %s - %s ; %s - %s as crop=%s, center=%s and width=%s" % (d0min, d0max, d1min, d1max, self.tCrop, self.tCenter, self.tWidth))
-            #array contiguity is needed for checksum calculation
+            # array contiguity is needed for checksum calculation
             self.npaIm1 = numpy.ascontiguousarray(self.npaIm1[d0min:d0max, d1min:d1max])
             self.npaIm2 = numpy.ascontiguousarray(self.npaIm2[ d0min:d0max, d1min:d1max])
             shape = self.npaIm1.shape

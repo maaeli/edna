@@ -370,23 +370,50 @@ complex type XSDataResultBioSaxsSingleSamplev1_0 extends XSDataResult{
 
 complex type XSDataInputBioSaxsISPyBv1_0 extends XSDataInput  {
 	"Input class for populating ISPyB"
-	sample 		: XSDataBioSaxsSample
-	autoRg		: XSDataAutoRg optional
-	gnom		: XSDataGnom optional 
-	volume		: XSDataDoubleWithUnit optional
-	frameAverage: XSDataInteger optional
-	frameMerged : XSDataInteger optional
-	curves: XSDataFile [] optional
-	bestBuffer: XSDataFile optional
-	scatterPlot: XSDataFile optional
-	guinierPlot: XSDataFile optional
-	kratkyPlot: XSDataFile optional
-	densityPlot: XSDataFile optional	
+	sample 			: XSDataBioSaxsSample
+	autoRg			: XSDataAutoRg optional
+	gnom			: XSDataGnom optional 
+	volume			: XSDataDoubleWithUnit optional
+//	Deprecated	
+	frameAverage	        : XSDataInteger optional
+//	Deprecated	
+	frameMerged 	        : XSDataInteger optional
+//	Deprecated	
+	curves			: XSDataFile [] optional
+
+//	Averages
+	averagedFrames          : XSDataFile [] optional
+	discardedFrames         : XSDataFile [] optional
+	averageFilePath		: XSDataFile
+
+//	Subtractions
+	bufferFrames		: XSDataFile [] optional
+	sampleFrames		: XSDataFile [] optional
+	subtractedFilePath	: XSDataFile optional
+	bestBuffer		: XSDataFile optional
+	averageSample		: XSDataFile optional
+
+	scatterPlot		: XSDataFile optional
+	guinierPlot		: XSDataFile optional
+	kratkyPlot		: XSDataFile optional
+	densityPlot		: XSDataFile optional	
 }
 
 complex type XSDataResultBioSaxsISPyBv1_0 extends XSDataResult {
 	
 }
+
+complex type XSDataInputBioSaxsISPyBHPLCv1_0 extends XSDataInput {
+	dataInputBioSaxs	: XSDataInputBioSaxsISPyBv1_0
+	startFrame 			: XSDataString
+	endFrame 			: XSDataString
+	experimentId		: XSDataInteger
+}
+
+complex type XSDataResultBioSaxsISPyBHPLCv1_0  {
+	dataInputBioSaxs	: XSDataInputBioSaxsISPyBv1_0
+}
+
 complex type XSDataInputBioSaxsISPyBModellingv1_0 extends XSDataInput  {
 	"Input class for populating ISPyB"
 	//saxsModelingResult: XSDataResultSaxsModeling
@@ -418,7 +445,8 @@ complex type XSDataInputBioSaxsISPyB_HPLCv1_0 extends XSDataInput  {
 }
 
 complex type XSDataResultBioSaxsISPyB_HPLCv1_0 extends XSDataResult {
-	
+	sample			: XSDataBioSaxsSample
+	experimentId	: XSDataInteger
 }
 
 

@@ -1,5 +1,5 @@
 #
-#coding: utf8
+#coding: utf-8
 #
 #    Project: bioSaxs
 #             http://www.edna-site.org

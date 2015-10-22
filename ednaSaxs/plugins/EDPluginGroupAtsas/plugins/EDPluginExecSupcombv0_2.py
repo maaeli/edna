@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: EdnaSaxs/Atsas
 #             http://www.edna-site.org
@@ -28,6 +28,7 @@ from __future__ import with_statement
 __authors__ = [ "irakli", "Jérôme Kieffer"]
 __license__ = "GPLv3+"
 __copyright__ = "2010 DLS, 2013 ESRF"
+__status__ = "deprecated"
 
 import os
 from math import pi, cos, sin

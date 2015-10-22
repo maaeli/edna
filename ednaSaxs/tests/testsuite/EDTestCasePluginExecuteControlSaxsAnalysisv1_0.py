@@ -1,9 +1,7 @@
-# coding: utf8
+# coding: utf-8
 #
-#    Project: EdnaSaxs    
+#    Project: EdnaSaxs
 #             http://www.edna-site.org
-#
-#    File: "$Id$"
 #
 #    Copyright (C) 2012 ESRF
 #
@@ -26,8 +24,8 @@
 __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
-__date__ = "201208031"
-__status__ = "development"
+__date__ = "27/08/2015"
+__status__ = "production"
 import os
 
 from EDVerbose                           import EDVerbose
@@ -35,6 +33,7 @@ from EDAssert                            import EDAssert
 from EDTestCasePluginExecute             import EDTestCasePluginExecute
 from XSDataEdnaSaxs import XSDataInputSaxsAnalysis as XSDataInput
 from XSDataEdnaSaxs import XSDataResultSaxsAnalysis as XSDataResult
+from parse_atsas import get_ATSAS_version
 
 class EDTestCasePluginExecuteControlSaxsAnalysisv1_0(EDTestCasePluginExecute):
 
@@ -46,7 +45,7 @@ class EDTestCasePluginExecuteControlSaxsAnalysisv1_0(EDTestCasePluginExecute):
         self.setDataInputFile(os.path.join(self.getPluginTestsDataHome(), \
                                            "XSDataInputSaxsAnalysisv1_0_reference.xml"))
         self.setReferenceDataOutputFile(os.path.join(self.getPluginTestsDataHome(), \
-                                                     "XSDataResultSaxsAnalysisv1_0_reference.xml"))
+                                            "XSDataResultSaxsAnalysisv1_0_reference.xml"))
 
     def preProcess(self):
         """
@@ -54,6 +53,14 @@ class EDTestCasePluginExecuteControlSaxsAnalysisv1_0(EDTestCasePluginExecute):
         """
         EDTestCasePluginExecute.preProcess(self)
         self.loadTestImage(["autosubtracted.dat"])
+        version = self.plugin.config.get("atsasVersion", "2.4.0")
+        if version < "2.5":
+            res = self.getReferenceDataOutputFile() + "-2.4.0"
+        elif version < "2.6":
+            res = self.getReferenceDataOutputFile() + "-2.5.2"
+        else:
+            res = self.getReferenceDataOutputFile() + "-2.6.1"
+        self.setReferenceDataOutputFile(res)
 
     def testExecute(self):
         """

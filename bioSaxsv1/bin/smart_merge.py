@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# coding: utf8
+# coding: utf-8
 
 from __future__ import with_statement
 
@@ -285,8 +285,8 @@ if __name__ == "__main__":
                       help="limit the number of CPU used", default=None)
 
     parser.add_option("-p", "--plugin", action="store", type="string",
-                      dest = "plugin", default = "EDPluginBioSaxsSmartMergev1_4",
-                      help = "use an alternative plugin, by default EDPluginBioSaxsSmartMergev1_4")
+                      dest="plugin", default="EDPluginBioSaxsSmartMergev1_6",
+                      help="use an alternative plugin, by default EDPluginBioSaxsSmartMergev1_6")
     parser.add_option("-r", "--range", action="store", type="str",
                       dest="filerange", default=None,
                       help="the range of frames to merge (by default all)")

@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: EDNA Saxs
 #             http://www.edna-site.org
@@ -25,7 +25,7 @@
 
 __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
-__copyright__ = "2011, ESRF, Grenoble"
+__copyright__ = "2011-2015, ESRF, Grenoble"
 
 from EDTestSuite  import EDTestSuite
 
@@ -38,6 +38,8 @@ class EDTestSuiteExecuteEdnaSaxs(EDTestSuite):
     def process(self):
         self.addTestCaseFromName("EDTestCasePluginExecuteControlSaxsAnalysisv1_0")
         self.addTestCaseFromName("EDTestCasePluginExecuteControlSaxsAnalysisv1_0_graph")
+        self.addTestCaseFromName("EDTestCasePluginExecuteControlSaxsModelingv1_0.py")
+        self.addTestCaseFromName("EDTestCasePluginExecuteControlSaxsModelingv1_1.py")
         self.addTestSuiteFromName("EDTestSuiteExecuteAtsas")
 
 

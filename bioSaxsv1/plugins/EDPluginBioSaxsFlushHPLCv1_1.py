@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: BioSaxs
 #             http://www.edna-site.org
@@ -30,15 +30,13 @@ __copyright__ = "2012 ESRF"
 __date__ = "20130310"
 __status__ = "development"
 
-import os, time
+import os
 from EDPluginControl import EDPluginControl
-from EDUtilsParallel import EDUtilsParallel
 from EDFactoryPlugin import edFactoryPlugin
 edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
 edFactoryPlugin.loadModule("XSDataEdnaSaxs")
 
-from XSDataBioSaxsv1_0 import XSDataInputBioSaxsHPLCv1_0, XSDataResultBioSaxsHPLCv1_0, \
-                            XSDataInputBioSaxsISPyB_HPLCv1_0
+from XSDataBioSaxsv1_0 import XSDataInputBioSaxsHPLCv1_0, XSDataResultBioSaxsHPLCv1_0, XSDataInputBioSaxsISPyB_HPLCv1_0
 from XSDataEdnaSaxs import XSDataInputDataver
 from XSDataCommon import XSDataString, XSDataStatus, XSDataFile
 from EDPluginBioSaxsHPLCv1_1 import EDPluginBioSaxsHPLCv1_1
@@ -90,7 +88,7 @@ class EDPluginBioSaxsFlushHPLCv1_1 (EDPluginControl):
         EDPluginControl.process(self)
         self.DEBUG("EDPluginBioSaxsFlushHPLCv1_1.process")
         if self.runId in EDPluginBioSaxsHPLCv1_1.dictHPLC:
-            res = self.processRun(EDPluginBioSaxsHPLCv1_1.dictHPLC[self.runId])
+            self.processRun(EDPluginBioSaxsHPLCv1_1.dictHPLC[self.runId])
             edpluginIsPyB = self.loadPlugin(self.strControlledPluginISPyB)
             edpluginIsPyB.dataInput=XSDataInputBioSaxsISPyB_HPLCv1_0(sample=self.dataInput.sample,
                                                                      hdf5File=self.xsDataResult.hplcFile,

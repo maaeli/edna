@@ -1,5 +1,5 @@
 #
-#coding: utf8
+#coding: utf-8
 #
 #    Project: BioSaxs
 #             http://www.edna-site.org
@@ -55,6 +55,8 @@ class EDTestCasePluginExecuteBioSaxsAveragev1_0(EDTestCasePluginExecute):
                                            "XSDataInputBioSaxsAveragev1_0_reference.xml"))
         self.setReferenceDataOutputFile(os.path.join(self.getPluginTestsDataHome(), \
                                                      "XSDataResultBioSaxsAveragev1_0_reference.xml"))
+        if not  self.getPlugin():
+            return
 
     def preProcess(self):
         """

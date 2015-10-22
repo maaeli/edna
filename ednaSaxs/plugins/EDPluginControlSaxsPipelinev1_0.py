@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: PROJECT
 #             http://www.edna-site.org
@@ -26,7 +26,7 @@
 __author__ = "Thomas Boeglin"
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
-
+__status__ = "deprecated"
 
 from EDPluginControl import EDPluginControl
 from XSDataEdnaSaxs import XSDataInputSaxsPipeline, XSDataResultSaxsPipeline, XSDataInputAutoRg

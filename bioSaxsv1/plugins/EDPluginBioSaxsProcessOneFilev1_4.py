@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: BioSaxs
 #             http://www.edna-site.org
@@ -27,8 +27,8 @@ from __future__ import with_statement
 __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
-__date__ = "20130701"
-__status__ = "development"
+__date__ = "28/08/2015"
+__status__ = "production"
 
 import os, time
 from EDVerbose              import EDVerbose
@@ -43,11 +43,13 @@ edFactoryPlugin.loadModule("XSDataWaitFilev1_0")
 from XSDataWaitFilev1_0     import XSDataInputWaitFile
 from XSDataBioSaxsv1_0      import XSDataInputBioSaxsProcessOneFilev1_0, XSDataResultBioSaxsProcessOneFilev1_0
 from XSDataCommon           import XSDataStatus, XSDataString, XSDataFile, XSDataInteger, XSDataTime
+import matplotlib
+matplotlib.use("Agg") # unless pyFAI initializes another backend !
 import fabio
 import numpy
 import pyFAI
 
-if pyFAI.version <= "0.8":
+if [int(i) for i in pyFAI.version.split(".")[:2]] <= [0,8]:
     EDVerbose.ERROR("Too old version of pyFAI detected ... expect to fail !")
 
 
@@ -58,7 +60,8 @@ class EDPluginBioSaxsProcessOneFilev1_4(EDPluginControl):
 
     Nota normalization is done AFTER integration not before as previously
     
-    New in version 1.4: return I/Q/stderr via XSDataArrays 
+    New in version 1.4: return I/Q/stderr via XSDataArrays
+     
     """
     cpWaitFile = "EDPluginWaitFile"
     integrator = pyFAI.AzimuthalIntegrator()
@@ -245,7 +248,7 @@ class EDPluginBioSaxsProcessOneFilev1_4(EDPluginControl):
                 self.integrator.wavelength = wavelength
                 self.integrator.detector.mask = self.calc_mask()
 
-            q, I, std = self.integrator.integrate1d(data=img.data, nbPt=max(img.dim1, img.dim2),
+            q, I, std = self.integrator.integrate1d(img.data, max(img.dim1, img.dim2),
                                        correctSolidAngle=True,
                                        dummy=self.dummy, delta_dummy=self.delta_dummy,
                                        filename=None,

@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: ExecPlugins / Saxs Group / SaxsCurves
 #             http://www.edna-site.org
@@ -39,6 +39,7 @@ __contact__ = "jerome.Kieffer@esrf.eu"
 __license__ = "GPLv3+"
 __copyright__ = "2011 - ESRF"
 __date__ = "20110913"
+__status__ = "deprecated"
 
 import os
 from EDVerbose              import EDVerbose

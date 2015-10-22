@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: EdnaSaxs / 
 #             http://www.edna-site.org
@@ -73,6 +73,7 @@ class EDTestCasePluginExecuteExecDatGnomv1_0(EDTestCasePluginExecute):
         EDVerbose.DEBUG("Checking obtained result...")
         xsDataResultReference = XSDataResult.parseString(strExpectedOutput)
         xsDataResultObtained = plugin.getDataOutput()
+        xsDataResultObtained.status=None
         EDAssert.strAlmostEqual(xsDataResultReference.marshal(), xsDataResultObtained.marshal(), "XSDataResult output are the same", _strExcluded="bioSaxs")
 
         EDAssert.isFile(xsDataResultObtained.gnom.gnomFile.path.value, "Gnom file exists")

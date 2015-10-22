@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: BioSaxs
 #             http://www.edna-site.org
@@ -26,7 +26,7 @@ from __future__ import with_statement
 __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "2011 ESRF"
-__status__ = "Development"
+__status__ = "deprecated"
 __date__ = "20120105"
 
 import os, threading

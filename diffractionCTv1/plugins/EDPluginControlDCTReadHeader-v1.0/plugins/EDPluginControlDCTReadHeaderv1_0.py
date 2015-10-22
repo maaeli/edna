@@ -1,4 +1,4 @@
-# coding: utf8 
+# coding: utf-8 
 #
 #    Project: DiffractionCTv1
 #             http://www.edna-site.org

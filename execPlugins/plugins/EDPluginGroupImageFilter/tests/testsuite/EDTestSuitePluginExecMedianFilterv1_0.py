@@ -1,5 +1,5 @@
 #
-# coding: utf8
+# coding: utf-8
 #
 #    Project: Image Filter
 #             http://www.edna-site.org

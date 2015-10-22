@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: The EDNA Kernel
 #             http://www.edna-site.org
@@ -9,7 +9,7 @@
 #                            Grenoble, France
 #
 #    Principal authors: Marie-Francoise Incardona (incardon@esrf.fr)
-#                       Olof Svensson (svensson@esrf.fr) 
+#                       Olof Svensson (svensson@esrf.fr)
 #                       Jérôme Kieffer (jerome.kieffer@esrf.eu)
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 #    GNU Lesser General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
-#    and the GNU Lesser General Public License  along with this program.  
+#    and the GNU Lesser General Public License  along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 
@@ -449,7 +449,8 @@ class EDPluginExecProcessScript(EDPluginExecProcess):
         else:
             listScript.append('subP = subprocess.Popen(%s, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=dictEnv)' % listCommandLine)
             for strCommandExecution in self.__listCommandExecution:
-                listScript.append('subP.stdin.write("%s%s")' % (strCommandExecution,
+                for subStrCommandExecution in strCommandExecution.split('\n'):
+                    listScript.append('subP.stdin.write("%s%s")' % (subStrCommandExecution,
                                             EDUtilsPlatform.escapedLinesep))
             listScript.append('subP.stdin.close()')
         listScript += ['timer = threading.Timer(%s,kill,args=(subP.pid,))' % (iScriptTimeOut),

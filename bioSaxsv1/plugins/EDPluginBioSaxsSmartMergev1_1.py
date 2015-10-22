@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: BioSaxs
 #             http://www.edna-site.org
@@ -29,7 +29,7 @@ __contact__ = "Jerome.Kieffer@esrf.fr"
 __license__ = "GPLv3+"
 __copyright__ = "2011, ESRF Grenoble"
 __date__ = "20110927"
-__status__ = "Production"
+__status__ = "deprecated"
 
 import os, shutil
 from EDPluginControl import EDPluginControl

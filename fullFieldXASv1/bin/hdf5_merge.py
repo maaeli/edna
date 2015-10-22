@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#coding: utf8
+#coding: utf-8
 #
 #    Project: Full Field XRay Absorption Spectroscopy
 #             http://www.edna-site.org
@@ -30,14 +30,20 @@ __copyright__ = "2012, ESRF, Grenoble"
 __contact__ = "jerome.kieffer@esrf.eu"
 __date__ = "20120529"
 __doc__ = """
+
 Merge and Crop HDF5 stacks of FullField Xanes/Exafs data 
+
 """
 
-import sys, logging, os, time
+import sys
+import logging
+import os
+import time
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("hdf5merge")
 import numpy
 import h5py
+
 
 class MergeFFX(object):
     """
@@ -59,11 +65,15 @@ class MergeFFX(object):
     def __init__(self, inputs, output, crop=False, check=False, normalize=False, logarithm=False, crop_region=None):
         """
         inputs and output are /path/to/file:internal
+        
+        @param crop
+        @param check
+        @param normalize: if True, divide each frame by its normalization factor stored in dataset "maxInt"
         """
         self._h5files = []
         self.start_time = None
         self.end_time = None
-        self.inputs = self.validateInputs(inputs) #list of HDF5 groups
+        self.inputs = self.validateInputs(inputs)  # list of HDF5 groups
         if output is None:
             raise RuntimeError("Output cannot be None")
         self.output = output
@@ -81,11 +91,13 @@ class MergeFFX(object):
             self.get_offsets()
             if self.offsets_security is None:
                 self.offsets_security = 0
-            dim1,dim2=crop_region.split(",",1)
+            dim1, dim2 = crop_region.split(",", 1)
             start1, stop1 = dim1.split(":", 1)
             start2, stop2 = dim2.split(":", 1)
-            if not start1: start1 = "0"
-            if not start2: start2 = "0"
+            if not start1:
+                start1 = "0"
+            if not start2:
+                start2 = "0"
             start1 = int(start1) + self.offsets_security
             stop1 = int(stop1) + self.offsets_security
             start2 = int(start2) + self.offsets_security
@@ -97,7 +109,6 @@ class MergeFFX(object):
             self._crop_region = None
             self.dim1 = None
             self.dim2 = None
-
 
     def validateInputs(self, inputs):
         """
@@ -126,13 +137,13 @@ class MergeFFX(object):
                             start_time = self.parseIsoTime(str(grp[self.START_TIME][()]))
                             if self.start_time is None:
                                 self.start_time = start_time
-                            elif  self.start_time > start_time:
+                            elif self.start_time > start_time:
                                 self.start_time = start_time
                         if self.END_TIME in grp:
                             end_time = self.parseIsoTime(str(grp[self.END_TIME][()]))
                             if self.end_time is None:
                                 self.end_time = end_time
-                            elif  self.end_time < end_time:
+                            elif self.end_time < end_time:
                                 self.end_time = end_time
                         self._h5files.append(h5file)
                         logger.debug("%s start: %s stop: %s" % (h5path, self.start_time, self.end_time))
@@ -140,12 +151,11 @@ class MergeFFX(object):
                     logger.warning("No such group %s in file: %s" % (h5path, filepath))
         return res
 
-    
     def open_hdf5(self, filename, size=None, policy=None):
         """
         Create an HDF5 file with extra option to optimize cache writing
         """
-        #ensure the file exists
+        # ensure the file exists
         if not os.path.isfile(filename):
             h5py.File(filename).close()
 
@@ -161,8 +171,6 @@ class MergeFFX(object):
         fid = h5py.h5f.open(filename, fapl=propfaid)
         self.h5file = h5py.File(fid)
 
-
-
     def create_output(self):
         if ":" not in self.output:
             logger.error("Input %s does not look like a HDF5 path: /path/to/file.h5:Aligned" % self.output)
@@ -176,11 +184,11 @@ class MergeFFX(object):
             self.h5grp.attrs["NX_class"] = "NXentry"
             self.h5grp.attrs["creator"] = os.path.basename(__file__)
             self.h5grp.attrs["index"] = "1"
-            if "title" not in  self.h5grp:
+            if "title" not in self.h5grp:
                 self.h5grp.create_dataset("title", data=self.TITLE)
-            if not "program" in  self.h5grp:
+            if "program" not in self.h5grp:
                 self.h5grp.create_dataset("program", data=os.path.basename(__file__))
-            if not self.START_TIME in  self.h5grp:
+            if self.START_TIME not in self.h5grp:
                 self.h5grp.create_dataset(self.START_TIME, data=self.getIsoTime(self.start_time))
             ########################################################################
             # Huge hack: for scalar modification: use [()] to refer to the data !!!
@@ -191,7 +199,7 @@ class MergeFFX(object):
                 self.h5grp.create_dataset(self.END_TIME, data=self.getIsoTime(self.end_time))
             if self.end_time and self.start_time:
                 duration = self.end_time - self.start_time
-                if self.DURATION in  self.h5grp:
+                if self.DURATION in self.h5grp:
                     self.h5grp[self.DURATION][()] = self.end_time - self.start_time
                 else:
                     self.h5grp.create_dataset(self.DURATION, data=duration, dtype="float")
@@ -210,18 +218,18 @@ class MergeFFX(object):
                 ds = self.h5grp[self.STACK]
             else:
                 ds = self.h5grp.create_dataset(self.STACK, (self.shape[0], self.dim1, self.dim2),
-                                       dtype="float32", chunks=(1, max(1, self.dim1 // 8), max(1, self.dim2 // 8)))
-                ds.attrs["interpretation"] = "image" # "spectrum", "scalar", "image" or "vertex"
+                                               dtype="float32",
+                                               chunks=(1, max(1, self.dim1 // 8), max(1, self.dim2 // 8)))
+                ds.attrs["interpretation"] = "image"  # "spectrum", "scalar", "image" or "vertex"
                 ds.attrs["signal"] = "1"
                 ds.attrs["axes"] = "energy"
                 ds.attrs["creator"] = os.path.basename(__file__)
                 ds.attrs["long_name"] = self.TITLE
-            if self.NX_DATA not in  self.h5grp:
+            if self.NX_DATA not in self.h5grp:
                 nxdata = self.h5grp.create_group(self.NX_DATA)
                 nxdata.attrs["NX_class"] = "NXdata"
                 nxdata[self.ENERGY] = ds_nrj
                 nxdata[self.STACK] = ds
-
 
     def get_offsets(self):
         """
@@ -247,7 +255,7 @@ class MergeFFX(object):
                 secu = self.offsets_security
                 start = numpy.ceil(numpy.array([npa.max(axis=0) for npa in self.offsets.values()]).max(axis=0) + secu).astype(int)
                 stop = numpy.floor(numpy.array([npa.min(axis=0) for npa in self.offsets.values()]).min(axis=0) - secu + shape).astype(int)
-                #handle the cas of offsets larger than secu
+                # handle the cas of offsets larger than secu
                 start = numpy.maximum(start, 0)
                 stop = numpy.minimum(stop, shape - secu)
                 self._crop_region = (slice(start[0], stop[0]), slice(start[1], stop[1]))
@@ -260,7 +268,6 @@ class MergeFFX(object):
         return self._crop_region
     crop_region = property(get_crop_region)
 
-
     def get_shape(self):
         if self._shape is None :
             for path, h5grp in self.inputs.items():
@@ -268,22 +275,21 @@ class MergeFFX(object):
                     self._shape = h5grp[self.STACK].shape
                     break
                 else:
-                     logger.warning("No dataset %s in %s" % (self.STACK, path))
+                    logger.warning("No dataset %s in %s" % (self.STACK, path))
         return self._shape
     shape = property(get_shape)
 
     def get_energy(self):
         for path, h5grp in self.inputs.items():
             if self.ENERGY in h5grp:
-                return  h5grp[self.ENERGY][:]
+                return h5grp[self.ENERGY][:]
             else:
-                 logger.warning("No dataset %s in %s" % (self.ENERGY, path))
-
+                logger.warning("No dataset %s in %s" % (self.ENERGY, path))
 
     def merge_dataset(self):
         print self.crop_region
         print('Crop region: [%s:%s, %s:%s] ' % (self.crop_region[0].start, self.crop_region[0].stop,
-                                               self.crop_region[1].start, self.crop_region[1].stop))
+                                                self.crop_region[1].start, self.crop_region[1].stop))
         ds = self.h5grp[self.STACK]
         logger.debug("Output dataset shape: (%i,%i,%i)" % ds.shape)
         sys.stdout.write("Averaging out frame ")
@@ -324,7 +330,7 @@ class MergeFFX(object):
             sys.stdout.write("  w=%5.3fs" % tw)
             writet.append(tw)
             sys.stdout.flush()
-            sys.stdout.write("\b"*24)
+            sys.stdout.write("\b" * 24)
 
         print("%sFinished !!!" % os.linesep)
         return readt, writet
@@ -371,9 +377,9 @@ if __name__ == "__main__":
     parser.add_option("-k", "--check", dest="recheck",
                       help="Shall we recheck the consistency of the various frames ... very time consuming !!! (not implemented)", default=False)
     parser.add_option("-n", "--normalize", dest="normalize",
-                      help="renormalize frames from intensity", default=True, action="store_true")
+                      help="renormalize frames from intensity (mean of 1% max of image).", default=True, action="store_true")
     parser.add_option("-N", "--no-normalize", dest="normalize",
-                      help="Do NOT renormalize frames from intensity", default=True, action="store_false")
+                      help="Do NOT renormalize frames from intensity. Deactivate when you have phase contrast propagation", default=True, action="store_false")
     parser.add_option("-q", "--quiet",
                       action="store_false", dest="verbose", default=True,
                       help="don't print status messages to stdout")
@@ -404,11 +410,11 @@ if __name__ == "__main__":
 #    mfx.get_offsets()
 #    mfx.get_crop_region()
     r, w = mfx.merge_dataset()
-    from pylab import *
-    plot(r, 'b', label="read time")
-    plot(w, 'r', label="write time")
-    xlabel("Frame number")
-    ylabel("elapsed time (s)")
-    title("HDF5 FullField Xanes dataset merge profile")
-    legend()
-    show()
+    import pylab
+    pylab.plot(r, 'b', label="read time")
+    pylab.plot(w, 'r', label="write time")
+    pylab.xlabel("Frame number")
+    pylab.ylabel("elapsed time (s)")
+    pylab.title("HDF5 FullField Xanes dataset merge profile")
+    pylab.legend()
+    pylab.show()

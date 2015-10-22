@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 #
 #    Project: templatev1
 #             http://www.edna-site.org
@@ -72,7 +72,8 @@ class EDTestCasePluginExecuteExecDatopv1_0(EDTestCasePluginExecute):
         EDAssert.strAlmostEqual(XSDataResultDatop.parseString(self.readAndParseFile(self.getReferenceDataOutputFile())).marshal(),
                                 xsdOut.marshal() , "XSData are almost the same", _fAbsError=0.1)
         refData = open(os.path.join(self.getTestsDataImagesHome(), "noise1+2.dat")).read()
-        obtData = open(self.destFile).read()
+        obtData = os.linesep.join([i for i in open(self.destFile) if i[0].isspace()])
+
         EDAssert.strAlmostEqual(refData, obtData, "Checking obtained file")
 
 
