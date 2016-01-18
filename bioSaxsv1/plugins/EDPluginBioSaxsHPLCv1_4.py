@@ -33,6 +33,7 @@ import fabio
 import numpy
 from EDPluginControl import EDPluginControl
 from EDThreading import Semaphore
+from EDUtilsArray import EDUtilsArray
 
 from EDFactoryPlugin import edFactoryPlugin
 edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
@@ -48,7 +49,7 @@ from EDUtilsBioSaxs import HPLCframe, HPLCrun, RamboTainerInvariant
 
 
 
-class EDPluginBioSaxsHPLCv1_3(EDPluginControl):
+class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
     """
     plugin for processing Saxs data coming from HPLC
 
@@ -103,13 +104,14 @@ class EDPluginBioSaxsHPLCv1_3(EDPluginControl):
         self.subtracted = None
         self.lstExecutiveSummary = []
         self.isBuffer = False
-        self.scatter_data = None
+        self.intensity = None
+        self.stdError = None
 
     def checkParameters(self):
         """
         Checks the mandatory parameters.
         """
-        self.DEBUG("EDPluginBioSaxsHPLCv1_3.checkParameters")
+        self.DEBUG("EDPluginBioSaxsHPLCv1_4.checkParameters")
         self.checkMandatoryParameters(self.dataInput, "Data Input is None")
         self.checkMandatoryParameters(self.dataInput.rawImage, "No raw image")
         self.checkMandatoryParameters(self.dataInput.sample, "no Sample parameter")
@@ -124,13 +126,13 @@ class EDPluginBioSaxsHPLCv1_3(EDPluginControl):
         if self.__class__.SIMILARITY_THRESHOLD_SAMPLE is None:
             with self._sem:
                 if self.__class__.SIMILARITY_THRESHOLD_SAMPLE is None:
-                    self.DEBUG("EDPluginBioSaxsHPLCv1_3.configure")
+                    self.DEBUG("EDPluginBioSaxsHPLCv1_4.configure")
                     self.__class__.SIMILARITY_THRESHOLD_BUFFER = float(self.config.get(self.SIMILARITY_THRESHOLD_BUFFER_KEY, self.SIMILARITY_THRESHOLD_BUFFER_DEFAULT))
                     self.__class__.SIMILARITY_THRESHOLD_SAMPLE = float(self.config.get(self.SIMILARITY_THRESHOLD_SAMPLE_KEY, self.SIMILARITY_THRESHOLD_SAMPLE_DEFAULT))
 
     def preProcess(self, _edObject=None):
         EDPluginControl.preProcess(self)
-        self.DEBUG("EDPluginBioSaxsHPLCv1_3.preProcess")
+        self.DEBUG("EDPluginBioSaxsHPLCv1_4.preProcess")
         sdi = self.dataInput
         if sdi.runId is not None:
             self.runId = sdi.runId.value
@@ -192,7 +194,7 @@ class EDPluginBioSaxsHPLCv1_3(EDPluginControl):
 
     def process(self, _edObject=None):
         EDPluginControl.process(self)
-        self.DEBUG("EDPluginBioSaxsHPLCv1_3.process")
+        self.DEBUG("EDPluginBioSaxsHPLCv1_4.process")
 
         xsdIn = XSDataInputBioSaxsProcessOneFilev1_0(rawImage=self.dataInput.rawImage,
                                                      sample=self.dataInput.sample,
@@ -222,25 +224,39 @@ class EDPluginBioSaxsHPLCv1_3(EDPluginControl):
         if self.isFailure() or self.isBuffer:
             return
 
+        
+        #######################
+        ## DatOp subtraction ##
+        #######################
+
         if self.dataInput.subtractedCurve is not None:
-            subtracted = self.dataInput.subtractedCurve.path.value
+            self.subtracted = self.dataInput.subtractedCurve.path.value
         else:
-            subtracted = os.path.splitext(self.curve)[0] + "_sub.dat"
-        if self.hplc_run.buffer is not None:
-            xsdIn = XSDataInputDatop(inputCurve=[XSDataFile(XSDataString(self.curve)),
-                                                  XSDataFile(XSDataString(self.hplc_run.buffer))],
-                                     outputCurve=XSDataFile(XSDataString(subtracted)),
-                                     operation=XSDataString("sub"))
-        else:
-            xsdIn = XSDataInputDatop(inputCurve=[XSDataFile(XSDataString(self.curve)),
-                                                  XSDataFile(XSDataString(self.hplc_run.first_curve))],
-                                     outputCurve=XSDataFile(XSDataString(subtracted)),
-                                     operation=XSDataString("sub"))
-        self.edPluginDatop = self.loadPlugin(self.strControlledPluginDatop)
-        self.edPluginDatop.dataInput = xsdIn
-        self.edPluginDatop.connectSUCCESS(self.doSuccessDatop)
-        self.edPluginDatop.connectFAILURE(self.doFailureDatop)
-        self.edPluginDatop.executeSynchronous()
+            self.subtracted = os.path.splitext(self.curve)[0] + "_sub.dat"
+
+        Isub = self.intensity - self.hplc_run.buffer_I 
+        StdErr = numpy.sqrt(self.stdError * self.stdError + \
+                            self.hplc_run.buffer_Stdev * self.hplc_run.buffer_Stdev)
+
+        with open(self.subtracted, "w") as outfile:
+            numpy.savetxt(outfile, numpy.vstack((self.hplc_run.q,Isub,StdErr)).T)
+        self.xsDataResult.subtractedCurve = XSDataFile(XSDataString(self.subtracted))
+        self.frame.subtracted = self.subtracted
+#         if self.hplc_run.buffer is not None:
+#             xsdIn = XSDataInputDatop(inputCurve=[XSDataFile(XSDataString(self.curve)),
+#                                                   XSDataFile(XSDataString(self.hplc_run.buffer))],
+#                                      outputCurve=XSDataFile(XSDataString(subtracted)),
+#                                      operation=XSDataString("sub"))
+#         else:
+#             xsdIn = XSDataInputDatop(inputCurve=[XSDataFile(XSDataString(self.curve)),
+#                                                   XSDataFile(XSDataString(self.hplc_run.first_curve))],
+#                                      outputCurve=XSDataFile(XSDataString(subtracted)),
+#                                      operation=XSDataString("sub"))
+#         self.edPluginDatop = self.loadPlugin(self.strControlledPluginDatop)
+#         self.edPluginDatop.dataInput = xsdIn
+#         self.edPluginDatop.connectSUCCESS(self.doSuccessDatop)
+#         self.edPluginDatop.connectFAILURE(self.doFailureDatop)
+#         self.edPluginDatop.executeSynchronous()
 
         if self.subtracted and os.path.exists(self.subtracted):
             self.edPluginAutoRg = self.loadPlugin(self.strControlledPluginAutoRg)
@@ -254,7 +270,7 @@ class EDPluginBioSaxsHPLCv1_3(EDPluginControl):
         after process
         """
         EDPluginControl.postProcess(self)
-        self.DEBUG("EDPluginBioSaxsHPLCv1_3.postProcess")
+        self.DEBUG("EDPluginBioSaxsHPLCv1_4.postProcess")
         if self.hplc_run.buffer:
             self.xsDataResult.bufferCurve = XSDataFile(XSDataString(self.hplc_run.buffer))
         if self.curve:
@@ -274,21 +290,37 @@ class EDPluginBioSaxsHPLCv1_3(EDPluginControl):
         """
         Average out all buffers
         """
-        self.lstExecutiveSummary.append("Averaging out buffer files: " + ", ".join(self.hplc_run.for_buffer))
-        xsdIn = XSDataInputDataver(inputCurve=[XSDataFile(XSDataString(i)) for i in self.hplc_run.for_buffer])
-        if self.dataInput.bufferCurve:
-            xsdIn.outputCurve = self.dataInput.bufferCurve
-        else:
-            xsdIn.outputCurve = XSDataFile(XSDataString(self.hplc_run.first_curve[::-1].split("_", 1)[1][::-1] + "_buffer_aver_%04i.dat" % len(self.hplc_run.for_buffer)))
-        self.edPluginDatAver = self.loadPlugin(self.strControlledPluginDatAver)
-        self.edPluginDatAver.dataInput = xsdIn
-        self.edPluginDatAver.connectSUCCESS(self.doSuccessDatAver)
-        self.edPluginDatAver.connectFAILURE(self.doFailureDatAver)
-        self.edPluginDatAver.executeSynchronous()
+        
+        print("Averaging")
+        nb_frames = len(self.hplc_run.for_buffer)
+
+        filename = self.hplc_run.first_curve[::-1].split("_", 1)[1][::-1] +\
+                    "_buffer_aver_%04i.dat" % nb_frames
+        self.lstExecutiveSummary.append("Averaging out buffer to %s: %s"%(filename, 
+                                            ", ".join([str(i) for i in self.hplc_run.for_buffer])))
+        
+        q = self.hplc_run.q
+        I = numpy.zeros(self.hplc_run.size, "float64")
+        s2 = numpy.zeros(self.hplc_run.size, "float64")
+        for idx in self.hplc_run.for_buffer:
+            frame = self.hplc_run.frames[idx] 
+            I += frame.I
+            s2 += frame.err*frame.err
+            frame.purge_memory()
+        I /= nb_frames
+        err = numpy.sqrt(s2)/nb_frames
+        m = numpy.vstack((q, I , err))
+
+        with open(filename, "w") as outfile:
+            numpy.savetxt(outfile, m.T)
+        with self._sem:
+            self.hplc_run.buffer = filename
+            self.hplc_run.buffer_I = I
+            self.hplc_run.buffer_Stdev = err
 
     def doSuccessProcessOneFile(self, _edPlugin=None):
-        self.DEBUG("EDPluginBioSaxsHPLCv1_3.doSuccessProcessOneFile")
-        self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_3.doSuccessProcessOneFile")
+        self.DEBUG("EDPluginBioSaxsHPLCv1_4.doSuccessProcessOneFile")
+        self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_4.doSuccessProcessOneFile")
         if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.status and _edPlugin.dataOutput.status.executiveSummary:
             self.lstExecutiveSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
         output = _edPlugin.dataOutput
@@ -310,6 +342,8 @@ class EDPluginBioSaxsHPLCv1_3(EDPluginControl):
         self.xsDataResult.dataI = output.dataI
         self.xsDataResult.dataQ = output.dataQ
         self.xsDataResult.dataStdErr = output.dataStdErr
+        self.intensity = EDUtilsArray.xsDataToArray(output.dataI)
+        self.stdError = EDUtilsArray.xsDataToArray(output.dataStdErr)
         if output.experimentSetup and output.experimentSetup.timeOfFrame:
             startTime = output.experimentSetup.timeOfFrame.value
         else:
@@ -319,56 +353,66 @@ class EDPluginBioSaxsHPLCv1_3(EDPluginControl):
                 self.ERROR("Unable to read time_of_day in header of %s" % self.dataInput.rawImage.path.value)
                 startTime = 0
 
-        with self._sem:
-            if not self.hplc_run.first_curve:
-                self.hplc_run.first_curve = self.curve
-                self.hplc_run.start_time = startTime
+        if not self.hplc_run.first_curve:
+            with self._sem:
+                if not self.hplc_run.first_curve:
+                    #Populate the buffer with the first curve if needed
+                    self.hplc_run.first_curve = self.curve
+                    self.hplc_run.start_time = startTime
+                    self.hplc_run.q = EDUtilsArray.xsDataToArray(output.dataQ)
+                    self.hplc_run.size = self.hplc_run.q.size
+                    self.hplc_run.buffer_I = self.intensity
+                    self.hplc_run.buffer_Stdev = self.stdError
+                    self.hplc_run.buffer = self.curve
+
         self.frame.curve = self.curve
         self.frame.time = startTime
         self.xsDataResult.timeStamp = XSDataTime(value=(startTime - self.hplc_run.start_time))
-        self.calcIntensity()
+#         self.calcIntensity()
+        self.frame.sum_I = float(self.intensity.sum())
+        self.xsDataResult.summedIntensity = XSDataDouble(value=self.frame.sum_I)
 
     def doFailureProcessOneFile(self, _edPlugin=None):
-        self.DEBUG("EDPluginBioSaxsHPLCv1_3.doFailureProcessOneFile")
-        self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_3.doFailureProcessOneFile")
+        self.DEBUG("EDPluginBioSaxsHPLCv1_4.doFailureProcessOneFile")
+        self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_4.doFailureProcessOneFile")
         if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.status and _edPlugin.dataOutput.status.executiveSummary:
             self.lstExecutiveSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
         else:
             self.lstExecutiveSummary.append("Edna plugin ProcessOneFile failed.")
         self.setFailure()
 
-    def doSuccessDatop(self, _edPlugin=None):
-        self.DEBUG("EDPluginBioSaxsHPLCv1_3.doSuccessDatop")
-        self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_3.doSuccessDatop")
-        if _edPlugin and _edPlugin.dataOutput:
-            output = _edPlugin.dataOutput
-            if output.status and output.status.executiveSummary:
-                self.lstExecutiveSummary.append(output.status.executiveSummary.value)
-            if output.outputCurve:
-                self.subtracted = output.outputCurve.path.value
-                if os.path.exists(self.subtracted):
-                    self.xsDataResult.subtractedCurve = output.outputCurve
-                    self.frame.subtracted = self.subtracted
-                else:
-                    strErr = "Edna plugin datop did not produce subtracted file %s" % self.subtracted
-                    self.ERROR(strErr)
-                    self.lstExecutiveSummary.append(strErr)
-                    self.setFailure()
-
-    def doFailureDatop(self, _edPlugin=None):
-        self.DEBUG("EDPluginBioSaxsHPLCv1_3.doFailureDatop")
-        self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_3.doFailureDatop")
-        strErr = "Edna plugin datop failed."
-        if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.status and _edPlugin.dataOutput.status.executiveSummary:
-            self.lstExecutiveSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
-        else:
-            self.lstExecutiveSummary.append(strErr)
-        self.ERROR(strErr)
-        self.setFailure()
+#     def doSuccessDatop(self, _edPlugin=None):
+#         self.DEBUG("EDPluginBioSaxsHPLCv1_4.doSuccessDatop")
+#         self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_4.doSuccessDatop")
+#         if _edPlugin and _edPlugin.dataOutput:
+#             output = _edPlugin.dataOutput
+#             if output.status and output.status.executiveSummary:
+#                 self.lstExecutiveSummary.append(output.status.executiveSummary.value)
+#             if output.outputCurve:
+#                 self.subtracted = output.outputCurve.path.value
+#                 if os.path.exists(self.subtracted):
+#                     self.xsDataResult.subtractedCurve = output.outputCurve
+#                     self.frame.subtracted = self.subtracted
+#                 else:
+#                     strErr = "Edna plugin datop did not produce subtracted file %s" % self.subtracted
+#                     self.ERROR(strErr)
+#                     self.lstExecutiveSummary.append(strErr)
+#                     self.setFailure()
+# 
+#     def doFailureDatop(self, _edPlugin=None):
+#         self.DEBUG("EDPluginBioSaxsHPLCv1_4.doFailureDatop")
+#         self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_4.doFailureDatop")
+#         strErr = "Edna plugin datop failed."
+#         if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.status and _edPlugin.dataOutput.status.executiveSummary:
+#             self.lstExecutiveSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
+#         else:
+#             self.lstExecutiveSummary.append(strErr)
+#         self.ERROR(strErr)
+#         self.setFailure()
 
     def doSuccessAutoRg(self, _edPlugin=None):
-        self.DEBUG("EDPluginBioSaxsHPLCv1_3.doSuccessAutoRg")
-        self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_3.doSuccessAutoRg")
+        self.DEBUG("EDPluginBioSaxsHPLCv1_4.doSuccessAutoRg")
+        self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_4.doSuccessAutoRg")
         if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.status and _edPlugin.dataOutput.status.executiveSummary:
             self.lstExecutiveSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
         try:
@@ -415,19 +459,19 @@ class EDPluginBioSaxsHPLCv1_3(EDPluginControl):
                 self.xsDataResult.rti = xsdRTI
 
     def doFailureAutoRg(self, _edPlugin=None):
-        self.DEBUG("EDPluginBioSaxsHPLCv1_3.doFailureAutoRg")
-        self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_3.doFailureAutoRg")
+        self.DEBUG("EDPluginBioSaxsHPLCv1_4.doFailureAutoRg")
+        self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_4.doFailureAutoRg")
         strErr = "Edna plugin AutoRg failed."
         if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.status and _edPlugin.dataOutput.status.executiveSummary:
             self.lstExecutiveSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
             self.lstExecutiveSummary.append(strErr)
         else:
             self.lstExecutiveSummary.append(strErr)
-        self.setFailure()
+#         self.setFailure()
 
     def doSuccessDatCmp(self, _edPlugin=None):
-        self.DEBUG("EDPluginBioSaxsHPLCv1_3.doSuccessDatCmp")
-        self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_3.doSuccessDatCmp")
+        self.DEBUG("EDPluginBioSaxsHPLCv1_4.doSuccessDatCmp")
+        self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_4.doSuccessDatCmp")
         if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.status and _edPlugin.dataOutput.status.executiveSummary:
             self.lstExecutiveSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
         if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.fidelity:
@@ -442,7 +486,10 @@ class EDPluginBioSaxsHPLCv1_3(EDPluginControl):
             if fidelity > self.SIMILARITY_THRESHOLD_SAMPLE:
                 self.isBuffer = True
                 if fidelity > self.SIMILARITY_THRESHOLD_BUFFER:
-                    self.hplc_run.for_buffer.append(self.curve)
+                    self.hplc_run.for_buffer.append(self.frameId)
+                    self.frame.I = EDUtilsArray.xsDataToArray(self.xsDataResult.dataI)
+                    self.frame.q = EDUtilsArray.xsDataToArray(self.xsDataResult.dataQ)
+                    self.frame.err = EDUtilsArray.xsDataToArray(self.xsDataResult.dataStdErr)
             else:
                 with self.buffer_sem:
                     if self.hplc_run.buffer is None:
@@ -451,45 +498,23 @@ class EDPluginBioSaxsHPLCv1_3(EDPluginControl):
             self.isBuffer = True
 
     def doFailureDatCmp(self, _edPlugin=None):
-        self.DEBUG("EDPluginBioSaxsHPLCv1_3.doFailureDatCmp")
-        self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_3.doFailureDatCmp")
+        self.DEBUG("EDPluginBioSaxsHPLCv1_4.doFailureDatCmp")
+        self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_4.doFailureDatCmp")
         if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.status and _edPlugin.dataOutput.status.executiveSummary:
             self.lstExecutiveSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
         else:
             self.lstExecutiveSummary.append("Edna plugin DatCmp failed.")
         self.setFailure()
 
-    def doSuccessDatAver(self, _edPlugin=None):
-        self.DEBUG("EDPluginBioSaxsHPLCv1_3.doSuccessDatAver")
-        self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_3.doSuccessDatAver")
-        if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.outputCurve:
-            bufferCurve = _edPlugin.dataOutput.outputCurve.path.value
-            if os.path.exists(bufferCurve):
-                with self._sem:
-                    self.hplc_run.buffer = bufferCurve
-            else:
-                strErr = "DatAver claimed buffer is in %s but no such file !!!" % bufferCurve
-                self.ERROR(strErr)
-                self.lstExecutiveSummary.append(strErr)
-                self.setFailure()
 
-    def doFailureDatAver(self, _edPlugin=None):
-        self.DEBUG("EDPluginBioSaxsHPLCv1_3.doFailureDatAver")
-        self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_3.doFailureDatAver")
-        if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.status and _edPlugin.dataOutput.status.executiveSummary:
-            self.lstExecutiveSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
-        else:
-            self.lstExecutiveSummary.append("Edna plugin DatAver failed.")
-        self.setFailure()
-
-    def calcIntensity(self):
-        """
-        Calculate invariants like:
-        Sum(I),
-        and set output data-structure.
-        
-        """
-        self.scatter_data = numpy.loadtxt(self.xsDataResult.integratedCurve.path.value)
-        self.frame.sum_I = self.scatter_data[:, 1].sum()
-        self.xsDataResult.summedIntensity = XSDataDouble(value=self.frame.sum_I)
+#     def calcIntensity(self):
+#         """
+#         Calculate invariants like:
+#         Sum(I),
+#         and set output data-structure.
+#         
+#         """
+#         self.scatter_data = numpy.loadtxt(self.xsDataResult.integratedCurve.path.value)
+#         
+#         
 

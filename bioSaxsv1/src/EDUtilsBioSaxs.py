@@ -271,6 +271,18 @@ class HPLCframe(object):
         self.Vc_Stdev = None
         self.Qr_Stdev = None
         self.mass_Stdev = None
+        self.q = None
+        self.I = None
+        self.err = None
+
+    def purge_memory(self):
+        """
+        free the memory associated with the curve
+        """
+        self.q = None
+        self.I = None
+        self.err = None
+    
 
 def median_filt(input_array, width=3):
     """
@@ -309,7 +321,7 @@ def datasmoothness(raw, filtered):
 class HPLCrun(object):
     def __init__(self, runId, first_curve=None):
         self.id = runId
-        self.buffer = None
+        self.buffer = None  #filename of the buffer
         self.first_curve = first_curve
         self.frames = {} #key: id, value: HPLCframe instance
         self.curves = []
@@ -346,7 +358,7 @@ class HPLCrun(object):
         self.Qr_Stdev = None
         self.mass_Stdev = None  
         self.buffer_frames = None
-        self.merge_frames = None  # indexes of first and last frame marged
+        self.merge_frames = None  # indexes of first and last frame merged
         self.buffer_I = None
         self.buffer_Stdev = None
         self.merge_I = None 
@@ -410,10 +422,11 @@ class HPLCrun(object):
     def extract_data(self, force_finished=False):
         self.max_size = self.calc_size(max(self.frames.keys()) + 1)
         self.time = numpy.zeros(self.max_size, dtype=numpy.float64)
-        data = numpy.loadtxt(self.first_curve)
-        self.q = data[:, 0]
-        self.size = self.q.size
-#        print self.size
+        if (self.q is None) or (self.size is None):
+            data = numpy.loadtxt(self.first_curve)
+            self.q = data[:, 0]
+            self.size = self.q.size
+
         for key in self.keys2d:
             self.__setattr__(key,numpy.zeros((self.max_size, self.size), dtype=numpy.float32))
 
@@ -670,8 +683,6 @@ class HPLCrun(object):
 
 
     def extract_merges(self):
-        self.buffer_I = numpy.zeros(self.size, dtype=numpy.float32)
-        self.buffer_Stdev = numpy.zeros(self.size, dtype=numpy.float32)
         if self.merge_frames:
             self.merge_I = numpy.zeros((len(self.merge_frames), self.size), dtype=numpy.float32)
             self.merge_Stdev = numpy.zeros((len(self.merge_frames), self.size), dtype=numpy.float32)
@@ -681,7 +692,10 @@ class HPLCrun(object):
 
         self.buffer_frames = [0, len(self.for_buffer)]
 
-        if self.buffer and os.path.exists(self.buffer):
+        if self.buffer and os.path.exists(self.buffer) and  (self.buffer_I is None):
+            self.buffer_I = numpy.zeros(self.size, dtype=numpy.float32)
+            self.buffer_Stdev = numpy.zeros(self.size, dtype=numpy.float32)
+
             data = numpy.loadtxt(self.buffer)
             self.buffer_I = data[:, 1]
             self.buffer_Stdev = data[:, 2]

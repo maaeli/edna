@@ -37,6 +37,9 @@ if sys.version > (3, 0):
 else:
     from Queue import Queue
 
+import matplotlib
+matplotlib.use("Agg")
+
 # Append the EDNA kernel source directory to the python path
 if "EDNA_HOME" not in os.environ:
     pyStrProgramPath = os.path.abspath(__file__)
