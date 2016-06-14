@@ -25,19 +25,19 @@
 #    and the GNU Lesser General Public License  along with this program.  
 #    If not, see <http://www.gnu.org/licenses/>.
 #
-testit=$(pgrep notifd)
-if [ "$testit" = "" ]; then
-  if [ -x /usr/lib/tango/notify_daemon ];
-    then
-        /usr/lib/tango/notify_daemon
-    else
-       LD_LIBRARY_PATH=/segfs/tango/release/debian6/lib/
-       $LD_LIBRARY_PATH /segfs/tango/release/debian6/bin/notifd -n >>/dev/null 2>&1 & 
-       sleep 3 
-       $LD_LIBRARY_PATH /segfs/tango/release/debian6/bin/notifd2db
-       sleep 3
-    fi
-fi
+#testit=$(pgrep notifd)
+#if [ "$testit" = "" ]; then
+#  if [ -x /usr/lib/tango/notify_daemon ];
+#    then
+#        /usr/lib/tango/notify_daemon
+#    else
+#       LD_LIBRARY_PATH=/segfs/tango/release/debian6/lib/
+#       $LD_LIBRARY_PATH /segfs/tango/release/debian6/bin/notifd -n >>/dev/null 2>&1 & 
+#       sleep 3 
+#       $LD_LIBRARY_PATH /segfs/tango/release/debian6/bin/notifd2db
+#       sleep 3
+#    fi
+#fi
 
 if [ ! -d ${HOME}/log ];
 then
