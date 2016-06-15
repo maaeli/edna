@@ -7,7 +7,7 @@ class cb (object):
 
 
 callback = cb()
-dev=DeviceProxy("dau/edna/2")
+dev=DeviceProxy("dau/edna/1")
 print "Imported!"
 
 ev_id = dev.subscribe_event ("jobSuccess", EventType.CHANGE_EVENT, callback, [], False)
