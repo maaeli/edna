@@ -634,14 +634,14 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
         self.retrieveMessages(_edPlugin)
         self.gnom = _edPlugin.dataOutput.gnom
         self.volume = _edPlugin.dataOutput.volume
-	self.rti = _edPlugin.dataOutput.rti
+        self.rti = _edPlugin.dataOutput.rti
         self.xsScatterPlot = _edPlugin.dataOutput.scatterPlot
         self.xsGuinierPlot = _edPlugin.dataOutput.guinierPlot
         self.xsKratkyPlot = _edPlugin.dataOutput.kratkyPlot
-	if hasattr(_edPlugin.dataOutput, 'kratkyRgPlot'):
-	    self.xsKratkyRgPlot = _edPlugin.dataOutput.kratkyRgPlot
-	if hasattr(_edPlugin.dataOutput, 'kratkyVcPlot'):
-	    self.xsKratkyVcPlot = _edPlugin.dataOutput.kratkyVcPlot
+        if hasattr(_edPlugin.dataOutput, 'kratkyRgPlot'):
+            self.xsKratkyRgPlot = _edPlugin.dataOutput.kratkyRgPlot
+        if hasattr(_edPlugin.dataOutput, 'kratkyVcPlot'):
+            self.xsKratkyVcPlot = _edPlugin.dataOutput.kratkyVcPlot
 
         self.xsDensityPlot = _edPlugin.dataOutput.densityPlot
         self.addExecutiveSummaryLine(_edPlugin.dataOutput.status.executiveSummary.value)

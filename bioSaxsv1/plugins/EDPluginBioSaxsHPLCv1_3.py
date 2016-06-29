@@ -289,6 +289,7 @@ class EDPluginBioSaxsHPLCv1_3(EDPluginControl):
     def doSuccessProcessOneFile(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsHPLCv1_3.doSuccessProcessOneFile")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_3.doSuccessProcessOneFile")
+        self.screen("ReprocessOneFile: success after %.3fs" % (_edPlugin.getRunTime()))
         if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.status and _edPlugin.dataOutput.status.executiveSummary:
             self.lstExecutiveSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
         output = _edPlugin.dataOutput
@@ -340,6 +341,7 @@ class EDPluginBioSaxsHPLCv1_3(EDPluginControl):
     def doSuccessDatop(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsHPLCv1_3.doSuccessDatop")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_3.doSuccessDatop")
+        self.screen("Datop: success after %.3fs" % (_edPlugin.getRunTime()))
         if _edPlugin and _edPlugin.dataOutput:
             output = _edPlugin.dataOutput
             if output.status and output.status.executiveSummary:
@@ -369,6 +371,7 @@ class EDPluginBioSaxsHPLCv1_3(EDPluginControl):
     def doSuccessAutoRg(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsHPLCv1_3.doSuccessAutoRg")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_3.doSuccessAutoRg")
+        self.screen("AutoRg: success after %.3fs" % (_edPlugin.getRunTime()))
         if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.status and _edPlugin.dataOutput.status.executiveSummary:
             self.lstExecutiveSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
         try:
@@ -428,6 +431,7 @@ class EDPluginBioSaxsHPLCv1_3(EDPluginControl):
     def doSuccessDatCmp(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsHPLCv1_3.doSuccessDatCmp")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_3.doSuccessDatCmp")
+        self.screen("DatCmp: success after %.3fs" % (_edPlugin.getRunTime()))
         if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.status and _edPlugin.dataOutput.status.executiveSummary:
             self.lstExecutiveSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
         if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.fidelity:
@@ -462,6 +466,7 @@ class EDPluginBioSaxsHPLCv1_3(EDPluginControl):
     def doSuccessDatAver(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsHPLCv1_3.doSuccessDatAver")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_3.doSuccessDatAver")
+        self.screen("DatAver: success after %.3fs" % (_edPlugin.getRunTime()))
         if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.outputCurve:
             bufferCurve = _edPlugin.dataOutput.outputCurve.path.value
             if os.path.exists(bufferCurve):
