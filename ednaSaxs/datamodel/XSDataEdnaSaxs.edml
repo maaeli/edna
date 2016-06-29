@@ -198,10 +198,10 @@ complex type XSDataResultSaxsModeling extends XSDataResult{
 	damstartModel: XSDataSaxsModel  optional
 	damminModel: XSDataSaxsModel  optional
 
-	fitFile: XSDataFile
-	logFile: XSDataFile
-	pdbMoleculeFile: XSDataFile
-	pdbSolventFile: XSDataFile
+	fitFile: XSDataFile  optional
+	logFile: XSDataFile  optional
+	pdbMoleculeFile: XSDataFile  optional
+	pdbSolventFile: XSDataFile   optional
 
 	chiRfactorPlot: XSDataFile
 	nsdPlot: XSDataFile

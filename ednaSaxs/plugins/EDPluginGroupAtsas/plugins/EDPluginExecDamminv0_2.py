@@ -235,7 +235,11 @@ class EDPluginExecDamminv0_2(EDPluginExecProcessScript):
 
     def returnDamminChiSqrt(self):
         logFile = open(os.path.join(self.getWorkingDirectory(), "dammin.fir"), "r")
-        self.sqrtChi = float(logFile.readline().split()[-1].split("=")[-1])
+        try:
+            self.sqrtChi = float(logFile.readline().split()[-1].split("=")[-1])
+        except: 
+            # can fail if chi is very high, set to zero in hope this raises suspicion
+            self.sqrtChi = 0.0
         return XSDataDouble(self.sqrtChi)
 
     def returnDamminRFactor(self):
