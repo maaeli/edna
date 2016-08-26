@@ -129,6 +129,7 @@ class EDPluginBioSaxsFlushHPLCv1_4 (EDPluginControl):
         executiveSummary = os.linesep.join(self.lstExecutiveSummary)
         self.xsDataResult.status = XSDataStatus(executiveSummary=XSDataString(executiveSummary))
         self.dataOutput = self.xsDataResult
+        EDPluginBioSaxsHPLCv1_4.dictHPLC[self.runId].reset()
 
     def processRun(self, run):
         run.dump_json()
