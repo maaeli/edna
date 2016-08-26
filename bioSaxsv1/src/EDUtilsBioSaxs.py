@@ -321,6 +321,7 @@ def datasmoothness(raw, filtered):
 class HPLCrun(object):
     def __init__(self, runId, first_curve=None):
         self.id = runId
+        self.deleted = False
         self.buffer = None  #filename of the buffer
         self.first_curve = first_curve
         self.frames = {} #key: id, value: HPLCframe instance
@@ -374,9 +375,47 @@ class HPLCrun(object):
         # self.keys_analysis = ["merge_Guinier", "merge_Gnom", "merge_Porod"]
 
     def reset(self):
-        self.frames = []
+        self.deleted = True
+        self.buffer = None  # filename of the buffer
+        self.first_curve = None
+        self.frames = {}  # key: id, value: HPLCframe instance
         self.curves = []
         self.for_buffer = []
+        self.start_time = None
+        self.time = None
+        self.gnom = None
+        self.Dmax = None
+        self.total = None
+        self.volume = None
+        self.Rg = None
+        self.Rg_Stdev = None
+        self.I0 = None
+        self.I0_Stdev = None
+        self.quality = None
+        self.q = None
+        self.size = None
+        self.scattering_I = None
+        self.scattering_Stdev = None
+        self.subtracted_I = None
+        self.subtracted_Stdev = None
+        self.sum_I = None
+        self.Vc = None
+        self.Qr = None
+        self.mass = None
+        self.Vc_Stdev = None
+        self.Qr_Stdev = None
+        self.mass_Stdev = None
+        self.buffer_frames = None
+        self.merge_frames = None  # indexes of first and last frame merged
+        self.buffer_I = None
+        self.buffer_Stdev = None
+        self.merge_I = None
+        self.merge_Stdev = None
+        self.merge_curves = []
+        self.merge_Rg = {}
+        self.merge_analysis = {}
+        self.merge_framesDIC = {}
+
 
     def dump_json(self, filename=None):
 
