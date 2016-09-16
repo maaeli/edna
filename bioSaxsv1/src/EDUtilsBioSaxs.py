@@ -327,6 +327,8 @@ class HPLCrun(object):
         self.frames = {}  # key: id, value: HPLCframe instance
         self.curves = []
         self.for_buffer = []
+        self.for_buffer_sum_I = None
+        self.for_buffer_sum_sigma2 = None
         self.hdf5_filename = None
         self.hdf5 = None
         self.chunk_size = 250
