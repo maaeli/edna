@@ -448,13 +448,13 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
                     with self.buffer_sem:
                         self.hplc_run.for_buffer.append(self.frameId)
                         if self.hplc_run.for_buffer_sum_I is None:
-                            self.hplc_run.for_buffer_sum_I = self.xsDataResult.dataI
+                            self.hplc_run.for_buffer_sum_I = self.intensity
                         else:
-                            self.hplc_run.for_buffer_sum_I += self.xsDataResult.dataI
+                            self.hplc_run.for_buffer_sum_I += self.intensity
                         if self.hplc_run.for_buffer_sum_sigma2 is None:
-                            self.hplc_run.for_buffer_sum_sigma2 = self.xsDataResult.dataStdErr ** 2
+                            self.hplc_run.for_buffer_sum_sigma2 = self.stdError ** 2
                         else:
-                            self.hplc_run.for_buffer_sum_sigma2 += self.xsDataResult.dataI ** 2
+                            self.hplc_run.for_buffer_sum_sigma2 += self.stdError ** 2
 
             else:
                 with self.buffer_sem:
