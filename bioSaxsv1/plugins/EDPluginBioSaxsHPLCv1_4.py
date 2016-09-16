@@ -40,13 +40,11 @@ edFactoryPlugin.loadModule("XSDataBioSaxsv1_0")
 edFactoryPlugin.loadModule("XSDataEdnaSaxs")
 from XSDataBioSaxsv1_0 import XSDataInputBioSaxsHPLCv1_0, XSDataResultBioSaxsHPLCv1_0, \
                             XSDataInputBioSaxsProcessOneFilev1_0, XSDataRamboTainer
-from XSDataEdnaSaxs import XSDataInputDatcmp, XSDataInputDataver, XSDataInputDatop, XSDataInputAutoRg
+from XSDataEdnaSaxs import XSDataInputDatcmp, XSDataInputAutoRg
 from XSDataCommon import XSDataFile, XSDataString, XSDataStatus, XSDataTime, \
     XSDataDouble
 
 from EDUtilsBioSaxs import HPLCframe, HPLCrun, RamboTainerInvariant
-
-
 
 
 class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
@@ -131,7 +129,7 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
                     self.__class__.SIMILARITY_THRESHOLD_SAMPLE = float(self.config.get(self.SIMILARITY_THRESHOLD_SAMPLE_KEY, self.SIMILARITY_THRESHOLD_SAMPLE_DEFAULT))
 
     def checkRun(self):
-        if self.hplc_run.deleted == True:
+        if self.hplc_run.deleted:
             str_err = "Processing of HPLC run already finished. Aborted processing of frame"
             self.ERROR(str_err)
             self.setFailure()
@@ -233,9 +231,9 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
         if self.isFailure() or self.isBuffer:
             return
 
-        
+
         #######################
-        ## DatOp subtraction ##
+        # # DatOp subtraction ##
         #######################
 
         if self.dataInput.subtractedCurve is not None:
@@ -243,29 +241,14 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
         else:
             self.subtracted = os.path.splitext(self.curve)[0] + "_sub.dat"
 
-        Isub = self.intensity - self.hplc_run.buffer_I 
+        Isub = self.intensity - self.hplc_run.buffer_I
         StdErr = numpy.sqrt(self.stdError * self.stdError + \
                             self.hplc_run.buffer_Stdev * self.hplc_run.buffer_Stdev)
 
         with open(self.subtracted, "w") as outfile:
-            numpy.savetxt(outfile, numpy.vstack((self.hplc_run.q,Isub,StdErr)).T)
+            numpy.savetxt(outfile, numpy.vstack((self.hplc_run.q, Isub, StdErr)).T)
         self.xsDataResult.subtractedCurve = XSDataFile(XSDataString(self.subtracted))
         self.frame.subtracted = self.subtracted
-#         if self.hplc_run.buffer is not None:
-#             xsdIn = XSDataInputDatop(inputCurve=[XSDataFile(XSDataString(self.curve)),
-#                                                   XSDataFile(XSDataString(self.hplc_run.buffer))],
-#                                      outputCurve=XSDataFile(XSDataString(subtracted)),
-#                                      operation=XSDataString("sub"))
-#         else:
-#             xsdIn = XSDataInputDatop(inputCurve=[XSDataFile(XSDataString(self.curve)),
-#                                                   XSDataFile(XSDataString(self.hplc_run.first_curve))],
-#                                      outputCurve=XSDataFile(XSDataString(subtracted)),
-#                                      operation=XSDataString("sub"))
-#         self.edPluginDatop = self.loadPlugin(self.strControlledPluginDatop)
-#         self.edPluginDatop.dataInput = xsdIn
-#         self.edPluginDatop.connectSUCCESS(self.doSuccessDatop)
-#         self.edPluginDatop.connectFAILURE(self.doFailureDatop)
-#         self.edPluginDatop.executeSynchronous()
 
         if self.subtracted and os.path.exists(self.subtracted):
             self.edPluginAutoRg = self.loadPlugin(self.strControlledPluginAutoRg)
@@ -299,25 +282,25 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
         """
         Average out all buffers
         """
-        
+
         print("Averaging")
         nb_frames = len(self.hplc_run.for_buffer)
 
-        filename = self.hplc_run.first_curve[::-1].split("_", 1)[1][::-1] +\
+        filename = self.hplc_run.first_curve[::-1].split("_", 1)[1][::-1] + \
                     "_buffer_aver_%04i.dat" % nb_frames
-        self.lstExecutiveSummary.append("Averaging out buffer to %s: %s"%(filename, 
+        self.lstExecutiveSummary.append("Averaging out buffer to %s: %s" % (filename,
                                             ", ".join([str(i) for i in self.hplc_run.for_buffer])))
-        
+
         q = self.hplc_run.q
         I = numpy.zeros(self.hplc_run.size, "float64")
         s2 = numpy.zeros(self.hplc_run.size, "float64")
         for idx in self.hplc_run.for_buffer:
-            frame = self.hplc_run.frames[idx] 
+            frame = self.hplc_run.frames[idx]
             I += frame.I
-            s2 += frame.err*frame.err
+            s2 += frame.err * frame.err
             frame.purge_memory()
         I /= nb_frames
-        err = numpy.sqrt(s2)/nb_frames
+        err = numpy.sqrt(s2) / nb_frames
         m = numpy.vstack((q, I , err))
 
         with open(filename, "w") as outfile:
@@ -365,7 +348,7 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
         if not self.hplc_run.first_curve:
             with self._sem:
                 if not self.hplc_run.first_curve:
-                    #Populate the buffer with the first curve if needed
+                    # Populate the buffer with the first curve if needed
                     self.hplc_run.first_curve = self.curve
                     self.hplc_run.start_time = startTime
                     self.hplc_run.q = EDUtilsArray.xsDataToArray(output.dataQ)
@@ -407,7 +390,7 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
 #                     self.ERROR(strErr)
 #                     self.lstExecutiveSummary.append(strErr)
 #                     self.setFailure()
-# 
+#
 #     def doFailureDatop(self, _edPlugin=None):
 #         self.DEBUG("EDPluginBioSaxsHPLCv1_4.doFailureDatop")
 #         self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_4.doFailureDatop")
@@ -491,7 +474,7 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
             self.lstExecutiveSummary.append(strErr)
             #  self.setFailure()
             fidelity = 0
-        if self.hplc_run.buffer is None:
+        if not self.hplc_run.deleted and self.hplc_run.buffer is None:
             if fidelity > self.SIMILARITY_THRESHOLD_SAMPLE:
                 self.isBuffer = True
                 if fidelity > self.SIMILARITY_THRESHOLD_BUFFER:
@@ -521,9 +504,9 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
 #         Calculate invariants like:
 #         Sum(I),
 #         and set output data-structure.
-#         
+#
 #         """
 #         self.scatter_data = numpy.loadtxt(self.xsDataResult.integratedCurve.path.value)
-#         
-#         
+#
+#
 
