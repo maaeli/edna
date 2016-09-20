@@ -319,15 +319,22 @@ def guinier_plot(curve_file, first_point=None, last_point=None, filename=None,
     q = data.get("q")
     I = data.get("I")
     err = data.get("err")
-    first_point = data.get("first_point", 0)
-    last_point = data.get("last_point", -1)
-
+    if first_point is None:
+        first_point = data.get("first_point", 0)
+    if last_point is None:
+        last_point = data.get("last_point", -1)
     q2 = q * q
     logI = numpy.log(I)
+
     if err is not None:
         w = I / err
     else:
         w = numpy.ones_like(q2)
+
+    # from scipy import  stats
+    # slope, intercept, r_value, p_value, std_err = stats.linregress(q2[first_point:last_point], logI[first_point:last_point])
+
+    # there seems to be a bug in tthis...  returning to scipy implemntation above
     Sw = (w[first_point:last_point]).sum()
     Sxy = ((w * q2 * logI)[first_point:last_point]).sum()
     Sx = ((w * q2)[first_point:last_point]).sum()
@@ -335,12 +342,11 @@ def guinier_plot(curve_file, first_point=None, last_point=None, filename=None,
     Sy = ((w * logI)[first_point:last_point]).sum()
     slope = (Sw * Sxy - Sx * Sy) / (Sw * Sxx - Sx * Sx)
     intercept = (Sy - Sx * slope) / Sw
-#     print(slope, intercept)
-#     from scipy import  stats
-#     print(stats.linregress(q2[first_point:last_point], logI[first_point:last_point]))
+#
 
     Rg = numpy.sqrt(-3 * slope)
     I0 = numpy.exp(intercept)
+
     end = min(q.size, (-1.5 / slope > q).sum())
     q = q[:end]
     I = I[:end]
@@ -386,7 +392,7 @@ guinierPlot = guinier_plot
 
 
 def kartky_plot(curve_file, filename=None, format="png",
-                unit="nm", ax=None, labelsize=None, fontsize=None):
+                unit="nm", Rg=None, I0=None, ax=None, labelsize=None, fontsize=None):
     """
     Generate a Kratky: q2I(q) vs q
     @param curve_file: name of the saxs curve file
@@ -400,12 +406,18 @@ def kartky_plot(curve_file, filename=None, format="png",
     q = data.get("q")
     I = data.get("I")
     err = data.get("err")
-    Rg = data.get("Rg")
-    I0 = data.get("I0")
+    if not (Rg and I0):
+        Rg = data.get("Rg")
+        I0 = data.get("I0")
+
 
     if not (Rg and I0):
-        data = auto_guinier(data)
+        Rg = 1
+        I0 = 1
+        # not implemented yet,...
+        # data = auto_guinier(data)
 
+    print 'Rg in Kratkyplot ', Rg
     if ax:
         fig = ax.figure
     else:
