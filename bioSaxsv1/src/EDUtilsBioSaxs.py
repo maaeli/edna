@@ -496,7 +496,7 @@ class HPLCrun(object):
             self.time -= self.time.min()
 
     def save_hdf5(self):
-        if not self.size:
+        if not self.max_size:
             self.extract_data()
         with self.lock:
             if os.path.exists(self.hdf5_filename):
