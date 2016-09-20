@@ -1,5 +1,5 @@
 #
-#coding: utf8
+# coding: utf8
 #
 #    Project: BioSaxs : ID14-3
 #             http://www.edna-site.org
@@ -155,7 +155,7 @@ class EDUtilsBioSaxs(EDObject):
 #            EDVerbose.DEBUG(_strMessage)
 
         if EDUtilsBioSaxs.specStatus is not None:
-            currentStatus = EDUtilsBioSaxs.specStatus.value["reprocess"]["status"]     # must do this, since SpecClient is apparently returning a non-expected data structure
+            currentStatus = EDUtilsBioSaxs.specStatus.value["reprocess"]["status"]  # must do this, since SpecClient is apparently returning a non-expected data structure
             i = currentStatus.rfind(",")
             # TB: This ,1 or ,0 suffix nonsense seems to be a hack to force Spec to signal a variable change to bsxcube
             if i == -1 or currentStatus[i + 1:] == "1":
@@ -208,13 +208,13 @@ class EDUtilsBioSaxs(EDObject):
                 else:
                     extra += "_" + oneItem
 
-        try: #remove the "." at the begining of the extension
+        try:  # remove the "." at the begining of the extension
             extension = extension[1:]
         except IndexError:
             extension = ""
 
 
-        try: #remove the "_" at the begining of the extra
+        try:  # remove the "_" at the begining of the extra
             extra = extra[1:]
         except IndexError:
             extra = ""
@@ -282,20 +282,21 @@ class HPLCframe(object):
         self.q = None
         self.I = None
         self.err = None
-    
+
 
 def median_filt(input_array, width=3):
     """
     Simple 1D median filter (with reflect mode)
     """
-    b = numpy.zeros(input_array.size + width, dtype=input_array.dtype)
-    b[:width // 2] = input_array[width // 2 - 1::-1]
-    b[-width + width // 2:] = input_array[-1:-width + width // 2 - 1:-1]
-    b[width // 2:-width + width // 2] = input_array
-    c = numpy.outer(b, numpy.ones(width, dtype=input_array.dtype))
-    c.strides = c.strides[0], c.strides[0]
-    d = numpy.median(c, axis= -1)
-    return d[:-width]
+    return medfilt(input_array, width)
+#     b = numpy.zeros(input_array.size + width, dtype=input_array.dtype)
+#     b[:width // 2] = input_array[width // 2 - 1::-1]
+#     b[-width + width // 2:] = input_array[-1:-width + width // 2 - 1:-1]
+#     b[width // 2:-width + width // 2] = input_array
+#     c = numpy.outer(b, numpy.ones(width, dtype=input_array.dtype))
+#     c.strides = c.strides[0], c.strides[0]
+#     d = numpy.median(c, axis=-1)
+#     return d[:-width]
 
 
 def label(a):
@@ -313,20 +314,22 @@ def label(a):
             last = cnt
     return out
 
+
 def datasmoothness(raw, filtered):
     return ((raw - filtered) * (raw - filtered)).mean() * 1.0 / raw.mean() ** 2
-
 
 
 class HPLCrun(object):
     def __init__(self, runId, first_curve=None):
         self.id = runId
         self.deleted = False
-        self.buffer = None  #filename of the buffer
+        self.buffer = None  # filename of the buffer
         self.first_curve = first_curve
-        self.frames = {} #key: id, value: HPLCframe instance
+        self.frames = {}  # key: id, value: HPLCframe instance
         self.curves = []
         self.for_buffer = []
+        self.for_buffer_sum_I = None
+        self.for_buffer_sum_sigma2 = None
         self.hdf5_filename = None
         self.hdf5 = None
         self.chunk_size = 250
@@ -357,19 +360,19 @@ class HPLCrun(object):
         self.mass = None
         self.Vc_Stdev = None
         self.Qr_Stdev = None
-        self.mass_Stdev = None  
+        self.mass_Stdev = None
         self.buffer_frames = None
         self.merge_frames = None  # indexes of first and last frame merged
         self.buffer_I = None
         self.buffer_Stdev = None
-        self.merge_I = None 
-        self.merge_Stdev = None     
+        self.merge_I = None
+        self.merge_Stdev = None
         self.merge_curves = []
         self.merge_Rg = {}
         self.merge_analysis = {}
         self.merge_framesDIC = {}
-        self.keys1d = ["gnom","Dmax","total","volume","Rg","Rg_Stdev","I0","I0_Stdev","quality","sum_I","Vc", "Qr","mass","Vc_Stdev","Qr_Stdev","mass_Stdev"]
-        self.keys2d = ["scattering_I","scattering_Stdev","subtracted_I","subtracted_Stdev"]
+        self.keys1d = ["gnom", "Dmax", "total", "volume", "Rg", "Rg_Stdev", "I0", "I0_Stdev", "quality", "sum_I", "Vc", "Qr", "mass", "Vc_Stdev", "Qr_Stdev", "mass_Stdev"]
+        self.keys2d = ["scattering_I", "scattering_Stdev", "subtracted_I", "subtracted_Stdev"]
         self.keys_frames = ["buffer_frames", "merge_frames"]
         self.keys_merges = ["buffer_I", "buffer_Stdev", "merge_I", "merge_Stdev"]
         # self.keys_analysis = ["merge_Guinier", "merge_Gnom", "merge_Porod"]
@@ -415,7 +418,6 @@ class HPLCrun(object):
         self.merge_Rg = {}
         self.merge_analysis = {}
         self.merge_framesDIC = {}
-
 
     def dump_json(self, filename=None):
 
@@ -467,7 +469,7 @@ class HPLCrun(object):
             self.size = self.q.size
 
         for key in self.keys2d:
-            self.__setattr__(key,numpy.zeros((self.max_size, self.size), dtype=numpy.float32))
+            self.__setattr__(key, numpy.zeros((self.max_size, self.size), dtype=numpy.float32))
 
         for key in self.keys1d:
             self.__setattr__(key, numpy.zeros(self.max_size, dtype=numpy.float32))
@@ -478,7 +480,7 @@ class HPLCrun(object):
                     time.sleep(1.0)
             for key in ["time"] + self.keys1d:
                 self.__getattribute__(key)[i] = frame.__getattribute__(key) or 0.0
-            
+
             if frame.curve and os.path.exists(frame.curve):
                 data = numpy.loadtxt(frame.curve)
                 self.scattering_I[i, :] = data[:, 1]
@@ -680,9 +682,9 @@ class HPLCrun(object):
                             maxindex = stop - start - 1
 
 
-                        if peak < maxindex and len(I0med[peak:maxindex])>1:                               
+                        if peak < maxindex and len(I0med[peak:maxindex]) > 1:
                             maxindex = I0med[peak:maxindex].argmin() + peak
-                        if minindex < peak  and len(I0med[minindex:peak + 1])>1 :
+                        if minindex < peak  and len(I0med[minindex:peak + 1]) > 1 :
                             minindex = I0med[minindex:peak + 1].argmin() + minindex
                         maxi = I0med[minindex:maxindex].argmax() + minindex
 
@@ -768,7 +770,7 @@ class HPLCrun(object):
                 self.hdf5.close()
             except:
                 print traceback.format_exc()
-                
+
         return self.hdf5_filename
 
 
