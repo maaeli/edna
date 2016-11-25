@@ -31,7 +31,7 @@ __license__ = "GPLv3+"
 __copyright__ = "European Synchrotron Radiation Facility, Grenoble, France"
 __date__ = "20131118"
 
-import os, sys, time, threading, gc
+import os, sys, time, threading, gc, psutil
 if sys.version > (3, 0):
     from queue import Queue
 else:
@@ -223,7 +223,7 @@ if __name__ == "__main__":
                       action="store_true", dest="verbose", default=False,
                       help="switch to debug mode")
     parser.add_option("-p", "--plugin", action="store", type="string",
-                      dest="plugin", default="EDPluginBioSaxsHPLCv1_3",
+                      dest="plugin", default="EDPluginBioSaxsHPLCv1_4",
                       help="use an alternative plugin")
     parser.add_option("-y", "--yappi", action="store_true",
                       dest="yappi", default=False,
@@ -256,8 +256,13 @@ if __name__ == "__main__":
     os.makedirs(working_dir)
     os.chdir(working_dir)
     if yappi: yappi.start()
+    print psutil.phymem_usage()
+    counter = 0
     for i in fullargs:
+        if counter%500 == 0:
+            print psutil.phymem_usage()
         reprocess.startJob(i)
+        counter += 1
     print("All %i jobs queued after %.3fs" % (len(args), time.time() - reprocess.startTime))
     reprocess.join()
     if yappi: yappi.stop()

@@ -363,7 +363,7 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
                     self.hplc_run.size = self.hplc_run.q.size
                     self.hplc_run.buffer_I = self.intensity
                     self.hplc_run.buffer_Stdev = self.stdError
-                    self.hplc_run.buffer = self.curve
+                    #self.hplc_run.buffer = self.curve
 
         self.frame.curve = self.curve
         self.frame.time = startTime
@@ -482,7 +482,10 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
             self.lstExecutiveSummary.append(strErr)
             #  self.setFailure()
             fidelity = 0
+    
+        
         if self.hplc_run.buffer is None:
+            
             if fidelity > self.SIMILARITY_THRESHOLD_SAMPLE:
                 self.isBuffer = True
                 if fidelity > self.SIMILARITY_THRESHOLD_BUFFER:

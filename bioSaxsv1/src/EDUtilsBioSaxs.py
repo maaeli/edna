@@ -432,14 +432,13 @@ class HPLCrun(object):
 
         for key in self.keys1d:
             self.__setattr__(key, numpy.zeros(self.max_size, dtype=numpy.float32))
-
+            
         for i, frame in self.frames.items():
             if not force_finished:
                 while frame.processing:
                     time.sleep(1.0)
             for key in ["time"] + self.keys1d:
                 self.__getattribute__(key)[i] = frame.__getattribute__(key) or 0.0
-            
             if frame.curve and os.path.exists(frame.curve):
                 data = numpy.loadtxt(frame.curve)
                 self.scattering_I[i, :] = data[:, 1]
@@ -447,7 +446,7 @@ class HPLCrun(object):
             if frame.subtracted and os.path.exists(frame.subtracted):
                 data = numpy.loadtxt(frame.subtracted)
                 self.subtracted_I[i, :] = data[:, 1]
-                self.subtracted_Stdev[i, :] = data[:, 2]
+                self.subtracted_Stdev[i, :] = data[:, 2] 
         t = self.time > 0
         x = numpy.arange(self.max_size)
         self.time = numpy.interp(x, x[t], self.time[t])
@@ -457,7 +456,7 @@ class HPLCrun(object):
             self.time -= self.time.min()
 
     def save_hdf5(self):
-        if not self.size:
+        if not self.size or self.subtracted_I is None:
             self.extract_data()
         with self.lock:
             if os.path.exists(self.hdf5_filename):
@@ -465,6 +464,7 @@ class HPLCrun(object):
             self.hdf5 = h5py.File(self.hdf5_filename)
             self.hdf5.create_dataset("q", shape=(self.size,), dtype=numpy.float32, data=self.q)
             for key in ["time"] + self.keys1d + self.keys2d:
+                print numpy.asarray(self.__getattribute__(key), dtype=numpy.float32).size
                 self.hdf5[key] = numpy.asarray(self.__getattribute__(key), dtype=numpy.float32)
             self.hdf5.close()
         return self.hdf5_filename
@@ -506,7 +506,7 @@ class HPLCrun(object):
         sp1.errorbar(valid_time, self.Rg, self.Rg_Stdev, label="Rg")
 #         sp1.plot(valid_time, self.gnom[valid_pts], label="Gnom")
 #         sp1.plot(valid_time, self.Dmax[valid_pts], label="Dmax")
-        sp1.set_ylabel("Radius of giration (nm)")
+        sp1.set_ylabel("Radius of gyration (nm)")
         datamax = median_filt((self.Rg + self.Rg_Stdev)[valid_pts], 9).max()
         if datamax > 0:
             sp1.set_ylim(0, datamax)
