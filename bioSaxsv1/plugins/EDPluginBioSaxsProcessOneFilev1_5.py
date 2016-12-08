@@ -54,7 +54,7 @@ if [int(i) for i in pyFAI.version.split(".")[:2]] <= [0, 8]:
     EDVerbose.ERROR("Too old version of pyFAI detected ... expect to fail !")
 
 
-class EDPluginBioSaxsProcessOneFilev1_4(EDPluginControl):
+class EDPluginBioSaxsProcessOneFilev1_5(EDPluginControl):
     """
     Control plugin that does the same as previously without sub-plugin call ...
     except WaitFile which is still called.
@@ -103,7 +103,7 @@ class EDPluginBioSaxsProcessOneFilev1_4(EDPluginControl):
         """
         Checks the mandatory parameters.
         """
-        self.DEBUG("EDPluginBioSaxsProcessOneFilev1_4.checkParameters")
+        self.DEBUG("EDPluginBioSaxsProcessOneFilev1_5.checkParameters")
         self.checkMandatoryParameters(self.dataInput, "Data Input is None")
         self.checkMandatoryParameters(self.dataInput.rawImage, "No raw image provided")
         self.checkMandatoryParameters(self.dataInput.sample, "No sample information provided")
@@ -121,10 +121,10 @@ class EDPluginBioSaxsProcessOneFilev1_4(EDPluginControl):
         if not self.__configured:
             with self.semaphore:
                 if not self.__configured:
-                    self.DEBUG("EDPluginBioSaxsProcessOneFilev1_4.configure")
+                    self.DEBUG("EDPluginBioSaxsProcessOneFilev1_5.configure")
                     dummy = self.config.get(self.CONF_DUMMY_PIXEL_VALUE)
                     if dummy is None:
-                        strMessage = 'EDPluginBioSaxsProcessOneFilev1_4.configure: %s Configuration parameter missing: \
+                        strMessage = 'EDPluginBioSaxsProcessOneFilev1_5.configure: %s Configuration parameter missing: \
             %s, defaulting to "%s"' % (self.getBaseName(), self.CONF_DUMMY_PIXEL_VALUE, self.dummy)
                         self.WARNING(strMessage)
                         self.addErrorWarningMessagesToExecutiveSummary(strMessage)
@@ -132,7 +132,7 @@ class EDPluginBioSaxsProcessOneFilev1_4(EDPluginControl):
                         self.__class__.dummy = float(dummy)
                     ddummy = self.config.get(self.CONF_DUMMY_PIXEL_DELTA)
                     if ddummy is None:
-                        strMessage = 'EDPluginBioSaxsProcessOneFilev1_4.configure: %s Configuration parameter missing: \
+                        strMessage = 'EDPluginBioSaxsProcessOneFilev1_5.configure: %s Configuration parameter missing: \
             %s, defaulting to "%s"' % (self.getBaseName(), self.CONF_DUMMY_PIXEL_DELTA, self.delta_dummy)
                         self.WARNING(strMessage)
                         self.addErrorWarningMessagesToExecutiveSummary(strMessage)
@@ -140,7 +140,7 @@ class EDPluginBioSaxsProcessOneFilev1_4(EDPluginControl):
                         self.__class__.delta_dummy = float(ddummy)
                     method = self.config.get(self.CONF_OPENCL_DEVICE)
                     if method is None:
-                        strMessage = 'EDPluginBioSaxsProcessOneFilev1_4.configure: %s Configuration parameter missing: \
+                        strMessage = 'EDPluginBioSaxsProcessOneFilev1_5.configure: %s Configuration parameter missing: \
             %s, defaulting to "%s"' % (self.getBaseName(), self.CONF_OPENCL_DEVICE, self.METHOD)
                         self.WARNING(strMessage)
                         self.addErrorWarningMessagesToExecutiveSummary(strMessage)
@@ -148,10 +148,9 @@ class EDPluginBioSaxsProcessOneFilev1_4(EDPluginControl):
                         self.__class__.METHOD = method
                     self.__class__.__configured = True
 
-
     def preProcess(self, _edObject=None):
         EDPluginControl.preProcess(self)
-        self.DEBUG("EDPluginBioSaxsProcessOneFilev1_4.preProcess")
+        self.DEBUG("EDPluginBioSaxsProcessOneFilev1_5.preProcess")
         self.__edPluginWaitFile = self.loadPlugin(self.cpWaitFile)
         if self.dataInput.rawImageSize is not None:
             self.rawImageSize = self.dataInput.rawImageSize
@@ -193,14 +192,13 @@ class EDPluginBioSaxsProcessOneFilev1_4(EDPluginControl):
         else:
             self.scale = self.experimentSetup.normalizationFactor.value / i0
 
-
     def process(self, _edObject=None):
         EDPluginControl.process(self)
-        self.DEBUG("EDPluginBioSaxsProcessOneFilev1_4.process")
+        self.DEBUG("EDPluginBioSaxsProcessOneFilev1_5.process")
 
         xsd = XSDataInputWaitFile(expectedFile=XSDataFile(XSDataString(self.rawImage)),
-                                           expectedSize=self.rawImageSize,
-                                           timeOut=XSDataTime(30))
+                                  expectedSize=self.rawImageSize,
+                                  timeOut=XSDataTime(30))
         self.__edPluginWaitFile.setDataInput(xsd)
         self.__edPluginWaitFile.connectSUCCESS(self.doSuccessWaitFile)
         self.__edPluginWaitFile.connectFAILURE(self.doFailureWaitFile)
@@ -221,7 +219,7 @@ class EDPluginBioSaxsProcessOneFilev1_4(EDPluginControl):
 
     def postProcess(self, _edObject=None):
         EDPluginControl.postProcess(self)
-        self.DEBUG("EDPluginBioSaxsProcessOneFilev1_4.postProcess")
+        self.DEBUG("EDPluginBioSaxsProcessOneFilev1_5.postProcess")
         # Create some output data
         if os.path.exists(self.integratedCurve):
             self.xsDataResult.integratedCurve = XSDataFile(XSDataString(self.integratedCurve))
@@ -230,33 +228,34 @@ class EDPluginBioSaxsProcessOneFilev1_4(EDPluginControl):
         self.setDataOutput(self.xsDataResult)
 
     def integrate(self):
-        img = fabio.open(self.rawImage)
-        if "Date" in img.header:
-            self.experimentSetup.timeOfFrame = XSDataTime(time.mktime(time.strptime(img.header["Date"], "%a %b %d %H:%M:%S %Y")))
-        wavelength = EDUtilsUnit.getSIValue(self.experimentSetup.wavelength)
-        current_config = self.integrator.getPyFAI()
-        short_config = {}
-        for key in self.integrator_config:
-            short_config[key] = current_config[key]
+        with open(self.rawImage) as raw:
+            img = fabio.open(raw)
+            if "Date" in img.header:
+                self.experimentSetup.timeOfFrame = XSDataTime(time.mktime(time.strptime(img.header["Date"], "%a %b %d %H:%M:%S %Y")))
+            wavelength = EDUtilsUnit.getSIValue(self.experimentSetup.wavelength)
+            current_config = self.integrator.getPyFAI()
+            short_config = {}
+            for key in self.integrator_config:
+                short_config[key] = current_config[key]
 
-        with self.__class__.semaphore:
-            if (short_config != self.integrator_config) or \
-               (self.integrator.wavelength != wavelength) or\
-               (self.maskfile != self.experimentSetup.maskFile.path.value):
-                self.screen("Resetting PyFAI integrator")
-                self.integrator.setPyFAI(**self.integrator_config)
-                self.integrator.wavelength = wavelength
-                self.integrator.detector.mask = self.calc_mask()
+            with self.__class__.semaphore:
+                if (short_config != self.integrator_config) or \
+                   (self.integrator.wavelength != wavelength) or\
+                   (self.maskfile != self.experimentSetup.maskFile.path.value):
+                    self.screen("Resetting PyFAI integrator")
+                    self.integrator.setPyFAI(**self.integrator_config)
+                    self.integrator.wavelength = wavelength
+                    self.integrator.detector.mask = self.calc_mask()
 
-            q, I, std = self.integrator.integrate1d(img.data, max(img.dim1, img.dim2),
-                                       correctSolidAngle=True,
-                                       dummy=self.dummy, delta_dummy=self.delta_dummy,
-                                       filename=None,
-                                       error_model="poisson",
-                                       radial_range=None, azimuth_range=None,
-                                       polarization_factor=0, dark=None, flat=None,
-                                       method=self.METHOD, unit="q_nm^-1", safe=False)
-        self.lstExecutiveSummary.append("Azimuthal integration of raw image '%s'-->'%s'." % (self.rawImage, self.integratedCurve))
+                q, I, std = self.integrator.integrate1d(img.data, max(img.dim1, img.dim2),
+                                                        correctSolidAngle=True,
+                                                        dummy=self.dummy, delta_dummy=self.delta_dummy,
+                                                        filename=None,
+                                                        error_model="poisson",
+                                                        radial_range=None, azimuth_range=None,
+                                                        polarization_factor=0, dark=None, flat=None,
+                                                        method=self.METHOD, unit="q_nm^-1", safe=False)
+            self.lstExecutiveSummary.append("Azimuthal integration of raw image '%s'-->'%s'." % (self.rawImage, self.integratedCurve))
         return q, I, std
 
     def normalize(self, data):
@@ -338,8 +337,7 @@ s-vector Intensity Error
             headers.append(hdr + " Sample c= %s mg/ml" % self.sample.concentration.value)
         else:
             headers.append(hdr + " Sample c= -1  mg/ml")
-        headers += [hdr,
-                   hdr + " Sample environment:"]
+        headers += [hdr, hdr + " Sample environment:"]
         if self.experimentSetup.detector is not None:
             headers.append(hdr + " Detector = %s" % self.experimentSetup.detector.value)
         if self.experimentSetup.pixelSize_1 is not None:
@@ -404,14 +402,11 @@ s-vector Intensity Error
             f.flush()
 
     def doSuccessWaitFile(self, _edPlugin=None):
-        self.DEBUG("EDPluginBioSaxsProcessOneFilev1_4.doSuccessWaitFile")
-        self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsProcessOneFilev1_4.doSuccessWaitFile")
+        self.DEBUG("EDPluginBioSaxsProcessOneFilev1_5.doSuccessWaitFile")
+        self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsProcessOneFilev1_5.doSuccessWaitFile")
 
     def doFailureWaitFile(self, _edPlugin=None):
-        self.DEBUG("EDPluginBioSaxsProcessOneFilev1_4.doFailureWaitFile")
-        self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsProcessOneFilev1_4.doFailureWaitFile")
+        self.DEBUG("EDPluginBioSaxsProcessOneFilev1_5.doFailureWaitFile")
+        self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsProcessOneFilev1_5.doFailureWaitFile")
         self.lstExecutiveSummary.append("Timeout in waiting for file '%s'" % (self.rawImage))
         self.setFailure()
-
-
-
