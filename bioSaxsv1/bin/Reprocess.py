@@ -53,7 +53,7 @@ from XSDataBioSaxsv1_0      import XSDataInputBioSaxsProcessOneFilev1_0, \
 from XSDataCommon import XSDataLength, XSDataWavelength, XSDataFile, XSDataString, XSDataInteger, XSDataDouble, XSDataImage
 
 
-EDNAPluginName = "EDPluginBioSaxsProcessOneFilev1_0"
+EDNAPluginName = "EDPluginBioSaxsProcessOneFilev1_4"
 LEN_INPUT_STR = 45
 
 class BioSaxsReprocess(EDLogging):

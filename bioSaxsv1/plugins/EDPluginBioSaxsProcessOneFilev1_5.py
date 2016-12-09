@@ -70,6 +70,7 @@ class EDPluginBioSaxsProcessOneFilev1_5(EDPluginControl):
     CONF_DUMMY_PIXEL_VALUE = "DummyPixelValue"
     CONF_DUMMY_PIXEL_DELTA = "DummyPixelDelta"
     CONF_OPENCL_DEVICE = "DeviceType"
+    CONF_NUMBER_OF_BINS = "NumberOfBins"
     __configured = False
     dummy = -2
     delta_dummy = 1.1
@@ -79,6 +80,7 @@ class EDPluginBioSaxsProcessOneFilev1_5(EDPluginControl):
         METHOD = "fullsplit_csr"
     else:
         METHOD = "fullsplit_csr_ocl_gpu"
+    number_of_bins = None
 
     def __init__(self):
         """
@@ -146,6 +148,14 @@ class EDPluginBioSaxsProcessOneFilev1_5(EDPluginControl):
                         self.addErrorWarningMessagesToExecutiveSummary(strMessage)
                     else:
                         self.__class__.METHOD = method
+                    number_of_bins = self.config.get(self.CONF_NUMBER_OF_BINS)
+                    if number_of_bins is None:
+                        strMessage = 'EDPluginBioSaxsProcessOneFilev1_5.configure: %s Configuration parameter missing: \
+            %s, defaulting to max(image.shape)' % (self.getBaseName(), self.CONF_NUMBER_OF_BINS)
+                        self.WARNING(strMessage)
+                        self.addErrorWarningMessagesToExecutiveSummary(strMessage)
+                    else:
+                        self.__class__.number_of_bins = number_of_bins
                     self.__class__.__configured = True
 
     def preProcess(self, _edObject=None):
@@ -227,8 +237,9 @@ class EDPluginBioSaxsProcessOneFilev1_5(EDPluginControl):
         self.setDataOutput(self.xsDataResult)
 
     def integrate(self):
-        with fabio.fabioutils.File(self.rawImage) as raw:
-            img = fabio.open(raw)
+        #with fabio.fabioutils.File(self.rawImage) as raw:
+            img = fabio.open(self.rawImage)
+            number_of_bins = self.number_of_bins or max(img.dim1, img.dim2)
             if "Date" in img.header:
                 self.experimentSetup.timeOfFrame = XSDataTime(time.mktime(time.strptime(img.header["Date"], "%a %b %d %H:%M:%S %Y")))
 
@@ -242,10 +253,10 @@ class EDPluginBioSaxsProcessOneFilev1_5(EDPluginControl):
                 if (str(new_integrator) != str(self.integrator) or
                    self.maskfile != self.experimentSetup.maskFile.path.value):
                     self.screen("Resetting PyFAI integrator")
-                    self.integrator = new_integrator
-                    self.integrator.detector.mask = self.calc_mask()
-
-                res_tuple = self.integrator.integrate1d(img.data, max(img.dim1, img.dim2),
+                    new_integrator.detector.mask = self.calc_mask()
+                    self.__class__.integrator = new_integrator
+                 
+                res_tuple = self.integrator.integrate1d(img.data, number_of_bins,
                                                         correctSolidAngle=True,
                                                         dummy=self.dummy, delta_dummy=self.delta_dummy,
                                                         filename=None,
@@ -253,10 +264,10 @@ class EDPluginBioSaxsProcessOneFilev1_5(EDPluginControl):
                                                         radial_range=None, azimuth_range=None,
                                                         polarization_factor=0.99, dark=None, flat=None,
                                                         method=self.METHOD, unit="q_nm^-1", safe=False,
-                                                        normalization_facor=self.normalization_factor
+                                                        normalization_factor=self.normalization_factor
                                                         )
             self.lstExecutiveSummary.append("Azimuthal integration of raw image '%s'-->'%s'." % (self.rawImage, self.integratedCurve))
-        return res_tuple
+            return res_tuple
 
     def calc_mask(self):
         """

@@ -1,0 +1,40 @@
+{    "__extend__": ["XSConfiguration_ESRF_debian7.json"], 
+
+    "EDPluginBioSaxsToSASv1_0": {
+        "fileSize": 1000, 
+        "timeOut": 8000
+    }, 
+    "EDPluginBioSaxsToSASv1_1": {
+        "fileSize": 1000, 
+        "timeOut": 8000
+    }, 
+    "EDPluginExecBioSaxsReprocessv1_0": {}, 
+    "EDPluginBioSaxsReprocessv1_0": {}, 
+    "EDPluginBioSaxsNormalizev1_0": {}, 
+    "EDPluginBioSaxsNormalizev1_1": {
+        "DummyPixelValue": -1
+    },
+	"EDPluginBioSaxsISPyBv1_0":{
+         "url":"http://ispyb.esrf.fr:8080/ispyb-ejb3/ispybWS/ToolsForBiosaxsWebService?wsdl"
+	},
+	"EDPluginBioSaxsProcessOneFilev1_3":{
+		"DummyPixelValue": -2.0,
+    	"DummyPixelDelta": 1.1,
+    	"DeviceType": "lut_ocl_gpu"	
+	},
+    "EDPluginBioSaxsProcessOneFilev1_4":{
+        "DummyPixelValue": -2.0,
+        "DummyPixelDelta": 1.1,
+        "DeviceType": "csr_ocl_gpu" 
+    },
+    "EDPluginBioSaxsProcessOneFilev1_5":{
+        "DummyPixelValue": -2.0,
+        "DummyPixelDelta": 1.5,
+        "DeviceType": "fullsplit_csr_ocl_gpu",
+        "NumberOfBins": 200 
+    },
+    "EDPluginBioSaxsHPLCv1_2":{
+        "similaritySample": 0.01,
+        "similarityBuffer": 0.1
+    }
+}

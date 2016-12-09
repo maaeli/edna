@@ -170,7 +170,7 @@ class EDPluginBioSaxsProcessOneFilev1_4(EDPluginControl):
         self.experimentSetup = self.dataInput.experimentSetup
         self.detector = self.experimentSetup.detector.value
         if self.detector.lower() == "pilatus":
-            self.detector = "Pilatus1M"
+            self.detector = "Pilatus 1M"
         else:
             self.detector = self.detector.capitalize()
         self.integrator_config = {'dist': self.experimentSetup.detectorDistance.value,
@@ -244,6 +244,13 @@ class EDPluginBioSaxsProcessOneFilev1_4(EDPluginControl):
                (self.integrator.wavelength != wavelength) or\
                (self.maskfile != self.experimentSetup.maskFile.path.value):
                 self.screen("Resetting PyFAI integrator")
+                self.screen(short_config)
+                self.screen(self.integrator_config)
+                self.screen(self.integrator.wavelength)
+                self.screen(wavelength)
+                self.screen(self.maskfile)
+                self.screen(self.experimentSetup.maskFile.path.value)
+
                 self.integrator.setPyFAI(**self.integrator_config)
                 self.integrator.wavelength = wavelength
                 self.integrator.detector.mask = self.calc_mask()
