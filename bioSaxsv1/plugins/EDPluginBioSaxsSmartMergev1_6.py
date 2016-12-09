@@ -84,8 +84,9 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
     __strControlledPluginAutoSub = "EDPluginAutoSubv1_0"
     __strControlledPluginSaxsAnalysis = "EDPluginControlSaxsAnalysisv1_0"
     __strControlledPluginSaxsISPyB = "EDPluginBioSaxsISPyBv1_0"
-
-
+    __configured = False
+    CONF_MINIMUM_CURVE_FILE_SIZE = "MinCurveFileSize"
+    minimumCurveFileSize = 10000
 
     def __init__(self):
         """
@@ -127,6 +128,26 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
         self.xsKratkyPlot = None
         self.xsDensityPlot = None
         self.xsdSubtractedCurve = None
+
+    def configure(self):
+        """
+        Configures the plugin from the configuration file with the following parameters:
+         - curve_file_size: minimum size of the file.
+        """
+        EDPluginControl.configure(self)
+        if not self.__configured:
+            with self.semaphore:
+                if not self.__configured:
+                    self.DEBUG("EDPluginBioSaxsSmartMergev1_6.configure")
+                    min_size = self.config.get(self.CONF_MINIMUM_CURVE_FILE_SIZE)
+                    if min_size is None:
+                        strMessage = 'EDPluginBioSaxsSmartMergev1_6.configure: %s Configuration parameter missing: \
+            %s, defaulting to "%s"' % (self.getBaseName(), self.CONF_MINIMUM_CURVE_FILE_SIZE, self.minimumCurveFileSize)
+                        self.WARNING(strMessage)
+                        self.addErrorWarningMessagesToExecutiveSummary(strMessage)
+                    else:
+                        self.__class__.minimumCurveFileSize = float(min_size)
+                    self.__class__.__configured = True
 
     def checkParameters(self):
         """
@@ -179,7 +200,7 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
         self.DEBUG("EDPluginBioSaxsSmartMergev1_6.process")
 
         xsdwf = XSDataInputWaitMultiFile(timeOut=XSDataTime(30),
-                                         expectedSize=XSDataInteger(8000),
+                                         expectedSize=XSDataInteger(self.minimumCurveFileSize),
                                          expectedFile=[XSDataFile(i.path) for i in self.lstInput])
         self.__edPluginExecWaitFile.setDataInput(xsdwf)
         self.__edPluginExecWaitFile.connectFAILURE(self.doFailureExecWait)

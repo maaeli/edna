@@ -36,5 +36,8 @@
     "EDPluginBioSaxsHPLCv1_2":{
         "similaritySample": 0.01,
         "similarityBuffer": 0.1
+    },
+    "EDPluginBioSaxsSmartMergev1_6":{
+    "MinCurveFileSize": 8000
     }
 }
