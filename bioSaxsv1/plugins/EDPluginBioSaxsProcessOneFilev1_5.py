@@ -27,7 +27,7 @@ from __future__ import with_statement
 __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
 __copyright__ = "ESRF"
-__date__ = "08/12/2016"
+__date__ = "09/12/2016"
 __status__ = "production"
 
 import os
@@ -50,7 +50,7 @@ import fabio
 import numpy
 import pyFAI
 
-if [int(i) for i in pyFAI.version.split(".")[:2]] <= [0, 8]:
+if [int(i) for i in pyFAI.version.split(".")[:2]] <= [0, 13]:
     EDVerbose.ERROR("Too old version of pyFAI detected ... expect to fail !")
 
 
@@ -76,9 +76,9 @@ class EDPluginBioSaxsProcessOneFilev1_5(EDPluginControl):
     semaphore = Semaphore()
     maskfile = None
     if pyFAI.opencl.ocl is None:
-        METHOD = "csr"
+        METHOD = "fullsplit_csr"
     else:
-        METHOD = "csr_ocl_gpu"
+        METHOD = "fullsplit_csr_ocl_gpu"
 
     def __init__(self):
         """
@@ -95,7 +95,7 @@ class EDPluginBioSaxsProcessOneFilev1_5(EDPluginControl):
         self.sample = None
         self.experimentSetup = None
         self.integrator_config = {}
-        self.scale = None
+        self.normalization_factor = None
         self.detector = None
         self.xsDataResult = XSDataResultBioSaxsProcessOneFilev1_0()
 
@@ -167,30 +167,31 @@ class EDPluginBioSaxsProcessOneFilev1_5(EDPluginControl):
 
         self.sample = self.dataInput.sample
         self.experimentSetup = self.dataInput.experimentSetup
-        self.detector = self.experimentSetup.detector.value
-        if self.detector.lower() == "pilatus":
-            self.detector = "Pilatus1M"
+        detector = self.experimentSetup.detector.value
+        if detector.lower() == "pilatus":
+            self.detector = pyFAI.detector_factory("Pilatus1M")
         else:
-            self.detector = self.detector.capitalize()
-        self.integrator_config = {'dist': self.experimentSetup.detectorDistance.value,
-                                  'pixel1': self.experimentSetup.pixelSize_2.value,  # flip X,Y
-                                  'pixel2': self.experimentSetup.pixelSize_1.value,  # flip X,Y
-                                  'poni1': self.experimentSetup.beamCenter_2.value * self.experimentSetup.pixelSize_2.value,
-                                  'poni2': self.experimentSetup.beamCenter_1.value * self.experimentSetup.pixelSize_1.value,
-                                  'rot1': 0.0,
-                                  'rot2': 0.0,
-                                  'rot3': 0.0,
-                                  'splineFile': None,
-                                  'detector': self.detector
-                                  }
+            self.detector = pyFAI.detector_factory(detector)
+            try:
+                self.detector.pixel1 = self.experimentSetup.pixelSize_2.value,  # flip X,Y
+                self.detector.pixel2 = self.experimentSetup.pixelSize_1.value,  # flip X,Y
+            except Exception as err:
+                self.WARNING("in setting pixel size: %s" % err)
+
         i0 = self.experimentSetup.beamStopDiode.value
+        normalization_factor = self.experimentSetup.normalizationFactor.value
+        if normalization_factor == 0:
+            warn = "normalization_factor is Null --> If we are testing, this is OK, else investigate !!!"
+            self.lstExecutiveSummary.append(warn)
+            self.warning(warn)
+            normalization_factor = 1.
         if i0 == 0:
             warn = "beamStopDiode is Null --> If we are testing, this is OK, else investigate !!!"
             self.lstExecutiveSummary.append(warn)
             self.warning(warn)
-            self.scale = self.experimentSetup.normalizationFactor.value
-        else:
-            self.scale = self.experimentSetup.normalizationFactor.value / i0
+            i0 = 1.0
+
+        self.normalization_factor = i0 / normalization_factor
 
     def process(self, _edObject=None):
         EDPluginControl.process(self)
@@ -209,13 +210,11 @@ class EDPluginBioSaxsProcessOneFilev1_5(EDPluginControl):
         self.xsDataResult.sample = self.sample
         self.xsDataResult.experimentSetup = self.experimentSetup
 
-        q, I, std = self.integrate()
-        I = self.normalize(I)
-        std = self.normalize(std)
-        self.write3ColumnAscii(q, I, std, self.integratedCurve)
-        self.xsDataResult.dataQ = EDUtilsArray.arrayToXSData(q)
-        self.xsDataResult.dataI = EDUtilsArray.arrayToXSData(I)
-        self.xsDataResult.dataStdErr = EDUtilsArray.arrayToXSData(std)
+        res = self.integrate()
+        self.write3ColumnAscii(res, self.integratedCurve)
+        self.xsDataResult.dataQ = EDUtilsArray.arrayToXSData(res.radial)
+        self.xsDataResult.dataI = EDUtilsArray.arrayToXSData(res.intensity)
+        self.xsDataResult.dataStdErr = EDUtilsArray.arrayToXSData(res.sigma)
 
     def postProcess(self, _edObject=None):
         EDPluginControl.postProcess(self)
@@ -228,60 +227,53 @@ class EDPluginBioSaxsProcessOneFilev1_5(EDPluginControl):
         self.setDataOutput(self.xsDataResult)
 
     def integrate(self):
-        with open(self.rawImage) as raw:
+        with fabio.fabioutils.File(self.rawImage) as raw:
             img = fabio.open(raw)
             if "Date" in img.header:
                 self.experimentSetup.timeOfFrame = XSDataTime(time.mktime(time.strptime(img.header["Date"], "%a %b %d %H:%M:%S %Y")))
-            wavelength = EDUtilsUnit.getSIValue(self.experimentSetup.wavelength)
-            current_config = self.integrator.getPyFAI()
-            short_config = {}
-            for key in self.integrator_config:
-                short_config[key] = current_config[key]
+
+            new_integrator = pyFAI.AzimuthalIntegrator(detector=self.detector)
+            new_integrator.setFit2D(self.experimentSetup.detectorDistance.value * 1000,
+                                    self.experimentSetup.beamCenter_1.value,
+                                    self.experimentSetup.beamCenter_2.value)
+            new_integrator.wavelength = EDUtilsUnit.getSIValue(self.experimentSetup.wavelength)
 
             with self.__class__.semaphore:
-                if (short_config != self.integrator_config) or \
-                   (self.integrator.wavelength != wavelength) or\
-                   (self.maskfile != self.experimentSetup.maskFile.path.value):
+                if (str(new_integrator) != str(self.integrator) or
+                   self.maskfile != self.experimentSetup.maskFile.path.value):
                     self.screen("Resetting PyFAI integrator")
-                    self.integrator.setPyFAI(**self.integrator_config)
-                    self.integrator.wavelength = wavelength
+                    self.integrator = new_integrator
                     self.integrator.detector.mask = self.calc_mask()
 
-                q, I, std = self.integrator.integrate1d(img.data, max(img.dim1, img.dim2),
+                res_tuple = self.integrator.integrate1d(img.data, max(img.dim1, img.dim2),
                                                         correctSolidAngle=True,
                                                         dummy=self.dummy, delta_dummy=self.delta_dummy,
                                                         filename=None,
                                                         error_model="poisson",
                                                         radial_range=None, azimuth_range=None,
-                                                        polarization_factor=0, dark=None, flat=None,
-                                                        method=self.METHOD, unit="q_nm^-1", safe=False)
+                                                        polarization_factor=0.99, dark=None, flat=None,
+                                                        method=self.METHOD, unit="q_nm^-1", safe=False,
+                                                        normalization_facor=self.normalization_factor
+                                                        )
             self.lstExecutiveSummary.append("Azimuthal integration of raw image '%s'-->'%s'." % (self.rawImage, self.integratedCurve))
-        return q, I, std
-
-    def normalize(self, data):
-        """
-        Perform the normalization of some data
-        @return: normalized data
-        """
-        maskedData = numpy.ma.masked_array(data, abs(data - self.dummy) < self.delta_dummy)
-        return numpy.ma.filled(maskedData * self.scale, self.dummy)
+        return res_tuple
 
     def calc_mask(self):
         """
         Merge the natural mask from the detector with the user proided one.
         @return: numpy array with the mask
         """
+        maskfile = self.experimentSetup.maskFile.path.value
+        mask = fabio.open(maskfile).data
 
-        mask = fabio.open(self.experimentSetup.maskFile.path.value).data
-
-        detector_mask = pyFAI.detectors.detector_factory(self.detector).calc_mask()
+        detector_mask = self.detector.calc_mask()
         shape0, shape1 = detector_mask.shape
         if detector_mask.shape == mask.shape:
             mask = numpy.logical_or(mask, detector_mask)
         else:
             # crop the user defined mask
             mask = numpy.logical_or(mask[:shape0, :shape1], detector_mask)
-        self.__class__.maskfile = self.experimentSetup.maskFile.path.value
+        self.__class__.maskfile = maskfile
         return mask
 
     def write3ColumnAscii(self, npaQ, npaI, npaStd=None, outputCurve="output.dat", hdr="#", linesep=os.linesep):
