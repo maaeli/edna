@@ -35,6 +35,7 @@ import os
 import shutil
 import time
 from math import log
+from threading import Semaphore
 from EDPluginControl import EDPluginControl
 from EDFactoryPluginStatic import EDFactoryPluginStatic
 EDFactoryPluginStatic.loadModule("XSDataEdnaSaxs")
@@ -87,6 +88,7 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
     __configured = False
     CONF_MINIMUM_CURVE_FILE_SIZE = "MinCurveFileSize"
     minimumCurveFileSize = 10000
+    semaphore = Semaphore()
 
     def __init__(self):
         """
