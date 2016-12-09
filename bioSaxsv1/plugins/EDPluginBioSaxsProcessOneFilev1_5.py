@@ -276,9 +276,9 @@ class EDPluginBioSaxsProcessOneFilev1_5(EDPluginControl):
         self.__class__.maskfile = maskfile
         return mask
 
-    def write3ColumnAscii(self, npaQ, npaI, npaStd=None, outputCurve="output.dat", hdr="#", linesep=os.linesep):
+    def write3ColumnAscii(self, res, outputCurve="output.dat", hdr="#", linesep=os.linesep):
         """
-        @param npaQ,npaI,npaStd: 3x 1d numpy array containing Scattering vector, Intensity and deviation
+        @param res: named tuple of numpy array containing Scattering vector, Intensity and deviation
         @param outputCurve: name of the 3-column ascii file to be written
         @param hdr: header mark, usually '#'
 
@@ -381,13 +381,14 @@ s-vector Intensity Error
         with open(outputCurve, "w") as f:
             f.writelines(linesep.join(headers))
             f.write(linesep)
-            if npaStd is None:
+
+            if res.sigma is None:
                 data = ["%14.6e %14.6e " % (q, I)
-                        for q, I in zip(npaQ, npaI)
+                        for q, I in zip(res.radial, res.intensity)
                         if abs(I - self.dummy) > self.delta_dummy]
             else:
                 data = ["%14.6e %14.6e %14.6e" % (q, I, std)
-                        for q, I, std in zip(npaQ, npaI, npaStd)
+                        for q, I, std in zip(res.radial, res.intensity, res.sigma)
                         if abs(I - self.dummy) > self.delta_dummy]
             data.append("")
             f.writelines(linesep.join(data))
