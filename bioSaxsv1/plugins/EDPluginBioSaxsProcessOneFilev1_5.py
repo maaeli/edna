@@ -50,7 +50,7 @@ import fabio
 import numpy
 import pyFAI
 
-if [int(i) for i in pyFAI.version.split(".")[:2]] <= [0, 13]:
+if [int(i) for i in pyFAI.version.split(".")[:2]] < [0, 13]:
     EDVerbose.ERROR("Too old version of pyFAI detected ... expect to fail !")
 
 
