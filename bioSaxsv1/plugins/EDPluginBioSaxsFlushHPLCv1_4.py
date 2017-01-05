@@ -132,6 +132,9 @@ class EDPluginBioSaxsFlushHPLCv1_4 (EDPluginControl):
         EDPluginBioSaxsHPLCv1_4.dictHPLC[self.runId].reset()
 
     def processRun(self, run):
+        # first rempoe unndunpable data from run
+        for idx in run.frames:
+            run.frames[idx].purge_memory()
         run.dump_json()
         hdf5 = run.save_hdf5()
         self.json = os.path.splitext(hdf5)[0] + ".json"

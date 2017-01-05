@@ -39,6 +39,12 @@
    "EDPluginControlSaxsAnalysisv1_0":{
        "atsasVersion": "2.6.1"
    },
+    "EDPluginExecAutoRgv1_0": {
+        "execProcessScriptExecutable": "/usr/bin/autorg",
+        "execProcessScriptShell": "/bin/bash",
+        "timeOut": 60
+    },
+
     "EDPluginControlSaxsModelingv1_0":{
         "do_dammin": 0,
         "dammifJobs": 8,
