@@ -463,11 +463,12 @@ class HPLCrun(object):
     def extract_data(self, force_finished=False):
         self.max_size = self.calc_size(max(self.frames.keys()) + 1)
         self.time = numpy.zeros(self.max_size, dtype=numpy.float64)
-        if (self.q is None) or (self.size is None):
-            data = numpy.loadtxt(self.first_curve)
-            self.q = data[:, 0]
-            self.size = self.q.size
-
+       
+        if (self.q is None) or (self.size is None): 
+            if self.first_curve and os.path.exists(self.first_curve):
+                data = numpy.loadtxt(self.first_curve)
+                self.q = data[:, 0]
+                self.size = self.q.size 
         for key in self.keys2d:
             self.__setattr__(key, numpy.zeros((self.max_size, self.size), dtype=numpy.float32))
 
@@ -736,7 +737,7 @@ class HPLCrun(object):
         if self.buffer and os.path.exists(self.buffer) and  (self.buffer_I is None):
             self.buffer_I = numpy.zeros(self.size, dtype=numpy.float32)
             self.buffer_Stdev = numpy.zeros(self.size, dtype=numpy.float32)
-
+            print self.buffer
             data = numpy.loadtxt(self.buffer)
             self.buffer_I = data[:, 1]
             self.buffer_Stdev = data[:, 2]
@@ -750,6 +751,7 @@ class HPLCrun(object):
                 else:
                     outname = os.path.splitext(self.frames[group[0]].subtracted)[0] + "_aver_%s.dat" % group[-1]
                 if os.path.exists(outname):
+                    print outname
                     data = numpy.loadtxt(outname)
                     self.merge_I[i, :] = data[:, 1]
                     self.merge_Stdev[i, :] = data[:, 2]

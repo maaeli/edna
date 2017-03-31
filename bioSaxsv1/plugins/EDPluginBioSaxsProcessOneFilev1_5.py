@@ -267,7 +267,11 @@ class EDPluginBioSaxsProcessOneFilev1_5(EDPluginControl):
                                                         normalization_factor=self.normalization_factor
                                                         )
             self.lstExecutiveSummary.append("Azimuthal integration of raw image '%s'-->'%s'." % (self.rawImage, self.integratedCurve))
-            return res_tuple
+            valid_bins = abs(res_tuple.intensity - self.dummy) > self.delta_dummy
+            short_tuple = res_tuple.__class__(res_tuple.radial[valid_bins],
+                                              res_tuple.intensity[valid_bins],
+                                              res_tuple.sigma[valid_bins])
+            return short_tuple
 
     def calc_mask(self):
         """
@@ -395,12 +399,12 @@ s-vector Intensity Error
 
             if res.sigma is None:
                 data = ["%14.6e %14.6e " % (q, I)
-                        for q, I in zip(res.radial, res.intensity)
-                        if abs(I - self.dummy) > self.delta_dummy]
+                        for q, I in zip(res.radial, res.intensity)]
+                        #3if abs(I - self.dummy) > self.delta_dummy]
             else:
                 data = ["%14.6e %14.6e %14.6e" % (q, I, std)
-                        for q, I, std in zip(res.radial, res.intensity, res.sigma)
-                        if abs(I - self.dummy) > self.delta_dummy]
+                        for q, I, std in zip(res.radial, res.intensity, res.sigma)]
+                        #if abs(I - self.dummy) > self.delta_dummy]
             data.append("")
             f.writelines(linesep.join(data))
             f.flush()
