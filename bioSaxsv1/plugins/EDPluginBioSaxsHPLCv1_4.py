@@ -69,7 +69,7 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
     lock during buffer curve creation.
     """
 
-    strControlledPluginProcessOneFile = "EDPluginBioSaxsProcessOneFilev1_5"
+    strControlledPluginProcessOneFile = "EDPluginBioSaxsProcessOneFilev1_4"
     strControlledPluginDatop = "EDPluginExecDatopv2_0"
     strControlledPluginAutoRg = "EDPluginExecAutoRgv1_0"
     strControlledPluginDatCmp = "EDPluginExecDatcmpv2_0"
