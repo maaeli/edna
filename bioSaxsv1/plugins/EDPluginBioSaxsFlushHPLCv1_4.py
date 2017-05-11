@@ -218,7 +218,7 @@ class EDPluginBioSaxsFlushHPLCv1_4 (EDPluginControl):
         # Martha, 11.7.2014
         mergeNumber = 1
         print run.merge_curves
-        if self.modeling = True:
+        if self.modeling == True:
             for merge in run.merge_curves:
                 if run.merge_analysis[merge] is not None and run.merge_analysis[merge].autoRg.rg.value >= 1.0:
                     try:
