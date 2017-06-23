@@ -33,7 +33,7 @@ from __future__ import with_statement
 __authors__ = ["Jérôme Kieffer"]
 __license__ = "MIT"
 __copyright__ = "ESRF"
-__date__ = "16/09/2015"
+__date__ = "17/09/2015"
 __status__ = "Development"
 __version__ = "0.2"
 
@@ -114,7 +114,6 @@ class memoized(object):
     def __get__(self, obj, objtype):
         '''Support instance methods.'''
         return functools.partial(self.__call__, obj)
-
 
 
 @memoized
@@ -277,7 +276,7 @@ def scatter_plot(curve_file, filename=None, format="png", unit="nm", gnomfile=No
             ax.plot(q, I, label="Experimental curve", color="blue")
     else:
         if err is not None:
-            ax.errorbar(q, I, err, label="Experimental curve", capsize=0, color="green", ecolor="lightgreen")
+            ax.errorbar(q, I, err, label="Experimental curve", capsize=0, color="0.2", ecolor="0.7")
         else:
             ax.plot(q, I, label="Experimental curve", color="green")
 
@@ -292,7 +291,7 @@ def scatter_plot(curve_file, filename=None, format="png", unit="nm", gnomfile=No
     ax.set_xlabel('$q$ (%s$^{-1}$)' % unit, fontsize=fontsize)
     ax.set_title("Scattering curve")
     ax.set_yscale("log")
-#     ax.legend()
+#     ax.set_ylim(ymin=I.min() * 10, ymax=I.max() * 1.1)
     ax.legend(loc=3)
     ax.tick_params(axis='x', labelsize=labelsize)
     ax.tick_params(axis='y', labelsize=labelsize)
@@ -320,15 +319,22 @@ def guinier_plot(curve_file, first_point=None, last_point=None, filename=None,
     q = data.get("q")
     I = data.get("I")
     err = data.get("err")
-    first_point = data.get("first_point", 0)
-    last_point = data.get("last_point", -1)
-
+    if first_point is None:
+        first_point = data.get("first_point", 0)
+    if last_point is None:
+        last_point = data.get("last_point", -1)
     q2 = q * q
     logI = numpy.log(I)
+
     if err is not None:
         w = I / err
     else:
         w = numpy.ones_like(q2)
+
+    # from scipy import  stats
+    # slope, intercept, r_value, p_value, std_err = stats.linregress(q2[first_point:last_point], logI[first_point:last_point])
+
+    # there seems to be a bug in tthis...  returning to scipy implemntation above
     Sw = (w[first_point:last_point]).sum()
     Sxy = ((w * q2 * logI)[first_point:last_point]).sum()
     Sx = ((w * q2)[first_point:last_point]).sum()
@@ -336,12 +342,11 @@ def guinier_plot(curve_file, first_point=None, last_point=None, filename=None,
     Sy = ((w * logI)[first_point:last_point]).sum()
     slope = (Sw * Sxy - Sx * Sy) / (Sw * Sxx - Sx * Sx)
     intercept = (Sy - Sx * slope) / Sw
-#     print(slope, intercept)
-#     from scipy import  stats
-#     print(stats.linregress(q2[first_point:last_point], logI[first_point:last_point]))
+#
 
     Rg = numpy.sqrt(-3 * slope)
     I0 = numpy.exp(intercept)
+
     end = min(q.size, (-1.5 / slope > q).sum())
     q = q[:end]
     I = I[:end]
@@ -366,28 +371,16 @@ def guinier_plot(curve_file, first_point=None, last_point=None, filename=None,
     dy = (ymax - ymin) / 2.0
     ax.vlines(xmin, ymin=ymin, ymax=ymax + dy, color='0.75', linewidth=1.0)
     ax.vlines(xmax, ymin=ymin - dy, ymax=ymin + dy, color='0.75', linewidth=1.0)
-#     Path = mpath.Path
-#     path_data = [(Path.MOVETO, [xmin, ymin + dy]),
-#                  (Path.LINETO, [xmax, ymin - dy]),
-#                  (Path.LINETO, [xmax, ymax - dy]),
-#                  (Path.LINETO, [xmin, ymax + dy]),
-#                  (Path.CLOSEPOLY, [xmin, ymin + dy])]
-#     codes, verts = zip(*path_data)
-#     path = mpath.Path(verts, codes)
-# #     print verts
-#     patch = mpatches.PathPatch(path, facecolor='none')
-#     ax.add_patch(patch)
-
-    ax.annotate("(qRg)$_{min}$=%.1f" % (Rg * q[first_point]), (xmin, ymax + dy),
+    ax.annotate("$(qR_{g})_{min}$=%.1f" % (Rg * q[first_point]), (xmin, ymax + dy),
                 xytext=None, xycoords='data', textcoords='data')
-    ax.annotate("(qRg)$_{max}$=%.1f" % (Rg * q[last_point]), (xmax, ymin + dy),
+    ax.annotate("$(qR_{g})_{max}$=%.1f" % (Rg * q[last_point]), (xmax, ymin + dy),
                 xytext=None, xycoords='data', textcoords='data')
     ax.annotate("Guinier region", (xmin, ymin - dy),
                 xytext=None, xycoords='data', textcoords='data')
     ax.plot(q2, intercept + slope * q2, label="ln[$I(q)$] = %.2f %.2f * $q^2$" % (intercept, slope), color="red")
     ax.set_ylabel('ln[$I(q)$]', fontsize=fontsize)
     ax.set_xlabel('$q^2$ (%s$^{-2}$)' % unit, fontsize=fontsize)
-    ax.set_title("Guinier plot: $Rg=$%.1f %s $I_{0}=$%.1f" % (Rg, unit, I0))
+    ax.set_title("Guinier plot: $R_{g}=$%.1f %s $I_{0}=$%.1f" % (Rg, unit, I0))
     ax.legend()
     if filename:
         if format:
@@ -399,7 +392,7 @@ guinierPlot = guinier_plot
 
 
 def kartky_plot(curve_file, filename=None, format="png",
-                unit="nm", ax=None, labelsize=None, fontsize=None):
+                unit="nm", Rg=None, I0=None, ax=None, labelsize=None, fontsize=None):
     """
     Generate a Kratky: q2I(q) vs q
     @param curve_file: name of the saxs curve file
@@ -412,32 +405,43 @@ def kartky_plot(curve_file, filename=None, format="png",
     data = load_saxs(curve_file)
     q = data.get("q")
     I = data.get("I")
-#     err = data.get("err")
-    Rg = data.get("Rg")
-    I0 = data.get("I0")
+    err = data.get("err")
+    if not (Rg and I0):
+        Rg = data.get("Rg")
+        I0 = data.get("I0")
+
 
     if not (Rg and I0):
-        data = auto_guinier(data)
+        Rg = 1
+        I0 = 1
+        # not implemented yet,...
+        # data = auto_guinier(data)
 
-    xdata = q * Rg
-    ydata = xdata * xdata * I / I0
-
+    print 'Rg in Kratkyplot ', Rg
     if ax:
         fig = ax.figure
     else:
         fig = plt.figure(figsize=(12, 10))
         ax = fig.add_subplot(1, 1, 1)
-    dplot = ax.plot(xdata, ydata, label="Experimental curve")
-    ax.set_ylabel('$(qR_{G})^2 I/I_{0}$', fontsize=fontsize)
-    ax.set_xlabel('$qR_{G}$', fontsize=fontsize)
-    ax.legend(loc=0)
+
+    xdata = q * Rg
+    ydata = xdata * xdata * I / I0
+    if err is not None:
+        dy = xdata * xdata * err / I0
+        dplot = ax.errorbar(xdata, ydata, dy, label="Experimental curve", capsize=0, color="blue", ecolor="lightblue")
+    else:
+        dplot = ax.plot(xdata, ydata, label="Experimental curve", color="blue")
+    ax.set_ylabel('$(qR_{g})^2 I/I_{0}$', fontsize=fontsize)
+    ax.set_xlabel('$qR_{g}$', fontsize=fontsize)
+    ax.legend(loc=1)
 
     ax.hlines(3.0 * numpy.exp(-1), xmin=-0.05, xmax=max(xdata), color='0.75', linewidth=1.0)
     ax.vlines(numpy.sqrt(3.0), ymin=-0.01, ymax=max(ydata), color='0.75', linewidth=1.0)
     ax.set_xlim(xmin=-0.05, xmax=8.5)
     ax.set_ylim(ymin=-0.01, ymax=3.5)
-    ax.set_title("Dimensionless Kratky plot - $R_{G}$ ")
-    ax.legend([dplot[0]], [dplot[0].get_label()], loc=0)
+    ax.set_title("Dimensionless Kratky plot - $R_{g}$ ")
+#     ax.legend([dplot[0]], [dplot[0].get_label()], loc=0)
+    ax.legend(loc=0)
     ax.tick_params(axis='x', labelsize=labelsize)
     ax.tick_params(axis='y', labelsize=labelsize)
 
@@ -751,7 +755,7 @@ def plotting(curve_file, gnom_file=None, filename=None, format="png", unit="nm")
     @param format: image format
     @return: the matplotlib figure
     """
-    figuresize = (12, 10)  # (3.6, 3)
+    figuresize = (14, 10)  # (3.6, 3)
     dpi = 400
     labelsize = 8
     fontsize = 11

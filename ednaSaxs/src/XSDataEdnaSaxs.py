@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Thu Jan 8 11:14::43 2015 by EDGenerateDS.
+# Generated Mon Feb 8 01:23::45 2016 by EDGenerateDS.
 #
 
 import os, sys
@@ -11,7 +11,8 @@ from xml.dom import Node
 
 strEdnaHome = os.environ.get("EDNA_HOME", None)
 
-dictLocation = {  "XSDataCommon": "kernel/datamodel", \
+dictLocation = { \
+ "XSDataCommon": "kernel/datamodel", \
 }
 
 try:
@@ -19,12 +20,12 @@ try:
     from XSDataCommon import XSDataArray
     from XSDataCommon import XSDataBoolean
     from XSDataCommon import XSDataDouble
+    from XSDataCommon import XSDataString
     from XSDataCommon import XSDataFile
     from XSDataCommon import XSDataInput
     from XSDataCommon import XSDataInteger
     from XSDataCommon import XSDataResult
     from XSDataCommon import XSDataRotation
-    from XSDataCommon import XSDataString
     from XSDataCommon import XSDataVectorDouble
     from XSDataCommon import XSDataDoubleWithUnit
     from XSDataCommon import XSDataImage
@@ -44,12 +45,12 @@ from XSDataCommon import XSData
 from XSDataCommon import XSDataArray
 from XSDataCommon import XSDataBoolean
 from XSDataCommon import XSDataDouble
+from XSDataCommon import XSDataString
 from XSDataCommon import XSDataFile
 from XSDataCommon import XSDataInput
 from XSDataCommon import XSDataInteger
 from XSDataCommon import XSDataResult
 from XSDataCommon import XSDataRotation
-from XSDataCommon import XSDataString
 from XSDataCommon import XSDataVectorDouble
 from XSDataCommon import XSDataDoubleWithUnit
 from XSDataCommon import XSDataImage
@@ -9680,20 +9681,12 @@ class XSDataResultSaxsModeling(XSDataResult):
             self.damminModel.export(outfile, level, name_='damminModel')
         if self._fitFile is not None:
             self.fitFile.export(outfile, level, name_='fitFile')
-        else:
-            warnEmptyAttribute("fitFile", "XSDataFile")
         if self._logFile is not None:
             self.logFile.export(outfile, level, name_='logFile')
-        else:
-            warnEmptyAttribute("logFile", "XSDataFile")
         if self._pdbMoleculeFile is not None:
             self.pdbMoleculeFile.export(outfile, level, name_='pdbMoleculeFile')
-        else:
-            warnEmptyAttribute("pdbMoleculeFile", "XSDataFile")
         if self._pdbSolventFile is not None:
             self.pdbSolventFile.export(outfile, level, name_='pdbSolventFile')
-        else:
-            warnEmptyAttribute("pdbSolventFile", "XSDataFile")
         if self._chiRfactorPlot is not None:
             self.chiRfactorPlot.export(outfile, level, name_='chiRfactorPlot')
         else:

@@ -56,7 +56,7 @@ from EDThreading import Semaphore
 
 
 class Reprocess(object):
-    EDNAPluginName = "EDPluginBioSaxsProcessOneFilev1_3"
+    EDNAPluginName = "EDPluginBioSaxsProcessOneFilev1_4"
     hc = 12.398419292004204
     def __init__(self):
         self.XML = "<XSDataInput>\

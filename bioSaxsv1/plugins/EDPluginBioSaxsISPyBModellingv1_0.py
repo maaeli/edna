@@ -153,6 +153,7 @@ class EDPluginBioSaxsISPyBModellingv1_0(EDPluginControl):
     def process(self, _edObject=None):
         EDPluginControl.process(self)
         self.DEBUG("EDPluginBioSaxsISPyBModellingv1_0.process")
+        self.addExecutiveSummaryLine("Registering analysis in ISPyB")
 #         dammifModels: XSDataSaxsModel [] optional
 #         damaverModel: XSDataSaxsModel  optional
 #         damfiltModel: XSDataSaxsModel  optional

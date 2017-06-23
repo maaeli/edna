@@ -1,6 +1,9 @@
 {
     "__extend__": ["XSConfiguration_ESRF.json"], 
     "EDPluginControlFullFieldXASv1_0": {}, 
+    "EDPluginExecNormalizeImagev1_2": {
+        "writeXMLInput": 1
+    },
     "EDPluginControlAlignStackv1_0": {
         "writeXMLInput": 0, 
         "timeOut": 6000

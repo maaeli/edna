@@ -141,7 +141,7 @@ class EDPluginControlSaxsAnalysisv1_0(EDPluginControl):
             try:
                 kratkyfile = os.path.join(self.getWorkingDirectory(), os.path.basename(self.scatterFile).split(".")[0] + "-Kratky" + ext)
                 kratkyplot = kartkyPlot(self.scatterFile, unit="nm",
-                                           filename=kratkyfile, format=ext[1:])
+                                           filename=kratkyfile, format=ext[1:], Rg=self.autoRg.rg.value, I0=self.autoRg.i0.value)
                 kratkyplot.clf()
                 if plt:
                     plt.close(kratkyplot)

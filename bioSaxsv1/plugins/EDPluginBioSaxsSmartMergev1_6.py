@@ -28,11 +28,14 @@ __author__ = "Jérôme Kieffer"
 __contact__ = "Jerome.Kieffer@esrf.fr"
 __license__ = "GPLv3+"
 __copyright__ = "2011, ESRF Grenoble"
-__date__ = "20130417"
+__date__ = "19/12/2016"
 __status__ = "development"
 
-import os, shutil, time
+import os
+import shutil
+import time
 from math import log
+from threading import Semaphore
 from EDPluginControl import EDPluginControl
 from EDFactoryPluginStatic import EDFactoryPluginStatic
 EDFactoryPluginStatic.loadModule("XSDataEdnaSaxs")
@@ -43,6 +46,7 @@ from XSDataBioSaxsv1_0  import XSDataInputBioSaxsSmartMergev1_0, XSDataResultBio
                             XSDataInputBioSaxsISPyBv1_0
 from XSDataEdnaSaxs     import XSDataInputDatcmp, XSDataInputDataver, XSDataInputAutoSub, XSDataInputDatop, XSDataInputSaxsAnalysis
 from XSDataWaitFilev1_0 import XSDataInputWaitMultiFile
+
 
 def cmp(a, b):
     """
@@ -74,15 +78,17 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
     # dictAve = {} #key=?; value=path to average file
     lastBuffer = None
     lastSample = None
-    dictFrames = {} #dictionary key = filename of average, value = list of files used for average
+    dictFrames = {}  # dictionary key = filename of average, value = list of files used for average
     __strControlledPluginDataver = "EDPluginExecDataverv2_0"
     __strControlledPluginDatcmp = "EDPluginExecDatcmpv2_0"
     __strControlledPluginWaitFile = "EDPluginWaitMultiFile"
     __strControlledPluginAutoSub = "EDPluginAutoSubv1_0"
     __strControlledPluginSaxsAnalysis = "EDPluginControlSaxsAnalysisv1_0"
     __strControlledPluginSaxsISPyB = "EDPluginBioSaxsISPyBv1_0"
-
-
+    __configured = False
+    CONF_MINIMUM_CURVE_FILE_SIZE = "MinCurveFileSize"
+    minimumCurveFileSize = 10000
+    semaphore = Semaphore()
 
     def __init__(self):
         """
@@ -99,9 +105,9 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
         self.__edPluginExecDatCmp = None
         self.lstInput = []
         self.curves = []
-	self.forgetLastSample = False
+        self.forgetLastSample = False
         self.lstMerged = []
-	self.lstDiscarded = []
+        self.lstDiscarded = []
         self.lstXsdInput = []
         self.absoluteFidelity = None
         self.relativeFidelity = None
@@ -117,13 +123,33 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
         self.fConcentration = None
         self.xsDataResult = XSDataResultBioSaxsSmartMergev1_0()
         self.xsBestBuffer = None
-	self.bestBufferType = ""
-	self.bufferFrames = []
+        self.bestBufferType = ""
+        self.bufferFrames = []
         self.xsScatterPlot = None
         self.xsGuinierPlot = None
         self.xsKratkyPlot = None
         self.xsDensityPlot = None
-	self.xsdSubtractedCurve = None
+        self.xsdSubtractedCurve = None
+
+    def configure(self):
+        """
+        Configures the plugin from the configuration file with the following parameters:
+         - curve_file_size: minimum size of the file.
+        """
+        EDPluginControl.configure(self)
+        if not self.__configured:
+            with self.semaphore:
+                if not self.__configured:
+                    self.DEBUG("EDPluginBioSaxsSmartMergev1_6.configure")
+                    min_size = self.config.get(self.CONF_MINIMUM_CURVE_FILE_SIZE)
+                    if min_size is None:
+                        strMessage = 'EDPluginBioSaxsSmartMergev1_6.configure: %s Configuration parameter missing: \
+            %s, defaulting to "%s"' % (self.getBaseName(), self.CONF_MINIMUM_CURVE_FILE_SIZE, self.minimumCurveFileSize)
+                        self.WARNING(strMessage)
+                        self.addErrorWarningMessagesToExecutiveSummary(strMessage)
+                    else:
+                        self.__class__.minimumCurveFileSize = float(min_size)
+                    self.__class__.__configured = True
 
     def checkParameters(self):
         """
@@ -133,7 +159,6 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
         self.checkMandatoryParameters(self.dataInput, "Data Input is None")
         self.checkMandatoryParameters(self.dataInput.inputCurves, "Input curve list is empty")
         self.checkMandatoryParameters(self.dataInput.mergedCurve, "Output curve filename  is empty")
-
 
     def preProcess(self, _edObject=None):
         EDPluginControl.preProcess(self)
@@ -161,28 +186,24 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
                 os.mkdir(dirname)
 
     def getFramesByFilename(self, filename):
-    	if filename is not None:
-	    if filename in self.__class__.dictFrames.keys():
-		return self.__class__.dictFrames[filename]
-	return {
-		"averaged" : [],
-		"discarded": []
-	}
+        if filename is not None:
+            if filename in self.__class__.dictFrames.keys():
+                return self.__class__.dictFrames[filename]
+        return {"averaged": [], "discarded": []}
 
     def getAveragedFrameByFilename(self, filename):
-    	frames = self.getFramesByFilename(filename)
-	if frames is not None:
-	    return frames["averaged"]
-	return []
+        frames = self.getFramesByFilename(filename)
+        if frames is not None:
+            return frames["averaged"]
+        return []
 
-    	
     def process(self, _edObject=None):
         EDPluginControl.process(self)
         self.DEBUG("EDPluginBioSaxsSmartMergev1_6.process")
 
         xsdwf = XSDataInputWaitMultiFile(timeOut=XSDataTime(30),
-                                        expectedSize=XSDataInteger(10000),
-                                        expectedFile=[XSDataFile(i.path) for i in self.lstInput])
+                                         expectedSize=XSDataInteger(self.minimumCurveFileSize),
+                                         expectedFile=[XSDataFile(i.path) for i in self.lstInput])
         self.__edPluginExecWaitFile.setDataInput(xsdwf)
         self.__edPluginExecWaitFile.connectFAILURE(self.doFailureExecWait)
         self.__edPluginExecWaitFile.connectSUCCESS(self.doSuccessExecWait)
@@ -203,7 +224,7 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
         else:
             self.lstMerged = []
             if (self.absoluteFidelity is not None) or (self.relativeFidelity is not None):
-                if self.absoluteFidelity is not None :
+                if self.absoluteFidelity is not None:
                     for idx, oneFile in enumerate(self.lstInput[1:]):
                         self.DEBUG("Calculating similarity of 0 and %s" % idx)
                         edPluginExecAbsoluteFidelity = self.loadPlugin(self.__strControlledPluginDatcmp)
@@ -213,7 +234,7 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
                         edPluginExecAbsoluteFidelity.connectSUCCESS(self.doSuccessExecDatcmp)
                         edPluginExecAbsoluteFidelity.execute()
                 if (self.relativeFidelity is not None):
-                    if (self.absoluteFidelity is  None):
+                    if (self.absoluteFidelity is None):
                         self.DEBUG("Calculating similarity of 0 and 1")
                         edPluginExecAbsoluteFidelity = self.loadPlugin(self.__strControlledPluginDatcmp)
                         xsd = XSDataInputDatcmp(inputCurve=[self.lstInput[0], self.lstInput[1] ])
@@ -237,25 +258,29 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
                     self.lstMerged.append(oneFile)
                 elif (self.absoluteFidelity is not None) and (self.relativeFidelity is not None):
                     if (idx - 1, idx) not in self.dictSimilarities:
-                        self.ERROR("dict missing %i,%i: \n" % (idx - 1, idx) + "\n".join([ "%s: %s" % (key, self.dictSimilarities[key]) for key in self.dictSimilarities]))
+                        self.ERROR("dict missing %i,%i: \n" % (idx - 1, idx) + "\n".join(["%s: %s" % (key, self.dictSimilarities[key]) for key in self.dictSimilarities]))
                         self.resynchronize()
 
                     if (0, idx) not in self.dictSimilarities:
-                        self.ERROR("dict missing %i,%i: \n" % (0, idx) + "\n".join([ "%s: %s" % (key, self.dictSimilarities[key]) for key in self.dictSimilarities]))
+                        self.ERROR("dict missing %i,%i: \n" % (0, idx) + "\n".join(["%s: %s" % (key, self.dictSimilarities[key]) for key in self.dictSimilarities]))
                         self.resynchronize()
 
                     if (self.dictSimilarities[(0, idx)] >= self.absoluteFidelity) and (self.dictSimilarities[(idx - 1, idx)] >= self.relativeFidelity):
                         self.lstMerged.append(oneFile)
-                elif (self.absoluteFidelity is not None) :
+                    #else:
+                    #    break
+                elif (self.absoluteFidelity is not None):
                     if (0, idx) not in self.dictSimilarities:
-                        self.ERROR("dict missing %i,%i: \n" % (0, idx) + "\n".join([ "%s: %s" % (key, self.dictSimilarities[key]) for key in self.dictSimilarities]))
+                        self.ERROR("dict missing %i,%i: \n" % (0, idx) + "\n".join(["%s: %s" % (key, self.dictSimilarities[key]) for key in self.dictSimilarities]))
                         self.resynchronize()
 
                     if (self.dictSimilarities[(0, idx)] >= self.absoluteFidelity):
                         self.lstMerged.append(oneFile)
-                elif (self.relativeFidelity is not None) :
+                    #else:
+                    #    break
+                elif (self.relativeFidelity is not None):
                     if (idx - 1, idx) not in self.dictSimilarities:
-                        self.ERROR("dict missing %i,%i: \n" % (idx - 1, idx) + "\n".join([ "%s: %s" % (key, self.dictSimilarities[key]) for key in self.dictSimilarities]))
+                        self.ERROR("dict missing %i,%i: \n" % (idx - 1, idx) + "\n".join(["%s: %s" % (key, self.dictSimilarities[key]) for key in self.dictSimilarities]))
                         self.resynchronize()
 
                     if (self.dictSimilarities[(idx - 1, idx)] >= self.relativeFidelity):
@@ -286,10 +311,10 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
                 suff = os.path.basename(self.strSubFile).split("_")[-1]
                 sub = os.path.join(os.path.dirname(self.strSubFile), base + "_" + suff)
                 self.xsdSubtractedCurve = XSDataFile(XSDataString(sub))
-                #self.curves.append(xsdSubtractedCurve)
+                # self.curves.append(xsdSubtractedCurve)
                 self.__edPluginExecAutoSub.dataInput = XSDataInputAutoSub(sampleCurve=self.__class__.lastSample,
-                                         buffers=[self.__class__.lastBuffer, self.dataInput.mergedCurve],
-                                         subtractedCurve=self.xsdSubtractedCurve)
+                                                                          buffers=[self.__class__.lastBuffer, self.dataInput.mergedCurve],
+                                                                          subtractedCurve=self.xsdSubtractedCurve)
                 self.__edPluginExecAutoSub.connectSUCCESS(self.doSuccessExecAutoSub)
                 self.__edPluginExecAutoSub.connectFAILURE(self.doFailureExecAutoSub)
                 self.__edPluginExecAutoSub.executeSynchronous()
@@ -306,15 +331,15 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
                 self.__edPluginSaxsAnalysis.executeSynchronous()
 
             self.__class__.lastBuffer = self.dataInput.mergedCurve
-            #self.__class__.lastSample = None #Information neededfor transfer to ISPyB
-            self.forgetLastSample = True 
+            # self.__class__.lastSample = None #Information neededfor transfer to ISPyB
+            self.forgetLastSample = True
         else:
             self.__class__.lastSample = self.dataInput.mergedCurve
 
         if self.dataInput.sample and self.dataInput.sample.login and self.dataInput.sample.passwd and self.dataInput.sample.measurementID:
             self.addExecutiveSummaryLine("Registering to ISPyB")
             self.lstDiscarded = list(set(self.lstInput) - set(self.lstMerged))
-            self.__class__.dictFrames[self.dataInput.mergedCurve] = {'averaged':self.lstMerged, 'discarded':self.lstDiscarded}
+            self.__class__.dictFrames[self.dataInput.mergedCurve] = {'averaged': self.lstMerged, 'discarded':self.lstDiscarded}
             self.__edPluginSaxsISPyB = self.loadPlugin(self.__strControlledPluginSaxsISPyB)
             if len(self.lstInput) > 1:
                 frameAverage = XSDataInteger(len(self.lstInput))
@@ -329,45 +354,43 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
             if self.strMergedFile is not None:
                 averageFilePath = XSDataFile(XSDataString(self.strMergedFile))
 
-            
-
             self.sampleFrames = self.getAveragedFrameByFilename(self.__class__.lastSample)
             lastSample = None
             if self.__class__.lastSample is not None:
                 lastSample = self.__class__.lastSample
 
-	    subtractedCurve = None	
+            subtractedCurve = None
             if self.xsdSubtractedCurve is not None:
-	        subtractedCurve = self.xsdSubtractedCurve
+                subtractedCurve = self.xsdSubtractedCurve
 
             xsdin = XSDataInputBioSaxsISPyBv1_0(sample=self.dataInput.sample,
-                                                     autoRg=self.autoRg,
-                                                     gnom=self.gnom,
-                                                     volume=self.volume,
-                                                     frameAverage=frameAverage,
-                                                     frameMerged=frameMerged,
-                                                     curves=self.curves,
-        					     discardedFrames=self.discardedCurves,
-        					     averagedFrames=self.mergedCurves,
-             					     averageFilePath=averageFilePath,
-        					     bufferFrames = self.bufferFrames,
-        					     sampleFrames = self.sampleFrames,
-                                                     bestBuffer=self.xsBestBuffer,
-        					     averageSample=lastSample,
-                                                     scatterPlot=self.xsScatterPlot,
-                                                     guinierPlot=self.xsGuinierPlot,
-                                                     kratkyPlot=self.xsKratkyPlot ,
-                                                     densityPlot=self.xsDensityPlot,
-						     subtractedFilePath=subtractedCurve
-#                                                     destination=self.dataInput.sample.ispybDestination #duplicate, already in sample
-                                               )
+                                                autoRg=self.autoRg,
+                                                gnom=self.gnom,
+                                                volume=self.volume,
+                                                frameAverage=frameAverage,
+                                                frameMerged=frameMerged,
+                                                curves=self.curves,
+                                                discardedFrames=self.discardedCurves,
+                                                averagedFrames=self.mergedCurves,
+                                                averageFilePath=averageFilePath,
+                                                bufferFrames=self.bufferFrames,
+                                                sampleFrames=self.sampleFrames,
+                                                bestBuffer=self.xsBestBuffer,
+                                                averageSample=lastSample,
+                                                scatterPlot=self.xsScatterPlot,
+                                                guinierPlot=self.xsGuinierPlot,
+                                                kratkyPlot=self.xsKratkyPlot ,
+                                                densityPlot=self.xsDensityPlot,
+                                                subtractedFilePath=subtractedCurve
+#                                               destination=self.dataInput.sample.ispybDestination #duplicate, already in sample
+                                                )
             self.__edPluginSaxsISPyB.dataInput = xsdin
             self.__edPluginSaxsISPyB.connectSUCCESS(self.doSuccessISPyB)
             self.__edPluginSaxsISPyB.connectFAILURE(self.doFailureISPyB)
             self.__edPluginSaxsISPyB.execute()
 
         if self.forgetLastSample:
-	    #Also redefine dictionary to contain the buffer just processed?
+            # Also redefine dictionary to contain the buffer just processed?
             self.__class__.lastSample = None
 
     def postProcess(self, _edObject=None):
@@ -385,7 +408,7 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
         EDPluginControl.finallyProcess(self)
 
         self.xsDataResult.status = XSDataStatus(message=self.getXSDataMessage(),
-                                          executiveSummary=XSDataString(os.linesep.join(self.getListExecutiveSummaryLines())))
+                                                executiveSummary=XSDataString(os.linesep.join(self.getListExecutiveSummaryLines())))
         self.dataOutput = self.xsDataResult
 
     def resynchronize(self):
@@ -395,7 +418,6 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
         time.sleep(1)  # this is just a way to give the focus to other threads
         self.synchronizePlugins()
         self.ERROR("I slept a second, waiting for sub-plugins to finish")
-
 
     def rewriteHeader(self, infile=None, output=None, hdr="#", linesep=os.linesep):
         """
@@ -424,7 +446,7 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
         headers = [line.strip() for line in open(originalFile) if line.startswith("#")]
         Comments = headers[0][1:].strip()
         for line in headers:
-            if "title =" in  line:
+            if "title =" in line:
                 Comments = line.split("=", 1)[1].strip()
             elif "Comments =" in line:
                 Comments = line.split("=", 1)[1].strip()
@@ -474,13 +496,12 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
             infile = self.strMergedFile
         if output is None:
             output = self.strMergedFile
-        data = linesep.join([ i.strip() for i in open(infile) if not i.startswith(hdr)])
+        data = linesep.join([i.strip() for i in open(infile) if not i.startswith(hdr)])
         with open(output, "w") as outfile:
             outfile.write(linesep.join(lstHeader))
             if not data.startswith(linesep):
                 outfile.write(linesep)
             outfile.write(data)
-
 
     def doSuccessExecWait(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsSmartMergev1_6.doSuccessExecWait")
@@ -494,7 +515,6 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
             self.ERROR(strErr)
             self.setFailure()
 
-
     def doFailureExecWait(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsSmartMergev1_6.doFailureExecWait")
         self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsSmartMergev1_6.doFailureExecWait")
@@ -504,13 +524,11 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
         self.addExecutiveSummaryLine(strErr)
         self.setFailure()
 
-
     def doSuccessExecDataver(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsSmartMergev1_6.doSuccessExecDataver")
         self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsSmartMergev1_6.doSuccessExecDataver")
         self.retrieveMessages(_edPlugin)
         self.rewriteHeader(_edPlugin.dataOutput.outputCurve.path.value, output=self.strMergedFile)
-
 
     def doFailureExecDataver(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsSmartMergev1_6.doFailureExecDataver")
@@ -520,7 +538,6 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
         self.addExecutiveSummaryLine(strErr)
         self.ERROR(strErr)
         self.setFailure()
-
 
     def doSuccessExecDatcmp(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsSmartMergev1_6.doSuccessExecDatcmp")
@@ -543,14 +560,12 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
                 logFid = "%.2f" % (-log(fidelity, 10))
             self.addExecutiveSummaryLine("-log(Fidelity) between %s and %s is %s" % (os.path.basename(file0), os.path.basename(file1), logFid))
 
-
     def doFailureExecDatcmp(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsSmartMergev1_6.doFailureExecDatcmp")
         self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsSmartMergev1_6.doFailureExecDatcmp")
         self.retrieveMessages(_edPlugin)
         self.addExecutiveSummaryLine("Failure in Processing of Atsas 'datcmp'")
         self.setFailure()
-
 
     def doSuccessExecAutoSub(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsSmartMergev1_6.doSuccessExecAutoSub")
@@ -562,23 +577,22 @@ class EDPluginBioSaxsSmartMergev1_6(EDPluginControl):
             if os.path.exists(subcurve.path.value):
                 self.strSubFile = subcurve.path.value
         self.xsBestBuffer = _edPlugin.dataOutput.bestBuffer
-	self.bestBufferType = _edPlugin.dataOutput.bestBufferType.value
+        self.bestBufferType = _edPlugin.dataOutput.bestBufferType.value
         if self.bestBufferType == 'average':
             self.bufferFrames = self.lstMerged
-	    #if self.__class__.dictFrames[self.__class__.lastBuffer] is not None:
-	    #	if self.__class__.dictFrames[self.__class__.lastBuffer]['averaged'] is not None:
-	    #	    self.bufferFrames = self.bufferFrames + self.__class__.dictFrames[self.__class__.lastBuffer]['averaged'] 
+            # if self.__class__.dictFrames[self.__class__.lastBuffer] is not None:
+            #         if self.__class__.dictFrames[self.__class__.lastBuffer]['averaged'] is not None:
+            #             self.bufferFrames = self.bufferFrames + self.__class__.dictFrames[self.__class__.lastBuffer]['averaged']
             self.bufferFrames = self.bufferFrames + self.getAveragedFrameByFilename(self.__class__.lastBuffer)
 
         elif self.bestBufferType == self.__class__.lastBuffer:
-            #if self.__class__.dictFrames[self.__class__.lastBuffer] is not None:
-	    #    if self.__class__.dictFrames[self.__class__.lastBuffer]['averaged'] is not None:
-	    #        self.bufferFrames = self.__class__.dictFrames[self.__class__.lastBuffer]['averaged']
+            # if self.__class__.dictFrames[self.__class__.lastBuffer] is not None:
+            #    if self.__class__.dictFrames[self.__class__.lastBuffer]['averaged'] is not None:
+            #        self.bufferFrames = self.__class__.dictFrames[self.__class__.lastBuffer]['averaged']
             self.bufferFrames = self.getAveragedFrameByFilename(self.__class__.lastBuffer)
         else:
             self.bufferFrames = self.lstMerged
         self.addExecutiveSummaryLine(_edPlugin.dataOutput.status.executiveSummary.value)
-
 
     def doFailureExecAutoSub(self, _edPlugin=None):
         self.DEBUG("EDPluginBioSaxsSmartMergev1_6.doFailureExecAutoSub")
