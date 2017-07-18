@@ -24,7 +24,7 @@ for root in glob.glob("/nobackup/*"):
     for logdir in logdirs[:-1]:
         dest = logdir + ".tar.bz2"
         logger.debug("Compressing %s", logdir)
-        with tarfile.TarFile(dest, mode="w:bz2") as tar:
+        with tarfile.open(dest, mode="w:bz2") as tar:
             tar.add(logdir, arcname=logdir[len(root):])
         logger.debug("Remove directory %s", logdir)
         shutil.rmtree(logdir)
