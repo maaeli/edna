@@ -32,6 +32,7 @@ __copyright__ = "European Synchrotron Radiation Facility, Grenoble, France"
 __date__ = "20121105"
 
 import os, sys, time, threading, gc, types
+import resource
 if sys.version > (3, 0):
     from queue import Queue
 else:
@@ -315,4 +316,5 @@ if __name__ == "__main__":
             for i in keys:
                 f.write("%8s\t%16s\t%16s\t%s%s" % (res[i][0], res[i][1], res[i][1] / res[i][0], i, os.linesep))
         print("Profiling information written in yappi.out")
-
+    else:
+        print("Used memory: %s kb"%resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)

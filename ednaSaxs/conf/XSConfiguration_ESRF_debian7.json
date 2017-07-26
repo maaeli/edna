@@ -37,16 +37,31 @@
         "execProcessScriptVersionString": "", 
         "execProcessScriptExecutable": "/usr/bin/dammin", 
         "execProcessScriptShell": "python", 
-        "timeOut": 15
+        "timeOut": 3000
     },  
    "EDPluginExecDatOpv2_0": {},
    "EDPluginControlSaxsAnalysisv1_0":{
        "atsasVersion": "2.6.1"
    },
+    "EDPluginExecAutoRgv1_0": {
+        "execProcessScriptExecutable": "/usr/bin/autorg",
+        "execProcessScriptShell": "/bin/bash",
+        "timeOut": 60
+    },
+
     "EDPluginControlSaxsModelingv1_0":{
         "do_dammin": 0,
         "dammifJobs": 8,
-        "timeOut": 1000,
+        "timeOut": 3000,
+        "clusterSize": 8,
+        "unit": "nanometer",
+                "symmetry": "P1",
+                "mode": "fast"
+    },
+   "EDPluginControlSaxsModelingv1_1":{
+        "do_dammin": 1,
+        "dammifJobs": 8,
+        "timeOut": 3000,
         "clusterSize": 8,
         "unit": "nanometer",
                 "symmetry": "P1",

@@ -46,8 +46,6 @@ from XSDataCommon import XSDataFile, XSDataString, XSDataStatus, XSDataTime, \
 from EDUtilsBioSaxs import HPLCframe, HPLCrun, RamboTainerInvariant
 
 
-
-
 class EDPluginBioSaxsHPLCv1_3(EDPluginControl):
     """
     plugin for processing Saxs data coming from HPLC
@@ -128,6 +126,13 @@ class EDPluginBioSaxsHPLCv1_3(EDPluginControl):
                     self.__class__.SIMILARITY_THRESHOLD_BUFFER = float(self.config.get(self.SIMILARITY_THRESHOLD_BUFFER_KEY, self.SIMILARITY_THRESHOLD_BUFFER_DEFAULT))
                     self.__class__.SIMILARITY_THRESHOLD_SAMPLE = float(self.config.get(self.SIMILARITY_THRESHOLD_SAMPLE_KEY, self.SIMILARITY_THRESHOLD_SAMPLE_DEFAULT))
 
+    def checkRun(self):
+        if self.hplc_run.deleted:
+            str_err = "Processing of HPLC run already finished. Aborted processing of frame"
+            self.ERROR(str_err)
+            self.setFailure()
+            raise RuntimeError(str_err)
+
     def preProcess(self, _edObject=None):
         EDPluginControl.preProcess(self)
         self.DEBUG("EDPluginBioSaxsHPLCv1_3.preProcess")
@@ -144,6 +149,8 @@ class EDPluginBioSaxsHPLCv1_3(EDPluginControl):
             if self.runId not in self.dictHPLC:
                 self.dictHPLC[self.runId] = HPLCrun(self.runId)
         self.hplc_run = self.dictHPLC[self.runId]
+        self.checkRun()  # Only continue if run is not deleted!
+
         if sdi.frameId is not None:
             self.frameId = sdi.frameId.value
         else:

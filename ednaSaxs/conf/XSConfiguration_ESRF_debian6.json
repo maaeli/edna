@@ -92,7 +92,7 @@
         "execProcessScriptVersionString": "", 
         "execProcessScriptExecutable": "/usr/bin/dammin", 
         "execProcessScriptShell": "/bin/bash", 
-        "timeOut": 1500
+        "timeOut": 3000
     }, 
     "EDPluginExecDatPorodv1_0": {
         "execProcessScriptExecutable": "/usr/bin/datporod", 
@@ -114,13 +114,13 @@
     },
     "EDPluginControlSaxsModelingv1_0":{
     	"dammifJobs": 8,
-    	"timeOut": 1000,
+    	"timeOut": 3000,
     	"clusterSize": 8,
     	"unit": "nanometer",
 		"symmetry": "P1",
 		"mode": "fast"
     },
     "EDPluginControlSaxsAnalysisModelingv1_0": {
-    "timeOut": 1000
+    "timeOut": 3000
     }
 }

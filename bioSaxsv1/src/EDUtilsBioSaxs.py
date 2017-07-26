@@ -282,7 +282,7 @@ class HPLCframe(object):
         self.q = None
         self.I = None
         self.err = None
-    
+
 
 def median_filt(input_array, width=3):
     """
@@ -321,11 +321,14 @@ def datasmoothness(raw, filtered):
 class HPLCrun(object):
     def __init__(self, runId, first_curve=None):
         self.id = runId
-        self.buffer = None  #filename of the buffer
+        self.deleted = False
+        self.buffer = None  # filename of the buffer
         self.first_curve = first_curve
         self.frames = {} #key: id, value: HPLCframe instance
         self.curves = []
         self.for_buffer = []
+        self.for_buffer_sum_I = None
+        self.for_buffer_sum_sigma2 = None
         self.hdf5_filename = None
         self.hdf5 = None
         self.chunk_size = 250
@@ -358,7 +361,7 @@ class HPLCrun(object):
         self.Qr_Stdev = None
         self.mass_Stdev = None  
         self.buffer_frames = None
-        self.merge_frames = None  # indexes of first and last frame merged
+        self.merge_frames = None  # indexes of first and last frame marged
         self.buffer_I = None
         self.buffer_Stdev = None
         self.merge_I = None 
@@ -374,9 +377,46 @@ class HPLCrun(object):
         # self.keys_analysis = ["merge_Guinier", "merge_Gnom", "merge_Porod"]
 
     def reset(self):
-        self.frames = []
+        self.deleted = True
+        self.buffer = None  # filename of the buffer
+        self.first_curve = None
+        self.frames = {}  # key: id, value: HPLCframe instance
         self.curves = []
         self.for_buffer = []
+        self.start_time = None
+        self.time = None
+        self.gnom = None
+        self.Dmax = None
+        self.total = None
+        self.volume = None
+        self.Rg = None
+        self.Rg_Stdev = None
+        self.I0 = None
+        self.I0_Stdev = None
+        self.quality = None
+        self.q = None
+        self.size = None
+        self.scattering_I = None
+        self.scattering_Stdev = None
+        self.subtracted_I = None
+        self.subtracted_Stdev = None
+        self.sum_I = None
+        self.Vc = None
+        self.Qr = None
+        self.mass = None
+        self.Vc_Stdev = None
+        self.Qr_Stdev = None
+        self.mass_Stdev = None
+        self.buffer_frames = None
+        self.merge_frames = None  # indexes of first and last frame merged
+        self.buffer_I = None
+        self.buffer_Stdev = None
+        self.merge_I = None
+        self.merge_Stdev = None
+        self.merge_curves = []
+        self.merge_Rg = {}
+        self.merge_analysis = {}
+        self.merge_framesDIC = {}
 
     def dump_json(self, filename=None):
 
@@ -428,17 +468,18 @@ class HPLCrun(object):
             self.size = self.q.size
 
         for key in self.keys2d:
-            self.__setattr__(key,numpy.zeros((self.max_size, self.size), dtype=numpy.float32))
+            self.__setattr__(key, numpy.zeros((self.max_size, self.size), dtype=numpy.float32))
 
         for key in self.keys1d:
             self.__setattr__(key, numpy.zeros(self.max_size, dtype=numpy.float32))
-            
+
         for i, frame in self.frames.items():
             if not force_finished:
                 while frame.processing:
                     time.sleep(1.0)
             for key in ["time"] + self.keys1d:
                 self.__getattribute__(key)[i] = frame.__getattribute__(key) or 0.0
+            
             if frame.curve and os.path.exists(frame.curve):
                 data = numpy.loadtxt(frame.curve)
                 self.scattering_I[i, :] = data[:, 1]
@@ -446,7 +487,7 @@ class HPLCrun(object):
             if frame.subtracted and os.path.exists(frame.subtracted):
                 data = numpy.loadtxt(frame.subtracted)
                 self.subtracted_I[i, :] = data[:, 1]
-                self.subtracted_Stdev[i, :] = data[:, 2] 
+                self.subtracted_Stdev[i, :] = data[:, 2]
         t = self.time > 0
         x = numpy.arange(self.max_size)
         self.time = numpy.interp(x, x[t], self.time[t])
@@ -456,7 +497,7 @@ class HPLCrun(object):
             self.time -= self.time.min()
 
     def save_hdf5(self):
-        if not self.size or self.subtracted_I is None:
+        if not self.max_size:
             self.extract_data()
         with self.lock:
             if os.path.exists(self.hdf5_filename):
@@ -464,7 +505,6 @@ class HPLCrun(object):
             self.hdf5 = h5py.File(self.hdf5_filename)
             self.hdf5.create_dataset("q", shape=(self.size,), dtype=numpy.float32, data=self.q)
             for key in ["time"] + self.keys1d + self.keys2d:
-                print numpy.asarray(self.__getattribute__(key), dtype=numpy.float32).size
                 self.hdf5[key] = numpy.asarray(self.__getattribute__(key), dtype=numpy.float32)
             self.hdf5.close()
         return self.hdf5_filename
@@ -688,6 +728,8 @@ class HPLCrun(object):
 
 
     def extract_merges(self):
+        self.buffer_I = numpy.zeros(self.size, dtype=numpy.float32)
+        self.buffer_Stdev = numpy.zeros(self.size, dtype=numpy.float32)
         if self.merge_frames:
             self.merge_I = numpy.zeros((len(self.merge_frames), self.size), dtype=numpy.float32)
             self.merge_Stdev = numpy.zeros((len(self.merge_frames), self.size), dtype=numpy.float32)
