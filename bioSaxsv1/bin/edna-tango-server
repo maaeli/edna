@@ -69,7 +69,11 @@ echo "Server Mode"
 cd $TestSpace
 ds="DAU_"${hostname}
 echo $ds
-nohup python -u $PythonProg $ds -v2 > ${HOME}/log/edna-tango-$(date +"%Y%m%dT%H%M%S").log 2>&1 &
+
+IP=$(${EDNA_HOME}/tango/bin/get_default_IP_address)
+echo $IP
+
+nohup python -u $PythonProg $ds -v2 -ORBendPoint giop:tcp:${IP}: > ${HOME}/log/edna-tango-$(date +"%Y%m%dT%H%M%S").log 2>&1 &
 #For debugging
 #python -u $PythonProg $ds -v2 
 

@@ -1,0 +1,30 @@
+#!/usr/bin/python
+import subprocess
+
+iface = None
+
+proute = subprocess.Popen(["/sbin/route", "-n"], stdout=subprocess.PIPE)
+proute.wait()
+for line in proute.stdout:
+    w = line.split()
+    if w[0] == "0.0.0.0":
+         iface = w[-1]
+#print(iface)
+
+pifconfig = subprocess.Popen(["/sbin/ifconfig"], stdout=subprocess.PIPE)
+pifconfig.wait()
+
+readnext=False
+for line in pifconfig.stdout:
+    if readnext:
+        w = line.split()
+        #print(w)
+        readnext=False
+        address = w[1].split(":")[1]
+
+    if line.startswith(iface):
+        readnext=True
+#print(iface, address)
+print(address)
+#from socket import *
+#print(gethostbyname(gethostname()))

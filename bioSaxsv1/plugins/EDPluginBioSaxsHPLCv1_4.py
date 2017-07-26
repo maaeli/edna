@@ -69,7 +69,7 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
     lock during buffer curve creation.
     """
 
-    strControlledPluginProcessOneFile = "EDPluginBioSaxsProcessOneFilev1_5"
+    strControlledPluginProcessOneFile = "EDPluginBioSaxsProcessOneFilev1_4"
     strControlledPluginDatop = "EDPluginExecDatopv2_0"
     strControlledPluginAutoRg = "EDPluginExecAutoRgv1_0"
     strControlledPluginDatCmp = "EDPluginExecDatcmpv2_0"
@@ -340,12 +340,13 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
 
         if not self.hplc_run.first_curve:
             with self._sem:
-                if not self.hplc_run.first_curve:
+                if True: #not self.hplc_run.first_curve:
                     # Populate the buffer with the first curve if needed
                     self.hplc_run.first_curve = self.curve
                     self.hplc_run.start_time = startTime
                     self.hplc_run.q = EDUtilsArray.xsDataToArray(output.dataQ)
                     self.hplc_run.size = self.hplc_run.q.size
+                    print self.hplc_run.q
                     self.hplc_run.buffer_I = self.intensity
                     self.hplc_run.buffer_Stdev = self.stdError
                     # self.hplc_run.buffer = self.curve

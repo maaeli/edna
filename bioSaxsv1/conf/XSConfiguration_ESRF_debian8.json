@@ -31,7 +31,7 @@
         "DummyPixelValue": -2.0,
         "DummyPixelDelta": 1.5,
         "DeviceType": "fullsplit_csr_ocl_gpu",
-        "NumberOfBins": 200 
+        "NumberOfBins": 1043 
     },
     "EDPluginBioSaxsHPLCv1_2":{
         "similaritySample": 0.01,
