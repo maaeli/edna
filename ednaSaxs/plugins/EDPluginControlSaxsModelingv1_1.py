@@ -470,6 +470,8 @@ class EDPluginControlSaxsModelingv1_1(EDPluginControl):
             lnsd.append(nsd)
             ax1.text(i0, i1, "%.2f" % nsd, ha="center", va="center", size=12 * 8 // self.dammif_jobs)
             ax1.text(i1, i0, "%.2f" % nsd, ha="center", va="center", size=12 * 8 // self.dammif_jobs)
+        if len(lnsd) == 0: 
+            return
         lnsd = numpy.array(lnsd)
 #        print lnsd
 #        print lnsd.mean() , lnsd.std(), lnsd.mean() + 2 * lnsd.std()

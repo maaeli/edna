@@ -78,7 +78,7 @@ class EDPluginAutoSubv1_0(EDPluginControl):
         self.__strPluginDatop = "EDPluginExecDatopv2_0"
         self.__strPluginDatcmp = "EDPluginExecDatcmpv3_0"
         self.__strPluginDataver = "EDPluginExecDataverv2_0"
-        self.__strPluginAutoRg = "EDPluginExecAutoRgv1_0"
+        self.__strPluginAutoRg = "EDPluginExecAutoRgv1_1"
         self.__edPluginDatcmp = None
         self.__edPluginDatop = None
         self.__edPluginDataver = None

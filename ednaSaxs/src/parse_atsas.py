@@ -145,7 +145,7 @@ def get_ATSAS_version():
     """
     @return: the version number of ATSAS (SVN version number) 
     """
-    plugin = "EDPluginExecAutoRgv1_0"
+    plugin = "EDPluginExecAutoRgv1_1"
     import EDConfigurationStatic
     res = EDConfigurationStatic.EDConfigurationStatic.loadPluginConfig(plugin)
     if res and 'execProcessScriptExecutable' in res:

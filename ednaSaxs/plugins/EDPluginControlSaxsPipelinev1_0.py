@@ -47,7 +47,7 @@ class EDPluginControlSaxsPipelinev1_0(EDPluginControl):
         EDPluginControl.__init__(self)
         self.setXSDataInputClass(XSDataInputSaxsPipeline)
         self.__strControlledPluginReduce = "EDPluginBioSaxsReduceFileSeriev1_0"
-        self.__strControlledPluginAutoRg = "EDPluginExecAutoRgv1_0"
+        self.__strControlledPluginAutoRg = "EDPluginExecAutoRgv1_1"
         self.__edPluginExecAutoRg = None
         self.__edPluginBioSaxsReduce = None
         self.inputautorg = None

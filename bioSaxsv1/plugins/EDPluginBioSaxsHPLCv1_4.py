@@ -46,6 +46,8 @@ from XSDataCommon import XSDataFile, XSDataString, XSDataStatus, XSDataTime, \
 
 from EDUtilsBioSaxs import HPLCframe, HPLCrun, RamboTainerInvariant
 
+from freesas.cormap import gof
+
 
 class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
     """
@@ -71,15 +73,15 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
 
     strControlledPluginProcessOneFile = "EDPluginBioSaxsProcessOneFilev1_4"
     strControlledPluginDatop = "EDPluginExecDatopv2_0"
-    strControlledPluginAutoRg = "EDPluginExecAutoRgv1_0"
-    strControlledPluginDatCmp = "EDPluginExecDatcmpv2_0"
+    strControlledPluginAutoRg = "EDPluginExecAutoRgv1_1"
+    #strControlledPluginDatCmp = "EDPluginExecDatcmpv2_0"
     strControlledPluginDatAver = "EDPluginExecDataverv2_0"
     dictHPLC = {}  # key=runId, value= HPLCrun instance
     _sem = Semaphore()
     buffer_sem = Semaphore()
     SIMILARITY_THRESHOLD_SAMPLE_KEY = "similaritySample"
     SIMILARITY_THRESHOLD_BUFFER_KEY = "similarityBuffer"
-    SIMILARITY_THRESHOLD_SAMPLE_DEFAULT = 0.0
+    SIMILARITY_THRESHOLD_SAMPLE_DEFAULT = 0.01
     SIMILARITY_THRESHOLD_BUFFER_DEFAULT = 0.1
     SIMILARITY_THRESHOLD_SAMPLE = None
     SIMILARITY_THRESHOLD_BUFFER = None
@@ -92,7 +94,7 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
         self.edPluginProcessOneFile = None
         self.edPluginSubtract = None
         self.edPluginAutoRg = None
-        self.edPluginDatCmp = None
+        #self.edPluginDatCmp = None
         self.xsDataResult = XSDataResultBioSaxsHPLCv1_0()
         self.runId = None
         self.frameId = None
@@ -220,15 +222,18 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
         if self.isFailure():
             return
 
-        xsdIn = XSDataInputDatcmp(inputCurve=[XSDataFile(XSDataString(self.hplc_run.first_curve)),
-                                              XSDataFile(XSDataString(self.curve))])
-        self.edPluginDatCmp = self.loadPlugin(self.strControlledPluginDatCmp)
-        self.edPluginDatCmp.dataInput = xsdIn
-        self.edPluginDatCmp.connectSUCCESS(self.doSuccessDatCmp)
-        self.edPluginDatCmp.connectFAILURE(self.doFailureDatCmp)
-        self.edPluginDatCmp.executeSynchronous()
+#         xsdIn = XSDataInputDatcmp(inputCurve=[XSDataFile(XSDataString(self.hplc_run.first_curve)),
+#                                               XSDataFile(XSDataString(self.curve))])
+#         self.edPluginDatCmp = self.loadPlugin(self.strControlledPluginDatCmp)
+#         self.edPluginDatCmp.dataInput = xsdIn
+#         self.edPluginDatCmp.connectSUCCESS(self.doSuccessDatCmp)
+#         self.edPluginDatCmp.connectFAILURE(self.doFailureDatCmp)
+#         self.edPluginDatCmp.executeSynchronous()
+
+        self.datcmp(self.hplc_run.firstCurveIntensity, self.intensity)
 
         if self.isFailure() or self.isBuffer:
+
             return
 
 
@@ -246,6 +251,7 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
                             self.hplc_run.buffer_Stdev * self.hplc_run.buffer_Stdev)
 
         with open(self.subtracted, "w") as outfile:
+            #print "Writing file"
             numpy.savetxt(outfile, numpy.vstack((self.hplc_run.q, Isub, StdErr)).T)
         self.xsDataResult.subtractedCurve = XSDataFile(XSDataString(self.subtracted))
         self.frame.subtracted = self.subtracted
@@ -278,12 +284,14 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
         if self.frame:
             self.frame.processing = False
 
+
     def average_buffers(self):
         """
         Average out all buffers
         """
 
         self.DEBUG("Averaging")
+        #print "Avergaring"
         nb_frames = len(self.hplc_run.for_buffer)
         self.hplc_run.for_buffer.sort()
         filename = self.hplc_run.first_curve[::-1].split("_", 1)[1][::-1] + \
@@ -297,6 +305,7 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
         m = numpy.vstack((q, I, err))
 
         with open(filename, "w") as outfile:
+           # print "Saving buffer"
             numpy.savetxt(outfile, m.T)
         with self._sem:
             self.hplc_run.buffer = filename
@@ -346,11 +355,9 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
                     self.hplc_run.start_time = startTime
                     self.hplc_run.q = EDUtilsArray.xsDataToArray(output.dataQ)
                     self.hplc_run.size = self.hplc_run.q.size
-                    print self.hplc_run.q
                     self.hplc_run.buffer_I = self.intensity
                     self.hplc_run.buffer_Stdev = self.stdError
-                    # self.hplc_run.buffer = self.curve
-
+                    self.hplc_run.firstCurveIntensity = self.intensity
         self.frame.curve = self.curve
         self.frame.time = startTime
         self.xsDataResult.timeStamp = XSDataTime(value=(startTime - self.hplc_run.start_time))
@@ -426,21 +433,28 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
             self.lstExecutiveSummary.append(strErr)
 #         self.setFailure()
 
-    def doSuccessDatCmp(self, _edPlugin=None):
-        self.DEBUG("EDPluginBioSaxsHPLCv1_4.doSuccessDatCmp")
-        self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_4.doSuccessDatCmp")
-        if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.status and _edPlugin.dataOutput.status.executiveSummary:
-            self.lstExecutiveSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
-        if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.fidelity:
-            fidelity = _edPlugin.dataOutput.fidelity.value
-        else:
+    #def doSuccessDatCmp(self, _edPlugin=None):
+    def datcmp(self,intensity1,intensity2):
+        self.DEBUG("DatCmp")
+        #self.retrieveSuccessMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_4.doSuccessDatCmp")
+        #if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.status and _edPlugin.dataOutput.status.executiveSummary:
+        #   self.lstExecutiveSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
+        #if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.fidelity:
+        #    fidelity = _edPlugin.dataOutput.fidelity.value
+        try: 
+            cor = gof(intensity1,intensity2)
+            fidelity = cor.P
+        except Exception as err:
             strErr = "No fidelity in output of datcmp"
             self.error(strErr)
             self.lstExecutiveSummary.append(strErr)
-            #  self.setFailure()
+            self.lstExecutiveSummary.append(err)
+            self.setFailure()
             fidelity = 0
+
         if not self.hplc_run.deleted and self.hplc_run.buffer is None:
             if fidelity > self.SIMILARITY_THRESHOLD_SAMPLE:
+            
                 self.isBuffer = True
                 if fidelity > self.SIMILARITY_THRESHOLD_BUFFER:
                     # self.frame.I = EDUtilsArray.xsDataToArray(self.xsDataResult.dataI)
@@ -451,12 +465,11 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
                         if self.hplc_run.for_buffer_sum_I is None:
                             self.hplc_run.for_buffer_sum_I = self.intensity
                         else:
-                            self.hplc_run.for_buffer_sum_I += self.intensity
+                            self.hplc_run.for_buffer_sum_I = self.hplc_run.for_buffer_sum_I + self.intensity
                         if self.hplc_run.for_buffer_sum_sigma2 is None:
                             self.hplc_run.for_buffer_sum_sigma2 = self.stdError ** 2
                         else:
                             self.hplc_run.for_buffer_sum_sigma2 += self.stdError ** 2
-
             else:
                 with self.buffer_sem:
                     if self.hplc_run.buffer is None:
@@ -464,12 +477,14 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
         elif fidelity > self.SIMILARITY_THRESHOLD_SAMPLE:
             self.isBuffer = True
 
-    def doFailureDatCmp(self, _edPlugin=None):
-        self.DEBUG("EDPluginBioSaxsHPLCv1_4.doFailureDatCmp")
-        self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_4.doFailureDatCmp")
-        if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.status and _edPlugin.dataOutput.status.executiveSummary:
-            self.lstExecutiveSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
-        else:
-            self.lstExecutiveSummary.append("Edna plugin DatCmp failed.")
-        self.setFailure()
+
+
+#     def doFailureDatCmp(self, _edPlugin=None):
+#         self.DEBUG("EDPluginBioSaxsHPLCv1_4.doFailureDatCmp")
+#         self.retrieveFailureMessages(_edPlugin, "EDPluginBioSaxsHPLCv1_4.doFailureDatCmp")
+#         if _edPlugin and _edPlugin.dataOutput and _edPlugin.dataOutput.status and _edPlugin.dataOutput.status.executiveSummary:
+#             self.lstExecutiveSummary.append(_edPlugin.dataOutput.status.executiveSummary.value)
+#         else:
+#             self.lstExecutiveSummary.append("Edna plugin DatCmp failed.")
+#         self.setFailure()
 

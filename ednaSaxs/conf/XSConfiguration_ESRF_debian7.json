@@ -21,7 +21,7 @@
     "EDPluginExecDatcmpv2_0": {
         "execProcessScriptExecutable": "/usr/bin/datcmp", 
         "execProcessScriptShell": "python",
-        "atsasVersion": "2.6.1"
+        "atsasVersion": "2.8.2"
     },
     "EDPluginExecDatcmpv3_0": {
         "execProcessScriptExecutable": "/usr/bin/datcmp", 
@@ -41,10 +41,22 @@
     },  
    "EDPluginExecDatOpv2_0": {},
    "EDPluginControlSaxsAnalysisv1_0":{
-       "atsasVersion": "2.6.1"
+       "atsasVersion": "2.8.2"
    },
     "EDPluginExecAutoRgv1_0": {
         "execProcessScriptExecutable": "/usr/bin/autorg",
+        "execProcessScriptShell": "/bin/bash",
+        "timeOut": 60
+    },
+    
+       "EDPluginExecAutoRgv1_1": {
+        "execProcessScriptExecutable": "/usr/bin/autorg",
+        "execProcessScriptShell": "/bin/bash",
+        "timeOut": 60
+    },
+    
+        "EDPluginExecDatGnomv1_1": {
+        "execProcessScriptExecutable": "/usr/bin/datgnom",
         "execProcessScriptShell": "/bin/bash",
         "timeOut": 60
     },
@@ -76,5 +88,6 @@
                 "symmetry": "P1",
                 "mode": "fast"
     }
+    
 
 }

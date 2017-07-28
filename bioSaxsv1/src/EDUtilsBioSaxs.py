@@ -319,7 +319,7 @@ def datasmoothness(raw, filtered):
 
 
 class HPLCrun(object):
-    def __init__(self, runId, first_curve=None):
+    def __init__(self, runId, first_curve=None, firstCurveIntensity = None):
         self.id = runId
         self.deleted = False
         self.buffer = None  # filename of the buffer
@@ -335,6 +335,10 @@ class HPLCrun(object):
         self.lock = Semaphore()
         if first_curve:
             self.files.append(first_curve)
+        if firstCurveIntensity:
+            self.firstCurveIntensity = firstCurveIntensity
+        else: 
+            self.firstCurveIntensity = None
         self.max_size = None
         self.start_time = None
         self.time = None
@@ -729,8 +733,10 @@ class HPLCrun(object):
 
 
     def extract_merges(self):
-        self.buffer_I = numpy.zeros(self.size, dtype=numpy.float32)
-        self.buffer_Stdev = numpy.zeros(self.size, dtype=numpy.float32)
+        #if self.buffer_I = None:
+        #    self.buffer_I = numpy.zeros(self.size, dtype=numpy.float32)
+        #if self.buffer_Stdev = None:    
+        #    self.buffer_Stdev = numpy.zeros(self.size, dtype=numpy.float32)
         if self.merge_frames:
             self.merge_I = numpy.zeros((len(self.merge_frames), self.size), dtype=numpy.float32)
             self.merge_Stdev = numpy.zeros((len(self.merge_frames), self.size), dtype=numpy.float32)
@@ -743,7 +749,6 @@ class HPLCrun(object):
         if self.buffer and os.path.exists(self.buffer) and  (self.buffer_I is None):
             self.buffer_I = numpy.zeros(self.size, dtype=numpy.float32)
             self.buffer_Stdev = numpy.zeros(self.size, dtype=numpy.float32)
-            print self.buffer
             data = numpy.loadtxt(self.buffer)
             self.buffer_I = data[:, 1]
             self.buffer_Stdev = data[:, 2]
@@ -757,7 +762,6 @@ class HPLCrun(object):
                 else:
                     outname = os.path.splitext(self.frames[group[0]].subtracted)[0] + "_aver_%s.dat" % group[-1]
                 if os.path.exists(outname):
-                    print outname
                     data = numpy.loadtxt(outname)
                     self.merge_I[i, :] = data[:, 1]
                     self.merge_Stdev[i, :] = data[:, 2]

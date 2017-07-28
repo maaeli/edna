@@ -202,6 +202,8 @@ def load_gnom(filename):
                 do_pr = False
             if "Distance distribution" in line:
                 do_reg = False
+            if "Real Space" in line:
+                do_reg = False
             if words:
                 if do_reg:
                     reg.write("%s %s\n" % (words[0], words[-1]))
@@ -211,10 +213,10 @@ def load_gnom(filename):
                 do_reg = True
             if "P(R)" in line:
                 do_pr = True
-    out["gnomRg"] = float(words[4])
-    out["gnomRg_err"] = float(words[6])
-    out["gnomI0"] = float(words[9])
-    out["gnomI0_err"] = float(words[11])
+#     out["gnomRg"] = float(words[4])
+#     out["gnomRg_err"] = float(words[6])
+#     out["gnomI0"] = float(words[9])
+#     out["gnomI0_err"] = float(words[11])
     reg.seek(0)
     pr.seek(0)
     out["q_fit"], out["I_fit"] = numpy.loadtxt(reg, unpack=True, dtype="float32")

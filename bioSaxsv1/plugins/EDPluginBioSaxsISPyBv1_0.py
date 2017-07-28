@@ -87,17 +87,17 @@ class EDPluginBioSaxsISPyBv1_0(EDPluginControl):
         self.guinierPlot = None
         self.kratkyPlot = None
         self.densityPlot = None
-	self.averageSample = None
+        self.averageSample = None
 
-	#For averages
-	self.lstDiscarded = []
-	self.lstAveraged = []
+        #For averages
+        self.lstDiscarded = []
+        self.lstAveraged = []
         self.averageFilePath = None
 
-	# For subtraction
-	self.bufferFrames = []
+        # For subtraction
+        self.bufferFrames = []
         self.sampleFrames = [] 
-	self.subtractedFilePath = None
+        self.subtractedFilePath = None
 
     def checkParameters(self):
         """

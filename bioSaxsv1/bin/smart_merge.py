@@ -288,8 +288,8 @@ if __name__ == "__main__":
                       help="limit the number of CPU used", default=None)
 
     parser.add_option("-p", "--plugin", action="store", type="string",
-                      dest="plugin", default="EDPluginBioSaxsSmartMergev1_6",
-                      help="use an alternative plugin, by default EDPluginBioSaxsSmartMergev1_6")
+                      dest="plugin", default="EDPluginBioSaxsSmartMergev1_7",
+                      help="use an alternative plugin, by default EDPluginBioSaxsSmartMergev1_7")
     parser.add_option("-r", "--range", action="store", type="str",
                       dest="filerange", default=None,
                       help="the range of frames to merge (by default all)")

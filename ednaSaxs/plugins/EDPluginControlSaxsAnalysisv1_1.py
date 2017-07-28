@@ -53,8 +53,8 @@ class EDPluginControlSaxsAnalysisv1_1(EDPluginControl):
     * DatGnom -> transformation from reciprocal to direct space. measure Dmax.
     * DatPorod -> calculates the volume of the protein using the porod formula.
     """
-    cpAutoRg = "EDPluginExecAutoRgv1_0"
-    cpDatGnom = "EDPluginExecDatGnomv1_0"
+    cpAutoRg = "EDPluginExecAutoRgv1_1"
+    cpDatGnom = "EDPluginExecDatGnomv1_1"
     cpDatPorod = "EDPluginExecDatPorodv1_0"
 
     def __init__(self):
@@ -250,7 +250,7 @@ Volume  =    %12.2f""" % (self.xVolume.value)
         self.retrieveMessages(_edPlugin)
         self.autoRg = _edPlugin.dataOutput.autoRgOut[0]
         print "autorg success"
-        if self.scatterFile and os.path.exists(self.scatterFile):
+        if self.scatterFile and os.path.exists(self.scatterFile) and self.autoRg.i0.value>0:
             self.subtracted_data = loadtxt(self.scatterFile)
             print "Trying to calculate RTI"
 #             if self.subtracted_data is not None and\
