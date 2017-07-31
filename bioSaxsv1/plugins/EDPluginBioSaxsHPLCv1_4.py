@@ -21,6 +21,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 from __future__ import with_statement
+from lxml.etree import ErrorLevels
 
 __author__ = "Jérôme Kieffer"
 __license__ = "GPLv3+"
@@ -44,7 +45,7 @@ from XSDataEdnaSaxs import XSDataInputDatcmp, XSDataInputAutoRg
 from XSDataCommon import XSDataFile, XSDataString, XSDataStatus, XSDataTime, \
     XSDataDouble
 
-from EDUtilsBioSaxs import HPLCframe, HPLCrun, RamboTainerInvariant
+from EDUtilsBioSaxs import HPLCframe, HPLCrun, RamboTainerInvariant, autoRg, InsufficientDataError
 
 from freesas.cormap import gof
 
@@ -221,7 +222,8 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
 
         if self.isFailure():
             return
-
+        if self.hplc_run.first_curve == self.curve:
+            return
 #         xsdIn = XSDataInputDatcmp(inputCurve=[XSDataFile(XSDataString(self.hplc_run.first_curve)),
 #                                               XSDataFile(XSDataString(self.curve))])
 #         self.edPluginDatCmp = self.loadPlugin(self.strControlledPluginDatCmp)
@@ -249,10 +251,10 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
         Isub = self.intensity - self.hplc_run.buffer_I
         StdErr = numpy.sqrt(self.stdError * self.stdError + \
                             self.hplc_run.buffer_Stdev * self.hplc_run.buffer_Stdev)
-
+        self.SAXSdata= numpy.vstack((self.hplc_run.q, Isub, StdErr)).T
         with open(self.subtracted, "w") as outfile:
             #print "Writing file"
-            numpy.savetxt(outfile, numpy.vstack((self.hplc_run.q, Isub, StdErr)).T)
+            numpy.savetxt(outfile, self.SAXSdata)
         self.xsDataResult.subtractedCurve = XSDataFile(XSDataString(self.subtracted))
         self.frame.subtracted = self.subtracted
 
@@ -262,6 +264,16 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
             self.edPluginAutoRg.connectSUCCESS(self.doSuccessAutoRg)
             self.edPluginAutoRg.connectFAILURE(self.doFailureAutoRg)
             self.edPluginAutoRg.executeSynchronous()
+        try:
+            print  autoRg(self.SAXSdata)
+        except InsufficientDataError:
+            print "Not enough usable data to run autorg"
+        except SystemError as SE:
+            print "System Error"
+            print SE
+        except Exception as Err:
+            print Err
+            raise 
 
     def postProcess(self, _edObject=None):
         """
@@ -291,8 +303,9 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
         """
 
         self.DEBUG("Averaging")
-        #print "Avergaring"
+        print "Avergaring"
         nb_frames = len(self.hplc_run.for_buffer)
+        print nb_frames
         self.hplc_run.for_buffer.sort()
         filename = self.hplc_run.first_curve[::-1].split("_", 1)[1][::-1] + \
                         "_buffer_aver_%04i.dat" % nb_frames
@@ -358,6 +371,9 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
                     self.hplc_run.buffer_I = self.intensity
                     self.hplc_run.buffer_Stdev = self.stdError
                     self.hplc_run.firstCurveIntensity = self.intensity
+                    self.hplc_run.for_buffer_sum_I = self.intensity
+                    self.hplc_run.for_buffer_sum_sigma2 = self.stdError ** 2
+                    self.hplc_run.for_buffer.append(self.frameId)
         self.frame.curve = self.curve
         self.frame.time = startTime
         self.xsDataResult.timeStamp = XSDataTime(value=(startTime - self.hplc_run.start_time))
@@ -395,7 +411,15 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
             if rg.quality:
                 self.frame.quality = rg.quality.value
             self.xsDataResult.autoRg = rg
-
+            try:
+                myRg = autoRg(self.SAXSdata)
+                print "ATSAS says: ", (self.frame.Rg, self.frame.I0), "We say: ", myRg
+            except InsufficientDataError:
+                print "Not enough usable data to run autorg"
+            except Exception as Err:
+                print Err
+                raise 
+     
         """
         Calculate the invariants Vc and Qr from the Rambo&Tainer 2013 Paper,
         also the the mass estimate based on Qr for proteins
