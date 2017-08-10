@@ -45,9 +45,10 @@ from XSDataEdnaSaxs import XSDataInputDatcmp, XSDataInputAutoRg
 from XSDataCommon import XSDataFile, XSDataString, XSDataStatus, XSDataTime, \
     XSDataDouble
 
-from EDUtilsBioSaxs import HPLCframe, HPLCrun, RamboTainerInvariant, autoRg, InsufficientDataError
+from EDUtilsBioSaxs import HPLCframe, HPLCrun, RamboTainerInvariant
 
 from freesas.cormap import gof
+from freesas.autorg import autoRg, InsufficientDataError
 
 
 class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
@@ -107,6 +108,7 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
         self.isBuffer = False
         self.intensity = None
         self.stdError = None
+        self.ATSASRg = False
 
     def checkParameters(self):
         """
@@ -257,15 +259,16 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
             numpy.savetxt(outfile, self.SAXSdata)
         self.xsDataResult.subtractedCurve = XSDataFile(XSDataString(self.subtracted))
         self.frame.subtracted = self.subtracted
-
-        if self.subtracted and os.path.exists(self.subtracted):
+        
+        if self.subtracted and os.path.exists(self.subtracted) and self.ATSASRg:
             self.edPluginAutoRg = self.loadPlugin(self.strControlledPluginAutoRg)
             self.edPluginAutoRg.dataInput = XSDataInputAutoRg(inputCurve=[XSDataFile(XSDataString(self.subtracted))])
             self.edPluginAutoRg.connectSUCCESS(self.doSuccessAutoRg)
             self.edPluginAutoRg.connectFAILURE(self.doFailureAutoRg)
             self.edPluginAutoRg.executeSynchronous()
         try:
-            print  autoRg(self.SAXSdata)
+            print self.subtracted, autoRg(self.SAXSdata)
+            self.frame.RgF, self.frame.Rg_StdevF, self.frame.I0F, self.frame.I0_StdevF, self.frame.Rg_imin, self.frame.Rg_imax  =   autoRg(self.SAXSdata)
         except InsufficientDataError:
             print "Not enough usable data to run autorg"
         except SystemError as SE:
@@ -274,6 +277,41 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
         except Exception as Err:
             print Err
             raise 
+        else: 
+            if self.ATSASRg == False:
+                self.frame.Rg = max(0,self.frame.RgF)
+                self.frame.Rg_Stdev =  max(0,self.frame.Rg_StdevF)
+                self.frame.I0 =  max(0,self.frame.I0F)
+                self.frame.I0_Stdev =  max(0,self.frame.I0_StdevF)
+                self.frame.quality = 0
+
+                """
+                Calculate the invariants Vc and Qr from the Rambo&Tainer 2013 Paper,
+                also the the mass estimate based on Qr for proteins
+                """
+            if self.subtracted and os.path.exists(self.subtracted):
+                self.subtracted_data = numpy.loadtxt(self.subtracted)
+                if self.subtracted_data is not None and\
+                    self.frame.RgF and self.frame.Rg_StdevF and self.frame.I0F and self.frame.I0_StdevF:
+                    dictRTI = RamboTainerInvariant(self.subtracted_data, self.frame.RgF,
+                                                   self.frame.Rg_StdevF, self.frame.I0F,
+                                                   self.frame.I0_StdevF, self.frame.Rg_imin)
+    #             {'Vc': vc[0], 'dVc': vc[1], 'Qr': qr, 'dQr': dqr, 'mass': mass, 'dmass': dmass}
+                    self.frame.Vc = dictRTI.get("Vc")
+                    self.frame.Vc_Stdev = dictRTI.get("dVc")
+                    self.frame.Qr = dictRTI.get("Qr")
+                    self.frame.Qr_Stdev = dictRTI.get("dQ")
+                    self.frame.mass = dictRTI.get("mass")
+                    self.frame.mass_Stdev = dictRTI.get("dmass")
+                    xsdRTI = XSDataRamboTainer(vc=XSDataDouble(self.frame.Vc),
+                                               qr=XSDataDouble(self.frame.Qr),
+                                               mass=XSDataDouble(self.frame.mass),
+                                               dvc=XSDataDouble(self.frame.Vc_Stdev),
+                                               dqr=XSDataDouble(self.frame.Qr_Stdev),
+                                               dmass=XSDataDouble(self.frame.mass_Stdev))
+                    self.xsDataResult.rti = xsdRTI
+
+
 
     def postProcess(self, _edObject=None):
         """
@@ -411,14 +449,7 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
             if rg.quality:
                 self.frame.quality = rg.quality.value
             self.xsDataResult.autoRg = rg
-            try:
-                myRg = autoRg(self.SAXSdata)
-                print "ATSAS says: ", (self.frame.Rg, self.frame.I0), "We say: ", myRg
-            except InsufficientDataError:
-                print "Not enough usable data to run autorg"
-            except Exception as Err:
-                print Err
-                raise 
+      
      
         """
         Calculate the invariants Vc and Qr from the Rambo&Tainer 2013 Paper,

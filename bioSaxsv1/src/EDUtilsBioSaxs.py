@@ -270,6 +270,12 @@ class HPLCframe(object):
         self.Rg_Stdev = None
         self.I0 = None
         self.I0_Stdev = None
+        self.RgF = None
+        self.Rg_StdevF = None
+        self.I0F = None
+        self.I0_StdevF = None
+        self.Rg_imax = None
+        self.Rg_imin = None
         self.quality = None
         self.sum_I = None
         self.Vc = None
