@@ -170,6 +170,7 @@ class EDPluginBioSaxsFlushHPLCv1_4 (EDPluginControl):
 
         for merge in run.merge_curves:
             if os.path.exists(merge):
+                print merge
                 xsdSubtractedCurve = XSDataFile(XSDataString(merge))
                 self.__edPluginSaxsAnalysis = self.loadPlugin(self.__strControlledPluginSaxsAnalysis)
 

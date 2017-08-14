@@ -267,7 +267,7 @@ class EDPluginBioSaxsHPLCv1_4(EDPluginControl):
             self.edPluginAutoRg.connectFAILURE(self.doFailureAutoRg)
             self.edPluginAutoRg.executeSynchronous()
         try:
-            print self.subtracted, autoRg(self.SAXSdata)
+            #print self.subtracted, autoRg(self.SAXSdata)
             self.frame.RgF, self.frame.Rg_StdevF, self.frame.I0F, self.frame.I0_StdevF, self.frame.Rg_imin, self.frame.Rg_imax  =   autoRg(self.SAXSdata)
         except InsufficientDataError:
             print "Not enough usable data to run autorg"
