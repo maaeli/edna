@@ -413,7 +413,7 @@ class EDPluginControlSaxsModelingv1_1(EDPluginControl):
 
     def chi2plot(self, filename=None, close=True):
 
-        chi2 = numpy.array([ plg.dataOutput.chiSqrt.value for plg in self.dammif_plugins])
+        chi2 = numpy.array([ plg.dataOutput.chiSqrt.value if plg.dataOutput is not None else numpy.NaN for plg in self.dammif_plugins])
         chi2max = chi2.mean() + 2 * chi2.std()
 
         xticks = 1 + numpy.arange(self.dammif_jobs)
@@ -425,7 +425,7 @@ class EDPluginControlSaxsModelingv1_1(EDPluginControl):
         ax1.plot([0.5, self.dammif_jobs + 0.5], [chi2max, chi2max], "-r", label=u"${\u03C7}^2$$_{max}$ = %.3f" % chi2max)
         ax1.set_xticks(xticks)
         ax1.legend(loc=8)
-        R = numpy.array([ plg.dataOutput.rfactor.value for plg in self.dammif_plugins])
+        R = numpy.array([ plg.dataOutput.rfactor.value if plg.dataOutput is not None else numpy.NaN for plg in self.dammif_plugins])
         Rmax = R.mean() + 2 * R.std()
         ax2 = fig.add_subplot(1, 2, 2)
         ax2.bar(xticks - 0.5, R)
